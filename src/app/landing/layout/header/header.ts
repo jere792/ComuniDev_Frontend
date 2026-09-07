@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-layout-header',
@@ -7,4 +8,6 @@ import { RouterLink } from '@angular/router';
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })
-export class LayoutHeader {}
+export class LayoutHeader {
+  theme = inject(ThemeService);
+}

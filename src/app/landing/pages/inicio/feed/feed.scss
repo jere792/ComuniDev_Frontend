@@ -112,9 +112,9 @@
   align-items: center;
   gap: 4px;
   padding: 3px 10px;
-  background-color: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background-color: var(--badge-bg, rgba(16, 185, 129, 0.15));
+  color: var(--badge-text, #34d399);
+  border: 1px solid var(--badge-border, rgba(16, 185, 129, 0.3));
   border-radius: var(--radius);
   font-size: 11px;
   font-weight: 600;
@@ -131,6 +131,10 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.dark .snippet-code {
+  background-color: #0b0f19;
 }
 
 .code-purple { color: #a78bfa; }
@@ -160,7 +164,7 @@
   width: 44px;
   height: 44px;
   border-radius: var(--radius-lg);
-  background-color: #eff6ff;
+  background-color: var(--badge-bg, #eff6ff);
   color: var(--primary-container);
   display: flex;
   align-items: center;
@@ -177,8 +181,9 @@
 .match-badge {
   padding: 3px 10px;
   border-radius: var(--radius);
-  background-color: #d1fae5;
-  color: #065f46;
+  background-color: var(--badge-bg, #d1fae5);
+  color: var(--badge-text, #065f46);
+  border: 1px solid var(--badge-border, transparent);
   font-size: 11px;
   font-weight: 600;
 }
@@ -186,8 +191,9 @@
 .job-type-badge {
   padding: 3px 10px;
   border-radius: var(--radius);
-  background-color: #f1f5f9;
-  color: #475569;
+  background-color: var(--badge-bg, #f1f5f9);
+  color: var(--badge-text, #475569);
+  border: 1px solid var(--badge-border, transparent);
   font-size: 11px;
   font-weight: 600;
 }
@@ -224,17 +230,17 @@
 .job-tag {
   padding: 3px 10px;
   border-radius: var(--radius-full);
-  background-color: #eff6ff;
-  color: var(--primary-container);
+  background-color: var(--badge-bg, #eff6ff);
+  color: var(--badge-text, var(--primary-container));
+  border: 1px solid var(--badge-border, #dbeafe);
   font-size: 11px;
   font-weight: 600;
-  border: 1px solid #dbeafe;
 }
 
 .btn-apply {
   padding: 10px var(--space-lg);
   background-color: var(--primary-container);
-  color: var(--on-primary);
+  color: var(--on-primary-container);
   border: none;
   border-radius: var(--radius);
   font-family: var(--font-body);
@@ -282,9 +288,9 @@
   margin-left: auto;
   padding: 3px 10px;
   border-radius: var(--radius);
-  background-color: #eff6ff;
-  border: 1px solid #dbeafe;
-  color: var(--primary-container);
+  background-color: var(--badge-bg, #eff6ff);
+  border: 1px solid var(--badge-border, #dbeafe);
+  color: var(--badge-text, var(--primary-container));
   font-size: 11px;
   font-weight: 600;
 }

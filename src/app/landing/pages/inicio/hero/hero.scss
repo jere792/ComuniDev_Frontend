@@ -178,6 +178,12 @@
     -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
     pointer-events: none;
   }
+
+  :root.dark &::before {
+    background-image:
+      linear-gradient(rgba(191, 234, 246, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(191, 234, 246, 0.1) 1px, transparent 1px);
+  }
 }
 
 .visual-card {
@@ -205,7 +211,7 @@
   width: 36px;
   height: 36px;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--primary-container), var(--tertiary-container));
+  background: var(--primary-container);
 }
 
 .card-info {
@@ -268,7 +274,7 @@
 }
 
 .code-block {
-  background-color: var(--secondary);
+  background-color: #202022;
   border-radius: var(--radius);
   padding: var(--space-sm);
   display: flex;
@@ -276,16 +282,32 @@
   gap: 2px;
 }
 
+.dark .code-block {
+  background-color: #bec6e0;
+}
+
 .code-line {
-  color: var(--surface);
+  color: #cbd5e1;
+}
+
+.dark .code-line {
+  color: #202022;
 }
 
 .code-keyword {
-  color: var(--tertiary-fixed);
+  color: #a78bfa;
+}
+
+.dark .code-keyword {
+  color: #5b21b6;
 }
 
 .code-func {
-  color: var(--primary-fixed);
+  color: #60a5fa;
+}
+
+.dark .code-func {
+  color: #1e40af;
 }
 
 .job-card {
@@ -387,7 +409,7 @@
 
   &:hover {
     transform: scale(1.05);
-    background-color: #08262d;
+    background-color: var(--primary-fixed-dim);
   }
 }
 

@@ -129,6 +129,78 @@
 }
 
 // ============================================================
+// DARK MODE
+// ============================================================
+
+.dark {
+  --surface: #121212;
+  --surface-dim: #121212;
+  --surface-bright: #383838;
+  --surface-container-lowest: #0e0e0e;
+  --surface-container-low: #1a1a1a;
+  --surface-container: #1e1e1e;
+  --surface-container-high: #282828;
+  --surface-container-highest: #333333;
+  --surface-variant: #424242;
+  --surface-tint: #a3cdda;
+
+  --on-surface: #e6e1e5;
+  --on-surface-variant: #cac4cf;
+
+  --inverse-surface: #e6e1e5;
+  --inverse-on-surface: #313033;
+  --inverse-primary: #006a78;
+
+  --outline: #8e9099;
+  --outline-variant: #44474e;
+
+  --primary: #a3cdda;
+  --on-primary: #001f26;
+  --primary-container: #bfeaf6;
+  --on-primary-container: #001f26;
+  --primary-fixed: #bfeaf6;
+  --primary-fixed-dim: #a3cdda;
+  --on-primary-fixed: #001f26;
+  --on-primary-fixed-variant: #224c57;
+
+  --secondary: #bec6e0;
+  --on-secondary: #283041;
+  --secondary-container: #3e465c;
+  --on-secondary-container: #dae2fd;
+  --secondary-fixed: #dae2fd;
+  --secondary-fixed-dim: #bec6e0;
+  --on-secondary-fixed: #131b2e;
+  --on-secondary-fixed-variant: #3f465c;
+
+  --tertiary: #a9ccdc;
+  --on-tertiary: #0b343f;
+  --tertiary-container: #224b58;
+  --on-tertiary-container: #c5e8f8;
+  --tertiary-fixed: #c5e8f8;
+  --tertiary-fixed-dim: #a9ccdc;
+  --on-tertiary-fixed: #001f29;
+  --on-tertiary-fixed-variant: #294b58;
+
+  --error: #ffb4ab;
+  --on-error: #690005;
+  --error-container: #93000a;
+  --on-error-container: #ffdad6;
+
+  --background: #121212;
+  --on-background: #e6e1e5;
+
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.2);
+  --shadow-floating: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+
+  // ── Tags & Badges ──
+  --badge-text: #c9d1d9;
+  --badge-bg: rgba(255, 255, 255, 0.06);
+  --badge-border: rgba(255, 255, 255, 0.1);
+}
+
+// ============================================================
 // BASE RESET & DEFAULTS
 // ============================================================
 
@@ -153,6 +225,7 @@ body {
   line-height: 24px;
   color: var(--on-surface);
   background-color: var(--background);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 // ============================================================

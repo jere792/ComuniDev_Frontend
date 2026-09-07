@@ -46,3 +46,17 @@
   font-weight: 700;
   color: #ffffff;
 }
+
+@media (max-width: 768px) {
+  .hero-terminal {
+    max-width: 260px;
+  }
+
+  .terminal-body {
+    padding: var(--space-xl) var(--space-xl);
+  }
+
+  .bracket-symbol {
+    font-size: 40px;
+  }
+}

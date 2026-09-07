@@ -93,3 +93,13 @@
   font-size: 40px;
   color: var(--on-primary-container);
 }
+
+@media (max-width: 768px) {
+  .team-section {
+    padding: var(--space-2xl) var(--space-md);
+  }
+
+  .team-card {
+    padding: var(--space-xl);
+  }
+}

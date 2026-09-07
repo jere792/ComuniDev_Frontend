@@ -74,7 +74,6 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-right: var(--space-3xl);
 }
 
 @media (max-width: 900px) {
@@ -84,6 +83,19 @@ h1 {
   }
 
   .page-hero-right {
-    justify-content: center;
+    justify-content: flex-end;
+    padding-right: var(--space-lg);
+  }
+}
+
+@media (max-width: 768px) {
+  .page-hero {
+    padding: 80px var(--space-md) var(--space-2xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .page-hero {
+    padding: 72px var(--space-sm) var(--space-xl);
   }
 }

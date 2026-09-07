@@ -93,3 +93,21 @@
     color: var(--on-surface-variant);
   }
 }
+
+@media (max-width: 768px) {
+  .download-section {
+    padding: var(--space-2xl) var(--space-md);
+  }
+
+  .download-card {
+    padding: var(--space-lg);
+  }
+
+  .download-icon {
+    font-size: 32px;
+  }
+
+  .download-btn {
+    padding: 10px 20px;
+  }
+}

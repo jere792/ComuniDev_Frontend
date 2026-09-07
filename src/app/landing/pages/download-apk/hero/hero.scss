@@ -105,3 +105,28 @@
   background-color: #555;
   border-radius: var(--radius-full);
 }
+
+@media (max-width: 768px) {
+  .phone-mockup {
+    width: 120px;
+    height: 220px;
+  }
+
+  .phone-screen {
+    padding: var(--space-md) var(--space-xs);
+    gap: var(--space-sm);
+  }
+
+  .phone-logo {
+    width: 32px;
+    height: 32px;
+  }
+
+  .phone-app-name {
+    font-size: 10px;
+  }
+
+  .phone-download-icon {
+    font-size: 20px;
+  }
+}

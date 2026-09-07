@@ -371,3 +371,167 @@
   color: var(--on-surface-variant);
   font-size: 10px;
 }
+
+// ── Responsive ──
+
+@media (max-width: 1024px) {
+  .home {
+    padding: 100px var(--space-lg) var(--space-xl);
+  }
+
+  .hero-layout {
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+  }
+
+  .hero-left {
+    min-height: auto;
+  }
+
+  .hero-right {
+    min-height: auto;
+  }
+
+  .auth-card {
+    margin-left: 0;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .hero-visual {
+    min-height: 380px;
+  }
+
+  .developer-card,
+  .question-card,
+  .job-card,
+  .visual-map {
+    transform: scale(0.9);
+  }
+}
+
+@media (max-width: 768px) {
+  .home {
+    padding: 80px var(--space-md) var(--space-lg);
+    overflow-x: hidden;
+  }
+
+  .hero-layout {
+    gap: var(--space-lg);
+  }
+
+  .hero-left {
+    display: contents;
+  }
+
+  .hero-brand {
+    margin-bottom: var(--space-lg);
+    order: 1;
+  }
+
+  .hero-right {
+    order: 2;
+  }
+
+  .hero-visual {
+    order: 3;
+    min-height: auto;
+    padding: var(--space-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    background-image: none;
+    overflow: hidden;
+  }
+
+  .hero-logo-img {
+    height: 32px;
+    transform: scale(1.1);
+  }
+
+  .hero-description {
+    max-width: 100%;
+  }
+
+  .auth-card {
+    padding: var(--space-lg);
+  }
+
+  .developer-card,
+  .question-card,
+  .job-card {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    max-width: 100%;
+    transform: translateX(30px);
+    opacity: 0;
+    animation: slideFromRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .developer-card { animation-delay: 0.1s; }
+  .question-card { animation-delay: 0.2s; }
+  .job-card { animation-delay: 0.3s; }
+
+  .visual-map {
+    display: none;
+  }
+
+  .hero-play {
+    display: none;
+  }
+}
+
+@keyframes slideFromRight {
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .home {
+    padding: 72px var(--space-sm) var(--space-md);
+  }
+
+  .hero-layout {
+    gap: var(--space-md);
+  }
+
+  .hero-brand {
+    margin-bottom: var(--space-md);
+  }
+
+  .hero-logo-img {
+    height: 28px;
+    transform: scale(1);
+  }
+
+  .hero-description {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .auth-card {
+    padding: var(--space-md);
+    border-radius: var(--radius-lg);
+  }
+
+  .auth-header {
+    margin-bottom: var(--space-md);
+  }
+
+  .hero-visual {
+    padding: var(--space-xs);
+    gap: var(--space-xs);
+  }
+
+  .developer-card,
+  .question-card,
+  .job-card {
+    width: 100%;
+  }
+}

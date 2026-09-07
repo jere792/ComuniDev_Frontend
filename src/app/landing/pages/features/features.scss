@@ -40,3 +40,26 @@
 .feature-card p {
   color: var(--on-surface-variant);
 }
+
+@media (max-width: 768px) {
+  .features-page {
+    padding: var(--space-2xl) var(--space-md);
+  }
+
+  .features-header {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+
+  .feature-card {
+    padding: var(--space-xl);
+  }
+
+  .feature-icon {
+    font-size: 40px;
+  }
+}

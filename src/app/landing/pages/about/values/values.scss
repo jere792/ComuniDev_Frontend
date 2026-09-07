@@ -75,3 +75,13 @@
     font-size: 22px;
   }
 }
+
+@media (max-width: 768px) {
+  .values-section {
+    padding: var(--space-2xl) var(--space-md);
+  }
+
+  .value-card {
+    padding: var(--space-lg);
+  }
+}

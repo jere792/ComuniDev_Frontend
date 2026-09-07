@@ -367,3 +367,30 @@
     max-width: 90%;
   }
 }
+
+@media (max-width: 768px) {
+  .contact-messenger {
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .messenger-container {
+    border-radius: var(--radius-lg);
+  }
+
+  .messenger-chat {
+    height: 480px;
+  }
+
+  .chat-header,
+  .chat-input {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .chat-body {
+    padding: var(--space-md);
+  }
+
+  .chat-message {
+    max-width: 85%;
+  }
+}

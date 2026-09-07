@@ -8,14 +8,25 @@
       />
     </a>
     <div class="nav-links">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-pill">Inicio</a>
-      <a routerLink="/about" routerLinkActive="active" class="nav-pill">Sobre nosotros</a>
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-pill"
+        >Inicio</a
+      >
       <a routerLink="/contact" routerLinkActive="active" class="nav-pill">Contacto</a>
+      <a routerLink="/about" routerLinkActive="active" class="nav-pill">Sobre nosotros</a>
+
       <a routerLink="/download-apk" routerLinkActive="active" class="nav-pill">Descargar</a>
     </div>
   </nav>
   <div class="header-actions">
-    <button class="theme-toggle" (click)="theme.toggle()" [attr.aria-label]="theme.dark() ? 'Modo claro' : 'Modo oscuro'">
+    <button
+      class="theme-toggle"
+      (click)="theme.toggle()"
+      [attr.aria-label]="theme.dark() ? 'Modo claro' : 'Modo oscuro'"
+    >
       @if (theme.dark()) {
         <span class="material-symbols-outlined">light_mode</span>
       } @else {

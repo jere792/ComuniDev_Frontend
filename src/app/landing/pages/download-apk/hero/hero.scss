@@ -1,0 +1,107 @@
+.download-hero-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phone-mockup {
+  width: 160px;
+  height: 300px;
+  background-color: #1a1a1a;
+  border-radius: 20px;
+  border: 2px solid #444;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+}
+
+.phone-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+}
+
+.status-time {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.status-icons {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+
+  .material-symbols-outlined {
+    font-size: 11px;
+    color: #ffffff;
+  }
+}
+
+.phone-screen {
+  flex: 1;
+  background-color: #ffffff;
+  margin: 0 5px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-lg) var(--space-sm);
+  gap: var(--space-md);
+  border: 1px solid #e5e5e5;
+}
+
+.phone-app-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.phone-logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.phone-app-name {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  color: #1c1c17;
+}
+
+.phone-app-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+}
+
+.phone-download-icon {
+  font-size: 24px;
+  color: var(--primary);
+}
+
+.phone-version {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: #71787b;
+}
+
+.phone-notch {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 3px;
+  background-color: #555;
+  border-radius: var(--radius-full);
+}

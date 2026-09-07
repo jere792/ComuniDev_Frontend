@@ -133,14 +133,14 @@
         @if (authMode === 'login') {
         <p class="body-sm auth-footer">
           ¿No tienes cuenta?
-          <a class="auth-link" (click)="toggleMode('register')">Regístrate</a>
+          <a routerLink="/register" class="auth-link">Regístrate</a>
         </p>
         }
 
         @if (authMode === 'register') {
         <p class="body-sm auth-footer">
           ¿Ya tienes cuenta?
-          <a class="auth-link" (click)="toggleMode('login')">Inicia sesión</a>
+          <a routerLink="/" class="auth-link">Inicia sesión</a>
         </p>
         }
       </div>

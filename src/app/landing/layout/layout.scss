@@ -1,0 +1,21 @@
+.landing-viewport {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs);
+  background: radial-gradient(ellipse at 50% 0%, #1a2332 0%, #0d1117 50%, #010409 100%);
+}
+
+.landing-container {
+  width: 100%;
+  max-width: 100%;
+  min-height: calc(100vh - var(--space-xs) * 2);
+  background-color: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 25px 80px -12px rgba(0, 0, 0, 0.5), 0 0 1px rgba(15, 23, 42, 0.1);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+}

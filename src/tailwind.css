@@ -1,1 +1,53 @@
 @import "tailwindcss";
+
+@theme {
+  --color-surface: #fcf9f0;
+  --color-surface-dim: #dddad1;
+  --color-surface-bright: #fcf9f0;
+  --color-surface-lowest: #ffffff;
+  --color-surface-low: #f7f3ea;
+  --color-surface-container: #f1eee5;
+  --color-surface-high: #ebe8df;
+  --color-surface-highest: #e5e2d9;
+  --color-surface-variant: #e5e2d9;
+  --color-on-surface: #1c1c17;
+  --color-on-surface-variant: #41484a;
+
+  --color-primary: #00242c;
+  --color-primary-container: #0c3b45;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #7ca5b1;
+  --color-inverse-primary: #a3cdda;
+
+  --color-secondary: #565e74;
+  --color-secondary-container: #dae2fd;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #5c647a;
+
+  --color-tertiary: #00242f;
+  --color-tertiary-container: #163a47;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #82a4b3;
+  --color-tertiary-fixed: #c5e8f8;
+
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+
+  --color-success: #15803d;
+  --color-success-bg: rgba(21, 128, 61, 0.1);
+
+  --color-outline: #71787b;
+  --color-outline-variant: #c0c8ca;
+
+  --color-inverse-surface: #31312b;
+  --color-inverse-on-surface: #f4f1e8;
+
+  --color-background: #fcf9f0;
+  --color-on-background: #1c1c17;
+
+  --font-display: 'Newsreader', serif;
+  --font-body: 'Hanken Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}

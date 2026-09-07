@@ -1,0 +1,29 @@
+<div class="landing-viewport">
+  <div class="landing-container">
+    <header class="landing-header">
+      <nav class="nav-capsule">
+        <a routerLink="/" class="nav-logo">
+          <img src="https://res.cloudinary.com/dp1vgjhsq/image/upload/v1788755182/isotipo_ec9uxb.png" alt="ComuniDev" class="nav-logo-img">
+        </a>
+        <div class="nav-links">
+          <a routerLink="/" class="nav-pill active">Community</a>
+          <a routerLink="/features" class="nav-pill">Questions</a>
+          <a routerLink="/download-apk" class="nav-pill">Jobs</a>
+          <a class="nav-pill">Map</a>
+          <a class="nav-pill">EcoDev</a>
+        </div>
+      </nav>
+      <a routerLink="/register" class="btn btn-primary header-cta">Create account</a>
+    </header>
+
+    <main class="landing-main">
+      <router-outlet />
+    </main>
+
+    <footer class="landing-footer">
+      <div class="footer-content">
+        <p class="metadata-sm">&copy; 2026 COMUNIDEV. All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+</div>

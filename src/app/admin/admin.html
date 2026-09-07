@@ -1,0 +1,19 @@
+<div class="dashboard-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-logo">ComuniDev</span>
+      <span class="badge badge-admin">Admin</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a routerLink="/admin/dashboard" routerLinkActive="active" class="sidebar-link">Dashboard</a>
+      <a routerLink="/admin/users" routerLinkActive="active" class="sidebar-link">Usuarios</a>
+      <a routerLink="/admin/settings" routerLinkActive="active" class="sidebar-link">Configuración</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn btn-ghost sidebar-logout">Cerrar sesión</button>
+    </div>
+  </aside>
+  <main class="dashboard-main">
+    <router-outlet />
+  </main>
+</div>

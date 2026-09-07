@@ -1,0 +1,19 @@
+<div class="dashboard-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-logo">ComuniDev</span>
+      <span class="badge">Recruiter</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a routerLink="/recruiter/dashboard" routerLinkActive="active" class="sidebar-link">Dashboard</a>
+      <a routerLink="/recruiter/candidates" routerLinkActive="active" class="sidebar-link">Candidatos</a>
+      <a routerLink="/recruiter/offers" routerLinkActive="active" class="sidebar-link">Ofertas</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn btn-ghost sidebar-logout">Cerrar sesión</button>
+    </div>
+  </aside>
+  <main class="dashboard-main">
+    <router-outlet />
+  </main>
+</div>

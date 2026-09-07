@@ -1,0 +1,122 @@
+<section class="feed-section">
+  <div class="feed-shell">
+
+    <div class="feed-header">
+      <div class="feed-header-left">
+        <span class="live-dot"></span>
+        <span class="label-md feed-title">Feed en Tiempo Real</span>
+      </div>
+    </div>
+
+    <div class="feed-body">
+
+      <div class="feed-col-left">
+
+        <div class="code-snippet-card">
+          <div class="snippet-bar">
+            <div class="snippet-dots">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-amber"></span>
+              <span class="dot dot-green"></span>
+              <span class="label-code-sm snippet-file">auth.interceptor.ts</span>
+            </div>
+            <span class="snippet-badge">
+              <span class="material-symbols-outlined" style="font-size:12px">bolt</span> -38% Latencia
+            </span>
+          </div>
+          <pre class="snippet-code label-code-sm"><code><span class="code-purple">export const</span> <span class="code-blue">authInterceptor</span>: HttpInterceptorFn = (req, next) =&gt; &#123;
+    <span class="code-purple">const</span> auth = inject(AuthService);
+    <span class="code-purple">const</span> router = inject(Router);
+    <span class="code-purple">const</span> token = auth.token;
+
+    <span class="code-purple">if</span> (!token) &#123;
+      <span class="code-purple">return</span> next(req);
+    &#125;
+
+    <span class="code-gray">// Attach Bearer token to outgoing requests</span>
+    <span class="code-purple">const</span> cloned = req.<span class="code-blue">clone</span>(&#123;
+      <span class="code-blue">setHeaders</span>: &#123; Authorization: <span class="code-amber">`Bearer $&#123;token&#125;`</span> &#125;
+    &#125;);
+
+    <span class="code-purple">return</span> next(cloned).<span class="code-blue">pipe</span>(
+      <span class="code-blue">catchError</span>((error: HttpErrorResponse) =&gt; &#123;
+        <span class="code-purple">if</span> (error.status === <span class="code-amber">401</span>) &#123;
+          <span class="code-gray">// Attempt silent token refresh</span>
+          <span class="code-purple">return</span> auth.<span class="code-blue">refreshToken</span>().<span class="code-blue">pipe</span>(
+            <span class="code-blue">switchMap</span>((newToken) =&gt; &#123;
+              <span class="code-purple">const</span> retried = req.<span class="code-blue">clone</span>(&#123;
+                <span class="code-blue">setHeaders</span>: &#123; Authorization: <span class="code-amber">`Bearer $&#123;newToken&#125;`</span> &#125;
+              &#125;);
+              <span class="code-purple">return</span> next(retried);
+            &#125;),
+            <span class="code-blue">catchError</span>(() =&gt; &#123;
+              auth.<span class="code-blue">logout</span>();
+              router.<span class="code-blue">navigate</span>([<span class="code-amber">'/login'</span>]);
+              <span class="code-purple">return</span> EMPTY;
+            &#125;)
+          );
+        &#125;
+        <span class="code-purple">return</span> <span class="code-blue">throwError</span>(() =&gt; error);
+      &#125;)
+    );
+&#125;;</code></pre>
+        </div>
+
+      </div>
+
+      <div class="feed-col-right">
+
+        <div class="job-offer-card">
+          <div class="job-offer-header">
+            <div class="job-offer-logo">NW</div>
+            <div class="job-offer-badge-row">
+              <span class="match-badge">Match 94%</span>
+              <span class="job-type-badge">Tiempo completo</span>
+            </div>
+          </div>
+          <div class="job-offer-body">
+            <span class="headline-sm job-offer-title">Staff Frontend Developer</span>
+            <span class="body-sm job-offer-company">NovaWare · Lima (Remoto)</span>
+            <span class="job-offer-salary">$45k - $65k USD</span>
+            <div class="job-offer-tags">
+              <span class="job-tag">Angular 21</span>
+              <span class="job-tag">TypeScript</span>
+              <span class="job-tag">GraphQL</span>
+            </div>
+          </div>
+          <button class="btn-apply">Aplicar rápido</button>
+        </div>
+
+        <div class="arch-card">
+          <div class="arch-header">
+            <span class="material-symbols-outlined arch-header-icon">account_tree</span>
+            <span class="headline-sm">Clean Architecture</span>
+            <span class="arch-tag">Regla de Dependencia</span>
+          </div>
+          <div class="arch-diagram">
+            <div class="arch-ring ring-frameworks">
+              <span class="arch-ring-label">Frameworks &amp; Drivers</span>
+              <div class="arch-ring ring-adapters">
+                <span class="arch-ring-label">Interface Adapters</span>
+                <div class="arch-ring ring-usecases">
+                  <span class="arch-ring-label">Use Cases</span>
+                  <div class="arch-core">
+                    <span class="arch-core-label">Domain</span>
+                    <span class="arch-core-sub">Entities</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="arch-footer caption">
+            <span class="material-symbols-outlined" style="font-size:16px">arrow_inward</span>
+            <span>Las dependencias solo apuntan hacia el dominio</span>
+            <span class="mini-map-link">Ver guia →</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>

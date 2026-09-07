@@ -1,1 +1,357 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Hanken+Grotesk:wght@300..800&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+// ============================================================
+// COMUNIDEV DESIGN SYSTEM
+// Editorial Typography + Structured Technical Minimalism
+// ============================================================
+
+:root {
+  // ── Colors: Surface ──
+  --surface: #fcf9f0;
+  --surface-dim: #dddad1;
+  --surface-bright: #fcf9f0;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f7f3ea;
+  --surface-container: #f1eee5;
+  --surface-container-high: #ebe8df;
+  --surface-container-highest: #e5e2d9;
+  --surface-variant: #e5e2d9;
+  --surface-tint: #3b646f;
+
+  // ── Colors: On Surface ──
+  --on-surface: #1c1c17;
+  --on-surface-variant: #41484a;
+
+  // ── Colors: Inverse ──
+  --inverse-surface: #31312b;
+  --inverse-on-surface: #f4f1e8;
+  --inverse-primary: #a3cdda;
+
+  // ── Colors: Outline ──
+  --outline: #71787b;
+  --outline-variant: #c0c8ca;
+
+  // ── Colors: Primary ──
+  --primary: #00242c;
+  --on-primary: #ffffff;
+  --primary-container: #0c3b45;
+  --on-primary-container: #7ca5b1;
+  --primary-fixed: #bfeaf6;
+  --primary-fixed-dim: #a3cdda;
+  --on-primary-fixed: #001f26;
+  --on-primary-fixed-variant: #224c57;
+
+  // ── Colors: Secondary ──
+  --secondary: #565e74;
+  --on-secondary: #ffffff;
+  --secondary-container: #dae2fd;
+  --on-secondary-container: #5c647a;
+  --secondary-fixed: #dae2fd;
+  --secondary-fixed-dim: #bec6e0;
+  --on-secondary-fixed: #131b2e;
+  --on-secondary-fixed-variant: #3f465c;
+
+  // ── Colors: Tertiary ──
+  --tertiary: #00242f;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #163a47;
+  --on-tertiary-container: #82a4b3;
+  --tertiary-fixed: #c5e8f8;
+  --tertiary-fixed-dim: #a9ccdc;
+  --on-tertiary-fixed: #001f29;
+  --on-tertiary-fixed-variant: #294b58;
+
+  // ── Colors: Error ──
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
+
+  // ── Colors: Status (Brand) ──
+  --status-success: #15803d;
+  --status-success-bg: rgba(21, 128, 61, 0.1);
+  --status-success-border: #15803d;
+
+  // ── Colors: Background ──
+  --background: #fcf9f0;
+  --on-background: #1c1c17;
+
+  // ── Typography ──
+  --font-display: 'Newsreader', serif;
+  --font-body: 'Hanken Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  // ── Typography Scale ──
+  --text-display-lg: 500 48px/56px var(--font-display);
+  --text-display-lg-mobile: 500 32px/40px var(--font-display);
+  --text-headline-lg: 500 36px/44px var(--font-display);
+  --text-headline-lg-mobile: 500 26px/34px var(--font-display);
+  --text-headline-md: 400 28px/36px var(--font-display);
+  --text-headline-sm: 600 20px/28px var(--font-body);
+  --text-body-lg: 400 18px/28px var(--font-body);
+  --text-body-md: 400 15px/24px var(--font-body);
+  --text-body-sm: 400 13px/20px var(--font-body);
+  --text-label-md: 600 14px/20px var(--font-body);
+  --text-code-md: 400 13px/20px var(--font-mono);
+  --text-metadata-sm: 500 11px/16px var(--font-mono);
+
+  // ── Spacing ──
+  --space-3xs: 0.125rem;
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+  --space-4xl: 6rem;
+
+  // ── Border Radius ──
+  --radius-sm: 0.125rem;
+  --radius: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+
+  // ── Elevation ──
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-medium: rgba(15, 23, 42, 0.12);
+  --border-strong: rgba(15, 23, 42, 0.2);
+  --shadow-floating: 0 4px 20px -2px rgba(12, 59, 69, 0.08);
+
+  // ── Layout ──
+  --container-max: 1280px;
+  --gutter-desktop: 24px;
+  --gutter-tablet: 20px;
+  --gutter-mobile: 12px;
+}
+
+// ============================================================
+// BASE RESET & DEFAULTS
+// ============================================================
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 24px;
+  color: var(--on-surface);
+  background-color: var(--background);
+}
+
+// ============================================================
+// TYPOGRAPHY UTILITIES
+// ============================================================
+
+.display-lg {
+  font: var(--text-display-lg);
+  letter-spacing: -0.02em;
+
+  @media (max-width: 767px) {
+    font: var(--text-display-lg-mobile);
+    letter-spacing: -0.01em;
+  }
+}
+
+.headline-lg {
+  font: var(--text-headline-lg);
+  letter-spacing: -0.015em;
+
+  @media (max-width: 767px) {
+    font: var(--text-headline-lg-mobile);
+    letter-spacing: -0.01em;
+  }
+}
+
+.headline-md {
+  font: var(--text-headline-md);
+}
+
+.headline-sm {
+  font: var(--text-headline-sm);
+  letter-spacing: -0.01em;
+}
+
+.body-lg {
+  font: var(--text-body-lg);
+}
+
+.body-md {
+  font: var(--text-body-md);
+}
+
+.body-sm {
+  font: var(--text-body-sm);
+}
+
+.label-md {
+  font: var(--text-label-md);
+}
+
+.code-md {
+  font: var(--text-code-md);
+}
+
+.metadata-sm {
+  font: var(--text-metadata-sm);
+  letter-spacing: 0.04em;
+}
+
+// ============================================================
+// COMPONENTS
+// ============================================================
+
+// ── Buttons ──
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--tertiary-fixed);
+    outline-offset: 2px;
+  }
+
+  &-primary {
+    background-color: var(--primary-container);
+    color: var(--on-primary);
+
+    &:hover {
+      background-color: #08262d;
+    }
+  }
+
+  &-secondary {
+    background-color: var(--surface-container-lowest);
+    color: var(--primary-container);
+    border: 1px solid var(--primary-container);
+
+    &:hover {
+      background-color: var(--surface);
+    }
+  }
+
+  &-ghost {
+    background-color: transparent;
+    color: var(--secondary);
+
+    &:hover {
+      background-color: rgba(178, 213, 229, 0.3);
+    }
+  }
+}
+
+// ── Cards ──
+.card {
+  background-color: var(--surface-container-lowest);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+
+  &-code {
+    background-color: var(--secondary);
+    border: 1px solid rgba(178, 213, 229, 0.15);
+    border-radius: var(--radius-xl);
+    padding: var(--space-md);
+    color: var(--surface);
+    font-family: var(--font-mono);
+  }
+}
+
+// ── Inputs ──
+.input {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 24px;
+  color: var(--secondary);
+  background-color: var(--surface-container-lowest);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &::placeholder {
+    color: rgba(15, 23, 42, 0.45);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-container);
+    box-shadow: 0 0 0 1px var(--primary-container);
+  }
+}
+
+// ── Badges ──
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(12, 59, 69, 0.15);
+  background-color: rgba(178, 213, 229, 0.35);
+  color: var(--primary-container);
+
+  &-success {
+    background-color: var(--status-success-bg);
+    color: var(--status-success);
+    border-color: var(--status-success-border);
+  }
+
+  &-error {
+    background-color: var(--error-container);
+    color: var(--on-error-container);
+    border-color: var(--error);
+  }
+}
+
+// ── Scrollbar ──
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--outline-variant);
+  border-radius: var(--radius-full);
+
+  &:hover {
+    background: var(--outline);
+  }
+}

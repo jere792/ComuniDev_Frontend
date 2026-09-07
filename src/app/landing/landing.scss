@@ -1,0 +1,108 @@
+.landing-viewport {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl);
+  background: radial-gradient(ellipse at 50% 0%, #1a2332 0%, #0d1117 50%, #010409 100%);
+}
+
+.landing-container {
+  width: 100%;
+  max-width: 1280px;
+  min-height: calc(100vh - var(--space-4xl));
+  background-color: var(--surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 25px 80px -12px rgba(0, 0, 0, 0.5), 0 0 1px rgba(15, 23, 42, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.landing-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-xl);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
+
+.nav-capsule {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background-color: var(--surface-container-lowest);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 8px 8px 8px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  margin-right: var(--space-sm);
+}
+
+.nav-logo-img {
+  height: 34px;
+  width: auto;
+  transform: scale(1.25);
+  transform-origin: left center;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-pill {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  transition: all 0.15s ease;
+  letter-spacing: 0.01em;
+
+  &:hover {
+    color: var(--on-surface);
+    background-color: var(--surface-container);
+  }
+
+  &.active {
+    color: var(--on-primary);
+    background-color: var(--primary-container);
+  }
+}
+
+.header-cta {
+  padding: 10px 24px;
+  font-size: 14px;
+  border-radius: var(--radius-full);
+}
+
+.landing-main {
+  flex: 1;
+}
+
+.landing-footer {
+  border-top: 1px solid var(--border-subtle);
+  background-color: var(--surface-container-low);
+  padding: var(--space-md) var(--space-xl);
+  margin-top: auto;
+}
+
+.footer-content {
+  text-align: center;
+  color: var(--outline);
+}

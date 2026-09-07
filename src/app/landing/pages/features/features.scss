@@ -1,0 +1,42 @@
+.features-page {
+  padding: var(--space-4xl) var(--space-xl);
+}
+
+.features-container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+}
+
+.features-header {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+}
+
+.features-subtitle {
+  margin-top: var(--space-md);
+  color: var(--on-surface-variant);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-xl);
+}
+
+.feature-card {
+  text-align: center;
+  padding: var(--space-2xl);
+}
+
+.feature-icon {
+  font-size: 48px;
+  margin-bottom: var(--space-md);
+}
+
+.feature-card h3 {
+  margin-bottom: var(--space-sm);
+}
+
+.feature-card p {
+  color: var(--on-surface-variant);
+}

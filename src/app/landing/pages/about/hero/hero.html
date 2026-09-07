@@ -1,11 +1,11 @@
 <app-page-hero
-  badge="Sobre nosotros"
-  title="Conoce a ComuniDev"
-  subtitle="Somos una comunidad de desarrolladores, diseñadores y profesionales tech comprometidos a crear espacios de aprendizaje y colaboración."
+  badge="{{ 'about' | t:'badge' }}"
+  title="{{ 'about' | t:'titulo' }}"
+  subtitle="{{ 'about' | t:'subtitulo' }}"
   [info]="[
-    { icon: 'groups', text: 'Comunidad activa' },
-    { icon: 'code', text: 'Open source' },
-    { icon: 'public', text: 'Latam first' }
+    { icon: 'groups', text: 'about' | t:'comunidadActiva' },
+    { icon: 'code', text: 'about' | t:'openSource' },
+    { icon: 'public', text: 'about' | t:'latamFirst' }
   ]">
   <div class="about-hero-visual">
     <div class="hero-terminal">

@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --configuration production && copy public\\_headers dist\\comunidev-frontend\\browser\\_headers && copy public\\_redirects dist\\comunidev-frontend\\browser\\_redirects",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

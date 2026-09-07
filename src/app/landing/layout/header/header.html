@@ -7,21 +7,29 @@
         class="nav-logo-img"
       />
     </a>
-    <div class="nav-links">
+    <div class="nav-links" [class.open]="menuOpen()">
       <a
         routerLink="/"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
         class="nav-pill"
-        >Inicio</a
+        (click)="menuOpen.set(false)"
+        >{{ 'header' | t:'inicio' }}</a
       >
-      <a routerLink="/contact" routerLinkActive="active" class="nav-pill">Contacto</a>
-      <a routerLink="/about" routerLinkActive="active" class="nav-pill">Sobre nosotros</a>
-
-      <a routerLink="/download-apk" routerLinkActive="active" class="nav-pill">Descargar</a>
+      <a routerLink="/contact" routerLinkActive="active" class="nav-pill" (click)="menuOpen.set(false)">{{ 'header' | t:'contacto' }}</a>
+      <a routerLink="/about" routerLinkActive="active" class="nav-pill" (click)="menuOpen.set(false)">{{ 'header' | t:'sobreNosotros' }}</a>
+      <a routerLink="/download-apk" routerLinkActive="active" class="nav-pill" (click)="menuOpen.set(false)">{{ 'header' | t:'descargar' }}</a>
     </div>
   </nav>
   <div class="header-actions">
+    <button class="menu-toggle" (click)="toggleMenu()" aria-label="Menu">
+      <span class="material-symbols-outlined">{{ menuOpen() ? 'close' : 'menu' }}</span>
+    </button>
+    <button class="lang-toggle" (click)="language.toggle()" [attr.aria-label]="language.lang() === 'es' ? 'Switch to English' : 'Cambiar a Español'">
+      <span class="lang-label" [class.active]="language.lang() === 'es'">ES</span>
+      <span class="lang-divider">/</span>
+      <span class="lang-label" [class.active]="language.lang() === 'en'">EN</span>
+    </button>
     <button
       class="theme-toggle"
       (click)="theme.toggle()"
@@ -33,6 +41,6 @@
         <span class="material-symbols-outlined">dark_mode</span>
       }
     </button>
-    <a routerLink="/register" class="btn btn-primary header-cta">Registrarse</a>
+    <a routerLink="/register" class="btn btn-primary header-cta">{{ 'header' | t:'registrarse' }}</a>
   </div>
 </header>

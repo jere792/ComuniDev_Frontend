@@ -1,0 +1,280 @@
+{
+  "header": {
+    "inicio": { "es": "Inicio", "en": "Home" },
+    "contacto": { "es": "Contacto", "en": "Contact" },
+    "sobreNosotros": { "es": "Sobre nosotros", "en": "About us" },
+    "descargar": { "es": "Descargar", "en": "Download" },
+    "registrarse": { "es": "Registrarse", "en": "Sign up" }
+  },
+  "hero": {
+    "descripcion": {
+      "es": "La comunidad tech donde desarrolladores conectan, resuelven problemas y encuentran oportunidades laborales. Aprende, comparte y crece con otros ingenieros.",
+      "en": "The tech community where developers connect, solve problems, and find job opportunities. Learn, share, and grow with other engineers."
+    },
+    "explora": { "es": "Explora la experiencia COMUNIDEV", "en": "Explore the COMUNIDEV experience" },
+    "iniciarSesion": { "es": "Iniciar sesión", "en": "Sign in" },
+    "bienvenido": { "es": "Bienvenido de vuelta a ComuniDev.", "en": "Welcome back to ComuniDev." },
+    "noTienesCuenta": { "es": "¿No tienes cuenta?", "en": "Don't have an account?" },
+    "registrate": { "es": "Regístrate", "en": "Sign up" }
+  },
+  "login": {
+    "email": { "es": "Email", "en": "Email" },
+    "emailPlaceholder": { "es": "tu@email.com", "en": "you@email.com" },
+    "contrasena": { "es": "Contraseña", "en": "Password" },
+    "contrasenaPlaceholder": { "es": "Tu contraseña", "en": "Your password" },
+    "olvidaste": { "es": "¿Olvidaste tu contraseña?", "en": "Forgot your password?" },
+    "iniciarSesion": { "es": "Iniciar sesión", "en": "Sign in" },
+    "oContinua": { "es": "o continúa con", "en": "or continue with" },
+    "google": { "es": "Google", "en": "Google" },
+    "github": { "es": "GitHub", "en": "GitHub" }
+  },
+  "footer": {
+    "tagline": {
+      "es": "Conectando desarrolladores con oportunidades reales.",
+      "en": "Connecting developers with real opportunities."
+    },
+    "plataforma": { "es": "Plataforma", "en": "Platform" },
+    "inicio": { "es": "Inicio", "en": "Home" },
+    "sobreNosotros": { "es": "Sobre nosotros", "en": "About us" },
+    "caracteristicas": { "es": "Características", "en": "Features" },
+    "descargarApk": { "es": "Descargar APK", "en": "Download APK" },
+    "comunidad": { "es": "Comunidad", "en": "Community" },
+    "preguntas": { "es": "Preguntas", "en": "Questions" },
+    "empleos": { "es": "Empleos", "en": "Jobs" },
+    "mapa": { "es": "Mapa", "en": "Map" },
+    "soporte": { "es": "Soporte", "en": "Support" },
+    "contacto": { "es": "Contacto", "en": "Contact" },
+    "documentacion": { "es": "Documentación", "en": "Documentation" },
+    "terminos": { "es": "Términos", "en": "Terms" },
+    "privacidad": { "es": "Privacidad", "en": "Privacy" },
+    "copyright": {
+      "es": "© 2026 COMUNIDEV. Todos los derechos reservados.",
+      "en": "© 2026 COMUNIDEV. All rights reserved."
+    }
+  },
+  "cta": {
+    " titulo": { "es": "Únete gratis", "en": "Join for free" },
+    "subtitulo": { "es": "Construye tu carrera en tecnología", "en": "Build your career in tech" },
+    "descripcion": {
+      "es": "Comparte código, conecta con reclutadores y accede a ofertas exclusivas. La comunidad tech que estabas buscando.",
+      "en": "Share code, connect with recruiters, and access exclusive offers. The tech community you were looking for."
+    },
+    "crearCuenta": { "es": "Crear cuenta gratis", "en": "Create free account" },
+    "explorar": { "es": "Explorar plataforma", "en": "Explore platform" },
+    "sinTarjeta": { "es": "Sin tarjeta de crédito", "en": "No credit card" },
+    "accesoInmediato": { "es": "Acceso inmediato", "en": "Instant access" },
+    "cancela": { "es": "Cancela cuando quieras", "en": "Cancel anytime" }
+  },
+  "enfoque": {
+    "titulo": { "es": "Nuestro enfoque", "en": "Our approach" },
+    "subtitulo": { "es": "Todo lo que necesitas en un solo lugar", "en": "Everything you need in one place" },
+    "descripcion": {
+      "es": "ComuniDev conecta talento técnico con oportunidades reales mediante una plataforma pensada para desarrolladores.",
+      "en": "ComuniDev connects technical talent with real opportunities through a platform built for developers."
+    },
+    "codigoIdentidad": { "es": "Código como identidad", "en": "Code as identity" },
+    "codigoIdentidadDesc": {
+      "es": "Comparte tus mejores soluciones y construye tu reputación técnica.",
+      "en": "Share your best solutions and build your technical reputation."
+    },
+    "conexionesReales": { "es": "Conexiones reales", "en": "Real connections" },
+    "conexionesRealesDesc": {
+      "es": "Enlázate directamente con reclutadores y equipos de desarrollo.",
+      "en": "Connect directly with recruiters and development teams."
+    },
+    "empleoOrientado": { "es": "Empleo orientado", "en": "Job-oriented" },
+    "empleoOrientadoDesc": {
+      "es": "Ofertas filtradas por tu stack, nivel y preferencias.",
+      "en": "Offers filtered by your stack, level, and preferences."
+    },
+    "comunidadActiva": { "es": "Comunidad activa", "en": "Active community" },
+    "comunidadActivaDesc": {
+      "es": "Preguntas, respuestas y debates entre desarrolladores.",
+      "en": "Questions, answers, and discussions between developers."
+    }
+  },
+  "techstack": {
+    "titulo": { "es": "Tech Stack", "en": "Tech Stack" },
+    "subtitulo": { "es": "Tecnologías que impulsan la comunidad", "en": "Technologies powering the community" },
+    "descripcion": {
+      "es": "Desarrolladores de todas las stacks comparten código, resuelven problemas y conectan con oportunidades.",
+      "en": "Developers from all stacks share code, solve problems, and connect with opportunities."
+    }
+  },
+  "feed": {
+    "titulo": { "es": "Feed en Tiempo Real", "en": "Real-time Feed" },
+    "latencia": { "es": "Latencia", "en": "Latency" },
+    "tiempoCompleto": { "es": "Tiempo completo", "en": "Full time" },
+    "aplicar": { "es": "Aplicar rápido", "en": "Apply now" },
+    "verGuia": { "es": "Ver guia →", "en": "View guide →" },
+    "dependencias": {
+      "es": "Las dependencias solo apuntan hacia el dominio",
+      "en": "Dependencies only point towards the domain"
+    }
+  },
+  "register": {
+    "volver": { "es": "Volver a inicio", "en": "Back to home" },
+    "crearCuenta": { "es": "Crear cuenta", "en": "Create account" },
+    "subtitulo": { "es": "Únete a la comunidad tech más completa.", "en": "Join the most complete tech community." },
+    "nombre": { "es": "Nombre *", "en": "First name *" },
+    "apellido": { "es": "Apellido", "en": "Last name" },
+    "nombreUsuario": { "es": "Nombre de usuario *", "en": "Username *" },
+    "telefono": { "es": "Teléfono", "en": "Phone" },
+    "email": { "es": "Email *", "en": "Email *" },
+    "contrasena": { "es": "Contraseña *", "en": "Password *" },
+    "confirmarContrasena": { "es": "Confirmar contraseña *", "en": "Confirm password *" },
+    "repite": { "es": "Repite tu contraseña", "en": "Repeat your password" },
+    "rol": { "es": "Rol", "en": "Role" },
+    "desarrollador": { "es": "Desarrollador", "en": "Developer" },
+    "reclutador": { "es": "Reclutador", "en": "Recruiter" },
+    "yaTienesCuenta": { "es": "¿Ya tienes cuenta?", "en": "Already have an account?" },
+    "iniciarSesion": { "es": "Iniciar sesión", "en": "Sign in" },
+    "errorMinimo": { "es": "Mínimo 8 caracteres", "en": "Minimum 8 characters" },
+    "errorUsuario": { "es": "Entre 3 y 30 caracteres", "en": "Between 3 and 30 characters" },
+    "errorEmail": { "es": "Ingresa un email válido", "en": "Enter a valid email" },
+    "errorContrasena": { "es": "Las contraseñas no coinciden", "en": "Passwords don't match" }
+  },
+  "forgotPassword": {
+    "titulo": { "es": "Recuperar contraseña", "en": "Reset password" },
+    "subtitulo": { "es": "Ingresa tu email y te enviaremos las instrucciones.", "en": "Enter your email and we'll send you the instructions." },
+    "email": { "es": "Email", "en": "Email" },
+    "emailPlaceholder": { "es": "tu@email.com", "en": "you@email.com" },
+    "enviar": { "es": "Enviar instrucciones", "en": "Send instructions" },
+    "volver": { "es": "Volver al inicio", "en": "Back to home" }
+  },
+  "about": {
+    "badge": { "es": "Sobre nosotros", "en": "About us" },
+    "titulo": { "es": "Conoce a ComuniDev", "en": "Meet ComuniDev" },
+    "subtitulo": {
+      "es": "Somos una comunidad de desarrolladores, diseñadores y profesionales tech comprometidos a crear espacios de aprendizaje y colaboración.",
+      "en": "We are a community of developers, designers, and tech professionals committed to creating spaces for learning and collaboration."
+    },
+    "comunidadActiva": { "es": "Comunidad activa", "en": "Active community" },
+    "openSource": { "es": "Open source", "en": "Open source" },
+    "latamFirst": { "es": "Latam first", "en": "Latam first" },
+    "proposito": { "es": "Nuestro propósito", "en": "Our purpose" },
+    "misionVision": { "es": "Misión & Visión", "en": "Mission & Vision" },
+    "mision": { "es": "Misión", "en": "Mission" },
+    "misionDesc": {
+      "es": "Democratizar el acceso al talento tech en Latinoamérica, conectando desarrolladores con oportunidades laborales justas y transparentes donde el código hable por ti.",
+      "en": "Democratize access to tech talent in Latin America, connecting developers with fair and transparent job opportunities where your code speaks for itself."
+    },
+    "vision": { "es": "Visión", "en": "Vision" },
+    "visionDesc": {
+      "es": "Ser la comunidad tech de referencia en Latinoamérica, donde cada desarrollador pueda construir su marca personal, aprender continuamente y acceder a las mejores oportunidades del mercado.",
+      "en": "Be the leading tech community in Latin America, where every developer can build their personal brand, learn continuously, and access the best market opportunities."
+    },
+    "equipo": { "es": "El equipo", "en": "The team" },
+    "quienesSomos": { "es": "Quiénes somos", "en": "Who we are" },
+    "equipoDesc": {
+      "es": "Un equipo pequeño con grandes sueños, distribuido por toda Latinoamérica.",
+      "en": "A small team with big dreams, distributed across Latin America."
+    },
+    "fundador": { "es": "Fundador", "en": "Founder" },
+    "rolFundador": { "es": "CEO & Lead Developer", "en": "CEO & Lead Developer" },
+    "fundadorDesc": {
+      "es": "Apasionado por crear herramientas que impacten positivamente en la comunidad tech latinoamericana.",
+      "en": "Passionate about creating tools that positively impact the Latin American tech community."
+    },
+    "uneteEquipo": { "es": "Únete al equipo", "en": "Join the team" },
+    "uneteDesc": {
+      "es": "Siempre buscamos personas talentosas que compartan nuestra visión.",
+      "en": "We're always looking for talented people who share our vision."
+    },
+    "contactanos": { "es": "Contáctanos", "en": "Contact us" },
+    "valoresTitulo": { "es": "Lo que nos define", "en": "What defines us" },
+    "valoresSubtitulo": { "es": "Nuestros valores", "en": "Our values" },
+    "valoresDesc": {
+      "es": "Los principios que guían cada decisión que tomamos en ComuniDev.",
+      "en": "The principles that guide every decision we make at ComuniDev."
+    },
+    "meritocracia": { "es": "Meritocracia", "en": "Meritocracy" },
+    "meritocraciaDesc": {
+      "es": "El talento y el esfuerzo son los que abren puertas. Medimos por resultados, no por títulos.",
+      "en": "Talent and effort open doors. We measure by results, not titles."
+    },
+    "transparencia": { "es": "Transparencia", "en": "Transparency" },
+    "transparenciaDesc": {
+      "es": "Código abierto, procesos claros. Creemos en la honestidad como base de toda relación profesional.",
+      "en": "Open code, clear processes. We believe honesty is the foundation of every professional relationship."
+    },
+    "comunidadVal": { "es": "Comunidad", "en": "Community" },
+    "comunidadDesc": {
+      "es": "Crecemos juntos. Fomentamos la colaboración y el apoyo mutuo entre desarrolladores.",
+      "en": "We grow together. We foster collaboration and mutual support among developers."
+    },
+    "innovacion": { "es": "Innovación", "en": "Innovation" },
+    "innovacionDesc": {
+      "es": "Desafiamos el status quo. Buscamos siempre mejores formas de resolver problemas reales.",
+      "en": "We challenge the status quo. We always seek better ways to solve real problems."
+    },
+    "inclusion": { "es": "Inclusión", "en": "Inclusion" },
+    "inclusionDesc": {
+      "es": "La diversidad nos fortalece. Creamos espacios seguros para todos los perfiles tech.",
+      "en": "Diversity strengthens us. We create safe spaces for all tech profiles."
+    },
+    "crecimiento": { "es": "Crecimiento", "en": "Growth" },
+    "crecimientoDesc": {
+      "es": "Apoyamos el desarrollo continuo, tanto profesional como personal, de cada miembro.",
+      "en": "We support continuous professional and personal development of every member."
+    }
+  },
+  "contact": {
+    "badge": { "es": "Contacto", "en": "Contact" },
+    "titulo": { "es": "Hablemos código", "en": "Let's talk code" },
+    "subtitulo": {
+      "es": "¿Tienes preguntas, sugerencias o quieres colaborar? Escríbenos.",
+      "en": "Have questions, suggestions, or want to collaborate? Write to us."
+    },
+    "respuesta": { "es": "Respuesta en <24h", "en": "Response in <24h" },
+    "ubicacion": { "es": "Latam · Remoto", "en": "Latam · Remote" }
+  },
+  "features": {
+    "titulo": { "es": "Características", "en": "Features" },
+    "subtitulo": {
+      "es": "Todo lo que necesitas para conectar con la comunidad tech.",
+      "en": "Everything you need to connect with the tech community."
+    },
+    "paraDevelopers": { "es": "Para Developers", "en": "For Developers" },
+    "paraDevelopersDesc": {
+      "es": "Construye tu portafolio, conecta con reclutadores y encuentra oportunidades reales.",
+      "en": "Build your portfolio, connect with recruiters, and find real opportunities."
+    },
+    "paraReclutadores": { "es": "Para Reclutadores", "en": "For Recruiters" },
+    "paraReclutadoresDesc": {
+      "es": "Accede a talento verificado, filtra por habilidades y contacta directamente.",
+      "en": "Access verified talent, filter by skills, and contact directly."
+    },
+    "moderacion": { "es": "Moderación Activa", "en": "Active Moderation" },
+    "moderacionDesc": {
+      "es": "Comunidad segura con sistema de reportes y revisión de contenido.",
+      "en": "Safe community with reporting system and content review."
+    },
+    "mobileFirst": { "es": "Mobile First", "en": "Mobile First" },
+    "mobileFirstDesc": {
+      "es": "Disponible en Android. Accede desde cualquier lugar.",
+      "en": "Available on Android. Access from anywhere."
+    }
+  },
+  "download": {
+    "badge": { "es": "Descargas", "en": "Downloads" },
+    "titulo": { "es": "ComuniDev en tu bolsillo", "en": "ComuniDev in your pocket" },
+    "subtitulo": {
+      "es": "Descarga la app y accede a la comunidad tech desde cualquier lugar. Conecta, aprende y crece profesionalmente.",
+      "en": "Download the app and access the tech community from anywhere. Connect, learn, and grow professionally."
+    },
+    "android": { "es": "Android 8.0+", "en": "Android 8.0+" },
+    "apkDirecto": { "es": "APK directo", "en": "Direct APK" },
+    "seguro": { "es": "100% seguro", "en": "100% safe" },
+    "descargarComuniDev": { "es": "Descargar ComuniDev", "en": "Download ComuniDev" },
+    "ultimaVersion": { "es": "Última versión: v1.0.0", "en": "Latest version: v1.0.0" },
+    "descargarApk": { "es": "Descargar APK", "en": "Download APK" },
+    "requisitos": { "es": "Requisitos", "en": "Requirements" },
+    "requisitosDesc": { "es": "Android 8.0 o superior", "en": "Android 8.0 or higher" },
+    "tamano": { "es": "Tamaño", "en": "Size" },
+    "ultimaActualizacion": { "es": "Última actualización", "en": "Last update" },
+    "septiembre": { "es": "Septiembre 2026", "en": "September 2026" },
+    "seguridad": { "es": "Seguridad", "en": "Security" },
+    "firmado": { "es": "Firmado digitalmente", "en": "Digitally signed" }
+  }
+}

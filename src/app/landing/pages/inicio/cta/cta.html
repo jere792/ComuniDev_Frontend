@@ -1,26 +1,26 @@
 <section class="cta-section">
   <div class="cta-shell">
-    <span class="cta-badge">Únete gratis</span>
-    <h2 class="cta-title">Construye tu carrera en tecnología</h2>
+    <span class="cta-badge">{{ 'cta' | t:'titulo' }}</span>
+    <h2 class="cta-title">{{ 'cta' | t:'subtitulo' }}</h2>
     <p class="cta-desc body-lg">
-      Comparte código, conecta con reclutadores y accede a ofertas exclusivas. La comunidad tech que estabas buscando.
+      {{ 'cta' | t:'descripcion' }}
     </p>
     <div class="cta-actions">
-      <a routerLink="/register" class="btn btn-primary cta-btn">Crear cuenta gratis</a>
-      <a routerLink="/features" class="btn btn-outline cta-btn">Explorar plataforma</a>
+      <a routerLink="/register" class="btn btn-primary cta-btn">{{ 'cta' | t:'crearCuenta' }}</a>
+      <a routerLink="/features" class="btn btn-outline cta-btn">{{ 'cta' | t:'explorar' }}</a>
     </div>
     <div class="cta-meta">
       <span class="cta-meta-item">
         <span class="material-symbols-outlined" style="font-size:16px">check_circle</span>
-        Sin tarjeta de crédito
+        {{ 'cta' | t:'sinTarjeta' }}
       </span>
       <span class="cta-meta-item">
         <span class="material-symbols-outlined" style="font-size:16px">check_circle</span>
-        Acceso inmediato
+        {{ 'cta' | t:'accesoInmediato' }}
       </span>
       <span class="cta-meta-item">
         <span class="material-symbols-outlined" style="font-size:16px">check_circle</span>
-        Cancela cuando quieras
+        {{ 'cta' | t:'cancela' }}
       </span>
     </div>
   </div>

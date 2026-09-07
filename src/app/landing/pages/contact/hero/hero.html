@@ -1,11 +1,11 @@
 <app-page-hero
-  badge="Contacto"
-  title="Hablemos código"
-  subtitle="¿Tienes preguntas, sugerencias o quieres colaborar? Escríbenos."
+  badge="{{ 'contact' | t:'badge' }}"
+  title="{{ 'contact' | t:'titulo' }}"
+  subtitle="{{ 'contact' | t:'subtitulo' }}"
   [info]="[
     { icon: 'mail', text: 'solvegrades@gmail.com' },
-    { icon: 'schedule', text: 'Respuesta en <24h' },
-    { icon: 'location_on', text: 'Latam · Remoto' }
+    { icon: 'schedule', text: 'contact' | t:'respuesta' },
+    { icon: 'location_on', text: 'contact' | t:'ubicacion' }
   ]"
 >
   <app-chat-preview />

@@ -1,11 +1,11 @@
 <app-page-hero
-  badge="Descargas"
-  title="ComuniDev en tu bolsillo"
-  subtitle="Descarga la app y accede a la comunidad tech desde cualquier lugar. Conecta, aprende y crece profesionalmente."
+  badge="{{ 'download' | t:'badge' }}"
+  title="{{ 'download' | t:'titulo' }}"
+  subtitle="{{ 'download' | t:'subtitulo' }}"
   [info]="[
-    { icon: 'android', text: 'Android 8.0+' },
-    { icon: 'download', text: 'APK directo' },
-    { icon: 'security', text: '100% seguro' }
+    { icon: 'android', text: 'download' | t:'android' },
+    { icon: 'download', text: 'download' | t:'apkDirecto' },
+    { icon: 'security', text: 'download' | t:'seguro' }
   ]">
   <div class="download-hero-visual">
     <div class="phone-mockup">

@@ -3,38 +3,38 @@
     <div class="footer-top">
       <div class="footer-brand">
         <img src="https://res.cloudinary.com/dp1vgjhsq/image/upload/v1788755182/logotipo_qdru3x.png" alt="ComuniDev" class="footer-logo">
-        <p class="body-sm footer-tagline">Conectando desarrolladores con oportunidades reales.</p>
+        <p class="body-sm footer-tagline">{{ 'footer' | t:'tagline' }}</p>
       </div>
 
       <div class="footer-columns">
         <div class="footer-col">
-          <p class="label-md footer-col-title">Plataforma</p>
-          <a routerLink="/" class="footer-link body-sm">Inicio</a>
-          <a routerLink="/about" class="footer-link body-sm">Sobre nosotros</a>
-          <a routerLink="/features" class="footer-link body-sm">Características</a>
-          <a routerLink="/download-apk" class="footer-link body-sm">Descargar APK</a>
+          <p class="label-md footer-col-title">{{ 'footer' | t:'plataforma' }}</p>
+          <a routerLink="/" class="footer-link body-sm">{{ 'footer' | t:'inicio' }}</a>
+          <a routerLink="/about" class="footer-link body-sm">{{ 'footer' | t:'sobreNosotros' }}</a>
+          <a routerLink="/features" class="footer-link body-sm">{{ 'footer' | t:'caracteristicas' }}</a>
+          <a routerLink="/download-apk" class="footer-link body-sm">{{ 'footer' | t:'descargarApk' }}</a>
         </div>
 
         <div class="footer-col">
-          <p class="label-md footer-col-title">Comunidad</p>
-          <a class="footer-link body-sm">Preguntas</a>
-          <a class="footer-link body-sm">Empleos</a>
-          <a class="footer-link body-sm">Mapa</a>
+          <p class="label-md footer-col-title">{{ 'footer' | t:'comunidad' }}</p>
+          <a class="footer-link body-sm">{{ 'footer' | t:'preguntas' }}</a>
+          <a class="footer-link body-sm">{{ 'footer' | t:'empleos' }}</a>
+          <a class="footer-link body-sm">{{ 'footer' | t:'mapa' }}</a>
           <a class="footer-link body-sm">EcoDev</a>
         </div>
 
         <div class="footer-col">
-          <p class="label-md footer-col-title">Soporte</p>
-          <a routerLink="/contact" class="footer-link body-sm">Contacto</a>
-          <a class="footer-link body-sm">Documentación</a>
-          <a class="footer-link body-sm">Términos</a>
-          <a class="footer-link body-sm">Privacidad</a>
+          <p class="label-md footer-col-title">{{ 'footer' | t:'soporte' }}</p>
+          <a routerLink="/contact" class="footer-link body-sm">{{ 'footer' | t:'contacto' }}</a>
+          <a class="footer-link body-sm">{{ 'footer' | t:'documentacion' }}</a>
+          <a class="footer-link body-sm">{{ 'footer' | t:'terminos' }}</a>
+          <a class="footer-link body-sm">{{ 'footer' | t:'privacidad' }}</a>
         </div>
       </div>
     </div>
 
     <div class="footer-bottom">
-      <p class="metadata-sm footer-copy">&copy; 2026 COMUNIDEV. Todos los derechos reservados.</p>
+      <p class="metadata-sm footer-copy">{{ 'footer' | t:'copyright' }}</p>
       <div class="footer-social">
         <a class="footer-social-link" aria-label="GitHub">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">

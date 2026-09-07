@@ -7,7 +7,7 @@
           <img src="https://res.cloudinary.com/dp1vgjhsq/image/upload/v1788755182/isotipo_ec9uxb.png" alt="ComuniDev" class="hero-logo-img" />
           <span class="hero-logo-text">ComuniDev</span>
         </div>
-        <p class="body-md hero-description">La comunidad tech donde desarrolladores conectan, resuelven problemas y encuentran oportunidades laborales. Aprende, comparte y crece con otros ingenieros.</p>
+        <p class="body-md hero-description">{{ 'hero' | t:'descripcion' }}</p>
       </div>
 
       <div class="hero-visual">
@@ -67,7 +67,7 @@
               <path d="M4 2L14 8L4 14V2Z" fill="currentColor"/>
             </svg>
           </button>
-          <span class="play-label metadata-sm">Explora la experiencia COMUNIDEV</span>
+          <span class="play-label metadata-sm">{{ 'hero' | t:'explora' }}</span>
         </div>
       </div>
     </div>
@@ -75,15 +75,15 @@
     <div class="hero-right">
       <div class="auth-card">
         <div class="auth-header">
-          <h1 class="headline-sm">Iniciar sesión</h1>
-          <p class="body-sm auth-subtitle">Bienvenido de vuelta a ComuniDev.</p>
+          <h1 class="headline-sm">{{ 'hero' | t:'iniciarSesion' }}</h1>
+          <p class="body-sm auth-subtitle">{{ 'hero' | t:'bienvenido' }}</p>
         </div>
 
         <app-login [form]="loginForm" (submitLogin)="onLogin()" (googleAuth)="onGoogleAuth()" (githubAuth)="onGitHubAuth()"></app-login>
 
         <p class="body-sm auth-footer">
-          ¿No tienes cuenta?
-          <a routerLink="/register" class="auth-link">Regístrate</a>
+          {{ 'hero' | t:'noTienesCuenta' }}
+          <a routerLink="/register" class="auth-link">{{ 'hero' | t:'registrate' }}</a>
         </p>
       </div>
     </div>

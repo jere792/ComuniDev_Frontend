@@ -2,10 +2,11 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Login } from './login/login';
+import { TranslationPipe } from '../../../../core/pipes/translation.pipe';
 
 @Component({
   selector: 'app-hero',
-  imports: [RouterLink, ReactiveFormsModule, Login],
+  imports: [RouterLink, ReactiveFormsModule, Login, TranslationPipe],
   templateUrl: './hero.html',
   styleUrl: './hero.scss',
 })

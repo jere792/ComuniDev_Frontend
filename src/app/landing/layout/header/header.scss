@@ -47,10 +47,13 @@
   font-weight: 600;
   color: var(--on-surface-variant);
   text-decoration: none;
-  padding: 8px 16px;
+  padding: 8px 12px;
   border-radius: var(--radius-full);
   transition: all 0.15s ease;
   letter-spacing: 0.01em;
+  min-width: 72px;
+  text-align: center;
+  white-space: nowrap;
 
   &:hover {
     color: var(--on-surface);
@@ -69,10 +72,47 @@
   gap: var(--space-sm);
 }
 
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+  background-color: var(--surface-container-lowest);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: var(--surface-container);
+  }
+}
+
+.lang-label {
+  color: var(--outline);
+  transition: color 0.15s ease;
+
+  &.active {
+    color: var(--primary-container);
+  }
+}
+
+.lang-divider {
+  color: var(--outline-variant);
+  font-weight: 400;
+}
+
 .header-cta {
-  padding: 10px 24px;
+  padding: 10px 16px;
   font-size: 14px;
   border-radius: var(--radius-full);
+  min-width: 120px;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .theme-toggle {

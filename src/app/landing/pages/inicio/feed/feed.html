@@ -4,7 +4,7 @@
     <div class="feed-header">
       <div class="feed-header-left">
         <span class="live-dot"></span>
-        <span class="label-md feed-title">Feed en Tiempo Real</span>
+        <span class="label-md feed-title">{{ 'feed' | t:'titulo' }}</span>
       </div>
     </div>
 
@@ -21,7 +21,7 @@
               <span class="label-code-sm snippet-file">auth.interceptor.ts</span>
             </div>
             <span class="snippet-badge">
-              <span class="material-symbols-outlined" style="font-size:12px">bolt</span> -38% Latencia
+              <span class="material-symbols-outlined" style="font-size:12px">bolt</span> -38% {{ 'feed' | t:'latencia' }}
             </span>
           </div>
           <pre class="snippet-code label-code-sm"><code><span class="code-purple">export const</span> <span class="code-blue">authInterceptor</span>: HttpInterceptorFn = (req, next) =&gt; &#123;
@@ -71,7 +71,7 @@
             <div class="job-offer-logo">NW</div>
             <div class="job-offer-badge-row">
               <span class="match-badge">Match 94%</span>
-              <span class="job-type-badge">Tiempo completo</span>
+              <span class="job-type-badge">{{ 'feed' | t:'tiempoCompleto' }}</span>
             </div>
           </div>
           <div class="job-offer-body">
@@ -84,7 +84,7 @@
               <span class="job-tag">GraphQL</span>
             </div>
           </div>
-          <button class="btn-apply">Aplicar rápido</button>
+          <button class="btn-apply">{{ 'feed' | t:'aplicar' }}</button>
         </div>
 
         <div class="arch-card">
@@ -110,8 +110,8 @@
           </div>
           <div class="arch-footer caption">
             <span class="material-symbols-outlined" style="font-size:16px">arrow_forward</span>
-            <span>Las dependencias solo apuntan hacia el dominio</span>
-            <span class="mini-map-link">Ver guia →</span>
+            <span>{{ 'feed' | t:'dependencias' }}</span>
+            <span class="mini-map-link">{{ 'feed' | t:'verGuia' }}</span>
           </div>
         </div>
 

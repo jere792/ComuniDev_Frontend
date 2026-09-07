@@ -2,25 +2,25 @@
   <div class="card register-card">
     <a routerLink="/" class="back-link">
       <span class="material-symbols-outlined">arrow_back</span>
-      <span class="label-md">Volver a inicio</span>
+      <span class="label-md">{{ 'register' | t:'volver' }}</span>
     </a>
-    <h1 class="headline-md">Crear cuenta</h1>
-    <p class="body-md register-subtitle">Únete a la comunidad tech más completa.</p>
+    <h1 class="headline-md">{{ 'register' | t:'crearCuenta' }}</h1>
+    <p class="body-md register-subtitle">{{ 'register' | t:'subtitulo' }}</p>
 
     <form class="register-form" (ngSubmit)="onSubmit()">
       <div class="form-row">
         <div class="form-group">
-          <label class="label-md" for="nombre">Nombre *</label>
+          <label class="label-md" for="nombre">{{ 'register' | t:'nombre' }} *</label>
           <input class="input" type="text" id="nombre" placeholder="Carlos" [ngModel]="nombre()" (ngModelChange)="nombre.set($event)" name="nombre" required />
         </div>
         <div class="form-group">
-          <label class="label-md" for="apellido">Apellido</label>
+          <label class="label-md" for="apellido">{{ 'register' | t:'apellido' }}</label>
           <input class="input" type="text" id="apellido" placeholder="Ruiz" [ngModel]="apellido()" (ngModelChange)="apellido.set($event)" name="apellido" />
         </div>
       </div>
 
       <div class="form-group">
-        <label class="label-md" for="username">Nombre de usuario *</label>
+        <label class="label-md" for="username">{{ 'register' | t:'nombreUsuario' }} *</label>
         <input class="input" type="text" id="username" placeholder="carlosdev" [ngModel]="nombreUsuario()" (ngModelChange)="nombreUsuario.set($event)" name="username" required minlength="3" maxlength="30" />
         @if (nombreUsuario().length > 0 && !usernameValid) {
           <span class="form-error">Entre 3 y 30 caracteres</span>
@@ -28,7 +28,7 @@
       </div>
 
       <div class="form-group">
-        <label class="label-md" for="telefono">Teléfono</label>
+        <label class="label-md" for="telefono">{{ 'register' | t:'telefono' }}</label>
         <div class="phone-input">
           <div class="phone-code-dropdown" (click)="toggleCountryDropdown()">
             <img [src]="getFlagUrl(selectedCountry().flag)" [alt]="selectedCountry().code" class="phone-code-flag-img" />
@@ -50,7 +50,7 @@
       </div>
 
       <div class="form-group">
-        <label class="label-md" for="email">Email *</label>
+        <label class="label-md" for="email">{{ 'register' | t:'email' }} *</label>
         <input class="input" type="email" id="email" placeholder="carlos@correo.com" [ngModel]="email()" (ngModelChange)="email.set($event)" name="email" required />
         @if (email().length > 0 && !emailValid) {
           <span class="form-error">Ingresa un email válido</span>
@@ -58,7 +58,7 @@
       </div>
 
       <div class="form-group">
-        <label class="label-md" for="password">Contraseña *</label>
+        <label class="label-md" for="password">{{ 'register' | t:'contrasena' }} *</label>
         <input class="input" type="password" id="password" placeholder="Mínimo 8 caracteres" [ngModel]="password()" (ngModelChange)="password.set($event)" name="password" required minlength="8" />
         @if (password().length > 0 && !passwordValid) {
           <span class="form-error">Mínimo 8 caracteres</span>
@@ -66,30 +66,30 @@
       </div>
 
       <div class="form-group">
-        <label class="label-md" for="confirmPassword">Confirmar contraseña *</label>
-        <input class="input" type="password" id="confirmPassword" placeholder="Repite tu contraseña" [ngModel]="confirmPassword()" (ngModelChange)="confirmPassword.set($event)" name="confirmPassword" required />
+        <label class="label-md" for="confirmPassword">{{ 'register' | t:'confirmarContrasena' }} *</label>
+        <input class="input" type="password" id="confirmPassword" [placeholder]="'register' | t:'repite'" [ngModel]="confirmPassword()" (ngModelChange)="confirmPassword.set($event)" name="confirmPassword" required />
         @if (confirmPassword().length > 0 && !passwordsMatch) {
           <span class="form-error">Las contraseñas no coinciden</span>
         }
       </div>
 
       <div class="form-group">
-        <label class="label-md">Rol</label>
+        <label class="label-md">{{ 'register' | t:'rol' }}</label>
         <div class="rol-buttons">
           <button type="button" class="rol-btn" [class.active]="rol() === 'DEVELOPER'" (click)="rol.set('DEVELOPER')">
             <span class="material-symbols-outlined">code</span>
-            <span class="label-md">Desarrollador</span>
+            <span class="label-md">{{ 'register' | t:'desarrollador' }}</span>
           </button>
           <button type="button" class="rol-btn" [class.active]="rol() === 'RECRUITER'" (click)="rol.set('RECRUITER')">
             <span class="material-symbols-outlined">work</span>
-            <span class="label-md">Reclutador</span>
+            <span class="label-md">{{ 'register' | t:'reclutador' }}</span>
           </button>
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary register-btn" [disabled]="!formValid">Crear cuenta</button>
+      <button type="submit" class="btn btn-primary register-btn" [disabled]="!formValid">{{ 'register' | t:'crearCuenta' }}</button>
     </form>
 
-    <p class="body-sm register-footer">¿Ya tienes cuenta? <a routerLink="/login" class="register-link">Iniciar sesión</a></p>
+    <p class="body-sm register-footer">{{ 'register' | t:'yaTienesCuenta' }} <a routerLink="/login" class="register-link">{{ 'register' | t:'iniciarSesion' }}</a></p>
   </div>
 </section>

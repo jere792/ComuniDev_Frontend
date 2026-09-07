@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslationPipe } from '../../../core/pipes/translation.pipe';
 
 interface Country {
   flag: string;
@@ -10,7 +11,7 @@ interface Country {
 
 @Component({
   selector: 'app-register',
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, TranslationPipe],
   templateUrl: './register.html',
   styleUrl: './register.scss',
 })

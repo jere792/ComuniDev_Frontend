@@ -1,93 +1,102 @@
 <div class="contact-messenger">
   <div class="messenger-container">
-    <div class="messenger-sidebar">
-      <div class="messenger-tabs">
-        <button class="messenger-tab active">
-          <span class="material-symbols-outlined">inbox</span>
-          <span class="label-md">General</span>
-        </button>
-        <button class="messenger-tab">
-          <span class="material-symbols-outlined">support_agent</span>
-          <span class="label-md">Soporte</span>
-        </button>
-        <button class="messenger-tab">
-          <span class="material-symbols-outlined">handshake</span>
-          <span class="label-md">Colaboración</span>
-        </button>
-      </div>
-
-      <div class="messenger-threads">
-        <div class="thread-item active">
-          <div class="thread-avatar">SG</div>
-          <div class="thread-info">
-            <div class="thread-top">
-              <span class="label-md">SolveGrades</span>
-              <span class="metadata-sm">2h</span>
-            </div>
-            <span class="body-sm thread-preview">¡Bienvenido! ¿En qué podemos ayudarte?</span>
-          </div>
-        </div>
-        <div class="thread-item">
-          <div class="thread-avatar avatar-green">SC</div>
-          <div class="thread-info">
-            <div class="thread-top">
-              <span class="label-md">Sarah Chen</span>
-              <span class="metadata-sm">1d</span>
-            </div>
-            <span class="body-sm thread-preview">Consulta sobre integración API...</span>
-          </div>
-        </div>
-        <div class="thread-item">
-          <div class="thread-avatar avatar-amber">MR</div>
-          <div class="thread-info">
-            <div class="thread-top">
-              <span class="label-md">Marcos Rivera</span>
-              <span class="metadata-sm">3d</span>
-            </div>
-            <span class="body-sm thread-preview">Propuesta de partnership...</span>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <div class="messenger-chat">
       <div class="chat-header">
         <div class="chat-header-info">
-          <div class="thread-avatar">SG</div>
+          <img [src]="mascotUrl" alt="Nexo" class="chat-avatar-img" />
           <div>
-            <span class="label-md">SolveGrades</span>
+            <span class="label-md">Nexo</span>
             <span class="body-sm chat-status">En línea</span>
           </div>
         </div>
         <span class="material-symbols-outlined chat-more">more_vert</span>
       </div>
 
-      <div class="chat-body">
+      <div class="chat-body" #chatBody>
         <div class="chat-date">
           <span class="metadata-sm">Hoy</span>
         </div>
 
-        <div class="chat-message received">
-          <div class="message-bubble">
-            <span class="body-md">¡Hola! 👋 Bienvenido a SolveGrades. ¿En qué podemos ayudarte hoy?</span>
+        @if (showWelcome()) {
+          <div class="welcome-card">
+            <img [src]="welcomeMascotUrl" alt="Nexo" class="welcome-mascot" />
+            <span class="headline-sm">¡Hola! Soy Nexo 👋</span>
+            <span class="body-md welcome-text">
+              Tu asistente virtual de SolveGrades. Estoy aquí para ayudarte con cualquier duda o consulta que tengas.
+            </span>
+            <button class="welcome-btn" (click)="onStartChat()">
+              <span class="label-lg">Iniciar conversación</span>
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
           </div>
-          <span class="metadata-sm message-time">10:24</span>
-        </div>
+        } @else {
+          @for (msg of messages(); track $index) {
+            <div class="chat-message" [class]="msg.sender">
+              @if (msg.sender === 'bot') {
+                <img [src]="mascotUrl" alt="Nexo" class="message-avatar-img" />
+              }
+              <div class="message-content">
+                <div class="message-bubble">
+                  <span class="body-md" [style.white-space]="'pre-line'">{{ msg.text }}</span>
+                </div>
+                <span class="metadata-sm message-time">{{ msg.time }}</span>
+              </div>
+            </div>
+          }
 
-        <div class="chat-message received">
-          <div class="message-bubble">
-            <span class="body-md">Puedes consultarnos sobre la plataforma, reportar bugs, o proponer mejoras.</span>
-          </div>
-          <span class="metadata-sm message-time">10:24</span>
-        </div>
+          @if (typewriterText()) {
+            <div class="chat-message bot">
+              <img [src]="mascotUrl" alt="Nexo" class="message-avatar-img" />
+              <div class="message-content">
+                <div class="message-bubble">
+                  <span class="body-md" [style.white-space]="'pre-line'">{{ typewriterText() }}</span>
+                  <span class="cursor">|</span>
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (isTyping() && !typewriterText()) {
+            <div class="chat-message bot">
+              <img [src]="mascotUrl" alt="Nexo" class="message-avatar-img" />
+              <div class="message-content">
+                <div class="message-bubble typing-bubble">
+                  <span class="typing-dot"></span>
+                  <span class="typing-dot"></span>
+                  <span class="typing-dot"></span>
+                </div>
+              </div>
+            </div>
+          }
+        }
       </div>
 
       <div class="chat-input">
-        <input type="text" placeholder="Escribe un mensaje..." class="chat-field" />
-        <button class="chat-send">
-          <span class="material-symbols-outlined">send</span>
-        </button>
+        @if (!showWelcome()) {
+          @if (currentStepData.type === 'selector' && !isTyping()) {
+            <div class="selector-options">
+              @for (opt of currentStepData.options; track opt.value) {
+                <button class="option-btn" (click)="selectOption(opt.value, opt.label)">{{ opt.label }}</button>
+              }
+            </div>
+          } @else {
+            <input
+              type="text"
+              [placeholder]="placeholder"
+              class="chat-field"
+              [ngModel]="inputValue()"
+              (ngModelChange)="inputValue.set($event)"
+              (keydown.enter)="sendMessage()"
+              [disabled]="isTyping() || isComplete()"
+            />
+            <button class="chat-send" (click)="sendMessage()" [disabled]="isTyping() || isComplete()">
+              <span class="material-symbols-outlined">send</span>
+            </button>
+          }
+        }
       </div>
     </div>
+
   </div>
 </div>

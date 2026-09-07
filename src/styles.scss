@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Hanken+Grotesk:wght@300..800&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Hanken+Grotesk:wght@300..800&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Chakra+Petch:wght@400;500;600;700&display=swap');
 
 // ============================================================
 // COMUNIDEV DESIGN SYSTEM
@@ -80,6 +80,7 @@
   --font-display: 'Newsreader', serif;
   --font-body: 'Hanken Grotesk', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+  --font-tech: 'Chakra Petch', sans-serif;
 
   // ── Typography Scale ──
   --text-display-lg: 500 48px/56px var(--font-display);

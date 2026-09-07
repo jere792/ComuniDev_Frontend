@@ -1,0 +1,104 @@
+.chat-preview {
+  width: 100%;
+  max-width: 340px;
+  background-color: var(--surface-container-lowest);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-floating);
+}
+
+.chat-preview-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.chat-preview-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--primary-container), var(--tertiary-container));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--on-primary);
+}
+
+.chat-preview-status {
+  display: flex;
+  flex-direction: column;
+}
+
+.online {
+  color: var(--status-success);
+}
+
+.chat-preview-body {
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-height: 140px;
+}
+
+.chat-msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 85%;
+
+  &.received {
+    align-self: flex-start;
+  }
+
+  &.sent {
+    align-self: flex-end;
+  }
+}
+
+.chat-bubble {
+  padding: 8px 14px;
+  border-radius: var(--radius-lg);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--on-surface);
+}
+
+.received .chat-bubble {
+  background-color: var(--surface-container);
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+.sent .chat-bubble {
+  background-color: var(--primary-container);
+  color: var(--on-primary-container);
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+.chat-msg .metadata-sm {
+  color: var(--on-surface-variant);
+  margin-top: 2px;
+  padding: 0 4px;
+}
+
+.sent .metadata-sm {
+  text-align: right;
+}
+
+.chat-preview-input {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+  color: var(--outline);
+
+  .material-symbols-outlined {
+    font-size: 18px;
+    color: var(--primary-container);
+  }
+}

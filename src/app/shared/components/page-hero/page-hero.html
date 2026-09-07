@@ -1,21 +1,27 @@
 <div class="page-hero">
-  <div class="page-hero-content">
-    @if (badge()) {
-      <span class="page-hero-badge badge">{{ badge() }}</span>
-    }
-    <h1 class="display-lg-mobile">{{ title() }}</h1>
-    @if (subtitle()) {
-      <p class="body-lg page-hero-subtitle">{{ subtitle() }}</p>
-    }
-    @if (info().length) {
-      <div class="page-hero-info">
-        @for (item of info(); track item.icon) {
-          <div class="page-hero-info-item">
-            <span class="material-symbols-outlined">{{ item.icon }}</span>
-            <span class="body-sm">{{ item.text }}</span>
-          </div>
-        }
-      </div>
-    }
+  <div class="page-hero-inner">
+    <div class="page-hero-left">
+      @if (badge()) {
+        <span class="page-hero-badge badge">{{ badge() }}</span>
+      }
+      <h1 class="display-lg-mobile">{{ title() }}</h1>
+      @if (subtitle()) {
+        <p class="body-lg page-hero-subtitle">{{ subtitle() }}</p>
+      }
+      @if (info().length) {
+        <div class="page-hero-info">
+          @for (item of info(); track item.icon) {
+            <div class="page-hero-info-card">
+              <span class="material-symbols-outlined">{{ item.icon }}</span>
+              <span class="body-sm">{{ item.text }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="page-hero-right">
+      <ng-content></ng-content>
+    </div>
   </div>
 </div>

@@ -1,0 +1,22 @@
+.about-hero-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-2xl);
+  background: linear-gradient(135deg, var(--primary-container), var(--tertiary-container));
+  border-radius: var(--radius-xl);
+  text-align: center;
+  max-width: 280px;
+}
+
+.hero-icon {
+  font-size: 48px;
+  color: var(--on-primary-container);
+}

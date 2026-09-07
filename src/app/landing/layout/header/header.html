@@ -8,10 +8,10 @@
       />
     </a>
     <div class="nav-links">
-      <a routerLink="/" class="nav-pill active">Inicio</a>
-      <a routerLink="/contact" class="nav-pill">Contacto</a>
-      <a routerLink="/about" class="nav-pill">Sobre nosotros</a>
-      <a routerLink="/download-apk" class="nav-pill">Descargar</a>
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-pill">Inicio</a>
+      <a routerLink="/about" routerLinkActive="active" class="nav-pill">Sobre nosotros</a>
+      <a routerLink="/contact" routerLinkActive="active" class="nav-pill">Contacto</a>
+      <a routerLink="/download-apk" routerLinkActive="active" class="nav-pill">Descargar</a>
     </div>
   </nav>
   <div class="header-actions">

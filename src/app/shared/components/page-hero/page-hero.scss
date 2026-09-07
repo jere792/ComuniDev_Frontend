@@ -1,48 +1,89 @@
 .page-hero {
-  padding: var(--space-3xl) var(--space-xl);
+  padding: 125px var(--space-xl) var(--space-3xl);
   background-color: var(--surface-container-low);
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.page-hero-content {
+.page-hero-inner {
   max-width: var(--container-max);
   margin: 0 auto;
-  text-align: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3xl);
+  align-items: center;
+}
+
+// ── Left ──
+
+.page-hero-left {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: var(--space-md);
 }
 
 .page-hero-badge {
-  margin-bottom: var(--space-xs);
+  width: fit-content;
+}
+
+h1 {
+  font-family: var(--font-tech);
+  font-size: clamp(36px, 6vw, 64px);
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .page-hero-subtitle {
   color: var(--on-surface-variant);
+  max-width: 480px;
 }
 
 .page-hero-info {
   display: flex;
-  gap: var(--space-xl);
-  margin-top: var(--space-sm);
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
 }
 
-.page-hero-info-item {
-  display: flex;
+.page-hero-info-card {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 6px;
+  padding: 6px 14px;
+  background-color: var(--surface-container-lowest);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
   color: var(--on-surface-variant);
+  font-size: 13px;
+  white-space: nowrap;
+  transition: border-color 0.15s ease;
 
   .material-symbols-outlined {
-    font-size: 18px;
+    font-size: 16px;
     color: var(--primary-container);
+  }
+
+  &:hover {
+    border-color: var(--primary-container);
   }
 }
 
-@media (max-width: 600px) {
-  .page-hero-info {
-    flex-direction: column;
-    gap: var(--space-sm);
+// ── Right ──
+
+.page-hero-right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-right: var(--space-3xl);
+}
+
+@media (max-width: 900px) {
+  .page-hero-inner {
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+  }
+
+  .page-hero-right {
+    justify-content: center;
   }
 }

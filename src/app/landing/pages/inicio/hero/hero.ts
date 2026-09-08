@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Login } from './login/login';
 import { TranslationPipe } from '../../../../core/pipes/translation.pipe';
 import { AuthService } from '../../../../core/services/auth.service';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-hero',
@@ -40,6 +41,6 @@ export class Hero {
   }
 
   onGitHubAuth(): void {
-    window.location.href = 'http://localhost:8080/api/v1/auth/github';
+    window.location.href = `${environment.apiUrl}/auth/github`;
   }
 }

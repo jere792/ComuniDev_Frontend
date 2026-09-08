@@ -1,5 +1,6 @@
 import { Component, signal, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RevealDirective } from '../../../../shared/directives/reveal/reveal.directive';
 
 interface ChatMessage {
   sender: 'bot' | 'user';
@@ -9,7 +10,7 @@ interface ChatMessage {
 
 @Component({
   selector: 'app-contact-messenger',
-  imports: [FormsModule],
+  imports: [FormsModule, RevealDirective],
   templateUrl: './messenger.html',
   styleUrl: './messenger.scss',
 })

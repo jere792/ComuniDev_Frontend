@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslationPipe } from '../../../core/pipes/translation.pipe';
+import { RevealDirective } from '../../../shared/directives/reveal/reveal.directive';
 
 interface Country {
   flag: string;
@@ -11,7 +12,7 @@ interface Country {
 
 @Component({
   selector: 'app-register',
-  imports: [RouterLink, FormsModule, TranslationPipe],
+  imports: [RouterLink, FormsModule, TranslationPipe, RevealDirective],
   templateUrl: './register.html',
   styleUrl: './register.scss',
 })

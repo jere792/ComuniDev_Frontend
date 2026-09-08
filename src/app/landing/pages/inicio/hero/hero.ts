@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Login } from './login/login';
 import { TranslationPipe } from '../../../../core/pipes/translation.pipe';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-hero',
@@ -12,25 +13,33 @@ import { TranslationPipe } from '../../../../core/pipes/translation.pipe';
 })
 export class Hero {
   loginForm: FormGroup;
+  loginError = '';
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private authService: AuthService) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 
-  onLogin(): void {
+  async onLogin(): Promise<void> {
     if (this.loginForm.valid) {
-      console.log('Login:', this.loginForm.value);
+      this.loginError = '';
+      const { email, password } = this.loginForm.value;
+      try {
+        const data = await this.authService.login(email, password);
+        this.authService.navigateByRole(data.rolActivo);
+      } catch (err: any) {
+        this.loginError = err?.error?.message || 'Credenciales invalidas';
+      }
     }
   }
 
   onGoogleAuth(): void {
-    console.log('Google OAuth - pendiente integración');
+    console.log('Google OAuth - pendiente integracion');
   }
 
   onGitHubAuth(): void {
-    console.log('GitHub OAuth - pendiente integración');
+    window.location.href = 'http://localhost:8080/api/v1/auth/github';
   }
 }

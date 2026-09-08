@@ -79,7 +79,7 @@
           <p class="body-sm auth-subtitle">{{ 'hero' | t:'bienvenido' }}</p>
         </div>
 
-        <app-login [form]="loginForm" (submitLogin)="onLogin()" (googleAuth)="onGoogleAuth()" (githubAuth)="onGitHubAuth()"></app-login>
+        <app-login [form]="loginForm" [error]="loginError" (submitLogin)="onLogin()" (googleAuth)="onGoogleAuth()" (githubAuth)="onGitHubAuth()"></app-login>
 
         <p class="body-sm auth-footer">
           {{ 'hero' | t:'noTienesCuenta' }}

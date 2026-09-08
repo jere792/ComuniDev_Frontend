@@ -1,4 +1,7 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+  @if (error) {
+    <div class="form-error">{{ error }}</div>
+  }
   <div class="form-field">
     <label class="label-md" for="login-email">{{ 'login' | t:'email' }}</label>
     <input class="input" type="email" id="login-email" formControlName="email" [placeholder]="'login' | t:'emailPlaceholder'">

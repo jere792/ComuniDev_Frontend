@@ -11,6 +11,7 @@ import { TranslationPipe } from '../../../../../core/pipes/translation.pipe';
 })
 export class Login {
   @Input({ required: true }) form!: FormGroup;
+  @Input() error: string = '';
   @Output() submitLogin = new EventEmitter<void>();
   @Output() googleAuth = new EventEmitter<void>();
   @Output() githubAuth = new EventEmitter<void>();

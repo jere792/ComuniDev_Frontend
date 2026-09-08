@@ -31,5 +31,13 @@ export const routes: Routes = [
     data: { roles: ['moderator', 'admin'] },
     loadChildren: () => import('./moderator/moderator.routes').then(m => m.routes),
   },
+  {
+    path: 'auth/callback',
+    loadComponent: () => import('./auth/callback/auth-callback.component').then(m => m.AuthCallbackComponent),
+  },
+  {
+    path: 'auth/role-selection',
+    loadComponent: () => import('./auth/role-selection/role-selection.component').then(m => m.RoleSelectionComponent),
+  },
   { path: '**', redirectTo: '' },
 ];

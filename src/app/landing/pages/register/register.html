@@ -8,6 +8,12 @@
     <p class="body-md register-subtitle">{{ 'register' | t:'subtitulo' }}</p>
 
     <form class="register-form" (ngSubmit)="onSubmit()">
+      @if (errorMessage()) {
+        <div class="form-error">{{ errorMessage() }}</div>
+      }
+      @if (successMessage()) {
+        <div class="form-success">{{ successMessage() }}</div>
+      }
       <div class="form-row">
         <div class="form-group">
           <label class="label-md" for="nombre">{{ 'register' | t:'nombre' }} *</label>

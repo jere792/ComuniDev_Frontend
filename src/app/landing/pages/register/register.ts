@@ -1,8 +1,9 @@
 import { Component, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslationPipe } from '../../../core/pipes/translation.pipe';
 import { RevealDirective } from '../../../shared/directives/reveal/reveal.directive';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface Country {
   flag: string;
@@ -28,6 +29,8 @@ export class Register {
   rol = signal('DEVELOPER');
   submitted = signal(false);
   showCountryDropdown = signal(false);
+  errorMessage = signal('');
+  successMessage = signal('');
 
   countries: Country[] = [
     { flag: 'pe', code: 'PE', dial: '+51' },
@@ -49,6 +52,8 @@ export class Register {
     { flag: 'do', code: 'DO', dial: '+1' },
     { flag: 'cu', code: 'CU', dial: '+53' },
   ];
+
+  constructor(private authService: AuthService, private router: Router) {}
 
   getFlagUrl(countryCode: string): string {
     return `https://flagcdn.io/${countryCode.toLowerCase()}.svg`;
@@ -94,17 +99,27 @@ export class Register {
     );
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (!this.formValid) return;
-    this.submitted.set(true);
-    console.log({
-      nombre: this.nombre(),
-      apellido: this.apellido(),
-      nombreUsuario: this.nombreUsuario(),
-      email: this.email(),
-      password: this.password(),
-      telefono: `${this.phoneCode()} ${this.telefono()}`,
-      rol: this.rol(),
-    });
+    this.errorMessage.set('');
+    this.successMessage.set('');
+
+    const fullName = this.apellido()
+      ? `${this.nombre()} ${this.apellido()}`
+      : this.nombre();
+
+    try {
+      await this.authService.register(
+        fullName,
+        this.nombreUsuario(),
+        this.email(),
+        this.password(),
+        this.rol()
+      );
+      this.successMessage.set('Cuenta creada exitosamente. Ahora puedes iniciar sesion.');
+      setTimeout(() => this.router.navigate(['/']), 2000);
+    } catch (err: any) {
+      this.errorMessage.set(err?.error?.message || 'Error al crear la cuenta');
+    }
   }
 }

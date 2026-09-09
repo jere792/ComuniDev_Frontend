@@ -1,12 +1,11 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { GraphQLService, User } from '../../../core/services/graphql.service';
 
 @Component({
   selector: 'app-admin-users',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './users.html',
   styleUrl: './users.scss',
 })

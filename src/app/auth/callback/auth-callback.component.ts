@@ -38,13 +38,14 @@ export class AuthCallbackComponent implements OnInit {
       }
 
       if (token && role) {
+        const normalizedRole = role.toLowerCase();
         localStorage.setItem('token', token);
-        localStorage.setItem('role', role);
+        localStorage.setItem('role', normalizedRole);
         if (userId) localStorage.setItem('userId', userId);
         if (nombre) localStorage.setItem('userName', nombre);
         if (email) localStorage.setItem('userEmail', email);
 
-        switch (role) {
+        switch (normalizedRole) {
           case 'admin': this.router.navigate(['/admin']); break;
           case 'moderator': this.router.navigate(['/moderator']); break;
           case 'recruiter': this.router.navigate(['/recruiter']); break;

@@ -4,6 +4,8 @@
     <main class="user-main">
       <router-outlet />
     </main>
-    <app-user-right-panel />
+    @if (showRightPanel) {
+      <app-user-right-panel />
+    }
   </div>
 </div>

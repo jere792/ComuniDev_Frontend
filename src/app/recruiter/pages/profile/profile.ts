@@ -18,13 +18,6 @@ export class RecruiterProfile implements OnInit {
   errorMessage = signal('');
   loading = signal(false);
 
-  // Recruiter-specific stats (mock for now)
-  stats = signal({
-    candidates: 156,
-    offers: 12,
-    interviews: 48,
-  });
-
   constructor(
     private fb: FormBuilder,
     private graphql: GraphQLService

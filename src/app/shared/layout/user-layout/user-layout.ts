@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet, ActivatedRoute } from '@angular/router';
+import { Router, RouterOutlet, ActivatedRoute, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { UserSidebar, SidebarLink } from './components/user-sidebar/user-sidebar';
 import { UserRightPanel } from './components/user-right-panel/user-right-panel';
 
@@ -11,11 +12,19 @@ import { UserRightPanel } from './components/user-right-panel/user-right-panel';
 })
 export class UserLayout implements OnInit {
   sidebarLinks: SidebarLink[] = [];
+  showRightPanel = true;
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, private router: Router) {}
 
   ngOnInit(): void {
     const data = this.route.snapshot.data;
     this.sidebarLinks = data['sidebarLinks'] || [];
+
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event) => {
+      const navEnd = event as NavigationEnd;
+      this.showRightPanel = !navEnd.urlAfterRedirects.includes('/profile');
+    });
   }
 }

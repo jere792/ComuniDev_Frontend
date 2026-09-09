@@ -114,36 +114,6 @@
   color: var(--text-secondary);
 }
 
-.profile-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-
-  .stat-card {
-    background: var(--bg-secondary);
-    border-radius: 12px;
-    padding: 16px;
-    text-align: center;
-    border: 1px solid var(--border-color);
-
-    .stat-value {
-      display: block;
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 4px;
-    }
-
-    .stat-label {
-      font-size: 13px;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-  }
-}
-
 .profile-details {
   display: flex;
   flex-direction: column;

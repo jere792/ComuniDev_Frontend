@@ -1,0 +1,103 @@
+:host {
+  display: block;
+}
+
+.user-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-xl);
+  background-color: var(--surface-container-lowest);
+  border-bottom: 1px solid var(--border-subtle);
+  height: 64px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.icon-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: var(--surface-container);
+    color: var(--on-surface);
+  }
+
+  .material-symbols-outlined {
+    font-size: 22px;
+  }
+}
+
+.notification-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background-color: var(--error);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--surface-container-lowest);
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--primary-container), var(--tertiary-container));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: var(--space-sm);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  .material-symbols-outlined {
+    font-size: 20px;
+    color: #fff;
+  }
+}
+
+.badge {
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background-color: var(--primary-container);
+  color: var(--on-primary);
+}

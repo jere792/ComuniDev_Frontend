@@ -1,0 +1,159 @@
+.reels-container {
+  width: 100%;
+  max-width: 400px;
+  height: calc(100vh - var(--space-lg));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.reel-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-height: 700px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--surface-container);
+}
+
+.reel-video-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.reel-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.reel-actions {
+  position: absolute;
+  right: var(--space-md);
+  bottom: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2xs);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+
+  .material-symbols-outlined {
+    font-size: 28px;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+
+    &.liked {
+      color: #e74c3c;
+    }
+
+    &.saved {
+      color: var(--primary);
+    }
+  }
+}
+
+.action-count {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.reel-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-lg);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: #fff;
+}
+
+.reel-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.follow-btn {
+  padding: var(--space-2xs) var(--space-md);
+  border: 1px solid #fff;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #fff;
+    color: #000;
+  }
+}
+
+.reel-description {
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.reel-nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.nav-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}

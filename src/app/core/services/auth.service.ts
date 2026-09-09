@@ -21,6 +21,7 @@ export class AuthService {
           localStorage.setItem('token', data.token);
           localStorage.setItem('role', data.rolActivo.toLowerCase());
           localStorage.setItem('userId', data.id);
+          localStorage.setItem('userName', data.nombre || data.nombreUsuario);
           resolve(data);
         },
         error: (err) => reject(err),
@@ -59,6 +60,7 @@ export class AuthService {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
     this.router.navigate(['/']);
   }
 }

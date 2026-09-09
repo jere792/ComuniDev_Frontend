@@ -1,0 +1,134 @@
+.profile-container {
+  width: 100%;
+  max-width: 500px;
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.avatar-section {
+  position: relative;
+  display: inline-block;
+  margin-bottom: var(--space-lg);
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--primary-container);
+}
+
+.edit-avatar-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  .material-symbols-outlined {
+    font-size: 18px;
+  }
+}
+
+.profile-name {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--on-surface);
+  margin: 0 0 var(--space-xs) 0;
+}
+
+.profile-role {
+  font-size: 16px;
+  color: var(--primary-container);
+  font-weight: 500;
+  margin: 0 0 var(--space-2xs) 0;
+}
+
+.profile-company {
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  margin: 0 0 var(--space-2xs) 0;
+}
+
+.profile-email {
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  margin: 0;
+}
+
+.stats-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary-container);
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin-top: var(--space-2xs);
+}
+
+.profile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--surface-container-lowest);
+  color: var(--on-surface);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--surface-container);
+  }
+
+  .material-symbols-outlined {
+    font-size: 22px;
+    color: var(--on-surface-variant);
+  }
+}

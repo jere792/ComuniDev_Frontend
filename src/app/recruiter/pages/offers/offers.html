@@ -1,0 +1,52 @@
+<div class="offers-container">
+  <div class="offers-header">
+    <h2 class="section-title">Mis Ofertas</h2>
+    <button class="btn btn-primary" (click)="openCreateModal()">
+      <span class="material-symbols-outlined">add</span>
+      Nueva Oferta
+    </button>
+  </div>
+
+  <div class="offers-list">
+    @for (offer of offers; track offer.id) {
+      <div class="offer-card">
+        <div class="offer-status" [class]="offer.status">
+          {{ offer.status === 'active' ? 'Activa' : 'Pausada' }}
+        </div>
+
+        <h3 class="offer-title">{{ offer.title }}</h3>
+        <p class="offer-company">{{ offer.company }}</p>
+
+        <div class="offer-details">
+          <span class="detail-item">
+            <span class="material-symbols-outlined">location_on</span>
+            {{ offer.location }}
+          </span>
+          <span class="detail-item">
+            <span class="material-symbols-outlined">payments</span>
+            {{ offer.salary }}
+          </span>
+          <span class="detail-item">
+            <span class="material-symbols-outlined">schedule</span>
+            {{ offer.type }}
+          </span>
+        </div>
+
+        <div class="offer-footer">
+          <span class="posted-time">{{ offer.posted }}</span>
+          <div class="offer-stats">
+            <span class="stat">
+              <span class="material-symbols-outlined">person</span>
+              {{ offer.applicants }} postulados
+            </span>
+          </div>
+        </div>
+
+        <div class="offer-actions">
+          <button class="btn btn-outline">Editar</button>
+          <button class="btn btn-outline">Ver postulados</button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

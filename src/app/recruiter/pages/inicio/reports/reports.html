@@ -1,0 +1,131 @@
+<div class="reports-section">
+  @for (report of reports; track report.id) {
+    <div class="report-card">
+      <div class="report-header">
+        <img [src]="report.user.avatar" [alt]="report.user.name" class="user-avatar" />
+        <div class="user-info">
+          <span class="user-name">{{ report.user.name }}</span>
+          <span class="post-time">{{ report.time }}</span>
+        </div>
+        @if (report.isOwn) {
+          <div class="report-menu">
+            <button class="menu-btn" (click)="startEdit(report)">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button class="menu-btn delete" (click)="deleteReport(report)">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="report-content">
+        @if (report.isEditing) {
+          <div class="edit-mode">
+            <textarea
+              [(ngModel)]="report.editText"
+              class="edit-textarea"
+              rows="3"
+            ></textarea>
+            <div class="edit-actions">
+              <button class="btn btn-outline" (click)="cancelEdit(report)">Cancelar</button>
+              <button class="btn btn-primary" (click)="saveEdit(report)">Guardar</button>
+            </div>
+          </div>
+        } @else {
+          <p class="content-text">{{ report.content }}</p>
+        }
+      </div>
+
+      @if (report.image && !report.isEditing) {
+        <div class="report-image">
+          <img [src]="report.image" alt="Post image" />
+        </div>
+      }
+
+      <div class="reactions-bar">
+        @for (reaction of report.reactions; track reaction.type) {
+          <button
+            class="reaction-btn"
+            [class.active]="reaction.reacted"
+            (click)="reaction.type !== 'comment' && toggleReaction(report, reaction.type)">
+            <span class="material-symbols-outlined">
+              {{ reaction.type === 'like' ? (reaction.reacted ? 'thumb_up' : 'thumb_up_off_alt') :
+                 reaction.type === 'love' ? (reaction.reacted ? 'favorite' : 'favorite_border') :
+                 'chat_bubble_outline' }}
+            </span>
+            <span class="reaction-count">{{ reaction.count }}</span>
+          </button>
+        }
+      </div>
+
+      @if (report.showComments) {
+        <div class="comments-section">
+          @for (comment of report.comments; track comment.id) {
+            <div class="comment">
+              <img [src]="comment.user.avatar" [alt]="comment.user.name" class="comment-avatar" />
+              <div class="comment-body">
+                <div class="comment-header">
+                  <span class="comment-name">{{ comment.user.name }}</span>
+                  <span class="comment-time">{{ comment.time }}</span>
+                </div>
+                <p class="comment-text">{{ comment.text }}</p>
+                <div class="comment-actions">
+                  <button class="action-link" [class.liked]="comment.liked" (click)="toggleCommentLike(comment)">
+                    {{ comment.liked ? 'Liked' : 'Like' }} ({{ comment.likes }})
+                  </button>
+                  <button class="action-link" (click)="toggleReply(comment)">Responder</button>
+                  @if (comment.replies.length > 0) {
+                    <button class="action-link" (click)="comment.showReplies = !comment.showReplies">
+                      {{ comment.showReplies ? 'Ocultar' : 'Ver' }} {{ comment.replies.length }} respuestas
+                    </button>
+                  }
+                </div>
+
+                @if (comment.showReplyInput) {
+                  <div class="reply-input">
+                    <input
+                      type="text"
+                      placeholder="Escribe una respuesta..."
+                      [(ngModel)]="comment.replyText"
+                      (keyup.enter)="addReply(comment, comment.replyText)"
+                    />
+                    <button class="send-btn" (click)="addReply(comment, comment.replyText)">
+                      <span class="material-symbols-outlined">send</span>
+                    </button>
+                  </div>
+                }
+
+                @if (comment.showReplies && comment.replies.length > 0) {
+                  <div class="replies">
+                    @for (reply of comment.replies; track reply.id) {
+                      <div class="reply">
+                        <img [src]="reply.user.avatar" [alt]="reply.user.name" class="reply-avatar" />
+                        <div class="reply-body">
+                          <div class="reply-header">
+                            <span class="reply-name">{{ reply.user.name }}</span>
+                            <span class="reply-time">{{ reply.time }}</span>
+                          </div>
+                          <p class="reply-text">{{ reply.text }}</p>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="add-comment">
+            <img src="https://i.pravatar.cc/150?img=12" alt="Tu" class="comment-avatar" />
+            <input
+              type="text"
+              placeholder="Escribe un comentario..."
+              (keyup.enter)="addComment(report, $any($event.target).value); $any($event.target).value = ''"
+            />
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

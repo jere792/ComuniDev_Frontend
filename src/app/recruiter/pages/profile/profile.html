@@ -1,0 +1,47 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <div class="avatar-section">
+      <img [src]="profile.avatar" [alt]="profile.name" class="profile-avatar" />
+      <button class="edit-avatar-btn">
+        <span class="material-symbols-outlined">camera_alt</span>
+      </button>
+    </div>
+
+    <div class="profile-info">
+      <h1 class="profile-name">{{ profile.name }}</h1>
+      <p class="profile-role">{{ profile.role }}</p>
+      <p class="profile-company">{{ profile.company }}</p>
+      <p class="profile-email">{{ profile.email }}</p>
+    </div>
+  </div>
+
+  <div class="stats-section">
+    <div class="stat-card">
+      <span class="stat-value">{{ profile.stats.candidates }}</span>
+      <span class="stat-label">Candidatos</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ profile.stats.offers }}</span>
+      <span class="stat-label">Ofertas</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ profile.stats.interviews }}</span>
+      <span class="stat-label">Entrevistas</span>
+    </div>
+  </div>
+
+  <div class="profile-actions">
+    <button class="action-btn">
+      <span class="material-symbols-outlined">edit</span>
+      Editar perfil
+    </button>
+    <button class="action-btn">
+      <span class="material-symbols-outlined">settings</span>
+      Configuración
+    </button>
+    <button class="action-btn">
+      <span class="material-symbols-outlined">share</span>
+      Compartir perfil
+    </button>
+  </div>
+</div>

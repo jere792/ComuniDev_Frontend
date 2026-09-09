@@ -1,0 +1,15 @@
+<aside class="sidebar">
+  <nav class="sidebar-nav">
+    @for (link of links; track link.route) {
+      <a [routerLink]="link.route" routerLinkActive="active" class="sidebar-link">
+        @if (link.icon) {
+          <span class="material-symbols-outlined">{{ link.icon }}</span>
+        }
+        {{ link.label }}
+      </a>
+    }
+  </nav>
+  <div class="sidebar-footer">
+    <button class="btn btn-ghost sidebar-logout" (click)="logout()">Cerrar sesión</button>
+  </div>
+</aside>

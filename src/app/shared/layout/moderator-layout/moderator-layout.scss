@@ -1,0 +1,17 @@
+.moderator-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.moderator-layout-body {
+  display: flex;
+  flex: 1;
+}
+
+.moderator-main {
+  flex: 1;
+  padding: var(--space-xl);
+  background-color: var(--surface);
+  overflow-y: auto;
+}

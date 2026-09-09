@@ -1,0 +1,11 @@
+<div class="admin-layout">
+  <app-admin-header>
+    <ng-content select="[header-content]" />
+  </app-admin-header>
+  <div class="admin-layout-body">
+    <app-admin-sidebar [links]="sidebarLinks" />
+    <main class="admin-main">
+      <router-outlet />
+    </main>
+  </div>
+</div>

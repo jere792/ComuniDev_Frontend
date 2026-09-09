@@ -1,0 +1,42 @@
+.moderator-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  background-color: var(--surface-container-lowest);
+  border-bottom: 1px solid var(--border-subtle);
+  height: 64px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.sidebar-logo {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primary-container);
+}
+
+.badge {
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-moderator {
+  background-color: var(--tertiary-fixed);
+  color: var(--tertiary);
+  border-color: var(--tertiary-container);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}

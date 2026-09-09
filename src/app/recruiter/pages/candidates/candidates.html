@@ -1,0 +1,51 @@
+<div class="candidates-container">
+  <div class="search-bar">
+    <span class="material-symbols-outlined">search</span>
+    <input
+      type="text"
+      placeholder="Buscar candidatos..."
+      [(ngModel)]="searchTerm"
+      class="search-input"
+    />
+  </div>
+
+  <div class="candidates-list">
+    @for (candidate of filteredCandidates; track candidate.id) {
+      <div class="candidate-card">
+        <div class="candidate-header">
+          <img [src]="candidate.avatar" [alt]="candidate.name" class="candidate-avatar" />
+          <div class="candidate-info">
+            <h3 class="candidate-name">{{ candidate.name }}</h3>
+            <p class="candidate-role">{{ candidate.role }}</p>
+          </div>
+          <span class="availability-badge" [class.available]="candidate.available">
+            {{ candidate.available ? 'Disponible' : 'Ocupado' }}
+          </span>
+        </div>
+
+        <div class="candidate-skills">
+          @for (skill of candidate.skills; track skill) {
+            <span class="skill-tag">{{ skill }}</span>
+          }
+        </div>
+
+        <div class="candidate-footer">
+          <span class="experience">
+            <span class="material-symbols-outlined">work_history</span>
+            {{ candidate.experience }}
+          </span>
+          <div class="candidate-actions">
+            <button class="btn btn-outline">
+              <span class="material-symbols-outlined">chat</span>
+              Mensaje
+            </button>
+            <button class="btn btn-primary">
+              <span class="material-symbols-outlined">person_add</span>
+              Contactar
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

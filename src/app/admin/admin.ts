@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { AdminLayout } from '../shared/layout/admin-layout/admin-layout';
 
 @Component({
   selector: 'app-admin',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
-  templateUrl: './admin.html',
-  styleUrl: './admin.scss',
+  imports: [AdminLayout],
+  template: `<app-admin-layout />`,
 })
 export class Admin {}

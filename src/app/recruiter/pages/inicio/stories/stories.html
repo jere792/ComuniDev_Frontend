@@ -1,0 +1,18 @@
+<div class="stories-section">
+  <div class="stories-scroll">
+    <div class="story-item your-story">
+      <div class="story-avatar">
+        <span class="material-symbols-outlined">add</span>
+      </div>
+      <span class="story-name">Tu historia</span>
+    </div>
+    @for (story of stories; track story.name) {
+      <div class="story-item">
+        <div class="story-avatar" [style.background]="story.gradient">
+          <img [src]="story.avatar" [alt]="story.name" class="story-img" />
+        </div>
+        <span class="story-name">{{ story.name }}</span>
+      </div>
+    }
+  </div>
+</div>

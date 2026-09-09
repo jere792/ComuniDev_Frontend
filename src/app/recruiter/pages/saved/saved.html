@@ -1,0 +1,39 @@
+<div class="saved-container">
+  <h2 class="section-title">Guardados</h2>
+
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab === 'all'" (click)="activeTab = 'all'">
+      Todos
+    </button>
+    <button class="tab" [class.active]="activeTab === 'candidates'" (click)="activeTab = 'candidates'">
+      Candidatos
+    </button>
+    <button class="tab" [class.active]="activeTab === 'reels'" (click)="activeTab = 'reels'">
+      Reels
+    </button>
+  </div>
+
+  <div class="saved-list">
+    @for (item of filteredItems; track item.id) {
+      <div class="saved-card">
+        @if (item.type === 'candidate') {
+          <img [src]="item.avatar" [alt]="item.title" class="item-avatar" />
+        } @else {
+          <div class="item-thumbnail">
+            <span class="material-symbols-outlined">smart_display</span>
+          </div>
+        }
+
+        <div class="item-info">
+          <h3 class="item-title">{{ item.title }}</h3>
+          <p class="item-subtitle">{{ item.subtitle }}</p>
+          <span class="item-time">{{ item.savedAt }}</span>
+        </div>
+
+        <button class="remove-btn">
+          <span class="material-symbols-outlined">bookmark_remove</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

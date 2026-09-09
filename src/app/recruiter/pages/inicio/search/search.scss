@@ -1,0 +1,115 @@
+.search-section {
+  margin-bottom: var(--space-xl);
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface-container);
+  border-radius: var(--radius-xl);
+  transition: box-shadow 0.2s ease;
+
+  &:focus-within {
+    box-shadow: 0 0 0 2px var(--primary-container);
+  }
+
+  .material-symbols-outlined {
+    color: var(--on-surface-variant);
+    font-size: 22px;
+  }
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  color: var(--on-surface);
+  outline: none;
+
+  &::placeholder {
+    color: var(--on-surface-variant);
+  }
+}
+
+.clear-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: var(--surface-container-high);
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--surface-container-highest);
+  }
+
+  .material-symbols-outlined {
+    font-size: 16px;
+  }
+}
+
+.recent-searches {
+  margin-top: var(--space-md);
+}
+
+.recent-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+}
+
+.recent-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--on-surface-variant);
+}
+
+.clear-all {
+  font-size: 12px;
+  color: var(--primary-container);
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.recent-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.recent-tag {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-2xs) var(--space-md);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--surface-container);
+    border-color: var(--primary-container);
+  }
+
+  .material-symbols-outlined {
+    font-size: 16px;
+  }
+}

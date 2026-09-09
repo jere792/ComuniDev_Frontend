@@ -1,0 +1,27 @@
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <img
+      src="https://res.cloudinary.com/dp1vgjhsq/image/upload/v1788755182/isotipo_ec9uxb.png"
+      alt="ComuniDev"
+      class="brand-logo"
+    />
+    <span class="brand-name">ComuniDev</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    @for (link of links; track link.route) {
+      <a [routerLink]="link.route" routerLinkActive="active" class="nav-item" [title]="link.label">
+        <span class="nav-indicator"></span>
+        <span class="nav-icon material-symbols-outlined">{{ link.icon || 'circle' }}</span>
+        <span class="nav-label">{{ link.label }}</span>
+      </a>
+    }
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()" title="Cerrar sesión">
+      <span class="material-symbols-outlined">logout</span>
+      <span class="logout-text">Cerrar sesión</span>
+    </button>
+  </div>
+</aside>

@@ -1,0 +1,53 @@
+<div class="reels-container">
+  <div class="reel-card">
+    <div class="reel-video-wrapper">
+      <video
+        [src]="reels[currentIndex].video"
+        class="reel-video"
+        autoplay
+        loop
+        muted
+        playsinline>
+      </video>
+
+      <div class="reel-actions">
+        <button class="action-btn" (click)="toggleLike(reels[currentIndex])">
+          <span class="material-symbols-outlined" [class.liked]="reels[currentIndex].liked">
+            {{ reels[currentIndex].liked ? 'favorite' : 'favorite_border' }}
+          </span>
+          <span class="action-count">{{ reels[currentIndex].likes }}</span>
+        </button>
+        <button class="action-btn">
+          <span class="material-symbols-outlined">chat_bubble_outline</span>
+          <span class="action-count">{{ reels[currentIndex].comments }}</span>
+        </button>
+        <button class="action-btn" (click)="toggleSave(reels[currentIndex])">
+          <span class="material-symbols-outlined" [class.saved]="reels[currentIndex].saved">
+            {{ reels[currentIndex].saved ? 'bookmark' : 'bookmark_border' }}
+          </span>
+        </button>
+        <button class="action-btn">
+          <span class="material-symbols-outlined">share</span>
+        </button>
+      </div>
+
+      <div class="reel-info">
+        <div class="reel-user">
+          <img [src]="reels[currentIndex].user.avatar" [alt]="reels[currentIndex].user.name" class="user-avatar" />
+          <span class="user-name">{{ reels[currentIndex].user.name }}</span>
+          <button class="follow-btn">Seguir</button>
+        </div>
+        <p class="reel-description">{{ reels[currentIndex].description }}</p>
+      </div>
+    </div>
+
+    <div class="reel-nav">
+      <button class="nav-btn" (click)="prevReel()" [disabled]="currentIndex === 0">
+        <span class="material-symbols-outlined">keyboard_arrow_up</span>
+      </button>
+      <button class="nav-btn" (click)="nextReel()" [disabled]="currentIndex === reels.length - 1">
+        <span class="material-symbols-outlined">keyboard_arrow_down</span>
+      </button>
+    </div>
+  </div>
+</div>

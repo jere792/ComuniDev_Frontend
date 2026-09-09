@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { UserLayout } from '../shared/layout/user-layout/user-layout';
 
 @Component({
   selector: 'app-developer',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
-  templateUrl: './developer.html',
-  styleUrl: './developer.scss',
+  imports: [UserLayout],
+  template: `<app-user-layout />`,
 })
 export class Developer {}

@@ -1,0 +1,11 @@
+<div class="moderator-layout">
+  <app-moderator-header>
+    <ng-content select="[header-content]" />
+  </app-moderator-header>
+  <div class="moderator-layout-body">
+    <app-moderator-sidebar [links]="sidebarLinks" />
+    <main class="moderator-main">
+      <router-outlet />
+    </main>
+  </div>
+</div>

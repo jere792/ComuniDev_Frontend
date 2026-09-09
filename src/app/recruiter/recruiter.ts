@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { UserLayout } from '../shared/layout/user-layout/user-layout';
 
 @Component({
   selector: 'app-recruiter',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
-  templateUrl: './recruiter.html',
-  styleUrl: './recruiter.scss',
+  imports: [UserLayout],
+  template: `<app-user-layout />`,
 })
 export class Recruiter {}

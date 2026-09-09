@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { ModeratorLayout } from '../shared/layout/moderator-layout/moderator-layout';
 
 @Component({
   selector: 'app-moderator',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
-  templateUrl: './moderator.html',
-  styleUrl: './moderator.scss',
+  imports: [ModeratorLayout],
+  template: `<app-moderator-layout />`,
 })
 export class Moderator {}

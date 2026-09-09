@@ -1,0 +1,17 @@
+.admin-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.admin-layout-body {
+  display: flex;
+  flex: 1;
+}
+
+.admin-main {
+  flex: 1;
+  padding: var(--space-xl);
+  background-color: var(--surface);
+  overflow-y: auto;
+}

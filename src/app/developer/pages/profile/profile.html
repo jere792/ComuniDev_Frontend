@@ -1,3 +1,11 @@
+@if (loading()) {
+  <div class="loading-state">Cargando perfil...</div>
+}
+
+@if (errorMessage()) {
+  <div class="error-message">{{ errorMessage() }}</div>
+}
+
 <div class="profile-container">
   <!-- Banner -->
   <div class="profile-banner">
@@ -35,8 +43,8 @@
           <span class="detail-value">{{ user()?.email }}</span>
         </div>
         <div class="detail-item">
-          <span class="detail-label">Biografía</span>
-          <span class="detail-value">{{ user()?.bio || 'Sin biografía' }}</span>
+          <span class="detail-label">Rol activo</span>
+          <span class="detail-value">{{ user()?.rolActivo }}</span>
         </div>
         <div class="detail-item">
           <span class="detail-label">ID de usuario</span>
@@ -70,12 +78,6 @@
           @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
             <span class="error-text">Email inválido</span>
           }
-        </div>
-
-        <div class="form-group">
-          <label>Biografía</label>
-          <textarea formControlName="bio" rows="4" placeholder="Cuéntanos sobre ti..."></textarea>
-          <span class="char-count">{{ profileForm.get('bio')?.value?.length || 0 }}/500</span>
         </div>
 
         <div class="form-actions">

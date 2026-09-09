@@ -1,17 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-
-interface UserProfile {
-  id: string;
-  nombre: string;
-  nombreUsuario: string;
-  email: string;
-  fotoPerfilUrl?: string;
-  bannerUrl?: string;
-  bio?: string;
-  rolActivo: string;
-}
+import { GraphQLService, User } from '../../../core/services/graphql.service';
 
 @Component({
   selector: 'app-developer-profile',
@@ -20,23 +10,55 @@ interface UserProfile {
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
-export class DeveloperProfile {
-  user = signal<UserProfile | null>(null);
+export class DeveloperProfile implements OnInit {
+  user = signal<User | null>(null);
   isEditing = signal(false);
   profileForm: FormGroup;
   updateMessage = signal('');
+  errorMessage = signal('');
+  loading = signal(false);
 
-  constructor(private fb: FormBuilder) {
-    this.loadUser();
+  constructor(
+    private fb: FormBuilder,
+    private graphql: GraphQLService
+  ) {
     this.profileForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
       nombreUsuario: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
-      bio: ['', [Validators.maxLength(500)]],
     });
   }
 
+  ngOnInit(): void {
+    this.loadUser();
+  }
+
   loadUser(): void {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      this.errorMessage.set('No se encontró el ID de usuario');
+      return;
+    }
+
+    this.loading.set(true);
+    this.errorMessage.set('');
+
+    this.graphql.getUser(userId).subscribe({
+      next: (user: User | null) => {
+        this.user.set(user);
+        this.loading.set(false);
+      },
+      error: (err: any) => {
+        console.error('Error loading user:', err);
+        this.errorMessage.set('Error al cargar el perfil');
+        this.loading.set(false);
+        // Fallback a localStorage
+        this.loadFromLocalStorage();
+      },
+    });
+  }
+
+  loadFromLocalStorage(): void {
     const userId = localStorage.getItem('userId');
     const nombre = localStorage.getItem('userName');
     const email = localStorage.getItem('userEmail');
@@ -48,8 +70,12 @@ export class DeveloperProfile {
         nombre: nombre || 'Usuario',
         nombreUsuario: nombre ? nombre.toLowerCase().replace(/\s+/g, '') : 'usuario',
         email: email || '',
-        bio: '',
+        fotoPerfilUrl: undefined,
+        bannerUrl: undefined,
+        roles: [role || 'developer'],
         rolActivo: role || 'developer',
+        estadoCuenta: 'ACTIVE',
+        emailVerificado: true,
       });
     }
   }
@@ -62,20 +88,34 @@ export class DeveloperProfile {
         nombre: u.nombre,
         nombreUsuario: u.nombreUsuario,
         email: u.email,
-        bio: u.bio || '',
+        bio: '',
       });
     }
     this.updateMessage.set('');
+    this.errorMessage.set('');
   }
 
   onSubmit(): void {
-    if (this.profileForm.valid) {
+    if (this.profileForm.valid && this.user()) {
+      this.loading.set(true);
       const values = this.profileForm.value;
-      this.user.update(u => u ? { ...u, ...values } : null);
-      localStorage.setItem('userName', values.nombre);
-      this.isEditing.set(false);
-      this.updateMessage.set('Perfil actualizado correctamente');
-      setTimeout(() => this.updateMessage.set(''), 3000);
+      const userId = this.user()!.id;
+
+      this.graphql.updateUser(userId, values).subscribe({
+        next: (updatedUser: User) => {
+          this.user.set(updatedUser);
+          localStorage.setItem('userName', updatedUser.nombre);
+          this.isEditing.set(false);
+          this.loading.set(false);
+          this.updateMessage.set('Perfil actualizado correctamente');
+          setTimeout(() => this.updateMessage.set(''), 3000);
+        },
+        error: (err: any) => {
+          console.error('Error updating user:', err);
+          this.loading.set(false);
+          this.errorMessage.set('Error al actualizar el perfil');
+        },
+      });
     }
   }
 

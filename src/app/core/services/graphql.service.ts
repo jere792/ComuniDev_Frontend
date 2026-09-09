@@ -40,6 +40,28 @@ const UPDATE_USER = gql`
   }
 `;
 
+const GET_USERS = gql`
+  query GetUsers {
+    users {
+      id
+      nombre
+      nombreUsuario
+      email
+      roles
+      rolActivo
+      estadoCuenta
+      emailVerificado
+      createdAt
+    }
+  }
+`;
+
+const DELETE_USER = gql`
+  mutation DeleteUser($id: ID!) {
+    deleteUser(id: $id)
+  }
+`;
+
 const LOGIN = gql`
   mutation Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
@@ -94,6 +116,19 @@ export class GraphQLService {
       mutation: UPDATE_USER,
       variables: { id, ...data },
     }).pipe(map(result => result.data?.updateUser));
+  }
+
+  getUsers(): Observable<any> {
+    return this.apollo.watchQuery<any>({
+      query: GET_USERS,
+    }).valueChanges.pipe(map(result => result.data?.users ?? []));
+  }
+
+  deleteUser(id: string): Observable<any> {
+    return this.apollo.mutate<any>({
+      mutation: DELETE_USER,
+      variables: { id },
+    }).pipe(map(result => result.data?.deleteUser));
   }
 
   login(email: string, password: string): Observable<any> {

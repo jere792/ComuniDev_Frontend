@@ -1,0 +1,88 @@
+<div class="users-header">
+  <h1>Gestión de usuarios</h1>
+  <p class="subtitle">Administra los usuarios de la plataforma</p>
+</div>
+
+@if (deleteMessage()) {
+  <div class="success-message">{{ deleteMessage() }}</div>
+}
+
+@if (errorMessage()) {
+  <div class="error-message">{{ errorMessage() }}</div>
+}
+
+<div class="users-toolbar">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input 
+      type="text" 
+      placeholder="Buscar por nombre, usuario, email o rol..."
+      (input)="onSearch($event)"
+    >
+  </div>
+  <div class="stats-summary">
+    <span class="count">{{ filteredUsers().length }} usuarios</span>
+  </div>
+</div>
+
+@if (loading()) {
+  <div class="loading-state">Cargando usuarios...</div>
+}
+
+@if (!loading() && filteredUsers().length === 0) {
+  <div class="empty-state">
+    <span class="empty-icon">👤</span>
+    <p>No se encontraron usuarios</p>
+  </div>
+}
+
+@if (!loading() && filteredUsers().length > 0) {
+  <div class="users-table-container">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th>Estado</th>
+          <th>Registro</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of filteredUsers(); track user.id) {
+          <tr>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">{{ user.nombre.charAt(0).toUpperCase() }}</div>
+                <div class="user-details">
+                  <span class="user-name">{{ user.nombre }}</span>
+                  <span class="user-username">&#64;{{ user.nombreUsuario }}</span>
+                </div>
+              </div>
+            </td>
+            <td>{{ user.email }}</td>
+            <td>
+              <span class="badge" [class]="getRoleBadgeClass(user.rolActivo)">
+                {{ user.rolActivo }}
+              </span>
+            </td>
+            <td>
+              <span class="badge" [class]="getStatusBadgeClass(user.estadoCuenta)">
+                {{ user.estadoCuenta }}
+              </span>
+            </td>
+            <td>{{ user.createdAt | date:'shortDate' }}</td>
+            <td>
+              <div class="actions">
+                <button class="action-btn view" title="Ver perfil">👁️</button>
+                <button class="action-btn edit" title="Editar">✏️</button>
+                <button class="action-btn delete" title="Eliminar" (click)="deleteUser(user.id)">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

@@ -37,6 +37,22 @@
 
     <!-- View Mode -->
     @if (!isEditing()) {
+      <!-- Stats -->
+      <div class="profile-stats">
+        <div class="stat-card">
+          <span class="stat-value">{{ user()?.seguidoresCount || 0 }}</span>
+          <span class="stat-label">Seguidores</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">{{ user()?.siguiendoCount || 0 }}</span>
+          <span class="stat-label">Siguiendo</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">{{ user()?.conexionesCount || 0 }}</span>
+          <span class="stat-label">Conexiones</span>
+        </div>
+      </div>
+
       <div class="profile-details">
         <div class="detail-item">
           <span class="detail-label">Email</span>
@@ -47,8 +63,12 @@
           <span class="detail-value">{{ user()?.rolActivo }}</span>
         </div>
         <div class="detail-item">
-          <span class="detail-label">ID de usuario</span>
-          <span class="detail-value id-value">{{ user()?.id }}</span>
+          <span class="detail-label">Estado</span>
+          <span class="detail-value">{{ user()?.estadoCuenta }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Email verificado</span>
+          <span class="detail-value">{{ user()?.emailVerificado ? 'Sí' : 'No' }}</span>
         </div>
       </div>
     }

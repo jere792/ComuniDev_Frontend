@@ -88,7 +88,6 @@ export class DeveloperProfile implements OnInit {
         nombre: u.nombre,
         nombreUsuario: u.nombreUsuario,
         email: u.email,
-        bio: '',
       });
     }
     this.updateMessage.set('');

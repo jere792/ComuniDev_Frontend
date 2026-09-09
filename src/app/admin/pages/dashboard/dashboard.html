@@ -1,0 +1,65 @@
+@if (loading()) {
+  <div class="loading-state">Cargando estadísticas...</div>
+}
+
+@if (errorMessage()) {
+  <div class="error-message">{{ errorMessage() }}</div>
+}
+
+<div class="dashboard-header">
+  <h1>Dashboard Admin</h1>
+  <p class="subtitle">Resumen de la plataforma</p>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card total">
+    <div class="stat-icon">👥</div>
+    <div class="stat-info">
+      <span class="stat-value">{{ stats().totalUsers }}</span>
+      <span class="stat-label">Total usuarios</span>
+    </div>
+  </div>
+
+  <div class="stat-card developers">
+    <div class="stat-icon">💻</div>
+    <div class="stat-info">
+      <span class="stat-value">{{ stats().developers }}</span>
+      <span class="stat-label">Developers</span>
+    </div>
+  </div>
+
+  <div class="stat-card recruiters">
+    <div class="stat-icon">🎯</div>
+    <div class="stat-info">
+      <span class="stat-value">{{ stats().recruiters }}</span>
+      <span class="stat-label">Recruiters</span>
+    </div>
+  </div>
+
+  <div class="stat-card admins">
+    <div class="stat-icon">⚙️</div>
+    <div class="stat-info">
+      <span class="stat-value">{{ stats().admins }}</span>
+      <span class="stat-label">Admins</span>
+    </div>
+  </div>
+
+  <div class="stat-card active">
+    <div class="stat-icon">✅</div>
+    <div class="stat-info">
+      <span class="stat-value">{{ stats().activeUsers }}</span>
+      <span class="stat-label">Usuarios activos</span>
+    </div>
+  </div>
+</div>
+
+<div class="quick-actions">
+  <h2>Acciones rápidas</h2>
+  <div class="actions-grid">
+    <a routerLink="/admin/users" class="action-card">
+      <span class="action-icon">👥</span>
+      <span class="action-title">Gestionar usuarios</span>
+      <span class="action-desc">Ver, editar y eliminar usuarios</span>
+    </a>
+  </div>
+</div>

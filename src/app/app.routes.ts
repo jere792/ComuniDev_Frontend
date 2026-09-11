@@ -39,5 +39,9 @@ export const routes: Routes = [
     path: 'auth/role-selection',
     loadComponent: () => import('./auth/role-selection/role-selection.component').then(m => m.RoleSelectionComponent),
   },
+  {
+    path: 'profile/:userId',
+    loadComponent: () => import('./shared/pages/public-profile/public-profile').then(m => m.PublicProfile),
+  },
   { path: '**', redirectTo: '' },
 ];

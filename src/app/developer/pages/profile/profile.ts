@@ -1,7 +1,7 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { GraphQLService, User } from '../../../core/services/graphql.service';
+import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { GraphQLService, User, DeveloperProfileData } from '../../../core/services/graphql.service';
 
 @Component({
   selector: 'app-developer-profile',
@@ -12,8 +12,11 @@ import { GraphQLService, User } from '../../../core/services/graphql.service';
 })
 export class DeveloperProfile implements OnInit {
   user = signal<User | null>(null);
-  isEditing = signal(false);
+  profile = signal<DeveloperProfileData | null>(null);
+  isEditingBasic = signal(false);
+  isEditingProfile = signal(false);
   profileForm: FormGroup;
+  basicForm: FormGroup;
   updateMessage = signal('');
   errorMessage = signal('');
   loading = signal(false);
@@ -22,15 +25,45 @@ export class DeveloperProfile implements OnInit {
     private fb: FormBuilder,
     private graphql: GraphQLService
   ) {
-    this.profileForm = this.fb.group({
+    this.basicForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
       nombreUsuario: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
+    });
+
+    this.profileForm = this.fb.group({
+      tituloProfesional: [''],
+      bio: [''],
+      ubicacionPais: [''],
+      ubicacionCiudad: [''],
+      ubicacionDistrito: [''],
+      github: [''],
+      linkedin: [''],
+      portafolio: [''],
+      buscandoEmpleo: [false],
+      tecnologias: this.fb.array([]),
+      habilidadesBlandas: [''],
     });
   }
 
   ngOnInit(): void {
     this.loadUser();
+  }
+
+  get tecnologias(): FormArray {
+    return this.profileForm.get('tecnologias') as FormArray;
+  }
+
+  addTecnologia(): void {
+    this.tecnologias.push(this.fb.group({
+      nombre: ['', Validators.required],
+      nivel: ['INTERMEDIO'],
+      aniosExperiencia: [0],
+    }));
+  }
+
+  removeTecnologia(index: number): void {
+    this.tecnologias.removeAt(index);
   }
 
   loadUser(): void {
@@ -46,13 +79,16 @@ export class DeveloperProfile implements OnInit {
     this.graphql.getUser(userId).subscribe({
       next: (user: User | null) => {
         this.user.set(user);
+        this.profile.set(user?.developerProfile ?? null);
         this.loading.set(false);
+        if (user?.developerProfile) {
+          this.populateProfileForm(user.developerProfile);
+        }
       },
       error: (err: any) => {
         console.error('Error loading user:', err);
         this.errorMessage.set('Error al cargar el perfil');
         this.loading.set(false);
-        // Fallback a localStorage
         this.loadFromLocalStorage();
       },
     });
@@ -80,42 +116,115 @@ export class DeveloperProfile implements OnInit {
     }
   }
 
-  toggleEdit(): void {
-    this.isEditing.update(v => !v);
-    if (this.isEditing() && this.user()) {
+  populateProfileForm(profile: DeveloperProfileData): void {
+    this.profileForm.patchValue({
+      tituloProfesional: profile.tituloProfesional || '',
+      bio: profile.bio || '',
+      ubicacionPais: profile.ubicacion?.pais || '',
+      ubicacionCiudad: profile.ubicacion?.ciudad || '',
+      ubicacionDistrito: profile.ubicacion?.distrito || '',
+      github: profile.enlaces?.github || '',
+      linkedin: profile.enlaces?.linkedin || '',
+      portafolio: profile.enlaces?.portafolio || '',
+      buscandoEmpleo: profile.disponibilidadLaboral?.buscandoEmpleo || false,
+      habilidadesBlandas: profile.habilidadesBlandas?.join(', ') || '',
+    });
+
+    this.tecnologias.clear();
+    profile.tecnologias?.forEach(tech => {
+      this.tecnologias.push(this.fb.group({
+        nombre: [tech.nombre, Validators.required],
+        nivel: [tech.nivel],
+        aniosExperiencia: [tech.aniosExperiencia],
+      }));
+    });
+  }
+
+  toggleEditBasic(): void {
+    this.isEditingBasic.update(v => !v);
+    if (this.isEditingBasic() && this.user()) {
       const u = this.user()!;
-      this.profileForm.patchValue({
+      this.basicForm.patchValue({
         nombre: u.nombre,
         nombreUsuario: u.nombreUsuario,
         email: u.email,
       });
     }
-    this.updateMessage.set('');
-    this.errorMessage.set('');
   }
 
-  onSubmit(): void {
-    if (this.profileForm.valid && this.user()) {
-      this.loading.set(true);
-      const values = this.profileForm.value;
-      const userId = this.user()!.id;
+  toggleEditProfile(): void {
+    this.isEditingProfile.update(v => !v);
+  }
 
-      this.graphql.updateUser(userId, values).subscribe({
+  onSubmitBasic(): void {
+    if (this.basicForm.valid && this.user()) {
+      this.loading.set(true);
+      this.graphql.updateUser(this.user()!.id, this.basicForm.value).subscribe({
         next: (updatedUser: User) => {
           this.user.set(updatedUser);
           localStorage.setItem('userName', updatedUser.nombre);
-          this.isEditing.set(false);
+          this.isEditingBasic.set(false);
           this.loading.set(false);
-          this.updateMessage.set('Perfil actualizado correctamente');
+          this.updateMessage.set('Datos básicos actualizados');
           setTimeout(() => this.updateMessage.set(''), 3000);
         },
         error: (err: any) => {
-          console.error('Error updating user:', err);
+          console.error('Error:', err);
           this.loading.set(false);
-          this.errorMessage.set('Error al actualizar el perfil');
+          this.errorMessage.set('Error al actualizar');
         },
       });
     }
+  }
+
+  onSubmitProfile(): void {
+    const userId = this.user()?.id;
+    if (!userId) return;
+
+    this.loading.set(true);
+    const formValue = this.profileForm.value;
+
+    const profileData = {
+      tituloProfesional: formValue.tituloProfesional,
+      bio: formValue.bio,
+      ubicacion: {
+        pais: formValue.ubicacionPais,
+        ciudad: formValue.ubicacionCiudad,
+        distrito: formValue.ubicacionDistrito,
+      },
+      tecnologias: formValue.tecnologias,
+      habilidadesBlandas: formValue.habilidadesBlandas?.split(',').map((s: string) => s.trim()).filter(Boolean),
+      enlaces: {
+        github: formValue.github,
+        linkedin: formValue.linkedin,
+        portafolio: formValue.portafolio,
+      },
+      disponibilidadLaboral: {
+        buscandoEmpleo: formValue.buscandoEmpleo,
+        modalidades: [],
+        tiposContrato: [],
+      },
+    };
+
+    const operation = this.profile()
+      ? this.graphql.updateDeveloperProfile(this.profile()!.id, profileData)
+      : this.graphql.createDeveloperProfile({ userId, ...profileData });
+
+    operation.subscribe({
+      next: (result: DeveloperProfileData) => {
+        this.profile.set(result);
+        this.isEditingProfile.set(false);
+        this.loading.set(false);
+        this.updateMessage.set('Perfil profesional actualizado');
+        setTimeout(() => this.updateMessage.set(''), 3000);
+        this.loadUser();
+      },
+      error: (err: any) => {
+        console.error('Error:', err);
+        this.loading.set(false);
+        this.errorMessage.set('Error al guardar perfil');
+      },
+    });
   }
 
   getInitials(): string {

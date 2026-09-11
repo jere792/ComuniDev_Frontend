@@ -1,7 +1,7 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { GraphQLService, User } from '../../../core/services/graphql.service';
+import { GraphQLService, User, RecruiterProfileData } from '../../../core/services/graphql.service';
 
 @Component({
   selector: 'app-recruiter-profile',
@@ -12,8 +12,11 @@ import { GraphQLService, User } from '../../../core/services/graphql.service';
 })
 export class RecruiterProfile implements OnInit {
   user = signal<User | null>(null);
-  isEditing = signal(false);
+  profile = signal<RecruiterProfileData | null>(null);
+  isEditingBasic = signal(false);
+  isEditingProfile = signal(false);
   profileForm: FormGroup;
+  basicForm: FormGroup;
   updateMessage = signal('');
   errorMessage = signal('');
   loading = signal(false);
@@ -22,10 +25,19 @@ export class RecruiterProfile implements OnInit {
     private fb: FormBuilder,
     private graphql: GraphQLService
   ) {
-    this.profileForm = this.fb.group({
+    this.basicForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
       nombreUsuario: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
+    });
+
+    this.profileForm = this.fb.group({
+      bio: [''],
+      nombres: [''],
+      apellidos: [''],
+      cargo: [''],
+      telefono: [''],
+      linkedinUrl: [''],
     });
   }
 
@@ -44,9 +56,13 @@ export class RecruiterProfile implements OnInit {
     this.errorMessage.set('');
 
     this.graphql.getUser(userId).subscribe({
-      next: (user: any) => {
+      next: (user: User | null) => {
         this.user.set(user);
+        this.profile.set(user?.recruiterProfile ?? null);
         this.loading.set(false);
+        if (user?.recruiterProfile) {
+          this.populateProfileForm(user.recruiterProfile);
+        }
       },
       error: (err: any) => {
         console.error('Error loading user:', err);
@@ -79,42 +95,159 @@ export class RecruiterProfile implements OnInit {
     }
   }
 
-  toggleEdit(): void {
-    this.isEditing.update(v => !v);
-    if (this.isEditing() && this.user()) {
+  populateProfileForm(profile: RecruiterProfileData): void {
+    this.profileForm.patchValue({
+      bio: profile.bio || '',
+      nombres: profile.nombres || '',
+      apellidos: profile.apellidos || '',
+      cargo: profile.cargo || '',
+      telefono: profile.telefono || '',
+      linkedinUrl: profile.linkedinUrl || '',
+    });
+  }
+
+  toggleEditBasic(): void {
+    this.isEditingBasic.update(v => !v);
+    if (this.isEditingBasic() && this.user()) {
       const u = this.user()!;
-      this.profileForm.patchValue({
+      this.basicForm.patchValue({
         nombre: u.nombre,
         nombreUsuario: u.nombreUsuario,
         email: u.email,
       });
     }
-    this.updateMessage.set('');
-    this.errorMessage.set('');
   }
 
-  onSubmit(): void {
-    if (this.profileForm.valid && this.user()) {
-      this.loading.set(true);
-      const values = this.profileForm.value;
-      const userId = this.user()!.id;
+  toggleEditProfile(): void {
+    this.isEditingProfile.update(v => !v);
+  }
 
-      this.graphql.updateUser(userId, values).subscribe({
-        next: (updatedUser: any) => {
+  onBannerSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    const file = input.files[0];
+    this.loading.set(true);
+
+    this.graphql.uploadFile(file).subscribe({
+      next: (result: any) => {
+        const bannerUrl = result.secure_url || result.url;
+
+        if (this.profile()?.id) {
+          this.graphql.updateRecruiterProfile(this.profile()!.id, { bannerUrl }).subscribe({
+            next: (updated) => {
+              this.profile.set(updated);
+              this.loading.set(false);
+              this.updateMessage.set('Banner actualizado');
+              setTimeout(() => this.updateMessage.set(''), 3000);
+            },
+            error: () => {
+              this.loading.set(false);
+              this.errorMessage.set('Error al guardar banner');
+            },
+          });
+        } else {
+          this.graphql.updateUser(this.user()!.id, { bannerUrl }).subscribe({
+            next: (updatedUser) => {
+              this.user.set(updatedUser);
+              this.loading.set(false);
+              this.updateMessage.set('Banner actualizado');
+              setTimeout(() => this.updateMessage.set(''), 3000);
+            },
+            error: () => {
+              this.loading.set(false);
+              this.errorMessage.set('Error al guardar banner');
+            },
+          });
+        }
+      },
+      error: (err: any) => {
+        console.error('Upload error:', err);
+        this.loading.set(false);
+        this.errorMessage.set('Error al subir imagen');
+      },
+    });
+  }
+
+  onPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    const file = input.files[0];
+    this.loading.set(true);
+
+    this.graphql.uploadFile(file).subscribe({
+      next: (result: any) => {
+        const fotoPerfilUrl = result.secure_url || result.url;
+        this.graphql.updateUser(this.user()!.id, { fotoPerfilUrl }).subscribe({
+          next: (updatedUser) => {
+            this.user.set(updatedUser);
+            localStorage.setItem('userPhoto', fotoPerfilUrl);
+            this.loading.set(false);
+            this.updateMessage.set('Foto de perfil actualizada');
+            setTimeout(() => this.updateMessage.set(''), 3000);
+          },
+          error: () => {
+            this.loading.set(false);
+            this.errorMessage.set('Error al guardar foto');
+          },
+        });
+      },
+      error: (err: any) => {
+        console.error('Upload error:', err);
+        this.loading.set(false);
+        this.errorMessage.set('Error al subir imagen');
+      },
+    });
+  }
+
+  onSubmitBasic(): void {
+    if (this.basicForm.valid && this.user()) {
+      this.loading.set(true);
+      this.graphql.updateUser(this.user()!.id, this.basicForm.value).subscribe({
+        next: (updatedUser: User) => {
           this.user.set(updatedUser);
           localStorage.setItem('userName', updatedUser.nombre);
-          this.isEditing.set(false);
+          this.isEditingBasic.set(false);
           this.loading.set(false);
-          this.updateMessage.set('Perfil actualizado correctamente');
+          this.updateMessage.set('Datos básicos actualizados');
           setTimeout(() => this.updateMessage.set(''), 3000);
         },
         error: (err: any) => {
-          console.error('Error updating user:', err);
+          console.error('Error:', err);
           this.loading.set(false);
-          this.errorMessage.set('Error al actualizar el perfil');
+          this.errorMessage.set('Error al actualizar');
         },
       });
     }
+  }
+
+  onSubmitProfile(): void {
+    const userId = this.user()?.id;
+    if (!userId) return;
+
+    this.loading.set(true);
+    const formValue = this.profileForm.value;
+
+    const operation = this.profile()
+      ? this.graphql.updateRecruiterProfile(this.profile()!.id, formValue)
+      : this.graphql.createRecruiterProfile({ userId, ...formValue });
+
+    operation.subscribe({
+      next: (result: RecruiterProfileData) => {
+        this.profile.set(result);
+        this.isEditingProfile.set(false);
+        this.loading.set(false);
+        this.updateMessage.set('Perfil profesional actualizado');
+        setTimeout(() => this.updateMessage.set(''), 3000);
+        this.loadUser();
+      },
+      error: (err: any) => {
+        console.error('Error:', err);
+        this.loading.set(false);
+        this.errorMessage.set('Error al guardar perfil');
+      },
+    });
   }
 
   getInitials(): string {

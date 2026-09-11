@@ -9,11 +9,25 @@
 <div class="profile-container">
   <!-- Banner -->
   <div class="profile-banner">
-    <div class="banner-placeholder"></div>
+    @if (profile()?.bannerUrl || user()?.bannerUrl) {
+      <img [src]="profile()?.bannerUrl || user()?.bannerUrl" alt="Banner" class="banner-image">
+    } @else {
+      <div class="banner-placeholder"></div>
+    }
+    <label class="banner-upload-btn">
+      <input type="file" accept="image/*" (change)="onBannerSelected($event)" hidden>
+      Cambiar banner
+    </label>
     <div class="profile-avatar">
-      <div class="avatar-circle">
-        {{ getInitials() }}
-      </div>
+      @if (user()?.fotoPerfilUrl) {
+        <img [src]="user()?.fotoPerfilUrl" alt="Foto de perfil" class="avatar-image">
+      } @else {
+        <div class="avatar-circle">{{ getInitials() }}</div>
+      }
+      <label class="avatar-upload-btn">
+        <input type="file" accept="image/*" (change)="onPhotoSelected($event)" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </label>
     </div>
   </div>
 
@@ -25,64 +39,168 @@
         <span class="username">&#64;{{ user()?.nombreUsuario }}</span>
         <span class="role-badge">{{ user()?.rolActivo }}</span>
       </div>
-      <button class="edit-btn" (click)="toggleEdit()">
-        {{ isEditing() ? 'Cancelar' : 'Editar perfil' }}
-      </button>
+      <div class="profile-actions">
+        <button class="edit-btn" (click)="toggleEditBasic()">
+          {{ isEditingBasic() ? 'Cancelar' : 'Editar datos básicos' }}
+        </button>
+        <button class="edit-btn" (click)="toggleEditProfile()">
+          {{ isEditingProfile() ? 'Cancelar' : profile() ? 'Editar perfil profesional' : 'Crear perfil profesional' }}
+        </button>
+      </div>
     </div>
 
-    <!-- Success Message -->
     @if (updateMessage()) {
       <div class="success-message">{{ updateMessage() }}</div>
     }
 
-    <!-- View Mode -->
-    @if (!isEditing()) {
+    <!-- Stats -->
+    <div class="profile-stats">
+      <div class="stat-card">
+        <span class="stat-value">{{ user()?.seguidoresCount || 0 }}</span>
+        <span class="stat-label">Seguidores</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ user()?.siguiendoCount || 0 }}</span>
+        <span class="stat-label">Siguiendo</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ user()?.conexionesCount || 0 }}</span>
+        <span class="stat-label">Conexiones</span>
+      </div>
+    </div>
+
+    <!-- Edit Basic Form -->
+    @if (isEditingBasic()) {
+      <form [formGroup]="basicForm" (ngSubmit)="onSubmitBasic()" class="profile-form">
+        <div class="form-group">
+          <label>Nombre completo</label>
+          <input type="text" formControlName="nombre" placeholder="Tu nombre">
+        </div>
+        <div class="form-group">
+          <label>Nombre de usuario</label>
+          <input type="text" formControlName="nombreUsuario" placeholder="usuario123">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" formControlName="email" placeholder="correo@ejemplo.com">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="toggleEditBasic()">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="basicForm.invalid">Guardar</button>
+        </div>
+      </form>
+    }
+
+    <!-- View Mode: Basic Info -->
+    @if (!isEditingBasic() && !isEditingProfile()) {
       <div class="profile-details">
         <div class="detail-item">
           <span class="detail-label">Email</span>
           <span class="detail-value">{{ user()?.email }}</span>
         </div>
         <div class="detail-item">
-          <span class="detail-label">Rol activo</span>
-          <span class="detail-value">{{ user()?.rolActivo }}</span>
-        </div>
-        <div class="detail-item">
           <span class="detail-label">Estado</span>
           <span class="detail-value">{{ user()?.estadoCuenta }}</span>
         </div>
       </div>
+
+      <!-- Recruiter Profile Section -->
+      @if (profile()) {
+        <div class="profile-section">
+          <h2>Perfil Profesional</h2>
+
+          @if (profile()?.bio) {
+            <div class="detail-item">
+              <span class="detail-label">Bio</span>
+              <span class="detail-value bio-text">{{ profile()?.bio }}</span>
+            </div>
+          }
+          
+          @if (profile()?.nombres || profile()?.apellidos) {
+            <div class="detail-item">
+              <span class="detail-label">Nombre completo</span>
+              <span class="detail-value">{{ profile()?.nombres }} {{ profile()?.apellidos }}</span>
+            </div>
+          }
+
+          @if (profile()?.cargo) {
+            <div class="detail-item">
+              <span class="detail-label">Cargo</span>
+              <span class="detail-value">{{ profile()?.cargo }}</span>
+            </div>
+          }
+
+          @if (profile()?.telefono) {
+            <div class="detail-item">
+              <span class="detail-label">Teléfono</span>
+              <span class="detail-value">{{ profile()?.telefono }}</span>
+            </div>
+          }
+
+          @if (profile()?.linkedinUrl) {
+            <div class="detail-section">
+              <span class="detail-label">LinkedIn</span>
+              <a href="{{ profile()?.linkedinUrl }}" target="_blank" class="link-item">{{ profile()?.linkedinUrl }}</a>
+            </div>
+          }
+
+          @if (profile()?.empresas?.length) {
+            <div class="detail-section">
+              <span class="detail-label">Empresas</span>
+              @for (empresa of profile()?.empresas; track empresa.companyId) {
+                <div class="experience-item">
+                  <strong>{{ empresa.cargoEnEmpresa }}</strong>
+                  <span class="metadata">Empresa ID: {{ empresa.companyId }}</span>
+                </div>
+              }
+            </div>
+          }
+
+          <div class="detail-item">
+            <span class="detail-label">Verificado</span>
+            <span class="detail-value">{{ profile()?.verificado ? 'Sí' : 'No' }}</span>
+          </div>
+        </div>
+      }
     }
 
-    <!-- Edit Mode -->
-    @if (isEditing()) {
-      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+    <!-- Edit Profile Form -->
+    @if (isEditingProfile()) {
+      <form [formGroup]="profileForm" (ngSubmit)="onSubmitProfile()" class="profile-form">
         <div class="form-group">
-          <label>Nombre completo</label>
-          <input type="text" formControlName="nombre" placeholder="Tu nombre">
-          @if (profileForm.get('nombre')?.invalid && profileForm.get('nombre')?.touched) {
-            <span class="error-text">Nombre requerido (mínimo 2 caracteres)</span>
-          }
+          <label>Bio</label>
+          <textarea formControlName="bio" placeholder="Cuéntanos sobre ti..." rows="4"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombres</label>
+            <input type="text" formControlName="nombres" placeholder="Tus nombres">
+          </div>
+          <div class="form-group">
+            <label>Apellidos</label>
+            <input type="text" formControlName="apellidos" placeholder="Tus apellidos">
+          </div>
         </div>
 
         <div class="form-group">
-          <label>Nombre de usuario</label>
-          <input type="text" formControlName="nombreUsuario" placeholder="usuario123">
-          @if (profileForm.get('nombreUsuario')?.invalid && profileForm.get('nombreUsuario')?.touched) {
-            <span class="error-text">Usuario requerido (mínimo 3 caracteres)</span>
-          }
+          <label>Cargo</label>
+          <input type="text" formControlName="cargo" placeholder="Ej: Technical Recruiter">
         </div>
 
         <div class="form-group">
-          <label>Email</label>
-          <input type="email" formControlName="email" placeholder="correo@ejemplo.com">
-          @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
-            <span class="error-text">Email inválido</span>
-          }
+          <label>Teléfono</label>
+          <input type="tel" formControlName="telefono" placeholder="+51 999 888 777">
+        </div>
+
+        <div class="form-group">
+          <label>LinkedIn URL</label>
+          <input type="url" formControlName="linkedinUrl" placeholder="https://linkedin.com/in/tu-usuario">
         </div>
 
         <div class="form-actions">
-          <button type="button" class="btn-secondary" (click)="toggleEdit()">Cancelar</button>
-          <button type="submit" class="btn-primary" [disabled]="profileForm.invalid">Guardar cambios</button>
+          <button type="button" class="btn-secondary" (click)="toggleEditProfile()">Cancelar</button>
+          <button type="submit" class="btn-primary">Guardar perfil</button>
         </div>
       </form>
     }

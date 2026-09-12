@@ -1,0 +1,19 @@
+.stat-card {
+  text-align: center;
+  padding: 1.5rem;
+  background: var(--surface, #fff);
+  border-radius: 12px;
+
+  .stat-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary, #667eea);
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary, #6c757d);
+    margin-top: 4px;
+  }
+}

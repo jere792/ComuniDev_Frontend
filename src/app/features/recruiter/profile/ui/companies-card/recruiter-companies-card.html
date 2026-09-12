@@ -1,0 +1,41 @@
+<section class="info-card">
+  <div class="card-header">
+    <div class="card-header-left">
+      <div class="card-icon">
+        <span class="material-symbols-outlined">apartment</span>
+      </div>
+      <div>
+        <h2 class="card-title">Empresas Vinculadas</h2>
+        <p class="card-subtitle">Clientes corporativos y asignaciones</p>
+      </div>
+    </div>
+    @if (empresas?.length) {
+      <span class="badge-count">{{ empresas.length }} empresas</span>
+    }
+  </div>
+
+  @if (empresas?.length) {
+    <div class="companies-grid">
+      @for (empresa of empresas; track empresa.companyId; let i = $index) {
+        <div class="company-card" [class.inactive]="!empresa.activo">
+          <div class="company-top">
+            <div class="company-avatar" [class]="'avatar-' + (i % 4)">
+              {{ empresa.companyId?.toString()?.slice(0, 2)?.toUpperCase() || 'EM' }}
+            </div>
+            <span class="company-status" [class.active]="empresa.activo">
+              <span class="status-dot-sm"></span>
+              {{ empresa.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+          <h3 class="company-name">Empresa {{ i + 1 }}</h3>
+          <span class="company-role">{{ empresa.cargoEnEmpresa }}</span>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="experience-empty">
+      <span class="material-symbols-outlined">add_business</span>
+      <p>Agrega empresas vinculadas para completar tu perfil.</p>
+    </div>
+  }
+</section>

@@ -1,0 +1,164 @@
+<div class="config-layout">
+  <!-- Sidebar nav -->
+  <nav class="config-sidebar">
+    <div class="config-sidebar-header">
+      <a routerLink="/recruiter/profile" class="back-link">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </a>
+      <h1 class="config-title">Configuración</h1>
+    </div>
+    <ul class="config-nav">
+      @for (section of sections; track section.id) {
+        <li>
+          <button
+            class="config-nav-item"
+            [class.active]="activeSection() === section.id"
+            [class.coming-soon]="section.comingSoon"
+            (click)="selectSection(section.id)"
+          >
+            <span class="material-symbols-outlined">{{ section.icon }}</span>
+            <span class="nav-label">{{ section.label }}</span>
+            @if (section.comingSoon) {
+              <span class="coming-soon-badge">Próximamente</span>
+            }
+          </button>
+        </li>
+      }
+    </ul>
+  </nav>
+
+  <!-- Content -->
+  <main class="config-content">
+    <!-- Perfil -->
+    @if (activeSection() === 'perfil') {
+      <section class="config-section">
+        <h2 class="section-title">Configuración de perfil</h2>
+        <p class="section-desc">Información básica de tu cuenta</p>
+        <div class="section-body">
+          <p class="placeholder">Edita tu nombre, datos personales e información de contacto.</p>
+        </div>
+      </section>
+    }
+
+    <!-- Perfil profesional -->
+    @if (activeSection() === 'profesional') {
+      <section class="config-section">
+        <h2 class="section-title">Perfil profesional</h2>
+        <p class="section-desc">Tu experiencia y especialización</p>
+        <div class="section-body">
+          <p class="placeholder">Gestiona tu experiencia laboral, empresas vinculadas y áreas de especialización.</p>
+        </div>
+      </section>
+    }
+
+    <!-- Redes sociales -->
+    @if (activeSection() === 'redes') {
+      <section class="config-section">
+        <h2 class="section-title">Redes sociales</h2>
+        <p class="section-desc">Conecta tus perfiles externos</p>
+        <div class="section-body">
+          <p class="placeholder">Agrega o edita tus enlaces de LinkedIn, Instagram, TikTok y Facebook.</p>
+        </div>
+      </section>
+    }
+
+    <!-- Descripción -->
+    @if (activeSection() === 'descripcion') {
+      <section class="config-section">
+        <h2 class="section-title">Descripción</h2>
+        <p class="section-desc">Cuéntanos sobre ti</p>
+        <div class="section-body">
+          <p class="placeholder">Escribe una breve descripción o bio para tu perfil público.</p>
+        </div>
+      </section>
+    }
+
+    <!-- Ubicación -->
+    @if (activeSection() === 'ubicacion') {
+      <section class="config-section">
+        <h2 class="section-title">Ubicación</h2>
+        <p class="section-desc">Tu zona de trabajo</p>
+        <div class="section-body">
+          <p class="placeholder">Configura tu ciudad, país y zona horaria.</p>
+        </div>
+      </section>
+    }
+
+    <!-- Privacidad -->
+    @if (activeSection() === 'privacidad') {
+      <section class="config-section">
+        <h2 class="section-title">Privacidad</h2>
+        <p class="section-desc">Controla quién ve tu información</p>
+        <div class="section-body">
+          <p class="placeholder">Define la visibilidad de tu perfil, datos de contacto y actividad.</p>
+        </div>
+      </section>
+    }
+
+    <!-- Cuenta -->
+    @if (activeSection() === 'cuenta') {
+      <section class="config-section">
+        <h2 class="section-title">Cuenta</h2>
+        <p class="section-desc">Estado y verificación de tu cuenta</p>
+        <div class="section-body">
+          <p class="placeholder">Revisa el estado de tu cuenta, verifica tu email y gestiona tus datos.</p>
+        </div>
+      </section>
+    }
+
+    <!-- Cambio de contraseña -->
+    @if (activeSection() === 'contrasena') {
+      <section class="config-section">
+        <h2 class="section-title">Cambio de contraseña</h2>
+        <p class="section-desc">Actualiza tu contraseña de acceso</p>
+        <div class="section-body">
+          <p class="placeholder">Cambia tu contraseña actual por una nueva.</p>
+        </div>
+      </section>
+    }
+
+    <!-- Notificaciones -->
+    @if (activeSection() === 'notificaciones') {
+      <section class="config-section">
+        <h2 class="section-title">Notificaciones</h2>
+        <p class="section-desc">Configura tus alertas y preferencias</p>
+        <div class="section-body">
+          <p class="placeholder">Gestiona las notificaciones que recibes por email y en la app.</p>
+        </div>
+      </section>
+    }
+
+    <!-- Seguridad -->
+    @if (activeSection() === 'seguridad') {
+      <section class="config-section">
+        <h2 class="section-title">Seguridad</h2>
+        <p class="section-desc">Protege tu cuenta</p>
+        <div class="section-body">
+          <p class="placeholder">Autenticación de dos factores, sesiones activas y más.</p>
+        </div>
+      </section>
+    }
+
+    <!-- Idioma y región -->
+    @if (activeSection() === 'idioma') {
+      <section class="config-section">
+        <h2 class="section-title">Idioma y región</h2>
+        <p class="section-desc">Preferencias de idioma</p>
+        <div class="section-body">
+          <p class="placeholder">Cambia el idioma de la plataforma y tu zona horaria.</p>
+        </div>
+      </section>
+    }
+
+    <!-- Términos y condiciones -->
+    @if (activeSection() === 'terminos') {
+      <section class="config-section">
+        <h2 class="section-title">Términos y condiciones</h2>
+        <p class="section-desc">Documentos legales</p>
+        <div class="section-body">
+          <p class="placeholder">Consulta nuestros términos de uso, política de privacidad y reglas de la comunidad.</p>
+        </div>
+      </section>
+    }
+  </main>
+</div>

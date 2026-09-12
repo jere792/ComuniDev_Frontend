@@ -1,0 +1,30 @@
+<aside class="sidebar">
+  <div class="sidebar-footer">
+    <a routerLink="/recruiter/profile" class="sidebar-avatar" title="Mi perfil">
+      @if (photoUrl()) {
+        <img [src]="photoUrl()" alt="Foto de perfil" class="avatar-img" />
+      } @else {
+        <div class="avatar-fallback">
+          <span class="material-symbols-outlined">person</span>
+        </div>
+      }
+    </a>
+    <a routerLink="/recruiter/saved" class="sidebar-btn" title="Guardados">
+      <span class="material-symbols-outlined">bookmark</span>
+    </a>
+    <div class="sidebar-divider"></div>
+    <button class="sidebar-btn" (click)="toggleTheme()" [title]="isDark() ? 'Modo claro' : 'Modo oscuro'">
+      @if (isDark()) {
+        <span class="material-symbols-outlined">light_mode</span>
+      } @else {
+        <span class="material-symbols-outlined">dark_mode</span>
+      }
+    </button>
+    <a routerLink="/recruiter/profile/configuracion" class="sidebar-btn" title="Configuración">
+      <span class="material-symbols-outlined">settings</span>
+    </a>
+    <button class="sidebar-btn danger" (click)="logout()" title="Cerrar sesión">
+      <span class="material-symbols-outlined">logout</span>
+    </button>
+  </div>
+</aside>

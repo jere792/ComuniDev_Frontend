@@ -1,0 +1,19 @@
+<div class="saved-card">
+  @if (type === 'candidate') {
+    <img [src]="avatar" [alt]="title" class="item-avatar" />
+  } @else {
+    <div class="item-thumbnail">
+      <span class="material-symbols-outlined">smart_display</span>
+    </div>
+  }
+
+  <div class="item-info">
+    <h3 class="item-title">{{ title }}</h3>
+    <p class="item-subtitle">{{ subtitle }}</p>
+    <span class="item-time">{{ savedAt }}</span>
+  </div>
+
+  <button class="remove-btn" (click)="remove.emit(id)">
+    <span class="material-symbols-outlined">bookmark_remove</span>
+  </button>
+</div>

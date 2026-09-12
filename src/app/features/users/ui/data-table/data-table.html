@@ -1,0 +1,20 @@
+<div class="data-table-container">
+  <table class="data-table">
+    <thead>
+      <tr>
+        @for (col of columns; track col.key) {
+          <th>{{ col.label }}</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of data; track $index) {
+        <tr>
+          @for (col of columns; track col.key) {
+            <td>{{ row[col.key] }}</td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,37 @@
+.data-table-container {
+  overflow-x: auto;
+  background: var(--bg-secondary, #f8f9fa);
+  border-radius: 16px;
+  border: 1px solid var(--border-color, #e9ecef);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th, td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color, #e9ecef);
+  }
+
+  th {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary, #6c757d);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  tbody tr {
+    transition: background 0.2s;
+
+    &:hover {
+      background: var(--bg-primary, #fff);
+    }
+
+    &:last-child td {
+      border-bottom: none;
+    }
+  }
+}

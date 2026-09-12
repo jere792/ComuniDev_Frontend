@@ -1,0 +1,70 @@
+.conversation-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: var(--bg-secondary, #f3f4f6);
+  }
+
+  &.active {
+    background: var(--primary-light, #eef2ff);
+  }
+
+  .conv-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .conv-info {
+    flex: 1;
+    min-width: 0;
+
+    .conv-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+
+      .conv-name {
+        font-size: 0.9375rem;
+        font-weight: 500;
+        color: var(--text-primary, #212529);
+      }
+
+      .conv-time {
+        font-size: 0.75rem;
+        color: var(--text-secondary, #6c757d);
+      }
+    }
+
+    .conv-message {
+      font-size: 0.875rem;
+      color: var(--text-secondary, #6c757d);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .unread-badge {
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background: var(--primary, #667eea);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+  }
+}

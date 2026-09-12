@@ -1,0 +1,43 @@
+<aside class="right-panel">
+  <div class="panel-section profile-section">
+    <img src="https://i.pravatar.cc/150?img=12" alt="Profile" class="profile-avatar" />
+    <div class="profile-info">
+      <span class="profile-name">{{ userName }}</span>
+      <span class="profile-role">{{ userRole }}</span>
+    </div>
+  </div>
+
+  <div class="panel-section">
+    <div class="section-header">
+      <span class="section-title">Sugerencias</span>
+      <button class="see-all">Ver todo</button>
+    </div>
+    <div class="suggestions-list">
+      @for (suggestion of suggestions; track suggestion.name) {
+        <div class="suggestion-item">
+          <img [src]="suggestion.avatar" [alt]="suggestion.name" class="suggestion-avatar" />
+          <div class="suggestion-info">
+            <span class="suggestion-name">{{ suggestion.name }}</span>
+            <span class="suggestion-role">{{ suggestion.role }}</span>
+          </div>
+          <button class="follow-btn">Seguir</button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="panel-section footer-section">
+    <div class="footer-links">
+      <span>Acerca de</span>
+      <span>·</span>
+      <span>Ayuda</span>
+      <span>·</span>
+      <span>Prensa</span>
+      <span>·</span>
+      <span>API</span>
+      <span>·</span>
+      <span>Empleo</span>
+    </div>
+    <span class="copyright">© 2026 ComuniDev</span>
+  </div>
+</aside>

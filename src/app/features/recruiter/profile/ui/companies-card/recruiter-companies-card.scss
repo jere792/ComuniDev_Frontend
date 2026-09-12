@@ -1,0 +1,215 @@
+// ============================================================
+// INFO CARD
+// ============================================================
+
+.info-card {
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-floating);
+}
+
+// ============================================================
+// CARD HEADER
+// ============================================================
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+}
+
+.card-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-container-high);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+
+  .material-symbols-outlined {
+    font-size: 22px;
+  }
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  line-height: 24px;
+  letter-spacing: -0.005em;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.card-subtitle {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--on-surface-variant);
+  margin: 0;
+}
+
+.badge-count {
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: var(--secondary-fixed);
+  color: var(--on-secondary-fixed);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+// ============================================================
+// COMPANIES GRID
+// ============================================================
+
+.companies-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.company-card {
+  padding: var(--space-lg);
+  border-radius: var(--radius-xl);
+  background: var(--surface-container-low);
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+
+  &:hover {
+    background: var(--surface-container);
+  }
+
+  &.inactive {
+    opacity: 0.7;
+  }
+}
+
+.company-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.company-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+
+  &.avatar-0 {
+    background: var(--primary-container);
+    color: var(--on-primary);
+  }
+  &.avatar-1 {
+    background: var(--surface-container-highest);
+    color: var(--secondary);
+  }
+  &.avatar-2 {
+    background: var(--secondary-fixed);
+    color: var(--on-secondary-fixed);
+  }
+  &.avatar-3 {
+    background: var(--surface-variant);
+    color: var(--on-surface-variant);
+  }
+}
+
+.company-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+
+  &.active {
+    background: rgba(16, 185, 129, 0.08);
+    color: #059669;
+  }
+
+  &:not(.active) {
+    background: var(--surface-container-highest);
+    color: var(--on-surface-variant);
+  }
+}
+
+.status-dot-sm {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.company-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.company-role {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: var(--radius);
+  background: var(--surface-container-lowest);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+// ============================================================
+// EMPTY STATE
+// ============================================================
+
+.experience-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--on-surface-variant);
+
+  .material-symbols-outlined {
+    font-size: 32px;
+    color: var(--outline-variant);
+  }
+
+  p {
+    font-family: var(--font-body);
+    font-size: 14px;
+    margin: 0;
+  }
+}

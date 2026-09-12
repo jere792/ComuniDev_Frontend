@@ -1,0 +1,61 @@
+<section class="info-card">
+  <div class="card-header">
+    <div class="card-header-left">
+      <div class="card-icon">
+        <span class="material-symbols-outlined">contact_page</span>
+      </div>
+      <div>
+        <h2 class="card-title">Información del Reclutador</h2>
+        <p class="card-subtitle">Ficha técnica y credenciales de contacto</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="contact-list">
+    <div class="contact-row">
+      <span class="material-symbols-outlined">mail</span>
+      <span class="contact-label">Correo Electrónico</span>
+      <span class="contact-value">{{ user?.email }}</span>
+    </div>
+
+    <div class="contact-row clickable" (click)="editBasic.emit()">
+      <span class="material-symbols-outlined">phone</span>
+      <span class="contact-label">Teléfono / WhatsApp</span>
+      @if (user?.telefono) {
+        <span class="contact-value">{{ user?.telefono }}</span>
+      } @else {
+        <span class="contact-value add-field">+ Agregar teléfono</span>
+      }
+    </div>
+
+    <div class="contact-row clickable" (click)="editBasic.emit()">
+      <span class="material-symbols-outlined">location_on</span>
+      <span class="contact-label">Sede Operativa</span>
+      @if (user?.ubicacion?.distrito) {
+        <span class="contact-value">{{ user?.ubicacion?.distrito }}, {{ user?.ubicacion?.ciudad }}, {{ user?.ubicacion?.pais }}</span>
+      } @else {
+        <span class="contact-value add-field">+ Agregar ubicación</span>
+      }
+    </div>
+
+    <div class="contact-row clickable" (click)="editProfile.emit()">
+      <span class="material-symbols-outlined">badge</span>
+      <span class="contact-label">Registro Fiscal (RUC)</span>
+      @if (profile?.ruc) {
+        <span class="contact-value">{{ profile?.ruc }}</span>
+      } @else {
+        <span class="contact-value add-field">+ Agregar RUC</span>
+      }
+    </div>
+
+    <div class="contact-row clickable" (click)="editProfile.emit()">
+      <span class="material-symbols-outlined">calendar_today</span>
+      <span class="contact-label">Trayectoria</span>
+      @if (profile?.anioCreacion) {
+        <span class="contact-value">Miembro desde {{ profile?.anioCreacion }}</span>
+      } @else {
+        <span class="contact-value add-field">+ Agregar año</span>
+      }
+    </div>
+  </div>
+</section>

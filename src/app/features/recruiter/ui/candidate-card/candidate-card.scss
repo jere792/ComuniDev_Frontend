@@ -1,0 +1,97 @@
+.candidate-card {
+  background: var(--surface, #fff);
+  border-radius: 16px;
+  padding: 1.25rem;
+  border: 1px solid var(--border-color, #e9ecef);
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .candidate-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    .candidate-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .candidate-info {
+      flex: 1;
+
+      .candidate-name {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0;
+        color: var(--text-primary, #212529);
+      }
+
+      .candidate-role {
+        font-size: 0.875rem;
+        color: var(--text-secondary, #6c757d);
+        margin: 0;
+      }
+    }
+
+    .availability-badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: rgba(107, 114, 128, 0.1);
+      color: #6b7280;
+
+      &.available {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+      }
+    }
+  }
+
+  .candidate-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+
+    .skill-tag {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      background: var(--bg-secondary, #f3f4f6);
+      color: var(--text-primary, #212529);
+    }
+  }
+
+  .candidate-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color, #e9ecef);
+
+    .experience {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.875rem;
+      color: var(--text-secondary, #6c757d);
+
+      .material-symbols-outlined {
+        font-size: 18px;
+      }
+    }
+
+    .candidate-actions {
+      display: flex;
+      gap: 8px;
+    }
+  }
+}

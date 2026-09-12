@@ -12,8 +12,11 @@ const GET_USER = gql`
       nombre
       nombreUsuario
       email
+      telefono
       fotoPerfilUrl
       bannerUrl
+      bio
+      ubicacion { pais ciudad distrito }
       roles
       rolActivo
       estadoCuenta
@@ -25,8 +28,6 @@ const GET_USER = gql`
       developerProfile {
         id
         tituloProfesional
-        bio
-        ubicacion { pais ciudad distrito }
         tecnologias { nombre nivel aniosExperiencia }
         habilidadesBlandas
         experiencias { empresa cargo descripcion fechaInicio fechaFin }
@@ -39,13 +40,12 @@ const GET_USER = gql`
       }
       recruiterProfile {
         id
-        nombres
-        apellidos
-        bio
         cargo
-        bannerUrl
-        telefono
-        linkedinUrl
+        ruc
+        lema
+        anioCreacion
+        modalidadTrabajo
+        redesSociales { linkedin instagram tiktok facebook }
         empresas { companyId cargoEnEmpresa activo }
         verificado
       }
@@ -54,14 +54,17 @@ const GET_USER = gql`
 `;
 
 const UPDATE_USER = gql`
-  mutation UpdateUser($id: ID!, $nombre: String, $nombreUsuario: String, $email: String, $fotoPerfilUrl: String, $bannerUrl: String) {
-    updateUser(id: $id, nombre: $nombre, nombreUsuario: $nombreUsuario, email: $email, fotoPerfilUrl: $fotoPerfilUrl, bannerUrl: $bannerUrl) {
+  mutation UpdateUser($id: ID!, $nombre: String, $nombreUsuario: String, $email: String, $telefono: String, $fotoPerfilUrl: String, $bannerUrl: String, $bio: String, $ubicacion: UserUbicacionInput) {
+    updateUser(id: $id, nombre: $nombre, nombreUsuario: $nombreUsuario, email: $email, telefono: $telefono, fotoPerfilUrl: $fotoPerfilUrl, bannerUrl: $bannerUrl, bio: $bio, ubicacion: $ubicacion) {
       id
       nombre
       nombreUsuario
       email
+      telefono
       fotoPerfilUrl
       bannerUrl
+      bio
+      ubicacion { pais ciudad distrito }
       roles
       rolActivo
       estadoCuenta
@@ -111,8 +114,6 @@ const CREATE_DEVELOPER_PROFILE = gql`
   mutation CreateDeveloperProfile(
     $userId: String!
     $tituloProfesional: String
-    $bio: String
-    $ubicacion: DeveloperUbicacionInput
     $tecnologias: [TecnologiaInput]
     $habilidadesBlandas: [String]
     $disponibilidadLaboral: DeveloperDisponibilidadInput
@@ -121,8 +122,6 @@ const CREATE_DEVELOPER_PROFILE = gql`
     createDeveloperProfile(
       userId: $userId
       tituloProfesional: $tituloProfesional
-      bio: $bio
-      ubicacion: $ubicacion
       tecnologias: $tecnologias
       habilidadesBlandas: $habilidadesBlandas
       disponibilidadLaboral: $disponibilidadLaboral
@@ -131,7 +130,6 @@ const CREATE_DEVELOPER_PROFILE = gql`
       id
       userId
       tituloProfesional
-      bio
     }
   }
 `;
@@ -140,8 +138,6 @@ const UPDATE_DEVELOPER_PROFILE = gql`
   mutation UpdateDeveloperProfile(
     $id: ID!
     $tituloProfesional: String
-    $bio: String
-    $ubicacion: DeveloperUbicacionInput
     $tecnologias: [TecnologiaInput]
     $habilidadesBlandas: [String]
     $disponibilidadLaboral: DeveloperDisponibilidadInput
@@ -150,8 +146,6 @@ const UPDATE_DEVELOPER_PROFILE = gql`
     updateDeveloperProfile(
       id: $id
       tituloProfesional: $tituloProfesional
-      bio: $bio
-      ubicacion: $ubicacion
       tecnologias: $tecnologias
       habilidadesBlandas: $habilidadesBlandas
       disponibilidadLaboral: $disponibilidadLaboral
@@ -160,7 +154,6 @@ const UPDATE_DEVELOPER_PROFILE = gql`
       id
       userId
       tituloProfesional
-      bio
     }
   }
 `;
@@ -168,28 +161,30 @@ const UPDATE_DEVELOPER_PROFILE = gql`
 const CREATE_RECRUITER_PROFILE = gql`
   mutation CreateRecruiterProfile(
     $userId: String!
-    $nombres: String
-    $apellidos: String
-    $bio: String
     $cargo: String
-    $telefono: String
-    $linkedinUrl: String
+    $ruc: String
+    $lema: String
+    $anioCreacion: Int
+    $modalidadTrabajo: ModalidadTrabajo
+    $redesSociales: RedesSocialesInput
   ) {
     createRecruiterProfile(
       userId: $userId
-      nombres: $nombres
-      apellidos: $apellidos
-      bio: $bio
       cargo: $cargo
-      telefono: $telefono
-      linkedinUrl: $linkedinUrl
+      ruc: $ruc
+      lema: $lema
+      anioCreacion: $anioCreacion
+      modalidadTrabajo: $modalidadTrabajo
+      redesSociales: $redesSociales
     ) {
       id
       userId
-      nombres
-      apellidos
-      bio
       cargo
+      ruc
+      lema
+      anioCreacion
+      modalidadTrabajo
+      redesSociales { linkedin instagram tiktok facebook }
     }
   }
 `;
@@ -197,31 +192,30 @@ const CREATE_RECRUITER_PROFILE = gql`
 const UPDATE_RECRUITER_PROFILE = gql`
   mutation UpdateRecruiterProfile(
     $id: ID!
-    $nombres: String
-    $apellidos: String
-    $bio: String
     $cargo: String
-    $bannerUrl: String
-    $telefono: String
-    $linkedinUrl: String
+    $ruc: String
+    $lema: String
+    $anioCreacion: Int
+    $modalidadTrabajo: ModalidadTrabajo
+    $redesSociales: RedesSocialesInput
   ) {
     updateRecruiterProfile(
       id: $id
-      nombres: $nombres
-      apellidos: $apellidos
-      bio: $bio
       cargo: $cargo
-      bannerUrl: $bannerUrl
-      telefono: $telefono
-      linkedinUrl: $linkedinUrl
+      ruc: $ruc
+      lema: $lema
+      anioCreacion: $anioCreacion
+      modalidadTrabajo: $modalidadTrabajo
+      redesSociales: $redesSociales
     ) {
       id
       userId
-      nombres
-      apellidos
-      bio
       cargo
-      bannerUrl
+      ruc
+      lema
+      anioCreacion
+      modalidadTrabajo
+      redesSociales { linkedin instagram tiktok facebook }
     }
   }
 `;
@@ -230,8 +224,6 @@ export interface DeveloperProfileData {
   id: string;
   userId: string;
   tituloProfesional?: string;
-  bio?: string;
-  ubicacion?: { pais: string; ciudad: string; distrito: string };
   tecnologias?: { nombre: string; nivel: string; aniosExperiencia: number }[];
   habilidadesBlandas?: string[];
   experiencias?: { empresa: string; cargo: string; descripcion: string; fechaInicio: string; fechaFin?: string }[];
@@ -246,13 +238,12 @@ export interface DeveloperProfileData {
 export interface RecruiterProfileData {
   id: string;
   userId: string;
-  nombres?: string;
-  apellidos?: string;
-  bio?: string;
   cargo?: string;
-  bannerUrl?: string;
-  telefono?: string;
-  linkedinUrl?: string;
+  ruc?: string;
+  lema?: string;
+  anioCreacion?: number;
+  modalidadTrabajo?: string;
+  redesSociales?: { linkedin?: string; instagram?: string; tiktok?: string; facebook?: string };
   empresas?: { companyId: string; cargoEnEmpresa: string; activo: boolean }[];
   verificado: boolean;
 }
@@ -262,8 +253,11 @@ export interface User {
   nombre: string;
   nombreUsuario: string;
   email: string;
+  telefono?: string;
   fotoPerfilUrl?: string;
   bannerUrl?: string;
+  bio?: string;
+  ubicacion?: { pais: string; ciudad: string; distrito: string };
   roles: string[];
   rolActivo: string;
   estadoCuenta: string;
@@ -272,6 +266,7 @@ export interface User {
   siguiendoCount?: number;
   conexionesCount?: number;
   createdAt?: string;
+  estadoActividad?: { estado: string; mensajePersonalizado?: string; ultimaVez?: string };
   developerProfile?: DeveloperProfileData;
   recruiterProfile?: RecruiterProfileData;
 }

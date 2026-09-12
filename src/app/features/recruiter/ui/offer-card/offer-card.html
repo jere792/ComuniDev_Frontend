@@ -1,0 +1,38 @@
+<div class="offer-card">
+  <div class="offer-status" [class]="status">
+    {{ status === 'active' ? 'Activa' : 'Pausada' }}
+  </div>
+
+  <h3 class="offer-title">{{ title }}</h3>
+  <p class="offer-company">{{ company }}</p>
+
+  <div class="offer-details">
+    <span class="detail-item">
+      <span class="material-symbols-outlined">location_on</span>
+      {{ location }}
+    </span>
+    <span class="detail-item">
+      <span class="material-symbols-outlined">payments</span>
+      {{ salary }}
+    </span>
+    <span class="detail-item">
+      <span class="material-symbols-outlined">schedule</span>
+      {{ type }}
+    </span>
+  </div>
+
+  <div class="offer-footer">
+    <span class="posted-time">{{ posted }}</span>
+    <div class="offer-stats">
+      <span class="stat">
+        <span class="material-symbols-outlined">person</span>
+        {{ applicants }} postulados
+      </span>
+    </div>
+  </div>
+
+  <div class="offer-actions">
+    <button class="btn btn-outline" (click)="edit.emit(id)">Editar</button>
+    <button class="btn btn-outline" (click)="viewApplicants.emit(id)">Ver postulados</button>
+  </div>
+</div>

@@ -1,0 +1,45 @@
+<div class="report-card">
+  <div class="report-header">
+    <img [src]="userAvatar" [alt]="userName" class="user-avatar" />
+    <div class="user-info">
+      <span class="user-name">{{ userName }}</span>
+      <span class="post-time">{{ time }}</span>
+    </div>
+    @if (isOwn) {
+      <div class="report-menu">
+        <button class="menu-btn" (click)="edit.emit(id)">
+          <span class="material-symbols-outlined">edit</span>
+        </button>
+        <button class="menu-btn delete" (click)="delete.emit(id)">
+          <span class="material-symbols-outlined">delete</span>
+        </button>
+      </div>
+    }
+  </div>
+
+  <div class="report-content">
+    <p class="content-text">{{ content }}</p>
+  </div>
+
+  @if (image) {
+    <div class="report-image">
+      <img [src]="image" alt="Post image" />
+    </div>
+  }
+
+  <div class="reactions-bar">
+    @for (reaction of reactions; track reaction.type) {
+      <button
+        class="reaction-btn"
+        [class.active]="reaction.reacted"
+        (click)="reaction.type !== 'comment' && toggleReaction.emit({ reportId: id, type: reaction.type })">
+        <span class="material-symbols-outlined">
+          {{ reaction.type === 'like' ? (reaction.reacted ? 'thumb_up' : 'thumb_up_off_alt') :
+             reaction.type === 'love' ? (reaction.reacted ? 'favorite' : 'favorite_border') :
+             'chat_bubble_outline' }}
+        </span>
+        <span class="reaction-count">{{ reaction.count }}</span>
+      </button>
+    }
+  </div>
+</div>

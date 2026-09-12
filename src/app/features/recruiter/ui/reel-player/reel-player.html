@@ -1,0 +1,42 @@
+<div class="reel-card">
+  <div class="reel-video-wrapper">
+    <video
+      [src]="video"
+      class="reel-video"
+      autoplay
+      loop
+      muted
+      playsinline>
+    </video>
+
+    <div class="reel-actions">
+      <button class="action-btn" (click)="toggleLike.emit()">
+        <span class="material-symbols-outlined" [class.liked]="liked">
+          {{ liked ? 'favorite' : 'favorite_border' }}
+        </span>
+        <span class="action-count">{{ likes }}</span>
+      </button>
+      <button class="action-btn">
+        <span class="material-symbols-outlined">chat_bubble_outline</span>
+        <span class="action-count">{{ comments }}</span>
+      </button>
+      <button class="action-btn" (click)="toggleSave.emit()">
+        <span class="material-symbols-outlined" [class.saved]="saved">
+          {{ saved ? 'bookmark' : 'bookmark_border' }}
+        </span>
+      </button>
+      <button class="action-btn">
+        <span class="material-symbols-outlined">share</span>
+      </button>
+    </div>
+
+    <div class="reel-info">
+      <div class="reel-user">
+        <img [src]="userAvatar" [alt]="userName" class="user-avatar" />
+        <span class="user-name">{{ userName }}</span>
+        <button class="follow-btn">Seguir</button>
+      </div>
+      <p class="reel-description">{{ description }}</p>
+    </div>
+  </div>
+</div>

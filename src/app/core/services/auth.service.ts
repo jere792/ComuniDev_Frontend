@@ -29,9 +29,9 @@ export class AuthService {
     });
   }
 
-  register(nombre: string, nombreUsuario: string, email: string, password: string, rol: string): Promise<any> {
+  register(nombre: string, nombreUsuario: string, email: string, password: string, rol: string, telefono?: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.api.register({ nombre, nombreUsuario, email, password, rol }).subscribe({
+      this.api.register({ nombre, nombreUsuario, email, password, rol, telefono }).subscribe({
         next: (data) => resolve(data),
         error: (err) => reject(err),
       });

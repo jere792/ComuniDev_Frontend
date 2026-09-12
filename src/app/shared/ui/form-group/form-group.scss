@@ -1,0 +1,31 @@
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary, #212529);
+  }
+
+  input, textarea, select {
+    padding: 10px 14px;
+    border: 1px solid var(--border-color, #e9ecef);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--bg-secondary, #f8f9fa);
+    color: var(--text-primary, #212529);
+    transition: border-color 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary, #667eea);
+    }
+
+    &::placeholder {
+      color: var(--text-secondary, #6c757d);
+    }
+  }
+}

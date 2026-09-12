@@ -1,0 +1,36 @@
+<section class="sidebar-card">
+  <div class="sidebar-card-header">
+    <div class="card-icon">
+      <span class="material-symbols-outlined">work_history</span>
+    </div>
+    <div>
+      <h2 class="card-title">Experiencia</h2>
+      <p class="card-subtitle">Trayectoria profesional</p>
+    </div>
+  </div>
+
+  <div class="experience-timeline">
+    @if (empresas?.length) {
+      @for (empresa of empresas; track empresa.companyId; let i = $index) {
+        <div class="experience-item">
+          <div class="experience-dot" [class.active]="empresa.activo"></div>
+          <div class="experience-content">
+            <div class="experience-header">
+              <h3 class="experience-role">{{ empresa.cargoEnEmpresa }}</h3>
+              <span class="experience-badge" [class.active]="empresa.activo">
+                {{ empresa.activo ? 'Actual' : 'Finalizado' }}
+              </span>
+            </div>
+            <p class="experience-company">Empresa {{ i + 1 }}</p>
+            <p class="experience-desc">Procesos de selección y gestión de talento.</p>
+          </div>
+        </div>
+      }
+    } @else {
+      <div class="experience-empty">
+        <span class="material-symbols-outlined">add_circle</span>
+        <p>Agrega tu experiencia para completar tu perfil.</p>
+      </div>
+    }
+  </div>
+</section>

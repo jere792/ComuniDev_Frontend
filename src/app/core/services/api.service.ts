@@ -15,6 +15,7 @@ export interface RegisterPayload {
   email: string;
   password: string;
   rol: string;
+  telefono?: string;
 }
 
 export interface ApiResponse<T> {

@@ -1,0 +1,16 @@
+<section class="sidebar-card">
+  @if (title) {
+    <div class="sidebar-card-header">
+      <div class="card-icon">
+        <span class="material-symbols-outlined">{{ icon }}</span>
+      </div>
+      <div>
+        <h3 class="card-title">{{ title }}</h3>
+        @if (subtitle) {
+          <p class="card-subtitle">{{ subtitle }}</p>
+        }
+      </div>
+    </div>
+  }
+  <ng-content />
+</section>

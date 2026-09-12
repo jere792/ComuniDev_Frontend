@@ -1,0 +1,118 @@
+.report-card {
+  background: var(--surface, #fff);
+  border-radius: 16px;
+  padding: 1.25rem;
+  border: 1px solid var(--border-color, #e9ecef);
+
+  .report-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .user-info {
+      flex: 1;
+
+      .user-name {
+        display: block;
+        font-size: 0.9375rem;
+        font-weight: 500;
+        color: var(--text-primary, #212529);
+      }
+
+      .post-time {
+        font-size: 0.75rem;
+        color: var(--text-secondary, #6c757d);
+      }
+    }
+
+    .report-menu {
+      display: flex;
+      gap: 4px;
+
+      .menu-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 6px;
+        color: var(--text-secondary, #6c757d);
+        transition: background 0.2s;
+
+        &:hover {
+          background: var(--bg-secondary, #f3f4f6);
+        }
+
+        &.delete:hover {
+          background: #fee2e2;
+          color: #ef4444;
+        }
+      }
+    }
+  }
+
+  .report-content {
+    margin-bottom: 12px;
+
+    .content-text {
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      margin: 0;
+      color: var(--text-primary, #212529);
+    }
+  }
+
+  .report-image {
+    margin-bottom: 12px;
+    border-radius: 12px;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      display: block;
+    }
+  }
+
+  .reactions-bar {
+    display: flex;
+    gap: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color, #e9ecef);
+
+    .reaction-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary, #6c757d);
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: background 0.2s;
+
+      &:hover {
+        background: var(--bg-secondary, #f3f4f6);
+      }
+
+      &.active {
+        color: var(--primary, #667eea);
+      }
+
+      .material-symbols-outlined {
+        font-size: 20px;
+      }
+
+      .reaction-count {
+        font-size: 0.8125rem;
+      }
+    }
+  }
+}

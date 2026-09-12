@@ -1,0 +1,30 @@
+<header class="user-header">
+  <img
+    src="https://res.cloudinary.com/dp1vgjhsq/image/upload/v1788755182/isotipo_ec9uxb.png"
+    alt="ComuniDev"
+    class="header-logo"
+  />
+  <div class="header-center">
+    <div class="search-bar">
+      <span class="material-symbols-outlined">search</span>
+      <input type="text" placeholder="Buscar..." class="search-input" />
+    </div>
+    <nav class="header-nav">
+      @for (link of links; track link.route) {
+        <a [routerLink]="link.route" routerLinkActive="active" class="nav-tab">
+          <span class="material-symbols-outlined">{{ link.icon || 'circle' }}</span>
+          <span class="nav-tab-label">{{ link.label }}</span>
+        </a>
+      }
+    </nav>
+  </div>
+  <div class="header-right">
+    <a routerLink="/recruiter/messages" class="icon-btn" title="Mensajes">
+      <span class="material-symbols-outlined">chat</span>
+    </a>
+    <button class="icon-btn">
+      <span class="material-symbols-outlined">notifications</span>
+      <span class="notification-dot"></span>
+    </button>
+  </div>
+</header>

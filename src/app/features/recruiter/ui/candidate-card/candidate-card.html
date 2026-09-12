@@ -1,0 +1,35 @@
+<div class="candidate-card">
+  <div class="candidate-header">
+    <img [src]="avatar" [alt]="name" class="candidate-avatar" />
+    <div class="candidate-info">
+      <h3 class="candidate-name">{{ name }}</h3>
+      <p class="candidate-role">{{ role }}</p>
+    </div>
+    <span class="availability-badge" [class.available]="available">
+      {{ available ? 'Disponible' : 'Ocupado' }}
+    </span>
+  </div>
+
+  <div class="candidate-skills">
+    @for (skill of skills; track skill) {
+      <span class="skill-tag">{{ skill }}</span>
+    }
+  </div>
+
+  <div class="candidate-footer">
+    <span class="experience">
+      <span class="material-symbols-outlined">work_history</span>
+      {{ experience }}
+    </span>
+    <div class="candidate-actions">
+      <button class="btn btn-outline" (click)="message.emit(id)">
+        <span class="material-symbols-outlined">chat</span>
+        Mensaje
+      </button>
+      <button class="btn btn-primary" (click)="contact.emit(id)">
+        <span class="material-symbols-outlined">person_add</span>
+        Contactar
+      </button>
+    </div>
+  </div>
+</div>

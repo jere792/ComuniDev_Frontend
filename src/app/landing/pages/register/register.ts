@@ -114,7 +114,8 @@ export class Register {
         this.nombreUsuario(),
         this.email(),
         this.password(),
-        this.rol()
+        this.rol(),
+        this.telefono() ? `${this.phoneCode()}${this.telefono()}` : undefined
       );
       this.successMessage.set('Cuenta creada exitosamente. Ahora puedes iniciar sesion.');
       setTimeout(() => this.router.navigate(['/']), 2000);

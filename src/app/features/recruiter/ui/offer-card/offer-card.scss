@@ -1,0 +1,90 @@
+.offer-card {
+  background: var(--surface, #fff);
+  border-radius: 16px;
+  padding: 1.25rem;
+  border: 1px solid var(--border-color, #e9ecef);
+  position: relative;
+
+  .offer-status {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+
+    &.active {
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
+    }
+
+    &.paused {
+      background: rgba(107, 114, 128, 0.1);
+      color: #6b7280;
+    }
+  }
+
+  .offer-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    color: var(--text-primary, #212529);
+  }
+
+  .offer-company {
+    font-size: 0.875rem;
+    color: var(--text-secondary, #6c757d);
+    margin: 0 0 12px 0;
+  }
+
+  .offer-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.875rem;
+      color: var(--text-secondary, #6c757d);
+
+      .material-symbols-outlined {
+        font-size: 16px;
+      }
+    }
+  }
+
+  .offer-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color, #e9ecef);
+
+    .posted-time {
+      font-size: 0.8rem;
+      color: var(--text-secondary, #6c757d);
+    }
+
+    .offer-stats .stat {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.875rem;
+      color: var(--text-secondary, #6c757d);
+
+      .material-symbols-outlined {
+        font-size: 16px;
+      }
+    }
+  }
+
+  .offer-actions {
+    display: flex;
+    gap: 8px;
+  }
+}

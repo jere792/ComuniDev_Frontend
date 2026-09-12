@@ -1,0 +1,97 @@
+.reel-card {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+
+  .reel-video-wrapper {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #000;
+
+    .reel-video {
+      width: 100%;
+      height: 70vh;
+      object-fit: cover;
+    }
+  }
+
+  .reel-actions {
+    position: absolute;
+    right: 12px;
+    bottom: 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+
+      .material-symbols-outlined {
+        font-size: 28px;
+
+        &.liked {
+          color: #ef4444;
+        }
+
+        &.saved {
+          color: #eab308;
+        }
+      }
+
+      .action-count {
+        font-size: 0.75rem;
+      }
+    }
+  }
+
+  .reel-info {
+    position: absolute;
+    bottom: 16px;
+    left: 12px;
+    right: 60px;
+    color: white;
+
+    .reel-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .user-name {
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+
+      .follow-btn {
+        padding: 4px 12px;
+        border-radius: 6px;
+        border: 1px solid white;
+        background: transparent;
+        color: white;
+        font-size: 0.75rem;
+        cursor: pointer;
+      }
+    }
+
+    .reel-description {
+      font-size: 0.875rem;
+      margin: 0;
+    }
+  }
+}

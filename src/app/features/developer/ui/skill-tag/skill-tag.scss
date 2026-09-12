@@ -1,0 +1,24 @@
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: var(--bg-secondary, #f3f4f6);
+  font-size: 0.8125rem;
+
+  .skill-name {
+    font-weight: 500;
+    color: var(--text-primary, #212529);
+  }
+
+  .skill-level {
+    color: var(--primary, #667eea);
+    font-size: 0.75rem;
+  }
+
+  .skill-years {
+    color: var(--text-secondary, #6c757d);
+    font-size: 0.75rem;
+  }
+}

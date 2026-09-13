@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 import { StoryGraphqlService, SocialStory } from '../../../../../core/services/social/story-graphql.service';
 import { GraphQLService } from '../../../../../core/services/graphql.service';
 
@@ -20,6 +21,7 @@ interface StoryUser {
 export class StoriesComponent implements OnInit {
   private storyService = inject(StoryGraphqlService);
   private graphql = inject(GraphQLService);
+  private router = inject(Router);
 
   storyUsers = signal<StoryUser[]>([]);
   showComposer = signal(false);
@@ -202,5 +204,9 @@ export class StoriesComponent implements OnInit {
   getInitials(name: string): string {
     if (!name) return '?';
     return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  }
+
+  goToProfile(autorId: string): void {
+    this.router.navigate(['/profile', autorId]);
   }
 }

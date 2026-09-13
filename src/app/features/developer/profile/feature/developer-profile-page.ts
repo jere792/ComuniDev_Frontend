@@ -234,6 +234,7 @@ export class DeveloperProfilePage implements OnInit {
         this.graphql.updateUser(userId, { [field]: res.url }).subscribe({
           next: (updatedUser: User) => {
             this.user.set(updatedUser);
+            if (field === 'fotoPerfilUrl') localStorage.setItem('userPhoto', res.url);
             this.uploadingImage.set(false);
             this.updateMessage.set(field === 'bannerUrl' ? 'Banner actualizado' : 'Foto de perfil actualizada');
             setTimeout(() => this.updateMessage.set(''), 3000);

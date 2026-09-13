@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 import { ReelGraphqlService, SocialReel } from '../../../../core/services/social/reel-graphql.service';
 import { ReactionGraphqlService, TipoReaccion } from '../../../../core/services/social/reaction-graphql.service';
 import { CommentGraphqlService, SocialComment } from '../../../../core/services/social/comment-graphql.service';
@@ -28,6 +29,7 @@ export class RecruiterReels implements OnInit {
   private reactionService = inject(ReactionGraphqlService);
   private commentService = inject(CommentGraphqlService);
   private graphql = inject(GraphQLService);
+  private router = inject(Router);
 
   reels = signal<ReelVM[]>([]);
   currentIndex = 0;
@@ -255,5 +257,9 @@ export class RecruiterReels implements OnInit {
 
   getInitials(name: string): string {
     return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  }
+
+  goToProfile(autorId: string): void {
+    this.router.navigate(['/profile', autorId]);
   }
 }

@@ -88,6 +88,14 @@
   margin-bottom: var(--space-sm);
 }
 
+.clickable {
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
 .user-avatar {
   width: 36px;
   height: 36px;

@@ -77,6 +77,8 @@ export class AuthStore {
 
     if (token && role) {
       const normalizedRole = role.toLowerCase();
+      localStorage.removeItem('userPhoto');
+      localStorage.removeItem('userEmail');
       localStorage.setItem('token', token);
       localStorage.setItem('role', normalizedRole);
       if (userId) localStorage.setItem('userId', userId);
@@ -95,16 +97,21 @@ export class AuthStore {
     localStorage.removeItem('userId');
     localStorage.removeItem('userName');
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('userUsername');
+    localStorage.removeItem('userPhoto');
     this.user.set(null);
     this.role.set(null);
     this.router.navigate(['/']);
   }
 
   private setSession(data: LoginResponse): void {
+    localStorage.removeItem('userPhoto');
+    localStorage.removeItem('userEmail');
     localStorage.setItem('token', data.token);
     localStorage.setItem('role', data.rolActivo.toLowerCase());
     localStorage.setItem('userId', data.id);
     localStorage.setItem('userName', data.nombre || data.nombreUsuario);
+    localStorage.setItem('userUsername', data.nombreUsuario);
     localStorage.setItem('userEmail', data.email);
     this.user.set(data);
     this.role.set(data.rolActivo.toLowerCase());

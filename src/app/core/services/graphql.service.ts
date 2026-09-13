@@ -81,10 +81,15 @@ const GET_USERS = gql`
       nombre
       nombreUsuario
       email
+      fotoPerfilUrl
+      bannerUrl
+      bio
       roles
       rolActivo
       estadoCuenta
       emailVerificado
+      seguidoresCount
+      siguiendoCount
       createdAt
     }
   }

@@ -16,6 +16,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', loadComponent: () => import('./feature/dashboard/admin-dashboard').then(m => m.AdminDashboard) },
       { path: 'users', loadChildren: () => import('../users/users.routes').then(m => m.routes) },
+      { path: 'discover', loadComponent: () => import('../shared/feature/discover-users/discover-users').then(m => m.DiscoverUsers) },
     ],
   },
 ];

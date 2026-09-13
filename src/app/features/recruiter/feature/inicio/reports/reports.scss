@@ -18,6 +18,14 @@
   padding: var(--space-md) var(--space-lg);
 }
 
+.clickable {
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
 .user-avatar {
   width: 44px;
   height: 44px;
@@ -366,40 +374,140 @@
   }
 }
 
-// ─── Composer ───
+// ─── Composer Trigger ───
 
-.composer-card {
-  padding: var(--space-lg);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-}
-
-.composer-header {
+.composer-trigger {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  color: var(--on-surface);
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: var(--surface-container);
+  }
 
   .material-symbols-outlined {
+    font-size: 22px;
     color: var(--primary);
+  }
+
+  .trigger-text {
+    flex: 1;
+    font-size: 14px;
+    color: var(--outline);
+    background: var(--surface-container);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-subtle);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .trigger-actions {
+    display: flex;
+    gap: var(--space-sm);
+  }
+
+  .trigger-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+
+    .material-symbols-outlined {
+      font-size: 20px;
+      color: var(--on-surface-variant);
+    }
+
+    &:hover {
+      background: var(--surface-container-high);
+    }
+  }
+}
+
+// ─── Composer Modal ───
+
+.composer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: #00000099;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.composer-modal {
+  width: 520px;
+  max-width: 90vw;
+  max-height: 85vh;
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 24px 80px #00000066;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.modal-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: var(--surface-container);
+  }
+
+  .material-symbols-outlined {
+    font-size: 20px;
   }
 }
 
 .composer-textarea {
   width: 100%;
-  padding: var(--space-md);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  border: none;
   font-size: 15px;
   font-family: inherit;
-  resize: vertical;
-  background: var(--surface);
+  resize: none;
+  background: transparent;
   color: var(--on-surface);
+  flex: 1;
+  min-height: 120px;
 
   &:focus {
     outline: none;
-    border-color: var(--primary);
   }
 
   &::placeholder {
@@ -409,6 +517,7 @@
 
 .composer-image-preview {
   position: relative;
+  margin: 0 var(--space-lg);
   border-radius: var(--radius-md);
   overflow: hidden;
 
@@ -428,7 +537,7 @@
   height: 32px;
   border: none;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.6);
+  background: #00000099;
   color: #fff;
   cursor: pointer;
   display: flex;
@@ -444,6 +553,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: var(--space-sm) var(--space-lg);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .attach-btn {

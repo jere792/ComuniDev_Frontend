@@ -1,0 +1,62 @@
+<div class="discover-container">
+  <div class="discover-header">
+    <button class="back-btn" (click)="goBack()">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <h1>Descubrir personas</h1>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <span class="material-symbols-outlined spinning">progress_activity</span>
+      <span>Cargando usuarios...</span>
+    </div>
+  } @else {
+    <div class="users-grid">
+      @for (user of users(); track user.id) {
+        <div class="user-card">
+          <div class="card-banner" (click)="goToProfile(user.id!)">
+            @if (user.bannerUrl) {
+              <img [src]="user.bannerUrl" alt="Banner" />
+            }
+          </div>
+          <div class="card-body">
+            <div class="card-avatar" (click)="goToProfile(user.id!)">
+              @if (user.fotoPerfilUrl) {
+                <img [src]="user.fotoPerfilUrl" [alt]="user.nombre" />
+              } @else {
+                <div class="avatar-fallback">{{ getInitials(user.nombre || '?') }}</div>
+              }
+            </div>
+            <div class="card-info" (click)="goToProfile(user.id!)">
+              <span class="card-name">{{ user.nombre }}</span>
+              <span class="card-username">&#64;{{ user.nombreUsuario }}</span>
+            </div>
+            @if (user.rolActivo) {
+              <span class="card-role">{{ user.rolActivo }}</span>
+            }
+            @if (user.bio) {
+              <p class="card-bio">{{ user.bio }}</p>
+            }
+            <div class="card-stats">
+              <span><strong>{{ user.seguidoresCount || 0 }}</strong> seguidores</span>
+              <span><strong>{{ user.siguiendoCount || 0 }}</strong> siguiendo</span>
+            </div>
+            <button
+              class="follow-btn"
+              [class.following]="user.isFollowing"
+              (click)="toggleFollow(user)"
+            >
+              {{ user.isFollowing ? 'Siguiendo' : 'Seguir' }}
+            </button>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">person_search</span>
+          <span>No hay usuarios para mostrar</span>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 import { PostGraphqlService, SocialPost } from '../../../../../core/services/social/post-graphql.service';
 import { CommentGraphqlService, SocialComment } from '../../../../../core/services/social/comment-graphql.service';
 import { ReactionGraphqlService, TipoReaccion } from '../../../../../core/services/social/reaction-graphql.service';
@@ -46,12 +47,14 @@ export class ReportsComponent implements OnInit {
   private commentService = inject(CommentGraphqlService);
   private reactionService = inject(ReactionGraphqlService);
   private graphql = inject(GraphQLService);
+  private router = inject(Router);
 
   posts = signal<PostVM[]>([]);
   composerText = '';
   composerImage: string | null = null;
   uploadingImage = false;
   loading = signal(true);
+  showComposerModal = signal(false);
 
   reactionTypes: TipoReaccion[] = ['LIKE', 'LOVE', 'CELEBRATE', 'SUPPORT'];
   reactionLabels = REACTION_LABELS;
@@ -182,10 +185,17 @@ export class ReportsComponent implements OnInit {
           this.loadAuthor(created.autorId);
           this.composerText = '';
           this.composerImage = null;
+          this.showComposerModal.set(false);
         }
       },
       error: () => {}
     });
+  }
+
+  closeComposerModal(): void {
+    this.showComposerModal.set(false);
+    this.composerText = '';
+    this.composerImage = null;
   }
 
   // ─── Reacciones ───
@@ -377,5 +387,9 @@ export class ReportsComponent implements OnInit {
 
   getInitials(name: string): string {
     return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  }
+
+  goToProfile(autorId: string): void {
+    this.router.navigate(['/profile', autorId]);
   }
 }

@@ -23,6 +23,7 @@ export const routes: Routes = [
       { path: 'offers', loadComponent: () => import('./feature/offers/offers').then(m => m.RecruiterOffers) },
       { path: 'messages', loadComponent: () => import('./feature/messages/messages').then(m => m.RecruiterMessages) },
       { path: 'saved', loadComponent: () => import('./feature/saved/saved').then(m => m.RecruiterSaved) },
+      { path: 'discover', loadComponent: () => import('../shared/feature/discover-users/discover-users').then(m => m.DiscoverUsers) },
       { path: 'profile', loadChildren: () => import('./profile/recruiter-profile.routes').then(m => m.routes) },
     ],
   },

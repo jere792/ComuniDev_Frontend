@@ -1,8 +1,15 @@
 <aside class="right-panel">
   <div class="panel-section profile-section">
-    <img src="https://i.pravatar.cc/150?img=12" alt="Profile" class="profile-avatar" />
+    @if (userPhoto()) {
+      <img [src]="userPhoto()" alt="Profile" class="profile-avatar" />
+    } @else {
+      <div class="profile-avatar avatar-fallback">{{ userName.charAt(0) }}</div>
+    }
     <div class="profile-info">
       <span class="profile-name">{{ userName }}</span>
+      @if (userUsername()) {
+        <span class="profile-username">&#64;{{ userUsername() }}</span>
+      }
       <span class="profile-role">{{ role }}</span>
     </div>
   </div>
@@ -10,20 +17,28 @@
   <div class="panel-section">
     <div class="section-header">
       <span class="section-title">Sugerencias</span>
-      <button class="see-all">Ver todo</button>
     </div>
     <div class="suggestions-list">
-      @for (suggestion of suggestions; track suggestion.name) {
+      @for (suggestion of suggestions(); track suggestion.id) {
         <div class="suggestion-item">
-          <img [src]="suggestion.avatar" [alt]="suggestion.name" class="suggestion-avatar" />
-          <div class="suggestion-info">
-            <span class="suggestion-name">{{ suggestion.name }}</span>
-            <span class="suggestion-role">{{ suggestion.role }}</span>
+          @if (suggestion.fotoPerfilUrl) {
+            <img [src]="suggestion.fotoPerfilUrl" [alt]="suggestion.nombre" class="suggestion-avatar" (click)="goToProfile(suggestion.id)" />
+          } @else {
+            <div class="suggestion-avatar avatar-fallback-small" (click)="goToProfile(suggestion.id)">{{ suggestion.nombre?.charAt(0) || '?' }}</div>
+          }
+          <div class="suggestion-info" (click)="goToProfile(suggestion.id)">
+            <span class="suggestion-name">{{ suggestion.nombre }}</span>
+            <span class="suggestion-username">&#64;{{ suggestion.nombreUsuario }}</span>
           </div>
-          <button class="follow-btn">Seguir</button>
+          <button class="follow-btn" [class.following]="suggestion.isFollowing" (click)="toggleFollow(suggestion)">
+            {{ suggestion.isFollowing ? 'Siguiendo' : 'Seguir' }}
+          </button>
         </div>
+      } @empty {
+        <span class="empty-suggestions">Sin sugerencias</span>
       }
     </div>
+    <a class="see-more" (click)="goToDiscover()">Ver más</a>
   </div>
 
   <div class="panel-section footer-section">

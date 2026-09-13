@@ -18,10 +18,13 @@ export class AuthService {
     return new Promise((resolve, reject) => {
       this.api.login({ email, password }).subscribe({
         next: (data) => {
+          localStorage.removeItem('userPhoto');
+          localStorage.removeItem('userEmail');
           localStorage.setItem('token', data.token);
           localStorage.setItem('role', data.rolActivo.toLowerCase());
           localStorage.setItem('userId', data.id);
           localStorage.setItem('userName', data.nombre || data.nombreUsuario);
+          localStorage.setItem('userUsername', data.nombreUsuario);
           resolve(data);
         },
         error: (err) => reject(err),
@@ -61,6 +64,9 @@ export class AuthService {
     localStorage.removeItem('role');
     localStorage.removeItem('userId');
     localStorage.removeItem('userName');
+    localStorage.removeItem('userUsername');
+    localStorage.removeItem('userPhoto');
+    localStorage.removeItem('userEmail');
     this.router.navigate(['/']);
   }
 }

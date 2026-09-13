@@ -25,12 +25,23 @@
   </div>
 </div>
 
+<!-- Close button for composer -->
+@if (showComposer()) {
+  <button class="close-outside" (click)="toggleComposer()">
+    <span class="material-symbols-outlined">close</span>
+  </button>
+}
+
+<!-- Close button for viewer -->
+@if (viewingUser()) {
+  <button class="close-outside" (click)="closeViewer()">
+    <span class="material-symbols-outlined">close</span>
+  </button>
+}
+
 <!-- Story Composer Fullscreen -->
 @if (showComposer()) {
-  <div class="story-fullscreen" (click)="toggleComposer()">
-    <button class="close-outside" (click)="toggleComposer()">
-      <span class="material-symbols-outlined">close</span>
-    </button>
+  <div class="story-fullscreen">
     <div class="story-phone-composer" (click)="$event.stopPropagation()">
       <div class="story-topbar">
         <span class="topbar-title">Nueva Story</span>
@@ -83,11 +94,8 @@
 
 <!-- Story Viewer -->
 @if (viewingUser(); as vu) {
-  <div class="story-viewer" (click)="closeViewer()">
-    <button class="close-outside" (click)="closeViewer()">
-      <span class="material-symbols-outlined">close</span>
-    </button>
-    <div class="story-phone" (click)="$event.stopPropagation()">
+  <div class="story-viewer">
+    <div class="story-phone">
       <!-- Progress bars -->
       <div class="story-progress-bar">
         @for (s of vu.stories; track s.id; let i = $index) {
@@ -103,7 +111,7 @@
 
       <!-- Top info -->
       <div class="viewer-top">
-        <div class="viewer-user">
+        <div class="viewer-user clickable" (click)="goToProfile(vu.stories[0]?.autorId || vu.autorId)">
           @if (vu.avatar) {
             <img [src]="vu.avatar" class="viewer-avatar" />
           } @else {

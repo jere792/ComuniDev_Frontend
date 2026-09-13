@@ -1,37 +1,56 @@
 <div class="reports-section">
-  <!-- Composer -->
-  <div class="report-card composer-card">
-    <div class="composer-header">
-      <span class="material-symbols-outlined">edit_note</span>
-      <strong>Crea una publicación</strong>
-    </div>
-    <textarea
-      class="composer-textarea"
-      [(ngModel)]="composerText"
-      placeholder="¿Qué quieres compartir con la comunidad?"
-      rows="3"
-    ></textarea>
-
-    @if (composerImage) {
-      <div class="composer-image-preview">
-        <img [src]="composerImage" alt="Vista previa" />
-        <button class="remove-image-btn" (click)="removeImage()">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </div>
-    }
-
-    <div class="composer-footer">
-      <label class="attach-btn">
+  <!-- Composer Trigger -->
+  <div class="composer-trigger" (click)="showComposerModal.set(true)">
+    <span class="material-symbols-outlined">edit_note</span>
+    <span class="trigger-text">¿Qué quieres compartir con la comunidad?</span>
+    <div class="trigger-actions">
+      <span class="trigger-icon">
         <span class="material-symbols-outlined">image</span>
-        <span>{{ uploadingImage ? 'Subiendo...' : 'Imagen' }}</span>
-        <input type="file" accept="image/*" hidden (change)="onFileSelected($event)" [disabled]="uploadingImage" />
-      </label>
-      <button class="btn-publish" (click)="publish()" [disabled]="!composerText.trim() && !composerImage">
-        Publicar
-      </button>
+      </span>
     </div>
   </div>
+
+  <!-- Composer Modal -->
+  @if (showComposerModal()) {
+    <div class="composer-overlay" (click)="closeComposerModal()">
+      <div class="composer-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <span class="modal-title">Crear publicación</span>
+          <button class="modal-close" (click)="closeComposerModal()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <textarea
+          class="composer-textarea"
+          [(ngModel)]="composerText"
+          placeholder="¿Qué quieres compartir con la comunidad?"
+          rows="4"
+          autofocus
+        ></textarea>
+
+        @if (composerImage) {
+          <div class="composer-image-preview">
+            <img [src]="composerImage" alt="Vista previa" />
+            <button class="remove-image-btn" (click)="removeImage()">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+        }
+
+        <div class="composer-footer">
+          <label class="attach-btn">
+            <span class="material-symbols-outlined">image</span>
+            <span>{{ uploadingImage ? 'Subiendo...' : 'Imagen' }}</span>
+            <input type="file" accept="image/*" hidden (change)="onFileSelected($event)" [disabled]="uploadingImage" />
+          </label>
+          <button class="btn-publish" (click)="publish()" [disabled]="!composerText.trim() && !composerImage">
+            Publicar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 
   <!-- Loading -->
   @if (loading()) {
@@ -43,11 +62,11 @@
     <div class="report-card">
       <div class="report-header">
         @if (vm.autorAvatar) {
-          <img [src]="vm.autorAvatar" [alt]="vm.autorNombre" class="user-avatar" />
+          <img [src]="vm.autorAvatar" [alt]="vm.autorNombre" class="user-avatar clickable" (click)="goToProfile(vm.post.autorId)" />
         } @else {
-          <div class="user-avatar avatar-fallback">{{ getInitials(vm.autorNombre || '?') }}</div>
+          <div class="user-avatar avatar-fallback clickable" (click)="goToProfile(vm.post.autorId)">{{ getInitials(vm.autorNombre || '?') }}</div>
         }
-        <div class="user-info">
+        <div class="user-info clickable" (click)="goToProfile(vm.post.autorId)">
           <span class="user-name">{{ vm.autorNombre || 'Usuario' }}</span>
           <span class="post-time">{{ vm.post.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
         </div>

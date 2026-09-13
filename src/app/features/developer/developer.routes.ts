@@ -17,6 +17,7 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', loadComponent: () => import('./feature/dashboard/developer-dashboard').then(m => m.DeveloperDashboard) },
+      { path: 'discover', loadComponent: () => import('../shared/feature/discover-users/discover-users').then(m => m.DiscoverUsers) },
       { path: 'profile', loadChildren: () => import('./profile/developer-profile.routes').then(m => m.routes) },
     ],
   },

@@ -117,11 +117,11 @@
         <div class="reel-info">
           <div class="reel-user">
             @if (reels()[currentIndex].autorAvatar) {
-              <img [src]="reels()[currentIndex].autorAvatar" [alt]="reels()[currentIndex].autorNombre" class="user-avatar" />
+              <img [src]="reels()[currentIndex].autorAvatar" [alt]="reels()[currentIndex].autorNombre" class="user-avatar clickable" (click)="goToProfile(reels()[currentIndex].reel.autorId)" />
             } @else {
-              <div class="user-avatar avatar-fallback">{{ getInitials(reels()[currentIndex].autorNombre || '?') }}</div>
+              <div class="user-avatar avatar-fallback clickable" (click)="goToProfile(reels()[currentIndex].reel.autorId)">{{ getInitials(reels()[currentIndex].autorNombre || '?') }}</div>
             }
-            <span class="user-name">{{ reels()[currentIndex].autorNombre || 'Usuario' }}</span>
+            <span class="user-name clickable" (click)="goToProfile(reels()[currentIndex].reel.autorId)">{{ reels()[currentIndex].autorNombre || 'Usuario' }}</span>
           </div>
           <p class="reel-description">{{ reels()[currentIndex].reel.descripcion }}</p>
           @if (reels()[currentIndex].reel.etiquetas?.length) {

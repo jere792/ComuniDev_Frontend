@@ -2,163 +2,440 @@
   <!-- Sidebar nav -->
   <nav class="config-sidebar">
     <div class="config-sidebar-header">
-      <a routerLink="/recruiter/profile" class="back-link">
-        <span class="material-symbols-outlined">arrow_back</span>
-      </a>
       <h1 class="config-title">Configuración</h1>
     </div>
-    <ul class="config-nav">
-      @for (section of sections; track section.id) {
-        <li>
+
+    <div class="config-nav">
+      @for (cat of categories; track cat.id) {
+        <div class="nav-category">
           <button
-            class="config-nav-item"
-            [class.active]="activeSection() === section.id"
-            [class.coming-soon]="section.comingSoon"
-            (click)="selectSection(section.id)"
+            class="category-btn"
+            [class.expanded]="expandedCategory() === cat.id"
+            (click)="toggleCategory(cat.id)"
           >
-            <span class="material-symbols-outlined">{{ section.icon }}</span>
-            <span class="nav-label">{{ section.label }}</span>
-            @if (section.comingSoon) {
-              <span class="coming-soon-badge">Próximamente</span>
-            }
+            <span class="material-symbols-outlined category-icon">{{ cat.icon }}</span>
+            <span class="category-label">{{ cat.label }}</span>
+            <span class="material-symbols-outlined chevron">expand_more</span>
           </button>
-        </li>
+          <div class="subitems-container" [class.open]="expandedCategory() === cat.id">
+            <div class="subitems-inner">
+              @for (sub of cat.subItems; track sub.id) {
+                <button
+                  class="subitem-btn"
+                  [class.active]="activeSection() === sub.id"
+                  (click)="selectSubItem(sub.id)"
+                >
+                  @if (activeSection() === sub.id) {
+                    <span class="active-dot"></span>
+                  }
+                  <span class="material-symbols-outlined subitem-icon">{{ sub.icon }}</span>
+                  <span class="subitem-label">{{ sub.label }}</span>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
       }
-    </ul>
+
+      @for (item of disabledItems; track item.id) {
+        <button class="nav-item disabled" disabled>
+          <span class="material-symbols-outlined category-icon">{{ item.icon }}</span>
+          <span class="category-label">{{ item.label }}</span>
+          <span class="coming-badge">Próx.</span>
+        </button>
+      }
+    </div>
   </nav>
 
   <!-- Content -->
   <main class="config-content">
-    <!-- Perfil -->
-    @if (activeSection() === 'perfil') {
-      <section class="config-section">
-        <h2 class="section-title">Configuración de perfil</h2>
-        <p class="section-desc">Información básica de tu cuenta</p>
+    @if (saved()) {
+      <div class="save-toast success">
+        <span class="material-symbols-outlined">check_circle</span>
+        Cambios guardados
+      </div>
+    }
+
+    @if (saveError()) {
+      <div class="save-toast error">
+        <span class="material-symbols-outlined">error</span>
+        {{ saveError() }}
+      </div>
+    }
+
+    @if (loading()) {
+      <div class="config-section loading-state">
+        <div class="spinner"></div>
+      </div>
+    } @else {
+
+    <!-- ═══ PERFIL ═══ -->
+
+    @if (activeSection() === 'perfil-personal') {
+      <section class="config-section" [formGroup]="perfilForm">
+        <h2 class="section-title">Información personal</h2>
+        <p class="section-desc">Datos básicos de tu cuenta</p>
         <div class="section-body">
-          <p class="placeholder">Edita tu nombre, datos personales e información de contacto.</p>
+          <div class="form-group">
+            <label class="form-label">Nombre completo</label>
+            <input class="form-input" type="text" formControlName="nombre" placeholder="Tu nombre completo" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Correo electrónico</label>
+            <input class="form-input" type="email" formControlName="email" placeholder="tuemail@ejemplo.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Teléfono</label>
+            <input class="form-input" type="tel" formControlName="telefono" placeholder="+51 999 888 777" />
+          </div>
+        </div>
+        <div class="section-footer">
+          <button class="btn-save" (click)="savePerfil()">Guardar cambios</button>
         </div>
       </section>
     }
 
-    <!-- Perfil profesional -->
-    @if (activeSection() === 'profesional') {
-      <section class="config-section">
+    @if (activeSection() === 'perfil-profesional') {
+      <section class="config-section" [formGroup]="profesionalForm">
         <h2 class="section-title">Perfil profesional</h2>
         <p class="section-desc">Tu experiencia y especialización</p>
         <div class="section-body">
-          <p class="placeholder">Gestiona tu experiencia laboral, empresas vinculadas y áreas de especialización.</p>
+          <div class="form-group">
+            <label class="form-label">Especialización</label>
+            <input class="form-input" type="text" formControlName="especializacion" placeholder="Ej: Reclutamiento de IT" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Lema / Eslogan</label>
+            <input class="form-input" type="text" formControlName="lema" placeholder="Ej: Conectando talento con oportunidades" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Empresas</label>
+            <textarea class="form-textarea" formControlName="empresas" placeholder="Describe las empresas con las que trabajas o tu experiencia laboral" rows="4"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group half">
+              <label class="form-label">Registro Fiscal (RUC)</label>
+              <input class="form-input" type="text" formControlName="ruc" placeholder="Ej: 20548756231" />
+            </div>
+            <div class="form-group half">
+              <label class="form-label">Fecha de creación</label>
+              <input class="form-input" type="date" formControlName="fechaCreacion" />
+            </div>
+          </div>
+        </div>
+        <div class="section-footer">
+          <button class="btn-save" (click)="saveProfesional()">Guardar cambios</button>
         </div>
       </section>
     }
 
-    <!-- Redes sociales -->
-    @if (activeSection() === 'redes') {
-      <section class="config-section">
+    @if (activeSection() === 'perfil-redes') {
+      <section class="config-section" [formGroup]="redesForm">
         <h2 class="section-title">Redes sociales</h2>
         <p class="section-desc">Conecta tus perfiles externos</p>
         <div class="section-body">
-          <p class="placeholder">Agrega o edita tus enlaces de LinkedIn, Instagram, TikTok y Facebook.</p>
+          <div class="form-group">
+            <label class="form-label">Sitio web / Portafolio</label>
+            <input class="form-input" type="url" formControlName="sitioWeb" placeholder="https://tusitio.com.pe" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">LinkedIn</label>
+            <input class="form-input" type="url" formControlName="linkedin" placeholder="https://linkedin.com/in/tu-perfil" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Instagram</label>
+            <input class="form-input" type="url" formControlName="instagram" placeholder="https://instagram.com/tu-usuario" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">TikTok</label>
+            <input class="form-input" type="url" formControlName="tiktok" placeholder="https://tiktok.com/@tu-usuario" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Facebook</label>
+            <input class="form-input" type="url" formControlName="facebook" placeholder="https://facebook.com/tu-perfil" />
+          </div>
+        </div>
+        <div class="section-footer">
+          <button class="btn-save" (click)="saveRedes()">Guardar cambios</button>
         </div>
       </section>
     }
 
-    <!-- Descripción -->
-    @if (activeSection() === 'descripcion') {
-      <section class="config-section">
+    @if (activeSection() === 'perfil-descripcion') {
+      <section class="config-section" [formGroup]="descripcionForm">
         <h2 class="section-title">Descripción</h2>
         <p class="section-desc">Cuéntanos sobre ti</p>
         <div class="section-body">
-          <p class="placeholder">Escribe una breve descripción o bio para tu perfil público.</p>
+          <div class="form-group">
+            <label class="form-label">Bio</label>
+            <textarea class="form-textarea" formControlName="bio" placeholder="Escribe una breve descripción sobre ti..." rows="6"></textarea>
+          </div>
+        </div>
+        <div class="section-footer">
+          <button class="btn-save" (click)="saveBio()" [disabled]="savingBio()">
+            @if (savingBio()) {
+              <span class="spinner-inline"></span>
+              Guardando...
+            } @else {
+              Guardar cambios
+            }
+          </button>
         </div>
       </section>
     }
 
-    <!-- Ubicación -->
-    @if (activeSection() === 'ubicacion') {
-      <section class="config-section">
+    @if (activeSection() === 'perfil-ubicacion') {
+      <section class="config-section" [formGroup]="ubicacionForm">
         <h2 class="section-title">Ubicación</h2>
-        <p class="section-desc">Tu zona de trabajo</p>
+        <p class="section-desc">Tu ubicación actual en el Perú</p>
         <div class="section-body">
-          <p class="placeholder">Configura tu ciudad, país y zona horaria.</p>
+          <div class="form-group">
+            <label class="form-label">País</label>
+            <input class="form-input" type="text" formControlName="pais" readonly />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Departamento</label>
+            <select class="form-input form-select" formControlName="departamento">
+              <option value="">Selecciona un departamento</option>
+              <option value="Amazonas">Amazonas</option>
+              <option value="Ancash">Áncash</option>
+              <option value="Apurimac">Apurímac</option>
+              <option value="Arequipa">Arequipa</option>
+              <option value="Ayacucho">Ayacucho</option>
+              <option value="Cajamarca">Cajamarca</option>
+              <option value="Callao">Callao</option>
+              <option value="Cusco">Cusco</option>
+              <option value="Huancavelica">Huancavelica</option>
+              <option value="Huanuco">Huánuco</option>
+              <option value="Ica">Ica</option>
+              <option value="Junin">Junín</option>
+              <option value="La Libertad">La Libertad</option>
+              <option value="Lambayeque">Lambayeque</option>
+              <option value="Lima">Lima</option>
+              <option value="Loreto">Loreto</option>
+              <option value="Madre de Dios">Madre de Dios</option>
+              <option value="Moquegua">Moquegua</option>
+              <option value="Pasco">Pasco</option>
+              <option value="Piura">Piura</option>
+              <option value="Puno">Puno</option>
+              <option value="San Martin">San Martín</option>
+              <option value="Tacna">Tacna</option>
+              <option value="Tumbes">Tumbes</option>
+              <option value="Ucayali">Ucayali</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Provincia</label>
+            <input class="form-input" type="text" formControlName="provincia" placeholder="Ej: Lima, Arequipa, Trujillo..." />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ciudad / Distrito</label>
+            <input class="form-input" type="text" formControlName="ciudad" placeholder="Ej: Miraflores, San Isidro, Surco..." />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Distrito / Zona / Localidad</label>
+            <input class="form-input" type="text" formControlName="distrito" placeholder="Ej: Corpac, La Molina, Barranco..." />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dirección</label>
+            <input class="form-input" type="text" formControlName="direccion" placeholder="Ej: Av. Javier Prado Este 4200, San Isidro" />
+          </div>
+        </div>
+        <div class="section-footer">
+          <button class="btn-save" (click)="saveUbicacion()">Guardar cambios</button>
         </div>
       </section>
     }
 
-    <!-- Privacidad -->
-    @if (activeSection() === 'privacidad') {
+    <!-- ═══ CUENTA ═══ -->
+
+    @if (activeSection() === 'cuenta-estado') {
       <section class="config-section">
-        <h2 class="section-title">Privacidad</h2>
-        <p class="section-desc">Controla quién ve tu información</p>
+        <h2 class="section-title">Estado de cuenta</h2>
+        <p class="section-desc">Información y verificación de tu cuenta</p>
         <div class="section-body">
-          <p class="placeholder">Define la visibilidad de tu perfil, datos de contacto y actividad.</p>
+          <div class="info-row">
+            <span class="info-label">Estado</span>
+            <span class="info-badge active">Activa</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Email verificado</span>
+            <span class="info-badge">Verificado</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Rol</span>
+            <span class="info-badge">Reclutador</span>
+          </div>
         </div>
       </section>
     }
 
-    <!-- Cuenta -->
-    @if (activeSection() === 'cuenta') {
-      <section class="config-section">
-        <h2 class="section-title">Cuenta</h2>
-        <p class="section-desc">Estado y verificación de tu cuenta</p>
-        <div class="section-body">
-          <p class="placeholder">Revisa el estado de tu cuenta, verifica tu email y gestiona tus datos.</p>
-        </div>
-      </section>
-    }
-
-    <!-- Cambio de contraseña -->
-    @if (activeSection() === 'contrasena') {
-      <section class="config-section">
+    @if (activeSection() === 'cuenta-contrasena') {
+      <section class="config-section" [formGroup]="contrasenaForm">
         <h2 class="section-title">Cambio de contraseña</h2>
         <p class="section-desc">Actualiza tu contraseña de acceso</p>
         <div class="section-body">
-          <p class="placeholder">Cambia tu contraseña actual por una nueva.</p>
+          <div class="form-group">
+            <label class="form-label">Contraseña actual</label>
+            <input class="form-input" type="password" formControlName="actual" placeholder="••••••••" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nueva contraseña</label>
+            <input class="form-input" type="password" formControlName="nueva" placeholder="••••••••" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirmar contraseña</label>
+            <input class="form-input" type="password" formControlName="confirmar" placeholder="••••••••" />
+          </div>
+        </div>
+        <div class="section-footer">
+          <button class="btn-save" (click)="saveContrasena()">Actualizar contraseña</button>
         </div>
       </section>
     }
 
-    <!-- Notificaciones -->
-    @if (activeSection() === 'notificaciones') {
-      <section class="config-section">
+    @if (activeSection() === 'cuenta-privacidad') {
+      <section class="config-section" [formGroup]="privacidadForm">
+        <h2 class="section-title">Privacidad</h2>
+        <p class="section-desc">Controla quién ve tu información</p>
+        <div class="section-body">
+          <div class="toggle-group">
+            <div class="toggle-row">
+              <div>
+                <span class="toggle-label">Perfil público</span>
+                <span class="toggle-desc">Tu perfil es visible para otros usuarios</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" formControlName="perfilPublico" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <span class="toggle-label">Mostrar email</span>
+                <span class="toggle-desc">Otros usuarios pueden ver tu correo</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" formControlName="mostrarEmail" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <span class="toggle-label">Mostrar teléfono</span>
+                <span class="toggle-desc">Otros usuarios pueden ver tu teléfono</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" formControlName="mostrarTelefono" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="section-footer">
+          <button class="btn-save" disabled title="Configuración estática">Guardar cambios</button>
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'cuenta-notificaciones') {
+      <section class="config-section" [formGroup]="notificacionesForm">
         <h2 class="section-title">Notificaciones</h2>
         <p class="section-desc">Configura tus alertas y preferencias</p>
         <div class="section-body">
-          <p class="placeholder">Gestiona las notificaciones que recibes por email y en la app.</p>
+          <div class="toggle-group">
+            <div class="toggle-row">
+              <div>
+                <span class="toggle-label">Notificaciones por email</span>
+                <span class="toggle-desc">Recibe alertas en tu correo</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" formControlName="email" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <span class="toggle-label">Notificaciones push</span>
+                <span class="toggle-desc">Recibe alertas en el navegador</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" formControlName="push" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <span class="toggle-label">Nuevos mensajes</span>
+                <span class="toggle-desc">Avísame cuando me escriban</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" formControlName="mensajes" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <span class="toggle-label">Nuevos candidatos</span>
+                <span class="toggle-desc">Avísame cuando haya nuevos candidatos</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" formControlName="candidatos" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="section-footer">
+          <button class="btn-save" (click)="saveNotificaciones()">Guardar cambios</button>
         </div>
       </section>
     }
 
-    <!-- Seguridad -->
+    @if (activeSection() === 'cuenta-terminos') {
+      <section class="config-section">
+        <h2 class="section-title">Términos y condiciones</h2>
+        <p class="section-desc">Documentos legales</p>
+        <div class="section-body">
+          <div class="terms-links">
+            <a class="terms-link" href="#" target="_blank">
+              <span class="material-symbols-outlined">description</span>
+              Términos de uso
+            </a>
+            <a class="terms-link" href="#" target="_blank">
+              <span class="material-symbols-outlined">shield</span>
+              Política de privacidad
+            </a>
+            <a class="terms-link" href="#" target="_blank">
+              <span class="material-symbols-outlined">gavel</span>
+              Reglas de la comunidad
+            </a>
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- ═══ COMING SOON ═══ -->
+
     @if (activeSection() === 'seguridad') {
       <section class="config-section">
         <h2 class="section-title">Seguridad</h2>
         <p class="section-desc">Protege tu cuenta</p>
         <div class="section-body">
-          <p class="placeholder">Autenticación de dos factores, sesiones activas y más.</p>
+          <p class="placeholder">Próximamente: autenticación de dos factores, sesiones activas y más.</p>
         </div>
       </section>
     }
 
-    <!-- Idioma y región -->
     @if (activeSection() === 'idioma') {
       <section class="config-section">
         <h2 class="section-title">Idioma y región</h2>
         <p class="section-desc">Preferencias de idioma</p>
         <div class="section-body">
-          <p class="placeholder">Cambia el idioma de la plataforma y tu zona horaria.</p>
+          <p class="placeholder">Próximamente: cambia el idioma de la plataforma y tu zona horaria.</p>
         </div>
       </section>
     }
-
-    <!-- Términos y condiciones -->
-    @if (activeSection() === 'terminos') {
-      <section class="config-section">
-        <h2 class="section-title">Términos y condiciones</h2>
-        <p class="section-desc">Documentos legales</p>
-        <div class="section-body">
-          <p class="placeholder">Consulta nuestros términos de uso, política de privacidad y reglas de la comunidad.</p>
-        </div>
-      </section>
     }
   </main>
 </div>

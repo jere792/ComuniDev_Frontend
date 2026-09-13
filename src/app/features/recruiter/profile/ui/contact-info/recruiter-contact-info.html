@@ -51,8 +51,8 @@
     <div class="contact-row clickable" (click)="editProfile.emit()">
       <span class="material-symbols-outlined">calendar_today</span>
       <span class="contact-label">Trayectoria</span>
-      @if (profile?.anioCreacion) {
-        <span class="contact-value">Miembro desde {{ profile?.anioCreacion }}</span>
+      @if (profile?.fechaCreacion) {
+        <span class="contact-value">Miembro desde {{ profile?.fechaCreacion }}</span>
       } @else {
         <span class="contact-value add-field">+ Agregar año</span>
       }

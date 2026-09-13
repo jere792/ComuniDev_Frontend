@@ -1,53 +1,186 @@
-<div class="reels-container">
-  <div class="reel-card">
-    <div class="reel-video-wrapper">
-      <video
-        [src]="reels[currentIndex].video"
-        class="reel-video"
-        autoplay
-        loop
-        muted
-        playsinline>
-      </video>
-
-      <div class="reel-actions">
-        <button class="action-btn" (click)="toggleLike(reels[currentIndex])">
-          <span class="material-symbols-outlined" [class.liked]="reels[currentIndex].liked">
-            {{ reels[currentIndex].liked ? 'favorite' : 'favorite_border' }}
-          </span>
-          <span class="action-count">{{ reels[currentIndex].likes }}</span>
-        </button>
-        <button class="action-btn">
-          <span class="material-symbols-outlined">chat_bubble_outline</span>
-          <span class="action-count">{{ reels[currentIndex].comments }}</span>
-        </button>
-        <button class="action-btn" (click)="toggleSave(reels[currentIndex])">
-          <span class="material-symbols-outlined" [class.saved]="reels[currentIndex].saved">
-            {{ reels[currentIndex].saved ? 'bookmark' : 'bookmark_border' }}
-          </span>
-        </button>
-        <button class="action-btn">
-          <span class="material-symbols-outlined">share</span>
-        </button>
-      </div>
-
-      <div class="reel-info">
-        <div class="reel-user">
-          <img [src]="reels[currentIndex].user.avatar" [alt]="reels[currentIndex].user.name" class="user-avatar" />
-          <span class="user-name">{{ reels[currentIndex].user.name }}</span>
-          <button class="follow-btn">Seguir</button>
+<div class="reels-page">
+  @if (showComposer()) {
+    <div class="composer-overlay">
+      <div class="composer-panel">
+        <div class="composer-header">
+          <h3>Crear Reel</h3>
+          <button class="close-btn" (click)="toggleComposer()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
         </div>
-        <p class="reel-description">{{ reels[currentIndex].description }}</p>
+
+        <div class="composer-form">
+          <label class="field-label">URL del video *</label>
+          <input
+            type="url"
+            [(ngModel)]="reelVideoUrl"
+            placeholder="https://ejemplo.com/video.mp4"
+            class="field-input"
+          />
+
+          <label class="field-label">Descripción</label>
+          <textarea
+            [(ngModel)]="reelDescripcion"
+            placeholder="¿De qué trata este reel?"
+            rows="3"
+            class="field-textarea"
+          ></textarea>
+
+          <label class="field-label">Etiquetas (separadas por coma)</label>
+          <input
+            type="text"
+            [(ngModel)]="reelEtiquetas"
+            placeholder="reclutamiento, tips, programación"
+            class="field-input"
+          />
+
+          <div class="composer-actions">
+            <button class="btn-cancel" (click)="toggleComposer()">Cancelar</button>
+            <button
+              class="btn-create"
+              (click)="createReel()"
+              [disabled]="!reelVideoUrl.trim() || creating"
+            >
+              {{ creating ? 'Creando...' : 'Publicar Reel' }}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
+  }
 
-    <div class="reel-nav">
-      <button class="nav-btn" (click)="prevReel()" [disabled]="currentIndex === 0">
-        <span class="material-symbols-outlined">keyboard_arrow_up</span>
+  <div class="reels-container">
+    @if (loading()) {
+      <div class="loading-text">Cargando reels...</div>
+    } @else if (reels().length === 0) {
+      <div class="empty-state">
+        <span class="material-symbols-outlined" style="font-size:48px;color:var(--outline)">videocam_off</span>
+        <p>No hay reels todavía</p>
+        <button class="btn-create" (click)="toggleComposer()">Crear el primero</button>
+      </div>
+    } @else {
+      @if (currentIndex > 0) {
+        <button class="nav-btn prev" (click)="prevReel()">
+          <span class="material-symbols-outlined">keyboard_arrow_up</span>
+        </button>
+      }
+
+      <div class="reel-card">
+        <div class="reel-video-wrapper">
+          <video
+            [src]="reels()[currentIndex].reel.videoUrl"
+            class="reel-video"
+            autoplay
+            loop
+            muted
+            playsinline
+            controls
+          ></video>
+        </div>
+
+        <div class="reel-actions">
+          <button class="action-btn" (click)="toggleLike(reels()[currentIndex])">
+            <span
+              class="material-symbols-outlined"
+              [class.liked]="reels()[currentIndex].myReaction"
+            >
+              {{ reels()[currentIndex].myReaction ? 'favorite' : 'favorite_border' }}
+            </span>
+            <span class="action-count">{{ reels()[currentIndex].reel.estadisticas?.reaccionesCount ?? 0 }}</span>
+          </button>
+
+          <button class="action-btn" (click)="toggleComments(reels()[currentIndex])">
+            <span class="material-symbols-outlined">chat_bubble_outline</span>
+            <span class="action-count">{{ reels()[currentIndex].reel.estadisticas?.comentariosCount ?? 0 }}</span>
+          </button>
+
+          <button class="action-btn" (click)="toggleSave(reels()[currentIndex])">
+            <span
+              class="material-symbols-outlined"
+              [class.saved]="reels()[currentIndex].saved"
+            >
+              {{ reels()[currentIndex].saved ? 'bookmark' : 'bookmark_border' }}
+            </span>
+          </button>
+
+          <button class="action-btn">
+            <span class="material-symbols-outlined">share</span>
+          </button>
+
+          @if (reels()[currentIndex].reel.autorId === getUserId()) {
+            <button class="action-btn" (click)="deleteReel(reels()[currentIndex])">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          }
+        </div>
+
+        <div class="reel-info">
+          <div class="reel-user">
+            @if (reels()[currentIndex].autorAvatar) {
+              <img [src]="reels()[currentIndex].autorAvatar" [alt]="reels()[currentIndex].autorNombre" class="user-avatar" />
+            } @else {
+              <div class="user-avatar avatar-fallback">{{ getInitials(reels()[currentIndex].autorNombre || '?') }}</div>
+            }
+            <span class="user-name">{{ reels()[currentIndex].autorNombre || 'Usuario' }}</span>
+          </div>
+          <p class="reel-description">{{ reels()[currentIndex].reel.descripcion }}</p>
+          @if (reels()[currentIndex].reel.etiquetas?.length) {
+            <div class="reel-tags">
+              @for (tag of reels()[currentIndex].reel.etiquetas; track tag) {
+                <span class="tag">#{{ tag }}</span>
+              }
+            </div>
+          }
+        </div>
+
+        @if (reels()[currentIndex].showComments) {
+          <div class="comments-panel">
+            <div class="comments-header">
+              <h4>Comentarios</h4>
+              <button class="close-btn small" (click)="toggleComments(reels()[currentIndex])">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div class="comments-list">
+              @for (c of reels()[currentIndex].comments; track c.comment.id) {
+                <div class="comment-item">
+                  <div class="comment-avatar avatar-fallback small">{{ getInitials(c.autorNombre || '?') }}</div>
+                  <div class="comment-body">
+                    <span class="comment-name">{{ c.autorNombre || 'Usuario' }}</span>
+                    <p class="comment-text">{{ c.comment.texto }}</p>
+                    <span class="comment-time">{{ c.comment.createdAt | date: 'dd/MM HH:mm' }}</span>
+                  </div>
+                </div>
+              } @empty {
+                <p class="no-comments">No hay comentarios aún</p>
+              }
+            </div>
+
+            <div class="comment-input">
+              <input
+                type="text"
+                placeholder="Escribe un comentario..."
+                [(ngModel)]="reels()[currentIndex].newComment"
+                (keyup.enter)="addComment(reels()[currentIndex])"
+              />
+              <button class="send-btn" (click)="addComment(reels()[currentIndex])">
+                <span class="material-symbols-outlined">send</span>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (currentIndex < reels().length - 1) {
+        <button class="nav-btn next" (click)="nextReel()">
+          <span class="material-symbols-outlined">keyboard_arrow_down</span>
+        </button>
+      }
+
+      <button class="create-fab" (click)="toggleComposer()">
+        <span class="material-symbols-outlined">add</span>
       </button>
-      <button class="nav-btn" (click)="nextReel()" [disabled]="currentIndex === reels.length - 1">
-        <span class="material-symbols-outlined">keyboard_arrow_down</span>
-      </button>
-    </div>
+    }
   </div>
 </div>

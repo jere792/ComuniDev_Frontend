@@ -1,18 +1,138 @@
 <div class="stories-section">
   <div class="stories-scroll">
-    <div class="story-item your-story">
-      <div class="story-avatar">
+    <!-- Create story button -->
+    <div class="story-item create-story" (click)="toggleComposer()">
+      <div class="story-avatar create-avatar">
         <span class="material-symbols-outlined">add</span>
       </div>
-      <span class="story-name">Tu historia</span>
+      <span class="story-name">Tu story</span>
     </div>
-    @for (story of stories; track story.name) {
-      <div class="story-item">
-        <div class="story-avatar" [style.background]="story.gradient">
-          <img [src]="story.avatar" [alt]="story.name" class="story-img" />
+
+    @for (user of storyUsers(); track user.autorId) {
+      <div class="story-item" (click)="openStory(user)">
+        <div class="story-avatar">
+          @if (user.avatar) {
+            <img [src]="user.avatar" [alt]="user.nombre" class="story-img" />
+          } @else {
+            <span class="material-symbols-outlined">person</span>
+          }
         </div>
-        <span class="story-name">{{ story.name }}</span>
+        <span class="story-name">{{ user.nombre || 'Usuario' }}</span>
       </div>
+    } @empty {
+      <span class="story-name empty-msg">Sin stories de tus seguidos</span>
     }
   </div>
 </div>
+
+<!-- Story Composer Fullscreen -->
+@if (showComposer()) {
+  <div class="story-fullscreen" (click)="toggleComposer()">
+    <button class="close-outside" (click)="toggleComposer()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    <div class="story-phone-composer" (click)="$event.stopPropagation()">
+      <div class="story-topbar">
+        <span class="topbar-title">Nueva Story</span>
+      </div>
+
+      <div class="story-preview">
+        @if (storyImage) {
+          <img [src]="storyImage" alt="Preview" class="preview-img" />
+          <button class="remove-img-btn" (click)="storyImage = null">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        } @else {
+          <div class="empty-preview">
+            @if (uploading) {
+              <span class="material-symbols-outlined spinning">progress_activity</span>
+              <p>Subiendo imagen...</p>
+            } @else {
+              <label class="upload-trigger">
+                <span class="material-symbols-outlined">photo_camera</span>
+              <p>Toca para agregar una imagen</p>
+              <input type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
+            </label>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="story-bottom">
+      <input
+        type="text"
+        [(ngModel)]="storyText"
+        placeholder="Escribe algo..."
+        class="story-text-input"
+      />
+      <button
+        class="publish-btn"
+        (click)="createStory()"
+        [disabled]="(!storyImage && !storyText.trim()) || creating || uploading"
+      >
+        @if (creating) {
+          <span class="material-symbols-outlined spinning">progress_activity</span>
+        } @else {
+          <span class="material-symbols-outlined">send</span>
+        }
+      </button>
+    </div>
+    </div>
+  </div>
+}
+
+<!-- Story Viewer -->
+@if (viewingUser(); as vu) {
+  <div class="story-viewer" (click)="closeViewer()">
+    <button class="close-outside" (click)="closeViewer()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    <div class="story-phone" (click)="$event.stopPropagation()">
+      <!-- Progress bars -->
+      <div class="story-progress-bar">
+        @for (s of vu.stories; track s.id; let i = $index) {
+          <div class="progress-track">
+            <div
+              class="progress-fill"
+              [class.active]="i < viewingIndex()"
+              [class.current]="i === viewingIndex()"
+            ></div>
+          </div>
+        }
+      </div>
+
+      <!-- Top info -->
+      <div class="viewer-top">
+        <div class="viewer-user">
+          @if (vu.avatar) {
+            <img [src]="vu.avatar" class="viewer-avatar" />
+          } @else {
+            <div class="viewer-avatar viewer-avatar-fallback">{{ getInitials(vu.nombre) }}</div>
+          }
+          <span class="viewer-name">{{ vu.nombre }}</span>
+        </div>
+      </div>
+
+      <!-- Story content -->
+      <div class="viewer-content" (click)="nextStory()">
+        @if (vu.stories[viewingIndex()]?.contenido?.imagenUrl) {
+          <img [src]="vu.stories[viewingIndex()].contenido?.imagenUrl" class="viewer-img" />
+        }
+        @if (vu.stories[viewingIndex()]?.contenido?.texto) {
+          <div class="viewer-text-overlay">
+            <p>{{ vu.stories[viewingIndex()].contenido?.texto }}</p>
+          </div>
+        }
+      </div>
+
+      <!-- Navigation zones -->
+      <div class="nav-zone nav-prev" (click)="prevStory()"></div>
+      <div class="nav-zone nav-next" (click)="nextStory()"></div>
+
+      <!-- Bottom -->
+      <div class="viewer-bottom">
+        <span class="viewer-time">{{ vu.stories[viewingIndex()]?.createdAt | date: 'HH:mm' }}</span>
+      </div>
+    </div>
+  </div>
+}

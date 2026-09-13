@@ -13,7 +13,8 @@ export interface CreateRecruiterProfileRequest {
   cargo?: string;
   ruc?: string;
   lema?: string;
-  anioCreacion?: number;
+  empresasDescripcion?: string;
+  fechaCreacion?: string;
   modalidadTrabajo?: string;
   redesSociales?: { linkedin?: string; instagram?: string; tiktok?: string; facebook?: string };
 }
@@ -22,7 +23,8 @@ export interface UpdateRecruiterProfileRequest {
   cargo?: string;
   ruc?: string;
   lema?: string;
-  anioCreacion?: number;
+  empresasDescripcion?: string;
+  fechaCreacion?: string;
   modalidadTrabajo?: string;
   redesSociales?: { linkedin?: string; instagram?: string; tiktok?: string; facebook?: string };
 }

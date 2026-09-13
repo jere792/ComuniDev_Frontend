@@ -16,7 +16,8 @@ const GET_USER = gql`
       fotoPerfilUrl
       bannerUrl
       bio
-      ubicacion { pais ciudad distrito }
+      sitioWeb
+      ubicacion { pais departamento provincia ciudad distrito direccion }
       roles
       rolActivo
       estadoCuenta
@@ -43,7 +44,7 @@ const GET_USER = gql`
         cargo
         ruc
         lema
-        anioCreacion
+        fechaCreacion
         modalidadTrabajo
         redesSociales { linkedin instagram tiktok facebook }
         empresas { companyId cargoEnEmpresa activo }
@@ -54,8 +55,8 @@ const GET_USER = gql`
 `;
 
 const UPDATE_USER = gql`
-  mutation UpdateUser($id: ID!, $nombre: String, $nombreUsuario: String, $email: String, $telefono: String, $fotoPerfilUrl: String, $bannerUrl: String, $bio: String, $ubicacion: UserUbicacionInput) {
-    updateUser(id: $id, nombre: $nombre, nombreUsuario: $nombreUsuario, email: $email, telefono: $telefono, fotoPerfilUrl: $fotoPerfilUrl, bannerUrl: $bannerUrl, bio: $bio, ubicacion: $ubicacion) {
+  mutation UpdateUser($id: ID!, $nombre: String, $nombreUsuario: String, $email: String, $telefono: String, $fotoPerfilUrl: String, $bannerUrl: String, $bio: String, $sitioWeb: String, $ubicacion: UserUbicacionInput) {
+    updateUser(id: $id, nombre: $nombre, nombreUsuario: $nombreUsuario, email: $email, telefono: $telefono, fotoPerfilUrl: $fotoPerfilUrl, bannerUrl: $bannerUrl, bio: $bio, sitioWeb: $sitioWeb, ubicacion: $ubicacion) {
       id
       nombre
       nombreUsuario
@@ -64,7 +65,8 @@ const UPDATE_USER = gql`
       fotoPerfilUrl
       bannerUrl
       bio
-      ubicacion { pais ciudad distrito }
+      sitioWeb
+      ubicacion { pais departamento provincia ciudad distrito direccion }
       roles
       rolActivo
       estadoCuenta
@@ -91,6 +93,31 @@ const GET_USERS = gql`
 const DELETE_USER = gql`
   mutation DeleteUser($id: ID!) {
     deleteUser(id: $id)
+  }
+`;
+
+const CHANGE_PASSWORD = gql`
+  mutation ChangePassword($userId: ID!, $currentPassword: String!, $newPassword: String!) {
+    changePassword(userId: $userId, currentPassword: $currentPassword, newPassword: $newPassword)
+  }
+`;
+
+const UPDATE_NOTIFICATION_PREFERENCES = gql`
+  mutation UpdateNotificationPreferences($userId: ID!, $preferences: NotificationPreferencesInput!) {
+    updateNotificationPreferences(userId: $userId, preferences: $preferences) {
+      id
+      configuracion {
+        notificaciones {
+          email
+          push
+          mensajes
+          comentarios
+          reacciones
+          conexiones
+          vacantes
+        }
+      }
+    }
   }
 `;
 
@@ -164,7 +191,8 @@ const CREATE_RECRUITER_PROFILE = gql`
     $cargo: String
     $ruc: String
     $lema: String
-    $anioCreacion: Int
+    $empresasDescripcion: String
+    $fechaCreacion: String
     $modalidadTrabajo: ModalidadTrabajo
     $redesSociales: RedesSocialesInput
   ) {
@@ -173,7 +201,8 @@ const CREATE_RECRUITER_PROFILE = gql`
       cargo: $cargo
       ruc: $ruc
       lema: $lema
-      anioCreacion: $anioCreacion
+      empresasDescripcion: $empresasDescripcion
+      fechaCreacion: $fechaCreacion
       modalidadTrabajo: $modalidadTrabajo
       redesSociales: $redesSociales
     ) {
@@ -182,7 +211,8 @@ const CREATE_RECRUITER_PROFILE = gql`
       cargo
       ruc
       lema
-      anioCreacion
+      empresasDescripcion
+      fechaCreacion
       modalidadTrabajo
       redesSociales { linkedin instagram tiktok facebook }
     }
@@ -195,7 +225,8 @@ const UPDATE_RECRUITER_PROFILE = gql`
     $cargo: String
     $ruc: String
     $lema: String
-    $anioCreacion: Int
+    $empresasDescripcion: String
+    $fechaCreacion: String
     $modalidadTrabajo: ModalidadTrabajo
     $redesSociales: RedesSocialesInput
   ) {
@@ -204,7 +235,8 @@ const UPDATE_RECRUITER_PROFILE = gql`
       cargo: $cargo
       ruc: $ruc
       lema: $lema
-      anioCreacion: $anioCreacion
+      empresasDescripcion: $empresasDescripcion
+      fechaCreacion: $fechaCreacion
       modalidadTrabajo: $modalidadTrabajo
       redesSociales: $redesSociales
     ) {
@@ -213,7 +245,8 @@ const UPDATE_RECRUITER_PROFILE = gql`
       cargo
       ruc
       lema
-      anioCreacion
+      empresasDescripcion
+      fechaCreacion
       modalidadTrabajo
       redesSociales { linkedin instagram tiktok facebook }
     }
@@ -241,7 +274,7 @@ export interface RecruiterProfileData {
   cargo?: string;
   ruc?: string;
   lema?: string;
-  anioCreacion?: number;
+  fechaCreacion?: string;
   modalidadTrabajo?: string;
   redesSociales?: { linkedin?: string; instagram?: string; tiktok?: string; facebook?: string };
   empresas?: { companyId: string; cargoEnEmpresa: string; activo: boolean }[];
@@ -257,6 +290,7 @@ export interface User {
   fotoPerfilUrl?: string;
   bannerUrl?: string;
   bio?: string;
+  sitioWeb?: string;
   ubicacion?: { pais: string; ciudad: string; distrito: string };
   roles: string[];
   rolActivo: string;
@@ -311,6 +345,20 @@ export class GraphQLService {
       mutation: DELETE_USER,
       variables: { id },
     }).pipe(map(result => result.data?.deleteUser));
+  }
+
+  changePassword(userId: string, currentPassword: string, newPassword: string): Observable<any> {
+    return this.apollo.mutate<any>({
+      mutation: CHANGE_PASSWORD,
+      variables: { userId, currentPassword, newPassword },
+    }).pipe(map(result => result.data?.changePassword));
+  }
+
+  updateNotificationPreferences(userId: string, preferences: any): Observable<any> {
+    return this.apollo.mutate<any>({
+      mutation: UPDATE_NOTIFICATION_PREFERENCES,
+      variables: { userId, preferences },
+    }).pipe(map(result => result.data?.updateNotificationPreferences));
   }
 
   login(email: string, password: string): Observable<any> {

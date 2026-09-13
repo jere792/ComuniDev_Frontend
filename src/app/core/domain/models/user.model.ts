@@ -7,6 +7,7 @@ export interface User {
   fotoPerfilUrl?: string;
   bannerUrl?: string;
   bio?: string;
+  sitioWeb?: string;
   ubicacion?: Ubicacion;
   roles: string[];
   rolActivo: string;
@@ -29,8 +30,11 @@ export interface EstadoActividad {
 
 export interface Ubicacion {
   pais: string;
+  departamento: string;
+  provincia: string;
   ciudad: string;
   distrito: string;
+  direccion: string;
 }
 
 export interface DeveloperProfile {
@@ -107,7 +111,8 @@ export interface RecruiterProfile {
   cargo?: string;
   ruc?: string;
   lema?: string;
-  anioCreacion?: number;
+  empresasDescripcion?: string;
+  fechaCreacion?: string;
   modalidadTrabajo?: string;
   redesSociales?: RedesSociales;
   empresas?: EmpresaRecruiter[];

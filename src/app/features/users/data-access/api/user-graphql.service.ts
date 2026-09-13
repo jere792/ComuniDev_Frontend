@@ -32,7 +32,7 @@ const GET_USER_BY_ID = gql`
       fotoPerfilUrl
       bannerUrl
       bio
-      ubicacion { pais ciudad distrito }
+      ubicacion { pais departamento provincia ciudad distrito direccion }
       roles
       rolActivo
       estadoCuenta

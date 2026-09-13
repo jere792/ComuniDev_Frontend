@@ -10,14 +10,15 @@ import {
 } from '../../domain/ports/recruiter-profile.repository';
 
 const GET_RECRUITER_PROFILE_BY_USER = gql`
-  query GetRecruiterProfileByUser($userId: ID!) {
-    recruiterProfileByUserId(userId: $userId) {
+  query GetRecruiterProfileByUser($userId: String!) {
+    recruiterProfile(userId: $userId) {
       id
       userId
       cargo
       ruc
       lema
-      anioCreacion
+      empresasDescripcion
+      fechaCreacion
       modalidadTrabajo
       redesSociales { linkedin instagram tiktok facebook }
       empresas { companyId cargoEnEmpresa activo }
@@ -32,7 +33,8 @@ const CREATE_RECRUITER_PROFILE = gql`
     $cargo: String
     $ruc: String
     $lema: String
-    $anioCreacion: Int
+    $empresasDescripcion: String
+    $fechaCreacion: String
     $modalidadTrabajo: ModalidadTrabajo
     $redesSociales: RedesSocialesInput
   ) {
@@ -41,7 +43,8 @@ const CREATE_RECRUITER_PROFILE = gql`
       cargo: $cargo
       ruc: $ruc
       lema: $lema
-      anioCreacion: $anioCreacion
+      empresasDescripcion: $empresasDescripcion
+      fechaCreacion: $fechaCreacion
       modalidadTrabajo: $modalidadTrabajo
       redesSociales: $redesSociales
     ) {
@@ -50,7 +53,8 @@ const CREATE_RECRUITER_PROFILE = gql`
       cargo
       ruc
       lema
-      anioCreacion
+      empresasDescripcion
+      fechaCreacion
       modalidadTrabajo
       redesSociales { linkedin instagram tiktok facebook }
     }
@@ -63,7 +67,8 @@ const UPDATE_RECRUITER_PROFILE = gql`
     $cargo: String
     $ruc: String
     $lema: String
-    $anioCreacion: Int
+    $empresasDescripcion: String
+    $fechaCreacion: String
     $modalidadTrabajo: ModalidadTrabajo
     $redesSociales: RedesSocialesInput
   ) {
@@ -72,7 +77,8 @@ const UPDATE_RECRUITER_PROFILE = gql`
       cargo: $cargo
       ruc: $ruc
       lema: $lema
-      anioCreacion: $anioCreacion
+      empresasDescripcion: $empresasDescripcion
+      fechaCreacion: $fechaCreacion
       modalidadTrabajo: $modalidadTrabajo
       redesSociales: $redesSociales
     ) {
@@ -81,7 +87,8 @@ const UPDATE_RECRUITER_PROFILE = gql`
       cargo
       ruc
       lema
-      anioCreacion
+      empresasDescripcion
+      fechaCreacion
       modalidadTrabajo
       redesSociales { linkedin instagram tiktok facebook }
     }
@@ -95,7 +102,7 @@ export class RecruiterProfileGraphqlService implements RecruiterProfileRepositor
   getByUserId(userId: string): Observable<RecruiterProfile | null> {
     return this.apollo
       .watchQuery<any>({ query: GET_RECRUITER_PROFILE_BY_USER, variables: { userId } })
-      .valueChanges.pipe(map(result => result.data?.recruiterProfileByUserId ?? null));
+      .valueChanges.pipe(map(result => result.data?.recruiterProfile ?? null));
   }
 
   create(data: CreateRecruiterProfileRequest): Observable<RecruiterProfile> {

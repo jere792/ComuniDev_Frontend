@@ -1,18 +1,62 @@
 <div class="reports-section">
-  @for (report of reports; track report.id) {
+  <!-- Composer -->
+  <div class="report-card composer-card">
+    <div class="composer-header">
+      <span class="material-symbols-outlined">edit_note</span>
+      <strong>Crea una publicación</strong>
+    </div>
+    <textarea
+      class="composer-textarea"
+      [(ngModel)]="composerText"
+      placeholder="¿Qué quieres compartir con la comunidad?"
+      rows="3"
+    ></textarea>
+
+    @if (composerImage) {
+      <div class="composer-image-preview">
+        <img [src]="composerImage" alt="Vista previa" />
+        <button class="remove-image-btn" (click)="removeImage()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+    }
+
+    <div class="composer-footer">
+      <label class="attach-btn">
+        <span class="material-symbols-outlined">image</span>
+        <span>{{ uploadingImage ? 'Subiendo...' : 'Imagen' }}</span>
+        <input type="file" accept="image/*" hidden (change)="onFileSelected($event)" [disabled]="uploadingImage" />
+      </label>
+      <button class="btn-publish" (click)="publish()" [disabled]="!composerText.trim() && !composerImage">
+        Publicar
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="feed-loading">Cargando publicaciones...</div>
+  }
+
+  <!-- Feed -->
+  @for (vm of posts(); track vm.post.id) {
     <div class="report-card">
       <div class="report-header">
-        <img [src]="report.user.avatar" [alt]="report.user.name" class="user-avatar" />
+        @if (vm.autorAvatar) {
+          <img [src]="vm.autorAvatar" [alt]="vm.autorNombre" class="user-avatar" />
+        } @else {
+          <div class="user-avatar avatar-fallback">{{ getInitials(vm.autorNombre || '?') }}</div>
+        }
         <div class="user-info">
-          <span class="user-name">{{ report.user.name }}</span>
-          <span class="post-time">{{ report.time }}</span>
+          <span class="user-name">{{ vm.autorNombre || 'Usuario' }}</span>
+          <span class="post-time">{{ vm.post.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
         </div>
-        @if (report.isOwn) {
+        @if (vm.post.autorId === getUserIdPublic()) {
           <div class="report-menu">
-            <button class="menu-btn" (click)="startEdit(report)">
+            <button class="menu-btn" (click)="startEdit(vm)">
               <span class="material-symbols-outlined">edit</span>
             </button>
-            <button class="menu-btn delete" (click)="deleteReport(report)">
+            <button class="menu-btn delete" (click)="deletePost(vm)">
               <span class="material-symbols-outlined">delete</span>
             </button>
           </div>
@@ -20,93 +64,96 @@
       </div>
 
       <div class="report-content">
-        @if (report.isEditing) {
+        @if (vm.isEditing) {
           <div class="edit-mode">
-            <textarea
-              [(ngModel)]="report.editText"
-              class="edit-textarea"
-              rows="3"
-            ></textarea>
+            <textarea [(ngModel)]="vm.editText" class="edit-textarea" rows="3"></textarea>
             <div class="edit-actions">
-              <button class="btn btn-outline" (click)="cancelEdit(report)">Cancelar</button>
-              <button class="btn btn-primary" (click)="saveEdit(report)">Guardar</button>
+              <button class="btn btn-outline" (click)="cancelEdit(vm)">Cancelar</button>
+              <button class="btn btn-primary" (click)="saveEdit(vm)">Guardar</button>
             </div>
           </div>
         } @else {
-          <p class="content-text">{{ report.content }}</p>
+          <p class="content-text">{{ vm.post.contenido?.texto }}</p>
         }
       </div>
 
-      @if (report.image && !report.isEditing) {
+      @if (vm.post.contenido?.imagenes?.length && !vm.isEditing) {
         <div class="report-image">
-          <img [src]="report.image" alt="Post image" />
+          <img [src]="vm.post.contenido?.imagenes?.[0]" alt="Imagen de la publicación" />
         </div>
       }
 
       <div class="reactions-bar">
-        @for (reaction of report.reactions; track reaction.type) {
+        @for (type of reactionTypes; track type) {
           <button
             class="reaction-btn"
-            [class.active]="reaction.reacted"
-            (click)="reaction.type !== 'comment' && toggleReaction(report, reaction.type)">
+            [class.active]="vm.myReaction === type"
+            (click)="toggleReaction(vm, type)"
+          >
             <span class="material-symbols-outlined">
-              {{ reaction.type === 'like' ? (reaction.reacted ? 'thumb_up' : 'thumb_up_off_alt') :
-                 reaction.type === 'love' ? (reaction.reacted ? 'favorite' : 'favorite_border') :
-                 'chat_bubble_outline' }}
+              {{ reactionLabels[type].icon }}
             </span>
-            <span class="reaction-count">{{ reaction.count }}</span>
+            @if (type === 'LIKE') {
+              <span class="reaction-count">{{ vm.post.estadisticas?.reaccionesCount ?? 0 }}</span>
+            }
+            <span class="reaction-label">{{ reactionLabels[type].label }}</span>
           </button>
         }
+        <button class="reaction-btn" (click)="toggleComments(vm)">
+          <span class="material-symbols-outlined">chat_bubble_outline</span>
+          <span class="reaction-count">{{ vm.post.estadisticas?.comentariosCount ?? 0 }}</span>
+          <span class="reaction-label">Comentar</span>
+        </button>
       </div>
 
-      @if (report.showComments) {
+      @if (vm.showComments) {
         <div class="comments-section">
-          @for (comment of report.comments; track comment.id) {
+          @for (commentVm of vm.comments; track commentVm.comment.id) {
             <div class="comment">
-              <img [src]="comment.user.avatar" [alt]="comment.user.name" class="comment-avatar" />
+              <div class="comment-avatar avatar-fallback small">{{ getInitials(commentVm.autorNombre || '?') }}</div>
               <div class="comment-body">
                 <div class="comment-header">
-                  <span class="comment-name">{{ comment.user.name }}</span>
-                  <span class="comment-time">{{ comment.time }}</span>
+                  <span class="comment-name">{{ commentVm.autorNombre || 'Usuario' }}</span>
+                  <span class="comment-time">{{ commentVm.comment.createdAt | date: 'dd/MM HH:mm' }}</span>
                 </div>
-                <p class="comment-text">{{ comment.text }}</p>
+                <p class="comment-text">{{ commentVm.comment.texto }}</p>
                 <div class="comment-actions">
-                  <button class="action-link" [class.liked]="comment.liked" (click)="toggleCommentLike(comment)">
-                    {{ comment.liked ? 'Liked' : 'Like' }} ({{ comment.likes }})
+                  <button class="action-link" [class.liked]="commentVm.myReaction" (click)="toggleCommentReaction(commentVm)">
+                    {{ commentVm.myReaction ? 'Quitar like' : 'Like' }} ({{ commentVm.comment.reaccionesCount ?? 0 }})
                   </button>
-                  <button class="action-link" (click)="toggleReply(comment)">Responder</button>
-                  @if (comment.replies.length > 0) {
-                    <button class="action-link" (click)="comment.showReplies = !comment.showReplies">
-                      {{ comment.showReplies ? 'Ocultar' : 'Ver' }} {{ comment.replies.length }} respuestas
+                  <button class="action-link" (click)="toggleReplyInput(commentVm)">Responder</button>
+                  @if (commentVm.replies.length > 0 || commentVm.comment.id) {
+                    <button class="action-link" (click)="toggleReplies(commentVm)">
+                      {{ commentVm.showReplies ? 'Ocultar respuestas' : 'Ver respuestas' }}
                     </button>
                   }
                 </div>
 
-                @if (comment.showReplyInput) {
+                @if (commentVm.showReplyInput) {
                   <div class="reply-input">
                     <input
                       type="text"
                       placeholder="Escribe una respuesta..."
-                      [(ngModel)]="comment.replyText"
-                      (keyup.enter)="addReply(comment, comment.replyText)"
+                      [(ngModel)]="commentVm.replyText"
+                      (keyup.enter)="addReply(commentVm, vm)"
                     />
-                    <button class="send-btn" (click)="addReply(comment, comment.replyText)">
+                    <button class="send-btn" (click)="addReply(commentVm, vm)">
                       <span class="material-symbols-outlined">send</span>
                     </button>
                   </div>
                 }
 
-                @if (comment.showReplies && comment.replies.length > 0) {
+                @if (commentVm.showReplies && commentVm.replies.length > 0) {
                   <div class="replies">
-                    @for (reply of comment.replies; track reply.id) {
+                    @for (reply of commentVm.replies; track reply.comment.id) {
                       <div class="reply">
-                        <img [src]="reply.user.avatar" [alt]="reply.user.name" class="reply-avatar" />
+                        <div class="reply-avatar avatar-fallback">{{ getInitials(reply.autorNombre || '?') }}</div>
                         <div class="reply-body">
                           <div class="reply-header">
-                            <span class="reply-name">{{ reply.user.name }}</span>
-                            <span class="reply-time">{{ reply.time }}</span>
+                            <span class="reply-name">{{ reply.autorNombre || 'Usuario' }}</span>
+                            <span class="reply-time">{{ reply.comment.createdAt | date: 'dd/MM HH:mm' }}</span>
                           </div>
-                          <p class="reply-text">{{ reply.text }}</p>
+                          <p class="reply-text">{{ reply.comment.texto }}</p>
                         </div>
                       </div>
                     }
@@ -117,15 +164,22 @@
           }
 
           <div class="add-comment">
-            <img src="https://i.pravatar.cc/150?img=12" alt="Tu" class="comment-avatar" />
             <input
               type="text"
               placeholder="Escribe un comentario..."
-              (keyup.enter)="addComment(report, $any($event.target).value); $any($event.target).value = ''"
+              [(ngModel)]="vm.newComment"
+              (keyup.enter)="addComment(vm)"
             />
+            <button class="send-btn" (click)="addComment(vm)">
+              <span class="material-symbols-outlined">send</span>
+            </button>
           </div>
         </div>
       }
     </div>
+  } @empty {
+    @if (!loading()) {
+      <p class="empty-feed">No hay publicaciones todavía. ¡Sé el primero en publicar!</p>
+    }
   }
 </div>

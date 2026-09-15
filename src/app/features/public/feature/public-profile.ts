@@ -2,7 +2,7 @@ import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GraphQLService, User } from '../../../core/services/graphql.service';
-import { FollowGraphqlService } from '../../../core/services/social/follow-graphql.service';
+import { ConnectionGraphqlService, ConnectionStatus } from '../../../core/services/social/connection-graphql.service';
 import { BlockGraphqlService } from '../../../core/services/social/block-graphql.service';
 
 @Component({
@@ -16,16 +16,16 @@ export class PublicProfile implements OnInit {
   user = signal<User | null>(null);
   loading = signal(false);
   errorMessage = signal('');
-  isFollowing = signal(false);
+  connectionStatus = signal<ConnectionStatus>({ status: 'NONE' });
   isOwnProfile = signal(false);
-  followLoading = signal(false);
+  connectionLoading = signal(false);
   isBlocked = signal(false);
   blockLoading = signal(false);
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private graphql = inject(GraphQLService);
-  private followService = inject(FollowGraphqlService);
+  private connectionService = inject(ConnectionGraphqlService);
   private blockService = inject(BlockGraphqlService);
 
   ngOnInit(): void {
@@ -45,7 +45,7 @@ export class PublicProfile implements OnInit {
         this.user.set(user);
         this.loading.set(false);
         if (user && currentUserId && !this.isOwnProfile()) {
-          this.checkFollowing(currentUserId, userId);
+          this.checkConnectionStatus(currentUserId, userId);
           this.checkBlocked(currentUserId, userId);
         }
       },
@@ -57,9 +57,9 @@ export class PublicProfile implements OnInit {
     });
   }
 
-  private checkFollowing(followerId: string, followedId: string): void {
-    this.followService.isFollowing(followerId, followedId).subscribe({
-      next: (result) => this.isFollowing.set(result),
+  private checkConnectionStatus(userId: string, otherUserId: string): void {
+    this.connectionService.getConnectionStatus(userId, otherUserId).subscribe({
+      next: (status) => this.connectionStatus.set(status),
     });
   }
 
@@ -69,32 +69,63 @@ export class PublicProfile implements OnInit {
     });
   }
 
-  toggleFollow(): void {
+  handleConnection(): void {
     const currentUserId = localStorage.getItem('userId');
     const targetUserId = this.user()?.id;
-    if (!currentUserId || !targetUserId || this.followLoading() || this.isBlocked()) return;
+    if (!currentUserId || !targetUserId || this.connectionLoading() || this.isBlocked()) return;
 
-    this.followLoading.set(true);
+    const status = this.connectionStatus().status;
 
-    if (this.isFollowing()) {
-      this.followService.unfollow(currentUserId, targetUserId).subscribe({
+    if (status === 'NONE') {
+      this.connectionLoading.set(true);
+      this.connectionService.sendRequest(currentUserId, targetUserId).subscribe({
         next: () => {
-          this.isFollowing.set(false);
-          this.followLoading.set(false);
-          this.user.update(u => u ? { ...u, seguidoresCount: Math.max(0, (u.seguidoresCount ?? 1) - 1) } : u);
+          this.connectionStatus.set({ status: 'PENDING_SENT' });
+          this.connectionLoading.set(false);
         },
-        error: () => this.followLoading.set(false),
+        error: () => this.connectionLoading.set(false),
       });
-    } else {
-      this.followService.follow(currentUserId, targetUserId).subscribe({
-        next: () => {
-          this.isFollowing.set(true);
-          this.followLoading.set(false);
-          this.user.update(u => u ? { ...u, seguidoresCount: (u.seguidoresCount ?? 0) + 1 } : u);
-        },
-        error: () => this.followLoading.set(false),
-      });
+    } else if (status === 'PENDING_RECEIVED') {
+      const requestId = this.connectionStatus().requestId;
+      if (requestId) {
+        this.connectionLoading.set(true);
+        this.connectionService.acceptConnection(requestId).subscribe({
+          next: (conn) => {
+            this.connectionStatus.set({ status: 'CONNECTED', connectionId: conn?.id });
+            this.connectionLoading.set(false);
+            this.user.update(u => u ? { ...u, conexionesCount: (u.conexionesCount ?? 0) + 1 } : u);
+          },
+          error: () => this.connectionLoading.set(false),
+        });
+      }
+    } else if (status === 'CONNECTED') {
+      const connectionId = this.connectionStatus().connectionId;
+      if (connectionId) {
+        this.connectionLoading.set(true);
+        this.connectionService.removeConnection(connectionId).subscribe({
+          next: () => {
+            this.connectionStatus.set({ status: 'NONE' });
+            this.connectionLoading.set(false);
+            this.user.update(u => u ? { ...u, conexionesCount: Math.max(0, (u.conexionesCount ?? 1) - 1) } : u);
+          },
+          error: () => this.connectionLoading.set(false),
+        });
+      }
     }
+  }
+
+  rejectRequest(): void {
+    const requestId = this.connectionStatus().requestId;
+    if (!requestId) return;
+
+    this.connectionLoading.set(true);
+    this.connectionService.rejectConnection(requestId).subscribe({
+      next: () => {
+        this.connectionStatus.set({ status: 'NONE' });
+        this.connectionLoading.set(false);
+      },
+      error: () => this.connectionLoading.set(false),
+    });
   }
 
   toggleBlock(): void {
@@ -117,10 +148,13 @@ export class PublicProfile implements OnInit {
         next: () => {
           this.isBlocked.set(true);
           this.blockLoading.set(false);
-          if (this.isFollowing()) {
-            this.followService.unfollow(currentUserId, targetUserId).subscribe(() => {
-              this.isFollowing.set(false);
-            });
+          if (this.connectionStatus().status === 'CONNECTED') {
+            const connectionId = this.connectionStatus().connectionId;
+            if (connectionId) {
+              this.connectionService.removeConnection(connectionId).subscribe(() => {
+                this.connectionStatus.set({ status: 'NONE' });
+              });
+            }
           }
         },
         error: () => this.blockLoading.set(false),

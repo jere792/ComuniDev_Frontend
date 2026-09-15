@@ -1,0 +1,59 @@
+<div class="bell-container">
+  <button class="icon-btn" (click)="togglePanel()" title="Notificaciones">
+    <span class="material-symbols-outlined">notifications</span>
+    @if (unreadCount() > 0 || connectionRequests().length > 0) {
+      <span class="notification-dot">{{ unreadCount() + connectionRequests().length }}</span>
+    }
+  </button>
+
+  @if (isOpen()) {
+    <div class="notification-overlay" (click)="closePanel()"></div>
+    <div class="notification-panel">
+      <div class="panel-header">
+        <h3>Notificaciones</h3>
+        @if (unreadCount() > 0) {
+          <button class="mark-all" (click)="markAllAsRead()">Marcar todo leído</button>
+        }
+      </div>
+
+      @if (connectionRequests().length) {
+        <div class="section-label">Solicitudes de conexión</div>
+        @for (req of connectionRequests(); track req.id) {
+          <div class="notification-item request">
+            <span class="material-symbols-outlined notif-icon">person_add</span>
+            <div class="notif-content">
+              <span class="notif-text">Solicitud de conexión pendiente</span>
+              <span class="notif-time">{{ getTimeAgo(req.createdAt) }}</span>
+            </div>
+            <div class="request-actions">
+              <button class="accept-btn" (click)="acceptRequest(req.id)">
+                <span class="material-symbols-outlined">check</span>
+              </button>
+              <button class="reject-btn" (click)="rejectRequest(req.id)">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+          </div>
+        }
+      }
+
+      @if (notifications().length) {
+        <div class="section-label">Actividad</div>
+        @for (notif of notifications(); track notif.id) {
+          <div class="notification-item" [class.unread]="!notif.leida" (click)="markAsRead(notif.id)">
+            <span class="material-symbols-outlined notif-icon">{{ getNotificationIcon(notif.tipo) }}</span>
+            <div class="notif-content">
+              <span class="notif-text">{{ notif.titulo }}</span>
+              @if (notif.mensaje) {
+                <span class="notif-sub">{{ notif.mensaje }}</span>
+              }
+              <span class="notif-time">{{ getTimeAgo(notif.createdAt) }}</span>
+            </div>
+          </div>
+        }
+      } @else if (!connectionRequests().length) {
+        <div class="empty-state">Sin notificaciones</div>
+      }
+    </div>
+  }
+</div>

@@ -96,8 +96,8 @@ export class PostGraphqlService {
 
   getFeed(userId: string, page = 0, size = 10): Observable<SocialPost[]> {
     return this.apollo
-      .watchQuery<any>({ query: GET_FEED, variables: { userId, page, size } })
-      .valueChanges.pipe(map(result => result.data?.feed ?? []));
+      .query<any>({ query: GET_FEED, variables: { userId, page, size }, fetchPolicy: 'network-only' })
+      .pipe(map(result => result.data?.feed ?? []));
   }
 
   getPosts(): Observable<SocialPost[]> {

@@ -88,7 +88,7 @@ export class StoryGraphqlService {
 
   getStories(userId: string): Observable<SocialStory[]> {
     return this.apollo
-      .watchQuery<any>({ query: GET_STORIES, variables: { userId } })
+      .watchQuery<any>({ query: GET_STORIES, variables: { userId }, fetchPolicy: 'network-only' })
       .valueChanges.pipe(map(result => result.data?.stories ?? []));
   }
 

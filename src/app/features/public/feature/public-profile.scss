@@ -109,7 +109,10 @@
   text-transform: capitalize;
 }
 
-.follow-btn {
+.connect-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 8px 24px;
   border: none;
   border-radius: 20px;
@@ -125,10 +128,33 @@
     opacity: 0.9;
   }
 
-  &.following {
+  &.pending {
     background: transparent;
     border: 1px solid var(--border);
     color: var(--on-surface);
+    cursor: default;
+  }
+
+  &.connected {
+    background: #2e7d32;
+    color: #fff;
+  }
+
+  &.blocked {
+    background: var(--outline);
+    color: var(--on-surface);
+    cursor: not-allowed;
+  }
+
+  &.accept {
+    background: #2e7d32;
+    color: #fff;
+  }
+
+  &.reject {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--on-surface-variant);
   }
 
   &:disabled {
@@ -138,12 +164,6 @@
 
   .material-symbols-outlined {
     font-size: 18px;
-  }
-
-  &.blocked {
-    background: var(--outline);
-    color: var(--on-surface);
-    cursor: not-allowed;
   }
 }
 

@@ -20,7 +20,12 @@
         <span class="story-name">{{ user.nombre || 'Usuario' }}</span>
       </div>
     } @empty {
-      <span class="story-name empty-msg">Sin stories de tus seguidos</span>
+      <div class="story-item empty-state">
+        <div class="story-avatar empty-avatar">
+          <span class="material-symbols-outlined">videocam_off</span>
+        </div>
+        <span class="story-name empty-msg">Sin stories</span>
+      </div>
     }
   </div>
 </div>

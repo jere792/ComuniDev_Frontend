@@ -20,7 +20,6 @@
             <span class="material-symbols-outlined">close</span>
           </button>
         </div>
-
         <textarea
           class="composer-textarea"
           [(ngModel)]="composerText"
@@ -28,7 +27,6 @@
           rows="4"
           autofocus
         ></textarea>
-
         @if (composerImage) {
           <div class="composer-image-preview">
             <img [src]="composerImage" alt="Vista previa" />
@@ -37,7 +35,6 @@
             </button>
           </div>
         }
-
         <div class="composer-footer">
           <label class="attach-btn">
             <span class="material-symbols-outlined">image</span>
@@ -52,153 +49,248 @@
     </div>
   }
 
-  <!-- Loading -->
   @if (loading()) {
-    <div class="feed-loading">Cargando publicaciones...</div>
-  }
-
-  <!-- Feed -->
-  @for (vm of posts(); track vm.post.id) {
-    <div class="report-card">
-      <div class="report-header">
-        @if (vm.autorAvatar) {
-          <img [src]="vm.autorAvatar" [alt]="vm.autorNombre" class="user-avatar clickable" (click)="goToProfile(vm.post.autorId)" />
-        } @else {
-          <div class="user-avatar avatar-fallback clickable" (click)="goToProfile(vm.post.autorId)">{{ getInitials(vm.autorNombre || '?') }}</div>
-        }
-        <div class="user-info clickable" (click)="goToProfile(vm.post.autorId)">
-          <span class="user-name">{{ vm.autorNombre || 'Usuario' }}</span>
-          <span class="post-time">{{ vm.post.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
-        </div>
-        @if (vm.post.autorId === getUserIdPublic()) {
-          <div class="report-menu">
-            <button class="menu-btn" (click)="startEdit(vm)">
-              <span class="material-symbols-outlined">edit</span>
-            </button>
-            <button class="menu-btn delete" (click)="deletePost(vm)">
-              <span class="material-symbols-outlined">delete</span>
-            </button>
+    <app-feed-skeleton />
+  } @else if (posts().length === 0) {
+    <p class="empty-feed">No hay publicaciones todavía. ¡Sé el primero en publicar!</p>
+  } @else {
+    @for (vm of posts(); track vm.post.id) {
+      <div class="report-card">
+        <!-- Header -->
+        <div class="report-header">
+          @if (vm.autorAvatar) {
+            <img [src]="vm.autorAvatar" [alt]="vm.autorNombre" class="user-avatar clickable" (click)="goToProfile(vm.post.autorId)" />
+          } @else {
+            <div class="user-avatar avatar-fallback clickable" (click)="goToProfile(vm.post.autorId)">{{ getInitials(vm.autorNombre || '?') }}</div>
+          }
+          <div class="user-info clickable" (click)="goToProfile(vm.post.autorId)">
+            <span class="user-name">{{ vm.autorNombre || 'Usuario' }}</span>
+            <span class="post-time">{{ vm.post.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
           </div>
-        }
-      </div>
-
-      <div class="report-content">
-        @if (vm.isEditing) {
-          <div class="edit-mode">
-            <textarea [(ngModel)]="vm.editText" class="edit-textarea" rows="3"></textarea>
-            <div class="edit-actions">
-              <button class="btn btn-outline" (click)="cancelEdit(vm)">Cancelar</button>
-              <button class="btn btn-primary" (click)="saveEdit(vm)">Guardar</button>
-            </div>
-          </div>
-        } @else {
-          <p class="content-text">{{ vm.post.contenido?.texto }}</p>
-        }
-      </div>
-
-      @if (vm.post.contenido?.imagenes?.length && !vm.isEditing) {
-        <div class="report-image">
-          <img [src]="vm.post.contenido?.imagenes?.[0]" alt="Imagen de la publicación" />
-        </div>
-      }
-
-      <div class="reactions-bar">
-        @for (type of reactionTypes; track type) {
-          <button
-            class="reaction-btn"
-            [class.active]="vm.myReaction === type"
-            (click)="toggleReaction(vm, type)"
-          >
-            <span class="material-symbols-outlined">
-              {{ reactionLabels[type].icon }}
-            </span>
-            @if (type === 'LIKE') {
-              <span class="reaction-count">{{ vm.post.estadisticas?.reaccionesCount ?? 0 }}</span>
-            }
-            <span class="reaction-label">{{ reactionLabels[type].label }}</span>
-          </button>
-        }
-        <button class="reaction-btn" (click)="toggleComments(vm)">
-          <span class="material-symbols-outlined">chat_bubble_outline</span>
-          <span class="reaction-count">{{ vm.post.estadisticas?.comentariosCount ?? 0 }}</span>
-          <span class="reaction-label">Comentar</span>
-        </button>
-      </div>
-
-      @if (vm.showComments) {
-        <div class="comments-section">
-          @for (commentVm of vm.comments; track commentVm.comment.id) {
-            <div class="comment">
-              <div class="comment-avatar avatar-fallback small">{{ getInitials(commentVm.autorNombre || '?') }}</div>
-              <div class="comment-body">
-                <div class="comment-header">
-                  <span class="comment-name">{{ commentVm.autorNombre || 'Usuario' }}</span>
-                  <span class="comment-time">{{ commentVm.comment.createdAt | date: 'dd/MM HH:mm' }}</span>
-                </div>
-                <p class="comment-text">{{ commentVm.comment.texto }}</p>
-                <div class="comment-actions">
-                  <button class="action-link" [class.liked]="commentVm.myReaction" (click)="toggleCommentReaction(commentVm)">
-                    {{ commentVm.myReaction ? 'Quitar like' : 'Like' }} ({{ commentVm.comment.reaccionesCount ?? 0 }})
-                  </button>
-                  <button class="action-link" (click)="toggleReplyInput(commentVm)">Responder</button>
-                  @if (commentVm.replies.length > 0 || commentVm.comment.id) {
-                    <button class="action-link" (click)="toggleReplies(commentVm)">
-                      {{ commentVm.showReplies ? 'Ocultar respuestas' : 'Ver respuestas' }}
-                    </button>
-                  }
-                </div>
-
-                @if (commentVm.showReplyInput) {
-                  <div class="reply-input">
-                    <input
-                      type="text"
-                      placeholder="Escribe una respuesta..."
-                      [(ngModel)]="commentVm.replyText"
-                      (keyup.enter)="addReply(commentVm, vm)"
-                    />
-                    <button class="send-btn" (click)="addReply(commentVm, vm)">
-                      <span class="material-symbols-outlined">send</span>
-                    </button>
-                  </div>
-                }
-
-                @if (commentVm.showReplies && commentVm.replies.length > 0) {
-                  <div class="replies">
-                    @for (reply of commentVm.replies; track reply.comment.id) {
-                      <div class="reply">
-                        <div class="reply-avatar avatar-fallback">{{ getInitials(reply.autorNombre || '?') }}</div>
-                        <div class="reply-body">
-                          <div class="reply-header">
-                            <span class="reply-name">{{ reply.autorNombre || 'Usuario' }}</span>
-                            <span class="reply-time">{{ reply.comment.createdAt | date: 'dd/MM HH:mm' }}</span>
-                          </div>
-                          <p class="reply-text">{{ reply.comment.texto }}</p>
-                        </div>
-                      </div>
-                    }
-                  </div>
-                }
-              </div>
+          @if (vm.post.autorId === getUserIdPublic()) {
+            <div class="report-menu">
+              <button class="menu-btn" (click)="startEdit(vm)">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+              <button class="menu-btn delete" (click)="deletePost(vm)">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
             </div>
           }
-
-          <div class="add-comment">
-            <input
-              type="text"
-              placeholder="Escribe un comentario..."
-              [(ngModel)]="vm.newComment"
-              (keyup.enter)="addComment(vm)"
-            />
-            <button class="send-btn" (click)="addComment(vm)">
-              <span class="material-symbols-outlined">send</span>
-            </button>
-          </div>
         </div>
-      }
-    </div>
-  } @empty {
-    @if (!loading()) {
-      <p class="empty-feed">No hay publicaciones todavía. ¡Sé el primero en publicar!</p>
+
+        <!-- Content -->
+        <div class="report-content">
+          @if (vm.isEditing) {
+            <div class="edit-mode">
+              <textarea [(ngModel)]="vm.editText" class="edit-textarea" rows="3"></textarea>
+              <div class="edit-actions">
+                <button class="btn btn-outline" (click)="cancelEdit(vm)">Cancelar</button>
+                <button class="btn btn-primary" (click)="saveEdit(vm)">Guardar</button>
+              </div>
+            </div>
+          } @else {
+            <p class="content-text">{{ vm.post.contenido?.texto }}</p>
+          }
+        </div>
+
+        @if (vm.post.contenido?.imagenes?.length && !vm.isEditing) {
+          <div class="report-image">
+            <img [src]="vm.post.contenido?.imagenes?.[0]" alt="Imagen de la publicación" />
+          </div>
+        }
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+          <div class="reacciones-wrapper">
+            <button class="action-btn" [class.reacted]="vm.myReaction" (click)="toggleReactionsDropdown(vm)">
+              <span class="reaction-emoji-btn">{{ getReactionEmoji(vm) }}</span>
+              <span class="action-text">{{ getReactionLabel(vm) }}</span>
+            </button>
+
+            @if (vm.showReactionsDropdown) {
+              <div class="reactions-dropdown">
+                @for (type of reactionTypes; track type) {
+                  <button
+                    class="dropdown-item"
+                    [class.active]="vm.myReaction === type"
+                    (click)="selectReaction(vm, type)"
+                  >
+                    <span class="dropdown-emoji">{{ reactionConfig[type].emoji }}</span>
+                    <span class="dropdown-label">{{ reactionConfig[type].label }}</span>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+
+          <button class="action-btn comment-btn" (click)="toggleComments(vm)">
+            <span class="material-symbols-outlined">chat_bubble_outline</span>
+            <span class="action-text">Comentar</span>
+          </button>
+        </div>
+
+        <!-- Comments Section -->
+        @if (vm.showComments) {
+          <div class="comments-section">
+            @for (commentVm of vm.comments.slice(0, vm.visibleComments); track commentVm.comment.id) {
+              <div class="comment">
+                @if (commentVm.autorAvatar) {
+                  <img [src]="commentVm.autorAvatar" class="comment-avatar clickable" (click)="goToProfile(commentVm.comment.autorId)" />
+                } @else {
+                  <div class="comment-avatar avatar-fallback small clickable" (click)="goToProfile(commentVm.comment.autorId)">{{ getInitials(commentVm.autorNombre || '?') }}</div>
+                }
+                <div class="comment-body">
+                  <div class="comment-bubble">
+                    <span class="comment-name clickable" (click)="goToProfile(commentVm.comment.autorId)">{{ commentVm.autorNombre || 'Usuario' }}</span>
+                    <p class="comment-text">{{ commentVm.comment.texto }}</p>
+                  </div>
+                  <div class="comment-actions">
+                    <!-- Comment Reaction Dropdown -->
+                    <div class="comment-reaction-wrapper">
+                      <button
+                        class="action-link"
+                        [class.liked]="commentVm.myReaction"
+                        (click)="toggleCommentReactionsDropdown(commentVm)"
+                      >
+                        {{ commentVm.myReaction ? reactionConfig[commentVm.myReaction].emoji + ' ' + reactionConfig[commentVm.myReaction].label : 'Like' }}
+                      </button>
+                      @if (commentVm.showReactionDropdown) {
+                        <div class="comment-reactions-dropdown">
+                          @for (type of reactionTypes; track type) {
+                            <button
+                              class="mini-dropdown-item"
+                              [class.active]="commentVm.myReaction === type"
+                              (click)="selectCommentReaction(commentVm, type, vm.post.id)"
+                            >
+                              <span>{{ reactionConfig[type].emoji }}</span>
+                            </button>
+                          }
+                        </div>
+                      }
+                    </div>
+                    <span class="action-dot">·</span>
+                    <button class="action-link" (click)="toggleReplyInput(commentVm)">Responder</button>
+                    <span class="action-dot">·</span>
+                    <span class="comment-time">{{ commentVm.comment.createdAt | date: 'dd/MM HH:mm' }}</span>
+                    @if ((commentVm.comment.reaccionesCount ?? 0) > 0) {
+                      <span class="comment-likes">
+                        👍 {{ commentVm.comment.reaccionesCount }}
+                      </span>
+                    }
+                  </div>
+
+                  <!-- Replies -->
+                  @if (commentVm.replies.length > 0 && commentVm.showReplies) {
+                    <div class="replies">
+                      @for (reply of commentVm.replies; track reply.comment.id) {
+                        <div class="reply">
+                          @if (reply.autorAvatar) {
+                            <img [src]="reply.autorAvatar" class="reply-avatar clickable" (click)="goToProfile(reply.comment.autorId)" />
+                          } @else {
+                            <div class="reply-avatar avatar-fallback clickable" (click)="goToProfile(reply.comment.autorId)">{{ getInitials(reply.autorNombre || '?') }}</div>
+                          }
+                          <div class="reply-body">
+                            <div class="comment-bubble">
+                              <span class="comment-name clickable" (click)="goToProfile(reply.comment.autorId)">{{ reply.autorNombre || 'Usuario' }}</span>
+                              <p class="comment-text">{{ reply.comment.texto }}</p>
+                            </div>
+                            <div class="comment-actions">
+                              <span class="comment-time">{{ reply.comment.createdAt | date: 'dd/MM HH:mm' }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  @if (commentVm.showReplies && commentVm.replies.length === 0) {
+                    <div class="replies-loading">Cargando respuestas...</div>
+                  }
+
+                  @if (!commentVm.showReplies && commentVm.replies.length > 0) {
+                    <button class="toggle-replies-btn" (click)="toggleReplies(commentVm)">
+                      Ver {{ commentVm.replies.length }} respuestas
+                    </button>
+                  }
+
+                  @if (commentVm.showReplyInput) {
+                    <div class="reply-input">
+                      <input
+                        type="text"
+                        placeholder="Escribe una respuesta..."
+                        [(ngModel)]="commentVm.replyText"
+                        (keyup.enter)="addReply(commentVm, vm)"
+                      />
+                      <button class="send-btn" [disabled]="!commentVm.replyText.trim()" (click)="addReply(commentVm, vm)">
+                        <span class="material-symbols-outlined">send</span>
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (vm.comments.length > vm.visibleComments) {
+              <button class="ver-mas-btn" (click)="openCommentsModal(vm)">
+                Ver todos los comentarios ({{ vm.comments.length }})
+              </button>
+            }
+
+            <div class="add-comment">
+              <input
+                type="text"
+                placeholder="Escribe un comentario..."
+                [(ngModel)]="vm.newComment"
+                (keyup.enter)="addComment(vm)"
+              />
+              <button class="send-btn" [disabled]="!vm.newComment.trim()" (click)="addComment(vm)">
+                <span class="material-symbols-outlined">send</span>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
     }
   }
 </div>
+
+<!-- Comments Modal -->
+@if (showCommentsModal()) {
+  <div class="modal-overlay" (click)="closeCommentsModal()">
+    <div class="comments-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title">Comentarios</span>
+        <button class="modal-close" (click)="closeCommentsModal()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        @for (commentVm of modalComments(); track commentVm.comment.id) {
+          <div class="comment">
+            @if (commentVm.autorAvatar) {
+              <img [src]="commentVm.autorAvatar" class="comment-avatar" (click)="goToProfile(commentVm.comment.autorId)" />
+            } @else {
+              <div class="comment-avatar avatar-fallback small clickable" (click)="goToProfile(commentVm.comment.autorId)">{{ getInitials(commentVm.autorNombre || '?') }}</div>
+            }
+            <div class="comment-body">
+              <div class="comment-bubble">
+                <span class="comment-name clickable" (click)="goToProfile(commentVm.comment.autorId)">{{ commentVm.autorNombre || 'Usuario' }}</span>
+                <p class="comment-text">{{ commentVm.comment.texto }}</p>
+              </div>
+              <div class="comment-actions">
+                <span class="comment-time">{{ commentVm.comment.createdAt | date: 'dd/MM HH:mm' }}</span>
+                @if ((commentVm.comment.reaccionesCount ?? 0) > 0) {
+                  <span class="comment-likes">👍 {{ commentVm.comment.reaccionesCount }}</span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+        @if (modalComments().length === 0) {
+          <div class="empty-modal">No hay comentarios aún</div>
+        }
+      </div>
+    </div>
+  </div>
+}

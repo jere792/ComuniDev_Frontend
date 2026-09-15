@@ -35,23 +35,51 @@
 
       @if (!isOwnProfile()) {
         <div class="action-buttons">
-          <button
-            class="follow-btn"
-            [class.following]="isFollowing()"
-            [class.blocked]="isBlocked()"
-            (click)="toggleFollow()"
-            [disabled]="followLoading() || isBlocked()"
-          >
-            @if (followLoading()) {
-              <span class="material-symbols-outlined spinning">progress_activity</span>
-            } @else if (isBlocked()) {
-              Bloqueado
-            } @else if (isFollowing()) {
-              Siguiendo
-            } @else {
-              Seguir
-            }
-          </button>
+          @if (connectionStatus().status === 'PENDING_RECEIVED') {
+            <button
+              class="connect-btn accept"
+              (click)="handleConnection()"
+              [disabled]="connectionLoading()"
+            >
+              @if (connectionLoading()) {
+                <span class="material-symbols-outlined spinning">progress_activity</span>
+              } @else {
+                <span class="material-symbols-outlined">person_add</span>
+                Aceptar
+              }
+            </button>
+            <button
+              class="connect-btn reject"
+              (click)="rejectRequest()"
+              [disabled]="connectionLoading()"
+            >
+              Rechazar
+            </button>
+          } @else {
+            <button
+              class="connect-btn"
+              [class.pending]="connectionStatus().status === 'PENDING_SENT'"
+              [class.connected]="connectionStatus().status === 'CONNECTED'"
+              [class.blocked]="isBlocked()"
+              (click)="handleConnection()"
+              [disabled]="connectionLoading() || isBlocked()"
+            >
+              @if (connectionLoading()) {
+                <span class="material-symbols-outlined spinning">progress_activity</span>
+              } @else if (isBlocked()) {
+                Bloqueado
+              } @else if (connectionStatus().status === 'PENDING_SENT') {
+                <span class="material-symbols-outlined">hourglass_top</span>
+                Solicitud enviada
+              } @else if (connectionStatus().status === 'CONNECTED') {
+                <span class="material-symbols-outlined">check_circle</span>
+                Conectado
+              } @else {
+                <span class="material-symbols-outlined">person_add</span>
+                Conectar
+              }
+            </button>
+          }
           <button class="block-btn" [class.blocked]="isBlocked()" (click)="toggleBlock()" [disabled]="blockLoading()">
             @if (blockLoading()) {
               <span class="material-symbols-outlined spinning">progress_activity</span>

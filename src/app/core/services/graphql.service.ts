@@ -90,6 +90,7 @@ const GET_USERS = gql`
       emailVerificado
       seguidoresCount
       siguiendoCount
+      conexionesCount
       createdAt
     }
   }

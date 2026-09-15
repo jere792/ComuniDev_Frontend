@@ -10,21 +10,22 @@
       <input type="text" placeholder="Buscar..." class="search-input" />
     </div>
     <nav class="header-nav">
-      @for (link of links; track link.route) {
-        <a [routerLink]="link.route" routerLinkActive="active" class="nav-tab">
+      @for (link of links; track link.route; let i = $index) {
+        <a #tabEl [routerLink]="link.route" routerLinkActive="active" class="nav-tab" (click)="onTabClick(i)">
           <span class="material-symbols-outlined">{{ link.icon || 'circle' }}</span>
           <span class="nav-tab-label">{{ link.label }}</span>
         </a>
       }
+      <div class="nav-indicator" [class.hidden]="!showIndicator" [style.left.px]="indicatorLeft" [style.width.px]="indicatorWidth"></div>
     </nav>
   </div>
   <div class="header-right">
     <a routerLink="/recruiter/messages" class="icon-btn" title="Mensajes">
       <span class="material-symbols-outlined">chat</span>
     </a>
-    <button class="icon-btn">
-      <span class="material-symbols-outlined">notifications</span>
-      <span class="notification-dot"></span>
-    </button>
+    <a routerLink="/recruiter/solicitudes" class="icon-btn" title="Solicitudes">
+      <span class="material-symbols-outlined">person_add</span>
+    </a>
+    <app-notification-bell />
   </div>
 </header>

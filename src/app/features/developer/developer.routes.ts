@@ -18,6 +18,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', loadComponent: () => import('./feature/dashboard/developer-dashboard').then(m => m.DeveloperDashboard) },
       { path: 'discover', loadComponent: () => import('../shared/feature/discover-users/discover-users').then(m => m.DiscoverUsers) },
+      { path: 'solicitudes', loadComponent: () => import('../shared/feature/solicitudes/solicitudes').then(m => m.Solicitudes) },
       { path: 'profile', loadChildren: () => import('./profile/developer-profile.routes').then(m => m.routes) },
     ],
   },

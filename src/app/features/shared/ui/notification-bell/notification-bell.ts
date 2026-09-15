@@ -1,0 +1,115 @@
+import { Component, signal, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { NotificationGraphqlService, AppNotification } from '../../../../core/services/social/notification-graphql.service';
+import { ConnectionGraphqlService, ConnectionRequest } from '../../../../core/services/social/connection-graphql.service';
+
+@Component({
+  selector: 'app-notification-bell',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './notification-bell.html',
+  styleUrl: './notification-bell.scss',
+})
+export class NotificationBell implements OnInit {
+  notifications = signal<AppNotification[]>([]);
+  connectionRequests = signal<ConnectionRequest[]>([]);
+  unreadCount = signal(0);
+  isOpen = signal(false);
+
+  private notifService = inject(NotificationGraphqlService);
+  private connService = inject(ConnectionGraphqlService);
+
+  ngOnInit(): void {
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      this.loadNotifications(userId);
+      this.loadConnectionRequests(userId);
+    }
+  }
+
+  private loadNotifications(userId: string): void {
+    this.notifService.getNotifications(userId).subscribe({
+      next: (notifs) => {
+        this.notifications.set(notifs);
+        this.unreadCount.set(notifs.filter(n => !n.leida).length);
+      },
+    });
+  }
+
+  private loadConnectionRequests(userId: string): void {
+    this.connService.getConnectionRequests(userId).subscribe({
+      next: (reqs) => this.connectionRequests.set(reqs),
+    });
+  }
+
+  togglePanel(): void {
+    this.isOpen.update(v => !v);
+  }
+
+  closePanel(): void {
+    this.isOpen.set(false);
+  }
+
+  markAsRead(notificationId: string): void {
+    this.notifService.markAsRead(notificationId).subscribe({
+      next: () => {
+        this.notifications.update(notifs =>
+          notifs.map(n => n.id === notificationId ? { ...n, leida: true } : n)
+        );
+        this.unreadCount.update(c => Math.max(0, c - 1));
+      },
+    });
+  }
+
+  markAllAsRead(): void {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    this.notifService.markAllAsRead(userId).subscribe({
+      next: () => {
+        this.notifications.update(notifs =>
+          notifs.map(n => ({ ...n, leida: true }))
+        );
+        this.unreadCount.set(0);
+      },
+    });
+  }
+
+  acceptRequest(requestId: string): void {
+    this.connService.acceptConnection(requestId).subscribe({
+      next: () => {
+        this.connectionRequests.update(reqs => reqs.filter(r => r.id !== requestId));
+      },
+    });
+  }
+
+  rejectRequest(requestId: string): void {
+    this.connService.rejectConnection(requestId).subscribe({
+      next: () => {
+        this.connectionRequests.update(reqs => reqs.filter(r => r.id !== requestId));
+      },
+    });
+  }
+
+  getNotificationIcon(tipo: string): string {
+    switch (tipo) {
+      case 'SOLICITUD_CONEXION': return 'person_add';
+      case 'CONEXION_ACEPTADA': return 'check_circle';
+      case 'COMENTARIO': return 'comment';
+      case 'REACCION': return 'favorite';
+      default: return 'notifications';
+    }
+  }
+
+  getTimeAgo(dateStr: string): string {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `${mins}m`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h`;
+    const days = Math.floor(hours / 24);
+    return `${days}d`;
+  }
+}

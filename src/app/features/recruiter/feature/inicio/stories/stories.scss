@@ -74,11 +74,24 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   text-align: center;
+}
 
-  &.empty-msg {
-    max-width: 120px;
+.empty-avatar {
+  background: var(--surface-container-high);
+  border: none;
+  padding: 0;
+
+  .material-symbols-outlined {
+    font-size: 28px;
     color: var(--outline);
   }
+}
+
+.empty-msg {
+  max-width: 180px;
+  white-space: nowrap;
+  color: var(--outline);
+  overflow: visible;
 }
 
 /* ─── Story Composer ─── */
@@ -195,7 +208,7 @@
 .preview-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .remove-img-btn {
@@ -465,7 +478,7 @@
 .viewer-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .viewer-text-overlay {

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
@@ -22,6 +22,7 @@ export class StoriesComponent implements OnInit {
   private storyService = inject(StoryGraphqlService);
   private graphql = inject(GraphQLService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   storyUsers = signal<StoryUser[]>([]);
   showComposer = signal(false);
@@ -53,6 +54,7 @@ export class StoriesComponent implements OnInit {
         const grouped = this.groupByAutor(data);
         this.storyUsers.set(grouped);
         grouped.forEach(g => this.loadUserNames(g));
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Failed to load stories:', err);
@@ -116,15 +118,21 @@ export class StoriesComponent implements OnInit {
     if (!file) return;
 
     this.uploading = true;
-    this.graphql.uploadFile(file).subscribe({
-      next: (res: any) => {
-        this.storyImage = res?.secure_url ?? res?.url ?? null;
-        this.uploading = false;
-      },
-      error: (err) => {
-        console.error('Failed to upload image:', err);
-        this.uploading = false;
-      }
+    this.cdr.detectChanges();
+    this.resizeImage(file).then((resizedBlob) => {
+      const resizedFile = new File([resizedBlob], file.name, { type: 'image/jpeg' });
+      this.graphql.uploadFile(resizedFile).subscribe({
+        next: (res: any) => {
+          this.storyImage = res?.secure_url ?? res?.url ?? null;
+          this.uploading = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Failed to upload image:', err);
+          this.uploading = false;
+          this.cdr.detectChanges();
+        }
+      });
     });
   }
 
@@ -147,10 +155,12 @@ export class StoriesComponent implements OnInit {
           this.toggleComposer();
         }
         this.creating = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Failed to create story:', err);
         this.creating = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -199,6 +209,45 @@ export class StoriesComponent implements OnInit {
         this.viewingIndex.set(prev.stories.length - 1);
       }
     }
+  }
+
+  private resizeImage(file: File): Promise<Blob> {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 1080;
+          const MAX_HEIGHT = 1920;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height = (height * MAX_WIDTH) / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width = (width * MAX_HEIGHT) / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d')!;
+          ctx.fillStyle = '#000';
+          ctx.fillRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob((blob) => resolve(blob!), 'image/jpeg', 0.85);
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
   }
 
   getInitials(name: string): string {

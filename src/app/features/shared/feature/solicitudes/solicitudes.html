@@ -1,0 +1,136 @@
+<div class="solicitudes-container">
+  <div class="solicitudes-header">
+    <button class="back-btn" (click)="goBack()">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <h1>Solicitudes</h1>
+  </div>
+
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab() === 'recibidas'" (click)="setTab('recibidas')">
+      Recibidas
+      @if (pendingRequests().length > 0) {
+        <span class="tab-badge">{{ pendingRequests().length }}</span>
+      }
+    </button>
+    <button class="tab" [class.active]="activeTab() === 'enviadas'" (click)="setTab('enviadas')">
+      Enviadas
+      @if (sentRequests().length > 0) {
+        <span class="tab-badge">{{ sentRequests().length }}</span>
+      }
+    </button>
+    <button class="tab" [class.active]="activeTab() === 'conexiones'" (click)="setTab('conexiones')">
+      Conexiones
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <span class="material-symbols-outlined spinning">progress_activity</span>
+      Cargando...
+    </div>
+  }
+
+  <!-- Recibidas -->
+  @if (activeTab() === 'recibidas' && !loading()) {
+    @for (req of pendingRequests(); track req.id) {
+      <div class="request-card">
+        <div class="request-avatar clickable" (click)="goToProfile(req.solicitanteId)">
+          @if (getUser(req.solicitanteId)?.fotoPerfilUrl) {
+            <img [src]="getUser(req.solicitanteId)!.fotoPerfilUrl" [alt]="getUser(req.solicitanteId)!.nombre" />
+          } @else {
+            <div class="avatar-fallback">{{ getInitials(getUser(req.solicitanteId)?.nombre || '?') }}</div>
+          }
+        </div>
+        <div class="request-info">
+          <span class="request-name clickable" (click)="goToProfile(req.solicitanteId)">
+            {{ getUser(req.solicitanteId)?.nombre || 'Usuario' }}
+          </span>
+          @if (getUser(req.solicitanteId)?.bio) {
+            <span class="request-bio">{{ getUser(req.solicitanteId)!.bio }}</span>
+          }
+          <span class="request-time">{{ getTimeAgo(req.createdAt) }}</span>
+        </div>
+        <div class="request-actions">
+          <button class="btn-accept" (click)="acceptRequest(req.id!)">
+            <span class="material-symbols-outlined">check</span>
+            Aceptar
+          </button>
+          <button class="btn-reject" (click)="rejectRequest(req.id!)">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-state">
+        <span class="material-symbols-outlined">inbox</span>
+        <span>No tienes solicitudes pendientes</span>
+      </div>
+    }
+  }
+
+  <!-- Enviadas -->
+  @if (activeTab() === 'enviadas' && !loading()) {
+    @for (req of sentRequests(); track req.id) {
+      <div class="request-card">
+        <div class="request-avatar clickable" (click)="goToProfile(req.receptorId)">
+          @if (getUser(req.receptorId)?.fotoPerfilUrl) {
+            <img [src]="getUser(req.receptorId)!.fotoPerfilUrl" [alt]="getUser(req.receptorId)!.nombre" />
+          } @else {
+            <div class="avatar-fallback">{{ getInitials(getUser(req.receptorId)?.nombre || '?') }}</div>
+          }
+        </div>
+        <div class="request-info">
+          <span class="request-name clickable" (click)="goToProfile(req.receptorId)">
+            {{ getUser(req.receptorId)?.nombre || 'Usuario' }}
+          </span>
+          <span class="request-time">Enviada {{ getTimeAgo(req.createdAt) }}</span>
+        </div>
+        <div class="request-actions">
+          <button class="btn-cancel" (click)="cancelRequest(req.id!)">
+            <span class="material-symbols-outlined">close</span>
+            Cancelar
+          </button>
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-state">
+        <span class="material-symbols-outlined">send</span>
+        <span>No tienes solicitudes enviadas</span>
+      </div>
+    }
+  }
+
+  <!-- Conexiones -->
+  @if (activeTab() === 'conexiones' && !loading()) {
+    @for (conn of connections(); track conn.id) {
+      @let peerId = getPeerId(conn);
+      <div class="request-card">
+        <div class="request-avatar clickable" (click)="goToProfile(peerId)">
+          @if (getUser(peerId)?.fotoPerfilUrl) {
+            <img [src]="getUser(peerId)!.fotoPerfilUrl" [alt]="getUser(peerId)!.nombre" />
+          } @else {
+            <div class="avatar-fallback">{{ getInitials(getUser(peerId)?.nombre || '?') }}</div>
+          }
+        </div>
+        <div class="request-info">
+          <span class="request-name clickable" (click)="goToProfile(peerId)">
+            {{ getUser(peerId)?.nombre || 'Usuario' }}
+          </span>
+          <span class="request-time">Conectado {{ getTimeAgo(conn.createdAt) }}</span>
+        </div>
+        <div class="request-actions">
+          <button class="btn-remove" (click)="removeConnection(conn.id!)">
+            <span class="material-symbols-outlined">person_remove</span>
+            Eliminar
+          </button>
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-state">
+        <span class="material-symbols-outlined">people</span>
+        <span>No tienes conexiones aún</span>
+      </div>
+    }
+  }
+</div>

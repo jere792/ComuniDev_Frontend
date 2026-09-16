@@ -831,6 +831,21 @@
   z-index: 10;
 }
 
+.viewer-timer {
+  position: absolute;
+  top: 20px;
+  right: 16px;
+  font-size: 11px;
+  color: #ffffff99;
+  z-index: 10;
+  font-variant-numeric: tabular-nums;
+}
+
+.viewer-timer-sep {
+  margin: 0 2px;
+  color: #ffffff59;
+}
+
 .progress-track {
   flex: 1;
   height: 3px;
@@ -853,7 +868,11 @@
   &.current {
     background: #fff;
     width: 0%;
-    animation: progressFill 5s linear forwards;
+    animation: progressFill 30s linear forwards;
+
+    &.paused {
+      animation-play-state: paused;
+    }
   }
 }
 
@@ -864,7 +883,7 @@
 
 .viewer-top {
   position: absolute;
-  top: 16px;
+  top: 36px;
   left: 0;
   right: 0;
   display: flex;
@@ -912,6 +931,23 @@
 .viewer-name {
   font-size: 13px;
   font-weight: 600;
+}
+
+/* ─── Viewer Music Bar (Top) ─── */
+
+.viewer-music-bar-top {
+  position: absolute;
+  top: 62px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 6px 10px;
+  background: #00000080;
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius-xl);
+  z-index: 10;
 }
 
 .viewer-content {
@@ -990,8 +1026,8 @@
 
 .nav-zone {
   position: absolute;
-  top: 60px;
-  bottom: 60px;
+  top: 110px;
+  bottom: 20px;
   width: 40%;
   z-index: 5;
 }
@@ -1055,8 +1091,8 @@
 }
 
 .viewer-music-play {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border: none;
   border-radius: 50%;
   background: #ffffff33;
@@ -1068,11 +1104,55 @@
   flex-shrink: 0;
 
   .material-symbols-outlined {
-    font-size: 20px;
+    font-size: 18px;
+  }
+}
+
+/* ─── Viewer Volume ─── */
+
+.viewer-volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.viewer-volume-icon {
+  font-size: 16px;
+  color: #ffffffcc;
+}
+
+.viewer-volume-slider {
+  width: 60px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #ffffff33;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+  }
+
+  &::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    border: none;
   }
 }
 
 .viewer-time {
-  font-size: 11px;
-  color: #ffffff99;
+  font-size: 12px;
+  color: #ffffffcc;
+  font-weight: 500;
 }

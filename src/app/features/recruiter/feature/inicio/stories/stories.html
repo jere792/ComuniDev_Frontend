@@ -310,10 +310,18 @@
               class="progress-fill"
               [class.active]="i < viewingIndex()"
               [class.current]="i === viewingIndex()"
+              [class.paused]="i === viewingIndex() && !playingPreview"
             ></div>
           </div>
         }
       </div>
+      @if (vu.stories[viewingIndex()]?.contenido?.musica) {
+        <div class="viewer-timer">
+          <span>{{ formatTime(currentTime()) }}</span>
+          <span class="viewer-timer-sep">/</span>
+          <span>{{ formatTime(duration()) }}</span>
+        </div>
+      }
 
       <!-- Top info -->
       <div class="viewer-top">
@@ -325,7 +333,26 @@
           }
           <span class="viewer-name">{{ vu.nombre }}</span>
         </div>
+        <span class="viewer-time">{{ vu.stories[viewingIndex()]?.createdAt | date: 'HH:mm' }}</span>
       </div>
+
+      <!-- Music bar (top, below user info) -->
+      @if (vu.stories[viewingIndex()]?.contenido?.musica) {
+        <div class="viewer-music-bar-top">
+          <button class="viewer-music-play" (click)="togglePreview(vu.stories[viewingIndex()].contenido?.musica!, $event)">
+            <span class="material-symbols-outlined">{{ playingPreview ? 'pause' : 'play_arrow' }}</span>
+          </button>
+          <div class="viewer-music-info-row">
+            <span class="viewer-music-track">{{ vu.stories[viewingIndex()].contenido?.musica?.trackName }}</span>
+            <span class="viewer-music-artist">{{ vu.stories[viewingIndex()].contenido?.musica?.artistName }}</span>
+          </div>
+          <div class="viewer-volume-wrap">
+            <span class="material-symbols-outlined viewer-volume-icon">volume_up</span>
+            <input type="range" class="viewer-volume-slider" min="0" max="1" step="0.05"
+                   [value]="volume" (input)="onVolumeChange($event)" (click)="$event.stopPropagation()" />
+          </div>
+        </div>
+      }
 
       <!-- Story content -->
       <div class="viewer-content" (click)="nextStory()">
@@ -389,21 +416,6 @@
       <div class="nav-zone nav-prev" (click)="prevStory()"></div>
       <div class="nav-zone nav-next" (click)="nextStory()"></div>
 
-      <!-- Bottom -->
-      <div class="viewer-bottom">
-        @if (vu.stories[viewingIndex()]?.contenido?.musica) {
-          <div class="viewer-music-bar">
-            <div class="viewer-music-info-row">
-              <span class="viewer-music-track">{{ vu.stories[viewingIndex()].contenido?.musica?.trackName }}</span>
-              <span class="viewer-music-artist">{{ vu.stories[viewingIndex()].contenido?.musica?.artistName }}</span>
-            </div>
-            <button class="viewer-music-play" (click)="togglePreview(vu.stories[viewingIndex()].contenido?.musica!, $event)">
-              <span class="material-symbols-outlined">{{ playingPreview ? 'pause' : 'play_arrow' }}</span>
-            </button>
-          </div>
-        }
-        <span class="viewer-time">{{ vu.stories[viewingIndex()]?.createdAt | date: 'HH:mm' }}</span>
-      </div>
     </div>
   </div>
 }

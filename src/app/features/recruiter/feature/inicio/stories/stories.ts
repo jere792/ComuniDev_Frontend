@@ -72,10 +72,15 @@ export class StoriesComponent implements OnInit, OnDestroy {
   // Audio
   previewAudio: HTMLAudioElement | null = null;
   playingPreview = false;
+  currentTime = signal(0);
+  duration = signal(0);
+  volume = 0.8;
 
   // Viewer
   viewingUser = signal<StoryUser | null>(null);
   viewingIndex = signal(0);
+  private storyTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly STORY_DURATION = 30000; // 30 seconds
 
   private userCache = new Map<string, { nombre: string; avatar: string }>();
 
@@ -234,7 +239,7 @@ export class StoriesComponent implements OnInit, OnDestroy {
         coverUrl: this.selectedMusic.coverUrl,
         previewUrl: this.selectedMusic.previewUrl,
         musicMode: this.musicMode,
-        lyricsText: this.musicMode === 'lyrics' ? this.lyricsText : null,
+        lyricsText: (this.musicMode === 'lyrics' || this.musicMode === 'cover+lyrics') ? this.lyricsText : null,
         lyricsPosX: this.lyricsPos().x,
         lyricsPosY: this.lyricsPos().y,
         coverPosX: this.coverPos().x,
@@ -443,6 +448,7 @@ export class StoriesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopLyricTracking();
+    this.stopStoryTimer();
     this.stopPreview();
   }
 
@@ -579,7 +585,27 @@ export class StoriesComponent implements OnInit, OnDestroy {
   togglePreview(track: { previewUrl?: string }, event: Event): void {
     event.stopPropagation();
     if (!track.previewUrl) return;
-    this.playMusic(track.previewUrl);
+    if (this.previewAudio && !this.previewAudio.paused) {
+      this.previewAudio.pause();
+      this.playingPreview = false;
+      this.stopStoryTimer();
+      this.cdr.detectChanges();
+    } else if (this.previewAudio) {
+      this.previewAudio.play();
+      this.playingPreview = true;
+      this.resetStoryTimer();
+      this.cdr.detectChanges();
+    } else {
+      this.playMusic(track.previewUrl);
+    }
+  }
+
+  onVolumeChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.volume = parseFloat(input.value);
+    if (this.previewAudio) {
+      this.previewAudio.volume = this.volume;
+    }
   }
 
   playMusic(url: string): void {
@@ -590,8 +616,18 @@ export class StoriesComponent implements OnInit, OnDestroy {
         return;
       }
     }
+    this.currentTime.set(0);
+    this.duration.set(0);
     this.previewAudio = new Audio(url);
+    this.previewAudio.volume = this.volume;
     this.previewAudio.loop = true;
+    this.previewAudio.addEventListener('loadedmetadata', () => {
+      this.duration.set(this.previewAudio?.duration ?? 0);
+      this.cdr.detectChanges();
+    });
+    this.previewAudio.addEventListener('timeupdate', () => {
+      this.currentTime.set(this.previewAudio?.currentTime ?? 0);
+    });
     this.previewAudio.play().catch(() => {
       this.playingPreview = false;
     });
@@ -620,12 +656,14 @@ export class StoriesComponent implements OnInit, OnDestroy {
     this.viewingUser.set(user);
     this.viewingIndex.set(0);
     this.fetchViewerSyncedLyrics();
+    this.startStoryTimer();
   }
 
   closeViewer(): void {
     this.viewingUser.set(null);
     this.viewingIndex.set(0);
     this.stopPreview();
+    this.stopStoryTimer();
     this.viewerSyncedLines = [];
     this.viewerHasSyncedLyrics = false;
     this.viewerCurrentLyricIndex.set(-1);
@@ -637,6 +675,7 @@ export class StoriesComponent implements OnInit, OnDestroy {
     if (this.viewingIndex() < user.stories.length - 1) {
       this.viewingIndex.update(i => i + 1);
       this.fetchViewerSyncedLyrics();
+      this.resetStoryTimer();
     } else {
       const users = this.storyUsers();
       const currentIdx = users.indexOf(user);
@@ -644,6 +683,7 @@ export class StoriesComponent implements OnInit, OnDestroy {
         this.viewingUser.set(users[currentIdx + 1]);
         this.viewingIndex.set(0);
         this.fetchViewerSyncedLyrics();
+        this.resetStoryTimer();
       } else {
         this.closeViewer();
       }
@@ -656,6 +696,7 @@ export class StoriesComponent implements OnInit, OnDestroy {
     if (this.viewingIndex() > 0) {
       this.viewingIndex.update(i => i - 1);
       this.fetchViewerSyncedLyrics();
+      this.resetStoryTimer();
     } else {
       const users = this.storyUsers();
       const currentIdx = users.indexOf(user);
@@ -714,6 +755,26 @@ export class StoriesComponent implements OnInit, OnDestroy {
     }, 100);
   }
 
+  // ─── Story Auto-Advance Timer ───
+
+  private startStoryTimer(): void {
+    this.stopStoryTimer();
+    this.storyTimer = setTimeout(() => {
+      this.nextStory();
+    }, this.STORY_DURATION);
+  }
+
+  private resetStoryTimer(): void {
+    this.startStoryTimer();
+  }
+
+  private stopStoryTimer(): void {
+    if (this.storyTimer) {
+      clearTimeout(this.storyTimer);
+      this.storyTimer = null;
+    }
+  }
+
   private resizeImage(file: File): Promise<Blob> {
     return new Promise((resolve) => {
       const reader = new FileReader();
@@ -756,6 +817,12 @@ export class StoriesComponent implements OnInit, OnDestroy {
   getInitials(name: string): string {
     if (!name) return '?';
     return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  }
+
+  formatTime(seconds: number): string {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
   }
 
   goToProfile(autorId: string): void {

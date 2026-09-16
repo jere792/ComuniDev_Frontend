@@ -105,7 +105,12 @@
           <div class="reacciones-wrapper">
             <button class="action-btn" [class.reacted]="vm.myReaction" (click)="toggleReactionsDropdown(vm)">
               <span class="reaction-emoji-btn">{{ getReactionEmoji(vm) }}</span>
-              <span class="action-text">{{ getReactionLabel(vm) }}</span>
+              <span class="action-text">
+                {{ getReactionLabel(vm) }}
+                @if ((vm.post.estadisticas?.reaccionesCount ?? 0) > 0) {
+                  ({{ vm.post.estadisticas?.reaccionesCount }})
+                }
+              </span>
             </button>
 
             @if (vm.showReactionsDropdown) {
@@ -126,7 +131,12 @@
 
           <button class="action-btn comment-btn" (click)="toggleComments(vm)">
             <span class="material-symbols-outlined">chat_bubble_outline</span>
-            <span class="action-text">Comentar</span>
+            <span class="action-text">
+              Comentar
+              @if ((vm.post.estadisticas?.comentariosCount ?? 0) > 0) {
+                ({{ vm.post.estadisticas?.comentariosCount }})
+              }
+            </span>
           </button>
         </div>
 

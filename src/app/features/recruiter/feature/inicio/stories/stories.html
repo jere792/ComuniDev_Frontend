@@ -50,9 +50,16 @@
     <div class="story-phone-composer" (click)="$event.stopPropagation()">
       <div class="story-topbar">
         <span class="topbar-title">Nueva Story</span>
+        <button class="topbar-music-btn" (click)="toggleMusicPanel()" [class.active]="selectedMusic || showMusicModal()">
+          <span class="material-symbols-outlined">music_note</span>
+        </button>
       </div>
 
-      <div class="story-preview">
+      <div class="story-preview"
+           (mousemove)="onLyricsMouseMove($event); onCoverMouseMove($event)"
+           (mouseup)="onLyricsMouseUp(); onCoverMouseUp()"
+           (touchmove)="onLyricsMouseMove($event); onCoverMouseMove($event)"
+           (touchend)="onLyricsMouseUp(); onCoverMouseUp()">
         @if (storyImage) {
           <img [src]="storyImage" alt="Preview" class="preview-img" />
           <button class="remove-img-btn" (click)="storyImage = null">
@@ -66,33 +73,227 @@
             } @else {
               <label class="upload-trigger">
                 <span class="material-symbols-outlined">photo_camera</span>
-              <p>Toca para agregar una imagen</p>
-              <input type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
-            </label>
+                <p>Toca para agregar una imagen</p>
+                <input type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
+              </label>
+            }
+          </div>
+        }
+
+        <!-- Music Search Overlay (inside preview) -->
+        @if (showMusicModal()) {
+          <div class="music-search-overlay" (click)="$event.stopPropagation()">
+            <div class="music-search-header">
+              <span class="material-symbols-outlined music-search-back" (click)="closeMusicModal()">arrow_back</span>
+              <span class="music-search-title">Buscar música</span>
+            </div>
+            <div class="music-search-input-wrap">
+              <span class="material-symbols-outlined">search</span>
+              <input
+                type="text"
+                [(ngModel)]="musicQuery"
+                placeholder="Buscar canción o artista..."
+                class="music-search-input"
+                (input)="onMusicQueryChange()"
+                (keyup.enter)="searchMusic()"
+                autofocus
+              />
+              @if (musicQuery) {
+                <button class="music-search-clear" (click)="musicQuery = ''; musicResults.set([]); hasSearched = false">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              }
+            </div>
+
+            @if (searchingMusic) {
+              <div class="music-search-loading">
+                <span class="material-symbols-outlined spinning">progress_activity</span>
+                <span>Buscando...</span>
+              </div>
+            }
+
+            @if (musicResults().length > 0) {
+              <div class="music-search-results">
+                @for (track of musicResults(); track track.id) {
+                  <div class="music-search-item" (click)="selectMusic(track)">
+                    <img [src]="track.coverUrl" class="music-search-cover" />
+                    <div class="music-search-info">
+                      <span class="music-search-track">{{ track.title }}</span>
+                      <span class="music-search-artist">{{ track.artist }}</span>
+                    </div>
+                    <button class="music-search-play" (click)="togglePreview(track, $event)">
+                      <span class="material-symbols-outlined">{{ playingPreview ? 'pause' : 'play_arrow' }}</span>
+                    </button>
+                  </div>
+                }
+              </div>
+            } @else if (!searchingMusic && hasSearched && musicQuery.trim()) {
+              <div class="music-search-empty">No se encontraron resultados</div>
+            }
+          </div>
+        }
+
+        <!-- Music Mode: Cover -->
+        @if (selectedMusic && musicMode === 'cover') {
+          <div class="composer-cover-overlay">
+            <img [src]="selectedMusic.coverUrl" class="composer-cover-img"
+                 [style.left.%]="coverPos().x"
+                 [style.top.%]="coverPos().y"
+                 [style.transform]="'translate(-50%, -50%) scale(' + coverScale() + ')'"
+                 (mousedown)="onCoverMouseDown($event)"
+                 (touchstart)="onCoverMouseDown($event); onCoverTouchStart($event)"
+                 (touchmove)="onCoverTouchMove($event)"
+                 (touchend)="onCoverTouchEnd()" />
+          </div>
+          <div class="zoom-controls zoom-controls-cover">
+            <button class="zoom-btn" (click)="zoomCoverOut()">
+              <span class="material-symbols-outlined">remove</span>
+            </button>
+            <span class="zoom-label">{{ (coverScale() * 100) | number:'1.0-0' }}%</span>
+            <button class="zoom-btn" (click)="zoomCoverIn()">
+              <span class="material-symbols-outlined">add</span>
+            </button>
+          </div>
+          <div class="composer-cover-hint">Arrastra para mover</div>
+        }
+
+        <!-- Music Mode: Lyrics -->
+        @if (selectedMusic && musicMode === 'lyrics' && lyricsText) {
+          <div class="composer-lyrics-text"
+               [style.left.%]="lyricsPos().x"
+               [style.top.%]="lyricsPos().y"
+               [style.transform]="'translate(-50%, -50%) scale(' + lyricsScale() + ')'"
+               (mousedown)="onLyricsMouseDown($event)"
+               (touchstart)="onLyricsMouseDown($event); onLyricsTouchStart($event)"
+               (touchmove)="onLyricsTouchMove($event)"
+               (touchend)="onLyricsTouchEnd()">
+            @if (hasSyncedLyrics && currentLyricIndex() >= 0) {
+              {{ syncedLyricsLines[currentLyricIndex()].text }}
+            } @else {
+              {{ lyricsText }}
+            }
+          </div>
+          <div class="zoom-controls zoom-controls-lyrics">
+            <button class="zoom-btn" (click)="zoomLyricsOut()">
+              <span class="material-symbols-outlined">remove</span>
+            </button>
+            <span class="zoom-label">{{ (lyricsScale() * 100) | number:'1.0-0' }}%</span>
+            <button class="zoom-btn" (click)="zoomLyricsIn()">
+              <span class="material-symbols-outlined">add</span>
+            </button>
+          </div>
+          <div class="composer-lyrics-hint">Arrastra para mover</div>
+        }
+
+        <!-- Music Mode: Cover + Lyrics -->
+        @if (selectedMusic && musicMode === 'cover+lyrics') {
+          <div class="composer-cover-overlay">
+            <img [src]="selectedMusic.coverUrl" class="composer-cover-img"
+                 [style.left.%]="coverPos().x"
+                 [style.top.%]="coverPos().y"
+                 [style.transform]="'translate(-50%, -50%) scale(' + coverScale() + ')'"
+                 (mousedown)="onCoverMouseDown($event)"
+                 (touchstart)="onCoverMouseDown($event); onCoverTouchStart($event)"
+                 (touchmove)="onCoverTouchMove($event)"
+                 (touchend)="onCoverTouchEnd()" />
+          </div>
+          @if (lyricsText) {
+            <div class="composer-lyrics-text"
+                 [style.left.%]="lyricsPos().x"
+                 [style.top.%]="lyricsPos().y"
+                 [style.transform]="'translate(-50%, -50%) scale(' + lyricsScale() + ')'"
+                 (mousedown)="onLyricsMouseDown($event)"
+                 (touchstart)="onLyricsMouseDown($event); onLyricsTouchStart($event)"
+                 (touchmove)="onLyricsTouchMove($event)"
+                 (touchend)="onLyricsTouchEnd()">
+              @if (hasSyncedLyrics && currentLyricIndex() >= 0) {
+                {{ syncedLyricsLines[currentLyricIndex()].text }}
+              } @else {
+                {{ lyricsText }}
+              }
+            </div>
           }
+          <div class="zoom-controls zoom-controls-cover">
+            <button class="zoom-btn" (click)="zoomCoverOut()">
+              <span class="material-symbols-outlined">remove</span>
+            </button>
+            <span class="zoom-label">{{ (coverScale() * 100) | number:'1.0-0' }}%</span>
+            <button class="zoom-btn" (click)="zoomCoverIn()">
+              <span class="material-symbols-outlined">add</span>
+            </button>
+          </div>
+          <div class="zoom-controls zoom-controls-lyrics">
+            <button class="zoom-btn" (click)="zoomLyricsOut()">
+              <span class="material-symbols-outlined">remove</span>
+            </button>
+            <span class="zoom-label">{{ (lyricsScale() * 100) | number:'1.0-0' }}%</span>
+            <button class="zoom-btn" (click)="zoomLyricsIn()">
+              <span class="material-symbols-outlined">add</span>
+            </button>
+          </div>
+          <div class="composer-cover-hint">Arrastra para mover portada y letra</div>
+        }
+      </div>
+
+      <!-- Music Mode Selector -->
+      @if (selectedMusic) {
+        <div class="music-mode-selector">
+          <button class="mode-btn" [class.active]="musicMode === 'cover'" (click)="setMusicMode('cover')">
+            <span class="material-symbols-outlined">album</span>
+            <span>Portada</span>
+          </button>
+          <button class="mode-btn" [class.active]="musicMode === 'audio'" (click)="setMusicMode('audio')">
+            <span class="material-symbols-outlined">music_note</span>
+            <span>Solo audio</span>
+          </button>
+          <button class="mode-btn" [class.active]="musicMode === 'lyrics'" (click)="setMusicMode('lyrics')">
+            <span class="material-symbols-outlined">lyrics</span>
+            <span>Letra</span>
+          </button>
+          <button class="mode-btn" [class.active]="musicMode === 'cover+lyrics'" (click)="setMusicMode('cover+lyrics')">
+            <span class="material-symbols-outlined">album</span>
+            <span class="material-symbols-outlined">lyrics</span>
+            <span>Todo</span>
+          </button>
         </div>
       }
-    </div>
 
-    <div class="story-bottom">
-      <input
-        type="text"
-        [(ngModel)]="storyText"
-        placeholder="Escribe algo..."
-        class="story-text-input"
-      />
-      <button
-        class="publish-btn"
-        (click)="createStory()"
-        [disabled]="(!storyImage && !storyText.trim()) || creating || uploading"
-      >
-        @if (creating) {
-          <span class="material-symbols-outlined spinning">progress_activity</span>
-        } @else {
-          <span class="material-symbols-outlined">send</span>
-        }
-      </button>
-    </div>
+      <!-- Lyrics Loading -->
+      @if (selectedMusic && (musicMode === 'lyrics' || musicMode === 'cover+lyrics') && lyricsLoading) {
+        <div class="lyrics-input-row">
+          <div class="lyrics-loading">
+            <span class="material-symbols-outlined spinning">progress_activity</span>
+            <span>Buscando letra...</span>
+          </div>
+        </div>
+      }
+
+      <div class="story-bottom">
+        <input
+          type="text"
+          [(ngModel)]="storyText"
+          placeholder="Escribe algo..."
+          class="story-text-input"
+        />
+        <div class="story-actions-row">
+          @if (selectedMusic) {
+            <button class="action-icon-btn remove-music-action" (click)="removeMusic()">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          }
+          <button
+            class="publish-btn"
+            (click)="createStory()"
+            [disabled]="(!storyImage && !storyText.trim() && !selectedMusic) || creating || uploading"
+          >
+            @if (creating) {
+              <span class="material-symbols-outlined spinning">progress_activity</span>
+            } @else {
+              <span class="material-symbols-outlined">send</span>
+            }
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 }
@@ -136,6 +337,52 @@
             <p>{{ vu.stories[viewingIndex()].contenido?.texto }}</p>
           </div>
         }
+
+        <!-- Viewer: Cover mode -->
+        @if (vu.stories[viewingIndex()]?.contenido?.musica?.musicMode === 'cover') {
+          <div class="viewer-cover-mode">
+            <img [src]="vu.stories[viewingIndex()].contenido?.musica?.coverUrl" class="viewer-cover-img"
+                 [style.left.%]="vu.stories[viewingIndex()].contenido?.musica?.coverPosX ?? 50"
+                 [style.top.%]="vu.stories[viewingIndex()].contenido?.musica?.coverPosY ?? 40"
+                 [style.transform]="'translate(-50%, -50%) scale(' + (vu.stories[viewingIndex()].contenido?.musica?.coverScale ?? 1) + ')'" />
+          </div>
+        }
+
+        <!-- Viewer: Lyrics mode -->
+        @if (vu.stories[viewingIndex()]?.contenido?.musica?.musicMode === 'lyrics' && vu.stories[viewingIndex()].contenido?.musica?.lyricsText) {
+          <div class="viewer-lyrics-mode"
+               [style.left.%]="vu.stories[viewingIndex()].contenido?.musica?.lyricsPosX ?? 50"
+               [style.top.%]="vu.stories[viewingIndex()].contenido?.musica?.lyricsPosY ?? 50"
+               [style.transform]="'translate(-50%, -50%) scale(' + (vu.stories[viewingIndex()].contenido?.musica?.lyricsScale ?? 1) + ')'">
+            @if (viewerHasSyncedLyrics && viewerCurrentLyricIndex() >= 0) {
+              {{ viewerSyncedLines[viewerCurrentLyricIndex()].text }}
+            } @else {
+              {{ vu.stories[viewingIndex()].contenido?.musica?.lyricsText }}
+            }
+          </div>
+        }
+
+        <!-- Viewer: Cover + Lyrics mode -->
+        @if (vu.stories[viewingIndex()]?.contenido?.musica?.musicMode === 'cover+lyrics') {
+          <div class="viewer-cover-mode">
+            <img [src]="vu.stories[viewingIndex()].contenido?.musica?.coverUrl" class="viewer-cover-img"
+                 [style.left.%]="vu.stories[viewingIndex()].contenido?.musica?.coverPosX ?? 50"
+                 [style.top.%]="vu.stories[viewingIndex()].contenido?.musica?.coverPosY ?? 40"
+                 [style.transform]="'translate(-50%, -50%) scale(' + (vu.stories[viewingIndex()].contenido?.musica?.coverScale ?? 1) + ')'" />
+          </div>
+          @if (vu.stories[viewingIndex()].contenido?.musica?.lyricsText) {
+            <div class="viewer-lyrics-mode"
+                 [style.left.%]="vu.stories[viewingIndex()].contenido?.musica?.lyricsPosX ?? 50"
+                 [style.top.%]="vu.stories[viewingIndex()].contenido?.musica?.lyricsPosY ?? 50"
+                 [style.transform]="'translate(-50%, -50%) scale(' + (vu.stories[viewingIndex()].contenido?.musica?.lyricsScale ?? 1) + ')'">
+              @if (viewerHasSyncedLyrics && viewerCurrentLyricIndex() >= 0) {
+                {{ viewerSyncedLines[viewerCurrentLyricIndex()].text }}
+              } @else {
+                {{ vu.stories[viewingIndex()].contenido?.musica?.lyricsText }}
+              }
+            </div>
+          }
+        }
       </div>
 
       <!-- Navigation zones -->
@@ -144,6 +391,17 @@
 
       <!-- Bottom -->
       <div class="viewer-bottom">
+        @if (vu.stories[viewingIndex()]?.contenido?.musica) {
+          <div class="viewer-music-bar">
+            <div class="viewer-music-info-row">
+              <span class="viewer-music-track">{{ vu.stories[viewingIndex()].contenido?.musica?.trackName }}</span>
+              <span class="viewer-music-artist">{{ vu.stories[viewingIndex()].contenido?.musica?.artistName }}</span>
+            </div>
+            <button class="viewer-music-play" (click)="togglePreview(vu.stories[viewingIndex()].contenido?.musica!, $event)">
+              <span class="material-symbols-outlined">{{ playingPreview ? 'pause' : 'play_arrow' }}</span>
+            </button>
+          </div>
+        }
         <span class="viewer-time">{{ vu.stories[viewingIndex()]?.createdAt | date: 'HH:mm' }}</span>
       </div>
     </div>

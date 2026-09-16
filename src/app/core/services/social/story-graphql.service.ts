@@ -6,7 +6,26 @@ import { map } from 'rxjs/operators';
 export interface SocialStory {
   id: string;
   autorId: string;
-  contenido?: { texto?: string; imagenUrl?: string; videoUrl?: string; musica?: string };
+  contenido?: {
+    texto?: string;
+    imagenUrl?: string;
+    videoUrl?: string;
+    musica?: {
+      trackId?: string;
+      trackName?: string;
+      artistName?: string;
+      coverUrl?: string;
+      previewUrl?: string;
+      musicMode?: string;
+      lyricsText?: string;
+      lyricsPosX?: number;
+      lyricsPosY?: number;
+      coverPosX?: number;
+      coverPosY?: number;
+      lyricsScale?: number;
+      coverScale?: number;
+    };
+  };
   visibilidad?: string;
   fechaExpiracion?: string;
   vistasCount?: number;
@@ -27,7 +46,26 @@ const GET_STORIES = gql`
     stories(userId: $userId) {
       id
       autorId
-      contenido { texto imagenUrl videoUrl musica }
+      contenido {
+        texto
+        imagenUrl
+        videoUrl
+        musica {
+          trackId
+          trackName
+          artistName
+          coverUrl
+          previewUrl
+          musicMode
+          lyricsText
+          lyricsPosX
+          lyricsPosY
+          coverPosX
+          coverPosY
+          lyricsScale
+          coverScale
+        }
+      }
       visibilidad
       fechaExpiracion
       vistasCount
@@ -43,7 +81,26 @@ const CREATE_STORY = gql`
     createStory(autorId: $autorId, contenido: $contenido, visibilidad: $visibilidad) {
       id
       autorId
-      contenido { texto imagenUrl videoUrl musica }
+      contenido {
+        texto
+        imagenUrl
+        videoUrl
+        musica {
+          trackId
+          trackName
+          artistName
+          coverUrl
+          previewUrl
+          musicMode
+          lyricsText
+          lyricsPosX
+          lyricsPosY
+          coverPosX
+          coverPosY
+          lyricsScale
+          coverScale
+        }
+      }
       visibilidad
       fechaExpiracion
       vistasCount
@@ -92,7 +149,26 @@ export class StoryGraphqlService {
       .valueChanges.pipe(map(result => result.data?.stories ?? []));
   }
 
-  createStory(autorId: string, contenido: { texto?: string; imagenUrl?: string; videoUrl?: string; musica?: string }, visibilidad?: string): Observable<SocialStory> {
+  createStory(autorId: string, contenido: {
+    texto?: string;
+    imagenUrl?: string;
+    videoUrl?: string;
+    musica?: {
+      trackId?: string;
+      trackName?: string;
+      artistName?: string;
+      coverUrl?: string;
+      previewUrl?: string;
+      musicMode?: string;
+      lyricsText?: string;
+      lyricsPosX?: number;
+      lyricsPosY?: number;
+      coverPosX?: number;
+      coverPosY?: number;
+      lyricsScale?: number;
+      coverScale?: number;
+    };
+  }, visibilidad?: string): Observable<SocialStory> {
     return this.apollo
       .mutate<any>({ mutation: CREATE_STORY, variables: { autorId, contenido, visibilidad } })
       .pipe(map(result => result.data?.createStory));

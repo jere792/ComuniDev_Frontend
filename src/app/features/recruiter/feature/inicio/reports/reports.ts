@@ -89,6 +89,7 @@ export class ReportsComponent implements OnInit {
         this.loading.set(false);
         data.forEach(p => this.loadAuthor(p.autorId));
         this.loadMyReactions(data);
+        data.forEach(p => this.loadCommentCountSilently(p));
       },
       error: () => {
         this.loading.set(false);
@@ -316,6 +317,16 @@ export class ReportsComponent implements OnInit {
       ...v,
       post: { ...v.post, estadisticas: { ...v.post.estadisticas, comentariosCount: count } }
     } : v));
+  }
+
+  private loadCommentCountSilently(post: SocialPost): void {
+    this.commentService.getComments(post.id, 'POST').subscribe({
+      next: (comments: SocialComment[]) => {
+        const topLevelCount = comments.filter(c => !c.parentCommentId).length;
+        this.updateCount(post.id, topLevelCount);
+      },
+      error: () => {}
+    });
   }
 
   private loadCommentAuthor(autorId: string, postId: string): void {

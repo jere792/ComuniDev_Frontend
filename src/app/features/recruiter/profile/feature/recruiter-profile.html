@@ -21,6 +21,7 @@
         (bannerClick)="onBannerClick(bannerInput)"
         (photoClick)="onPhotoClick(photoInput)"
         (bioClick)="toggleEditProfile()"
+        (statClick)="openSocialModal($event)"
       />
       <input #bannerInput type="file" accept="image/*" hidden (change)="onBannerSelected($event)" />
       <input #photoInput type="file" accept="image/*" hidden (change)="onPhotoSelected($event)" />
@@ -179,3 +180,10 @@
     </aside>
   </div>
 </div>
+
+<app-social-list-modal
+  [open]="socialModalOpen()"
+  [type]="socialModalType()"
+  [userId]="user()?.id || ''"
+  (close)="closeSocialModal()"
+/>

@@ -64,18 +64,18 @@
         </div>
         <div class="stats-column">
           <div class="stats-grid">
-            <div class="stat-item">
+            <button type="button" class="stat-item stat-btn" (click)="openStat('followers')">
               <span class="stat-value">{{ user?.seguidoresCount || 0 }}</span>
               <span class="stat-label">Seguidores</span>
-            </div>
-            <div class="stat-item">
+            </button>
+            <button type="button" class="stat-item stat-btn" (click)="openStat('following')">
               <span class="stat-value">{{ user?.siguiendoCount || 0 }}</span>
               <span class="stat-label">Siguiendo</span>
-            </div>
-            <div class="stat-item">
+            </button>
+            <button type="button" class="stat-item stat-btn" (click)="openStat('connections')">
               <span class="stat-value">{{ user?.conexionesCount || 0 }}</span>
               <span class="stat-label">Conexiones</span>
-            </div>
+            </button>
           </div>
           @if (user?.estadoCuenta) {
             <div class="account-status-tag" [class.active]="user?.estadoCuenta === 'ACTIVE'" [class.pending]="user?.estadoCuenta === 'PENDING_VERIFICATION'">

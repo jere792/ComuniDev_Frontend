@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { SocialListType } from '../social-list-modal/social-list-modal';
 
 @Component({
   selector: 'app-recruiter-profile-card',
@@ -16,6 +17,11 @@ export class RecruiterProfileCard {
   @Output() bannerClick = new EventEmitter<void>();
   @Output() photoClick = new EventEmitter<void>();
   @Output() bioClick = new EventEmitter<void>();
+  @Output() statClick = new EventEmitter<SocialListType>();
+
+  openStat(type: SocialListType): void {
+    this.statClick.emit(type);
+  }
 
   getInitials(): string {
     const name = this.user?.nombre;

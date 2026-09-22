@@ -1,0 +1,143 @@
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  background: #00000099;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-modal {
+  width: 400px;
+  max-width: 92vw;
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 24px 80px #00000066;
+  padding: var(--space-xl) var(--space-lg) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-md);
+  animation: confirm-in 0.2s ease;
+}
+
+.confirm-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .material-symbols-outlined {
+    font-size: 28px;
+  }
+
+  &.success {
+    background: rgba(21, 128, 61, 0.12);
+    color: #15803d;
+  }
+
+  &.warning {
+    background: rgba(161, 98, 7, 0.14);
+    color: #a16207;
+  }
+
+  &.danger {
+    background: rgba(186, 26, 26, 0.12);
+    color: var(--error);
+  }
+}
+
+.confirm-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.confirm-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--on-surface);
+  margin: 0;
+}
+
+.confirm-message {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--on-surface-variant);
+  margin: 0;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: var(--space-sm);
+  width: 100%;
+  margin-top: var(--space-xs);
+}
+
+.btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.btn-cancel {
+  background: var(--surface-container);
+  color: var(--on-surface-variant);
+  border: 1px solid var(--outline-variant);
+
+  &:hover {
+    background: var(--surface-container-high);
+    opacity: 1;
+  }
+}
+
+.btn-confirm {
+  color: #fff;
+
+  &.success {
+    background: #15803d;
+  }
+
+  &.warning {
+    background: #a16207;
+    color: #fff8e1;
+  }
+
+  &.danger {
+    background: var(--error);
+    color: var(--on-error);
+  }
+}
+
+@keyframes confirm-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

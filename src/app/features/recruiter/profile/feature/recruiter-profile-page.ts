@@ -10,6 +10,7 @@ import { RecruiterContactInfo } from '../ui/contact-info/recruiter-contact-info'
 import { RecruiterCompaniesCard } from '../ui/companies-card/recruiter-companies-card';
 import { RecruiterExperienceTimeline } from '../ui/experience-timeline/recruiter-experience-timeline';
 import { SidebarCard } from '../ui/sidebar-card/sidebar-card';
+import { SocialListModal, SocialListType } from '../ui/social-list-modal/social-list-modal';
 
 @Component({
   selector: 'app-recruiter-profile-page',
@@ -23,6 +24,7 @@ import { SidebarCard } from '../ui/sidebar-card/sidebar-card';
     RecruiterCompaniesCard,
     RecruiterExperienceTimeline,
     SidebarCard,
+    SocialListModal,
   ],
   templateUrl: './recruiter-profile.html',
   styleUrl: './recruiter-profile.scss',
@@ -33,6 +35,8 @@ export class RecruiterProfilePage implements OnInit {
   isEditingProfile = signal(false);
   updateMessage = signal('');
   uploadingImage = signal(false);
+  socialModalOpen = signal(false);
+  socialModalType = signal<SocialListType>('followers');
   basicForm: FormGroup;
   profileForm: FormGroup;
 
@@ -173,6 +177,15 @@ export class RecruiterProfilePage implements OnInit {
   getInitials(): string {
     const name = this.user()?.nombre || '';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  }
+
+  openSocialModal(type: SocialListType): void {
+    this.socialModalType.set(type);
+    this.socialModalOpen.set(true);
+  }
+
+  closeSocialModal(): void {
+    this.socialModalOpen.set(false);
   }
 
   onBannerClick(input: HTMLInputElement): void {

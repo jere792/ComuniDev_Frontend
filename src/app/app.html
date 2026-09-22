@@ -1,1 +1,11 @@
 <router-outlet />
+
+@if (toast(); as t) {
+  <app-toast
+    [message]="t.message"
+    [type]="t.type"
+    [duration]="t.duration"
+    [visible]="true"
+    (dismiss)="dismissToast()"
+  />
+}

@@ -1,0 +1,25 @@
+@if (open) {
+  <div class="confirm-overlay" (click)="onOverlayClick($event)">
+    <div class="confirm-modal" [ngClass]="variant" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="confirm-icon-wrap" [ngClass]="variant">
+        <span class="material-symbols-outlined">{{ icon }}</span>
+      </div>
+
+      <div class="confirm-body">
+        <h3 class="confirm-title">{{ title }}</h3>
+        @if (message) {
+          <p class="confirm-message">{{ message }}</p>
+        }
+      </div>
+
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-cancel" (click)="onCancel()">
+          {{ cancelText }}
+        </button>
+        <button type="button" class="btn btn-confirm" [ngClass]="variant" (click)="onConfirm()">
+          {{ confirmText }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -408,6 +408,24 @@
   gap: 2px;
 }
 
+.stat-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 10px;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    background: var(--surface-container-low);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
 .stat-value {
   font-family: var(--font-display);
   font-size: 20px;

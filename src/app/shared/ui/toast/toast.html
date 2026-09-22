@@ -1,0 +1,11 @@
+@if (visible) {
+  <div class="toast-overlay" (click)="onOverlayClick($event)">
+    <div class="toast" [ngClass]="type" role="status">
+      <span class="material-symbols-outlined toast-icon">{{ icon }}</span>
+      <span class="toast-message">{{ message }}</span>
+      <button class="toast-close" type="button" (click)="onClose()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+  </div>
+}

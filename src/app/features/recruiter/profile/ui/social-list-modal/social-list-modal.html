@@ -1,0 +1,62 @@
+@if (open) {
+  <div class="modal-overlay" (click)="onOverlayClick($event)">
+    <div class="social-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title">{{ modalTitle }}</span>
+        <button class="modal-close" (click)="close.emit()" type="button">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="modal-search">
+        <span class="material-symbols-outlined search-icon">search</span>
+        <input
+          type="text"
+          placeholder="Buscar por nombre o usuario..."
+          [value]="search()"
+          (input)="onSearch($event)"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="modal-body">
+        @if (loading()) {
+          <div class="loading-state">
+            <span class="material-symbols-outlined spinning">progress_activity</span>
+            Cargando...
+          </div>
+        } @else {
+          @for (user of filteredUsers(); track user.id) {
+            <div class="user-row" (click)="goToProfile(user.id)">
+              @if (user.fotoPerfilUrl) {
+                <img [src]="user.fotoPerfilUrl" [alt]="user.nombre" class="user-avatar" />
+              } @else {
+                <div class="avatar-fallback">{{ getInitials(user.nombre) }}</div>
+              }
+              <div class="user-info">
+                <span class="user-name">{{ user.nombre || 'Usuario' }}</span>
+                <span class="user-handle">@{{ user.nombreUsuario }}</span>
+              </div>
+              <span class="material-symbols-outlined row-arrow">chevron_right</span>
+            </div>
+          } @empty {
+            <div class="empty-state">
+              <span class="material-symbols-outlined">group</span>
+              <span>
+                @if (search()) {
+                  No se encontraron resultados
+                } @else if (type === 'followers') {
+                  Aún no tienes seguidores
+                } @else if (type === 'following') {
+                  No sigues a nadie aún
+                } @else {
+                  No tienes conexiones aún
+                }
+              </span>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+}

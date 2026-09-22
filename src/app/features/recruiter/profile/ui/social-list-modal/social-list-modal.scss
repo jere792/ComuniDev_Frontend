@@ -1,0 +1,212 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: #00000099;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.social-modal {
+  width: 480px;
+  max-width: 92vw;
+  max-height: 80vh;
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 24px 80px #00000066;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--outline-variant);
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+.modal-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: var(--surface-container-high);
+  }
+
+  .material-symbols-outlined {
+    font-size: 20px;
+  }
+}
+
+.modal-search {
+  position: relative;
+  padding: var(--space-sm) var(--space-lg);
+  border-bottom: 1px solid var(--outline-variant);
+
+  .search-icon {
+    position: absolute;
+    left: calc(var(--space-lg) + 4px);
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: var(--outline);
+    pointer-events: none;
+  }
+
+  input {
+    width: 100%;
+    padding: 10px 14px 10px 36px;
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-full);
+    background: var(--surface-container-low);
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--on-surface);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &::placeholder {
+      color: var(--outline);
+    }
+
+    &:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 36, 44, 0.12);
+    }
+  }
+}
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-sm) var(--space-md);
+  min-height: 180px;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-2xl) 0;
+  color: var(--on-surface-variant);
+  font-size: 14px;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.user-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: var(--surface-container-low);
+
+    .row-arrow {
+      opacity: 1;
+    }
+  }
+}
+
+.user-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.avatar-fallback {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-handle {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+
+.row-arrow {
+  font-size: 20px;
+  color: var(--outline);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-2xl) var(--space-md);
+  color: var(--on-surface-variant);
+  text-align: center;
+
+  .material-symbols-outlined {
+    font-size: 42px;
+    opacity: 0.45;
+  }
+
+  span {
+    font-size: 14px;
+  }
+}

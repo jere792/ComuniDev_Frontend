@@ -1,6 +1,7 @@
 <div class="user-layout">
+  <app-developer-header [links]="headerLinks" />
   <div class="user-layout-body">
-    <app-developer-sidebar [links]="sidebarLinks" />
+    <app-developer-sidebar />
     <main class="user-main">
       <router-outlet />
     </main>

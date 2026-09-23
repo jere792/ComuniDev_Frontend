@@ -169,9 +169,9 @@ export class Solicitudes implements OnInit {
   }
 
   private getBaseRoute(): string {
-    const role = localStorage.getItem('role');
-    if (role === 'RECLUTADOR') return '/recruiter/inicio';
-    if (role === 'DESARROLLADOR') return '/developer/dashboard';
+    const role = (localStorage.getItem('role') || '').toLowerCase();
+    if (role === 'reclutador' || role === 'recruiter') return '/recruiter/inicio';
+    if (role === 'desarrollador' || role === 'developer') return '/developer/inicio';
     return '/';
   }
 

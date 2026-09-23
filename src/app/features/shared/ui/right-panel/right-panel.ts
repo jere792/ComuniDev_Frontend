@@ -105,7 +105,8 @@ export class SharedRightPanel implements OnInit {
   }
 
   goToDiscover(): void {
-    const role = localStorage.getItem('role') || 'developer';
-    this.router.navigate(['/' + role, 'discover']);
+    const role = (localStorage.getItem('role') || 'developer').toLowerCase();
+    const basePath = role === 'recruiter' || role === 'reclutador' ? '/recruiter' : '/developer';
+    this.router.navigate([basePath, 'discover']);
   }
 }

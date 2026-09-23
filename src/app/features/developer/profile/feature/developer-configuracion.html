@@ -1,0 +1,353 @@
+<div class="config-layout">
+  <nav class="config-sidebar">
+    <div class="config-sidebar-header">
+      <h1 class="config-title">Configuración</h1>
+    </div>
+
+    <div class="config-nav">
+      @for (cat of categories; track cat.id) {
+        <div class="nav-category">
+          <button
+            class="category-btn"
+            [class.expanded]="expandedCategory() === cat.id"
+            (click)="toggleCategory(cat.id)"
+          >
+            <span class="material-symbols-outlined category-icon">{{ cat.icon }}</span>
+            <span class="category-label">{{ cat.label }}</span>
+            <span class="material-symbols-outlined chevron">expand_more</span>
+          </button>
+          <div class="subitems-container" [class.open]="expandedCategory() === cat.id">
+            <div class="subitems-inner">
+              @for (sub of cat.subItems; track sub.id) {
+                <button
+                  class="subitem-btn"
+                  [class.active]="activeSection() === sub.id"
+                  (click)="selectSubItem(sub.id)"
+                >
+                  @if (activeSection() === sub.id) {
+                    <span class="active-dot"></span>
+                  }
+                  <span class="material-symbols-outlined subitem-icon">{{ sub.icon }}</span>
+                  <span class="subitem-label">{{ sub.label }}</span>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      @for (item of disabledItems; track item.id) {
+        <button class="nav-item disabled" disabled>
+          <span class="material-symbols-outlined category-icon">{{ item.icon }}</span>
+          <span class="category-label">{{ item.label }}</span>
+          <span class="coming-badge">Próx.</span>
+        </button>
+      }
+    </div>
+  </nav>
+
+  <main class="config-content">
+    @if (loading()) {
+      <div class="config-section loading-state">
+        <div class="spinner"></div>
+      </div>
+    } @else {
+
+    @if (activeSection() === 'perfil-personal') {
+      <section class="config-section" [formGroup]="perfilForm">
+        <h2 class="section-title">Información personal</h2>
+        <p class="section-desc">Datos básicos de tu cuenta</p>
+        <div class="section-body">
+          <div class="form-group">
+            <label class="form-label">Nombre completo</label>
+            <input class="form-input" type="text" formControlName="nombre" placeholder="Tu nombre completo" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Correo electrónico</label>
+            <input class="form-input" type="email" formControlName="email" placeholder="tuemail@ejemplo.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Teléfono</label>
+            <input class="form-input" type="tel" formControlName="telefono" placeholder="+51 999 888 777" />
+          </div>
+        </div>
+        <div class="section-footer">
+          <button class="btn-save" (click)="savePerfil()">Guardar cambios</button>
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'perfil-descripcion') {
+      <section class="config-section" [formGroup]="descripcionForm">
+        <h2 class="section-title">Descripción</h2>
+        <p class="section-desc">Cuéntanos sobre ti</p>
+        <div class="section-body">
+          <div class="form-group">
+            <label class="form-label">Bio</label>
+            <textarea class="form-textarea" formControlName="bio" placeholder="Escribe una breve descriación sobre ti..." rows="6"></textarea>
+          </div>
+        </div>
+        <div class="section-footer">
+          <button class="btn-save" (click)="saveBio()" [disabled]="savingBio()">
+            @if (savingBio()) {
+              <span class="spinner-inline"></span>
+              Guardando...
+            } @else {
+              Guardar cambios
+            }
+          </button>
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'perfil-ubicacion') {
+      <section class="config-section" [formGroup]="ubicacionForm">
+        <h2 class="section-title">Ubicación</h2>
+        <p class="section-desc">Tu ubicación actual en el Perú</p>
+        <div class="section-body">
+          <div class="form-group">
+            <label class="form-label">País</label>
+            <input class="form-input" type="text" formControlName="pais" readonly />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Departamento</label>
+            <select class="form-input form-select" formControlName="departamento">
+              <option value="">Selecciona un departamento</option>
+              <option value="Amazonas">Amazonas</option>
+              <option value="Ancash">Áncash</option>
+              <option value="Apurimac">Apurímac</option>
+              <option value="Arequipa">Arequipa</option>
+              <option value="Ayacucho">Ayacucho</option>
+              <option value="Cajamarca">Cajamarca</option>
+              <option value="Callao">Callao</option>
+              <option value="Cusco">Cusco</option>
+              <option value="Huancavelica">Huancavelica</option>
+              <option value="Huanuco">Huánuco</option>
+              <option value="Ica">Ica</option>
+              <option value="Junin">Junín</option>
+              <option value="La Libertad">La Libertad</option>
+              <option value="Lambayeque">Lambayeque</option>
+              <option value="Lima">Lima</option>
+              <option value="Loreto">Loreto</option>
+              <option value="Madre de Dios">Madre de Dios</option>
+              <option value="Moquegua">Moquegua</option>
+              <option value="Pasco">Pasco</option>
+              <option value="Piura">Piura</option>
+              <option value="Puno">Puno</option>
+              <option value="San Martin">San Martín</option>
+              <option value="Tacna">Tacna</option>
+              <option value="Tumbes">Tumbes</option>
+              <option value="Ucayali">Ucayali</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Provincia</label>
+            <input class="form-input" type="text" formControlName="provincia" placeholder="Ej: Lima, Arequipa, Trujillo..." />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ciudad / Distrito</label>
+            <input class="form-input" type="text" formControlName="ciudad" placeholder="Ej: Miraflores, San Isidro, Surco..." />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Distrito / Zona / Localidad</label>
+            <input class="form-input" type="text" formControlName="distrito" placeholder="Ej: Corpac, La Molina, Barranco..." />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dirección</label>
+            <input class="form-input" type="text" formControlName="direccion" placeholder="Ej: Av. Javier Prado Este 4200, San Isidro" />
+          </div>
+        </div>
+        <div class="section-footer">
+          <button class="btn-save" (click)="saveUbicacion()">Guardar cambios</button>
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'cuenta-estado') {
+      <section class="config-section">
+        <h2 class="section-title">Estado de cuenta</h2>
+        <p class="section-desc">Información y verificación de tu cuenta</p>
+        <div class="section-body">
+          <div class="info-row">
+            <span class="info-label">Estado</span>
+            <span class="info-badge active">Activa</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Email verificado</span>
+            <span class="info-badge">Verificado</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Rol</span>
+            <span class="info-badge">Desarrollador</span>
+          </div>
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'cuenta-contrasena') {
+      <section class="config-section" [formGroup]="contrasenaForm">
+        <h2 class="section-title">Cambio de contraseña</h2>
+        <p class="section-desc">Actualiza tu contraseña de acceso</p>
+        <div class="section-body">
+          <div class="form-group">
+            <label class="form-label">Contraseña actual</label>
+            <input class="form-input" type="password" formControlName="actual" placeholder="••••••••" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nueva contraseña</label>
+            <input class="form-input" type="password" formControlName="nueva" placeholder="••••••••" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirmar contraseña</label>
+            <input class="form-input" type="password" formControlName="confirmar" placeholder="••••••••" />
+          </div>
+        </div>
+        <div class="section-footer">
+          <button class="btn-save" (click)="saveContrasena()">Actualizar contraseña</button>
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'cuenta-privacidad') {
+      <section class="config-section" [formGroup]="privacidadForm">
+        <h2 class="section-title">Privacidad</h2>
+        <p class="section-desc">Controla quién ve tu información</p>
+        <div class="section-body">
+          <div class="toggle-group">
+            <div class="toggle-row">
+              <div>
+                <span class="toggle-label">Perfil público</span>
+                <span class="toggle-desc">Tu perfil es visible para otros usuarios</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" formControlName="perfilPublico" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <span class="toggle-label">Mostrar email</span>
+                <span class="toggle-desc">Otros usuarios pueden ver tu correo</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" formControlName="mostrarEmail" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <span class="toggle-label">Mostrar teléfono</span>
+                <span class="toggle-desc">Otros usuarios pueden ver tu teléfono</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" formControlName="mostrarTelefono" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="section-footer">
+          <button class="btn-save" disabled title="Configuración estática">Guardar cambios</button>
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'cuenta-notificaciones') {
+      <section class="config-section" [formGroup]="notificacionesForm">
+        <h2 class="section-title">Notificaciones</h2>
+        <p class="section-desc">Configura tus alertas y preferencias</p>
+        <div class="section-body">
+          <div class="toggle-group">
+            <div class="toggle-row">
+              <div>
+                <span class="toggle-label">Notificaciones por email</span>
+                <span class="toggle-desc">Recibe alertas en tu correo</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" formControlName="email" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <span class="toggle-label">Notificaciones push</span>
+                <span class="toggle-desc">Recibe alertas en el navegador</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" formControlName="push" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <span class="toggle-label">Nuevos mensajes</span>
+                <span class="toggle-desc">Avísame cuando me escriban</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" formControlName="mensajes" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <span class="toggle-label">Nuevas ofertas</span>
+                <span class="toggle-desc">Avísame cuando haya ofertas relacionadas</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" formControlName="ofertas" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="section-footer">
+          <button class="btn-save" (click)="saveNotificaciones()">Guardar cambios</button>
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'cuenta-terminos') {
+      <section class="config-section">
+        <h2 class="section-title">Términos y condiciones</h2>
+        <p class="section-desc">Documentos legales</p>
+        <div class="section-body">
+          <div class="terms-links">
+            <a class="terms-link" href="#" target="_blank">
+              <span class="material-symbols-outlined">description</span>
+              Términos de uso
+            </a>
+            <a class="terms-link" href="#" target="_blank">
+              <span class="material-symbols-outlined">shield</span>
+              Política de privacidad
+            </a>
+            <a class="terms-link" href="#" target="_blank">
+              <span class="material-symbols-outlined">gavel</span>
+              Reglas de la comunidad
+            </a>
+          </div>
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'seguridad') {
+      <section class="config-section">
+        <h2 class="section-title">Seguridad</h2>
+        <p class="section-desc">Protege tu cuenta</p>
+        <div class="section-body">
+          <p class="placeholder">Próximamente: autenticación de dos factores, sesiones activas y más.</p>
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'idioma') {
+      <section class="config-section">
+        <h2 class="section-title">Idioma y región</h2>
+        <p class="section-desc">Preferencias de idioma</p>
+        <div class="section-body">
+          <p class="placeholder">Próximamente: cambia el idioma de la plataforma y tu zona horaria.</p>
+        </div>
+      </section>
+    }
+    }
+  </main>
+</div>

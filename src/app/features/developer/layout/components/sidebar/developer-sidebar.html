@@ -1,27 +1,27 @@
 <aside class="sidebar">
-  <div class="sidebar-brand">
-    <img
-      src="https://res.cloudinary.com/dp1vgjhsq/image/upload/v1788755182/isotipo_ec9uxb.png"
-      alt="ComuniDev"
-      class="brand-logo"
-    />
-    <span class="brand-name">ComuniDev</span>
-  </div>
-
-  <nav class="sidebar-nav">
-    @for (link of links; track link.route) {
-      <a [routerLink]="link.route" routerLinkActive="active" class="nav-item" [title]="link.label">
-        <span class="nav-indicator"></span>
-        <span class="nav-icon material-symbols-outlined">{{ link.icon || 'circle' }}</span>
-        <span class="nav-label">{{ link.label }}</span>
-      </a>
-    }
-  </nav>
-
   <div class="sidebar-footer">
-    <button class="logout-btn" (click)="logout()" title="Cerrar sesión">
+    <a routerLink="/developer/profile" class="sidebar-avatar" title="Mi perfil">
+      @if (photoUrl()) {
+        <img [src]="photoUrl()" alt="Foto de perfil" class="avatar-img" />
+      } @else {
+        <div class="avatar-fallback">
+          <span class="material-symbols-outlined">person</span>
+        </div>
+      }
+    </a>
+    <div class="sidebar-divider"></div>
+    <button class="sidebar-btn" (click)="toggleTheme()" [title]="isDark() ? 'Modo claro' : 'Modo oscuro'">
+      @if (isDark()) {
+        <span class="material-symbols-outlined">light_mode</span>
+      } @else {
+        <span class="material-symbols-outlined">dark_mode</span>
+      }
+    </button>
+    <a routerLink="/developer/profile/configuracion" class="sidebar-btn" title="Configuración">
+      <span class="material-symbols-outlined">settings</span>
+    </a>
+    <button class="sidebar-btn danger" (click)="logout()" title="Cerrar sesión">
       <span class="material-symbols-outlined">logout</span>
-      <span class="logout-text">Cerrar sesión</span>
     </button>
   </div>
 </aside>

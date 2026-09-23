@@ -14,8 +14,8 @@ import { AUTH_REPOSITORY } from './features/auth/domain/ports/auth.repository';
 import { AuthHttpService } from './features/auth/data-access/api/auth-http.service';
 import { USER_REPOSITORY } from './features/users/domain/ports/user.repository';
 import { UserGraphqlService } from './features/users/data-access/api/user-graphql.service';
-import { RECRUITER_PROFILE_REPOSITORY } from './features/recruiter/profile/domain/ports/recruiter-profile.repository';
-import { RecruiterProfileGraphqlService } from './features/recruiter/profile/data-access/api/recruiter-profile-graphql.service';
+import { RECRUITER_PROFILE_REPOSITORY } from './features/recruiter/pages/profile/domain/ports/recruiter-profile.repository';
+import { RecruiterProfileGraphqlService } from './features/recruiter/pages/profile/data-access/api/recruiter-profile-graphql.service';
 import { DEVELOPER_PROFILE_REPOSITORY } from './features/developer/profile/domain/ports/developer-profile.repository';
 import { DeveloperProfileGraphqlService } from './features/developer/profile/data-access/api/developer-profile-graphql.service';
 

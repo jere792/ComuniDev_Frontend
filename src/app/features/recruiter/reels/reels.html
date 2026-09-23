@@ -108,7 +108,7 @@
           </button>
 
           @if (reels()[currentIndex].reel.autorId === getUserId()) {
-            <button class="action-btn" (click)="deleteReel(reels()[currentIndex])">
+            <button class="action-btn" (click)="askDeleteReel(reels()[currentIndex])">
               <span class="material-symbols-outlined">delete</span>
             </button>
           }
@@ -184,3 +184,15 @@
     }
   </div>
 </div>
+
+<app-confirm-modal
+  [open]="deleteConfirmOpen()"
+  title="Eliminar reel"
+  message="¿Estás seguro de eliminar este reel? Esta acción no se puede deshacer."
+  confirmText="Eliminar"
+  cancelText="Cancelar"
+  variant="danger"
+  icon="delete"
+  (confirm)="onConfirmDelete()"
+  (cancel)="onCancelDelete()"
+/>

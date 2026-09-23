@@ -49,20 +49,6 @@
 
   <!-- Content -->
   <main class="config-content">
-    @if (saved()) {
-      <div class="save-toast success">
-        <span class="material-symbols-outlined">check_circle</span>
-        Cambios guardados
-      </div>
-    }
-
-    @if (saveError()) {
-      <div class="save-toast error">
-        <span class="material-symbols-outlined">error</span>
-        {{ saveError() }}
-      </div>
-    }
-
     @if (loading()) {
       <div class="config-section loading-state">
         <div class="spinner"></div>

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { StoriesComponent } from './stories/stories';
 import { ReportsComponent } from './reports/reports';
-import { SharedRightPanel } from '../../../shared/ui/right-panel/right-panel';
+import { SharedRightPanel } from '../../shared/ui/right-panel/right-panel';
 
 @Component({
   selector: 'app-recruiter-inicio',

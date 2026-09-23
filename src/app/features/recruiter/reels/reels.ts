@@ -6,6 +6,8 @@ import { ReelGraphqlService, SocialReel } from '../../../../core/services/social
 import { ReactionGraphqlService, TipoReaccion } from '../../../../core/services/social/reaction-graphql.service';
 import { CommentGraphqlService, SocialComment } from '../../../../core/services/social/comment-graphql.service';
 import { GraphQLService } from '../../../../core/services/graphql.service';
+import { ToastService } from '../../../../core/services/toast.service';
+import { ConfirmModal } from '../../../../shared/ui/confirm-modal/confirm-modal';
 
 interface ReelVM {
   reel: SocialReel;
@@ -20,7 +22,7 @@ interface ReelVM {
 
 @Component({
   selector: 'app-recruiter-reels',
-  imports: [FormsModule, DatePipe],
+  imports: [FormsModule, DatePipe, ConfirmModal],
   templateUrl: './reels.html',
   styleUrl: './reels.scss',
 })
@@ -30,10 +32,13 @@ export class RecruiterReels implements OnInit {
   private commentService = inject(CommentGraphqlService);
   private graphql = inject(GraphQLService);
   private router = inject(Router);
+  private toast = inject(ToastService);
 
   reels = signal<ReelVM[]>([]);
   currentIndex = 0;
   loading = signal(true);
+  deleteConfirmOpen = signal(false);
+  pendingDeleteId = signal<string | null>(null);
 
   // Composer
   showComposer = signal(false);
@@ -150,11 +155,13 @@ export class RecruiterReels implements OnInit {
           this.reelEtiquetas = '';
           this.showComposer.set(false);
           this.currentIndex = 0;
+          this.toast.success('Reel creado');
         }
         this.creating = false;
       },
       error: () => {
         this.creating = false;
+        this.toast.error('Error al crear reel');
       }
     });
   }
@@ -242,16 +249,35 @@ export class RecruiterReels implements OnInit {
     });
   }
 
-  deleteReel(vm: ReelVM): void {
-    this.reelService.deleteReel(vm.reel.id).subscribe({
+  askDeleteReel(vm: ReelVM): void {
+    this.pendingDeleteId.set(vm.reel.id);
+    this.deleteConfirmOpen.set(true);
+  }
+
+  onCancelDelete(): void {
+    this.deleteConfirmOpen.set(false);
+    this.pendingDeleteId.set(null);
+  }
+
+  onConfirmDelete(): void {
+    const reelId = this.pendingDeleteId();
+    this.deleteConfirmOpen.set(false);
+    this.pendingDeleteId.set(null);
+    if (!reelId) return;
+
+    this.reelService.deleteReel(reelId).subscribe({
       next: (ok: boolean) => {
         if (ok) {
-          this.reels.update(list => list.filter(r => r.reel.id !== vm.reel.id));
+          this.reels.update(list => list.filter(r => r.reel.id !== reelId));
           if (this.currentIndex >= this.reels().length) {
             this.currentIndex = Math.max(0, this.reels().length - 1);
           }
+          this.toast.success('Reel eliminado');
+        } else {
+          this.toast.error('No se pudo eliminar el reel');
         }
-      }
+      },
+      error: () => this.toast.error('Error al eliminar reel')
     });
   }
 

@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ConnectionGraphqlService, ConnectionRequest } from '../../../../core/services/social/connection-graphql.service';
 import { GraphQLService, User } from '../../../../core/services/graphql.service';
+import { ToastService } from '../../../../core/services/toast.service';
+import { ConfirmModal } from '../../../../shared/ui/confirm-modal/confirm-modal';
 
 interface RequestWithUser extends ConnectionRequest {
   solicitante?: User;
@@ -11,7 +13,7 @@ interface RequestWithUser extends ConnectionRequest {
 @Component({
   selector: 'app-solicitudes',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ConfirmModal],
   templateUrl: './solicitudes.html',
   styleUrl: './solicitudes.scss',
 })
@@ -22,10 +24,16 @@ export class Solicitudes implements OnInit {
   usersMap = signal<Map<string, User>>(new Map());
   loading = signal(true);
   activeTab = signal<'recibidas' | 'enviadas' | 'conexiones'>('recibidas');
+  confirmOpen = signal(false);
+  confirmTitle = signal('');
+  confirmMessage = signal('');
+  confirmAction = signal<'remove' | 'cancel' | null>(null);
+  pendingId = signal<string | null>(null);
 
   private connService = inject(ConnectionGraphqlService);
   private graphql = inject(GraphQLService);
   private router = inject(Router);
+  private toast = inject(ToastService);
 
   ngOnInit(): void {
     this.loadData();
@@ -81,7 +89,9 @@ export class Solicitudes implements OnInit {
     this.connService.acceptConnection(requestId).subscribe({
       next: () => {
         this.pendingRequests.update(reqs => reqs.filter(r => r.id !== requestId));
+        this.toast.success('Solicitud aceptada');
       },
+      error: () => this.toast.error('Error al aceptar solicitud'),
     });
   }
 
@@ -89,24 +99,59 @@ export class Solicitudes implements OnInit {
     this.connService.rejectConnection(requestId).subscribe({
       next: () => {
         this.pendingRequests.update(reqs => reqs.filter(r => r.id !== requestId));
+        this.toast.success('Solicitud rechazada');
       },
+      error: () => this.toast.error('Error al rechazar solicitud'),
     });
   }
 
-  cancelRequest(requestId: string): void {
-    this.connService.rejectConnection(requestId).subscribe({
-      next: () => {
-        this.sentRequests.update(reqs => reqs.filter(r => r.id !== requestId));
-      },
-    });
+  askCancelRequest(requestId: string): void {
+    this.pendingId.set(requestId);
+    this.confirmAction.set('cancel');
+    this.confirmTitle.set('Cancelar solicitud');
+    this.confirmMessage.set('¿Estás seguro de cancelar esta solicitud de conexión?');
+    this.confirmOpen.set(true);
   }
 
-  removeConnection(connectionId: string): void {
-    this.connService.removeConnection(connectionId).subscribe({
-      next: () => {
-        this.connections.update(conns => conns.filter(c => c.id !== connectionId));
-      },
-    });
+  askRemoveConnection(connectionId: string): void {
+    this.pendingId.set(connectionId);
+    this.confirmAction.set('remove');
+    this.confirmTitle.set('Eliminar conexión');
+    this.confirmMessage.set('¿Estás seguro de eliminar esta conexión?');
+    this.confirmOpen.set(true);
+  }
+
+  onConfirm(): void {
+    const action = this.confirmAction();
+    const id = this.pendingId();
+    this.confirmOpen.set(false);
+    this.confirmAction.set(null);
+    this.pendingId.set(null);
+    if (!id) return;
+
+    if (action === 'cancel') {
+      this.connService.rejectConnection(id).subscribe({
+        next: () => {
+          this.sentRequests.update(reqs => reqs.filter(r => r.id !== id));
+          this.toast.success('Solicitud cancelada');
+        },
+        error: () => this.toast.error('Error al cancelar solicitud'),
+      });
+    } else if (action === 'remove') {
+      this.connService.removeConnection(id).subscribe({
+        next: () => {
+          this.connections.update(conns => conns.filter(c => c.id !== id));
+          this.toast.success('Conexión eliminada');
+        },
+        error: () => this.toast.error('Error al eliminar conexión'),
+      });
+    }
+  }
+
+  onCancelConfirm(): void {
+    this.confirmOpen.set(false);
+    this.confirmAction.set(null);
+    this.pendingId.set(null);
   }
 
   setTab(tab: 'recibidas' | 'enviadas' | 'conexiones'): void {

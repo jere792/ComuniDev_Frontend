@@ -4,29 +4,32 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { GraphQLService, User } from '../../../core/services/graphql.service';
 import { ConnectionGraphqlService, ConnectionStatus } from '../../../core/services/social/connection-graphql.service';
 import { BlockGraphqlService } from '../../../core/services/social/block-graphql.service';
+import { ToastService } from '../../../core/services/toast.service';
+import { ConfirmModal } from '../../../shared/ui/confirm-modal/confirm-modal';
 
 @Component({
   selector: 'app-public-profile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ConfirmModal],
   templateUrl: './public-profile.html',
   styleUrl: './public-profile.scss',
 })
 export class PublicProfile implements OnInit {
   user = signal<User | null>(null);
   loading = signal(false);
-  errorMessage = signal('');
   connectionStatus = signal<ConnectionStatus>({ status: 'NONE' });
   isOwnProfile = signal(false);
   connectionLoading = signal(false);
   isBlocked = signal(false);
   blockLoading = signal(false);
+  removeConfirmOpen = signal(false);
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private graphql = inject(GraphQLService);
   private connectionService = inject(ConnectionGraphqlService);
   private blockService = inject(BlockGraphqlService);
+  private toast = inject(ToastService);
 
   ngOnInit(): void {
     const userId = this.route.snapshot.paramMap.get('userId');
@@ -51,7 +54,7 @@ export class PublicProfile implements OnInit {
       },
       error: (err: any) => {
         console.error('Error:', err);
-        this.errorMessage.set('Usuario no encontrado');
+        this.toast.error('Usuario no encontrado');
         this.loading.set(false);
       },
     });
@@ -82,8 +85,12 @@ export class PublicProfile implements OnInit {
         next: () => {
           this.connectionStatus.set({ status: 'PENDING_SENT' });
           this.connectionLoading.set(false);
+          this.toast.success('Solicitud de conexión enviada');
         },
-        error: () => this.connectionLoading.set(false),
+        error: () => {
+          this.connectionLoading.set(false);
+          this.toast.error('Error al enviar solicitud');
+        },
       });
     } else if (status === 'PENDING_RECEIVED') {
       const requestId = this.connectionStatus().requestId;
@@ -94,24 +101,41 @@ export class PublicProfile implements OnInit {
             this.connectionStatus.set({ status: 'CONNECTED', connectionId: conn?.id });
             this.connectionLoading.set(false);
             this.user.update(u => u ? { ...u, conexionesCount: (u.conexionesCount ?? 0) + 1 } : u);
+            this.toast.success('Conexión aceptada');
           },
-          error: () => this.connectionLoading.set(false),
+          error: () => {
+            this.connectionLoading.set(false);
+            this.toast.error('Error al aceptar conexión');
+          },
         });
       }
     } else if (status === 'CONNECTED') {
-      const connectionId = this.connectionStatus().connectionId;
-      if (connectionId) {
-        this.connectionLoading.set(true);
-        this.connectionService.removeConnection(connectionId).subscribe({
-          next: () => {
-            this.connectionStatus.set({ status: 'NONE' });
-            this.connectionLoading.set(false);
-            this.user.update(u => u ? { ...u, conexionesCount: Math.max(0, (u.conexionesCount ?? 1) - 1) } : u);
-          },
-          error: () => this.connectionLoading.set(false),
-        });
-      }
+      this.removeConfirmOpen.set(true);
     }
+  }
+
+  onCancelRemoveConnection(): void {
+    this.removeConfirmOpen.set(false);
+  }
+
+  onConfirmRemoveConnection(): void {
+    this.removeConfirmOpen.set(false);
+    const connectionId = this.connectionStatus().connectionId;
+    if (!connectionId) return;
+
+    this.connectionLoading.set(true);
+    this.connectionService.removeConnection(connectionId).subscribe({
+      next: () => {
+        this.connectionStatus.set({ status: 'NONE' });
+        this.connectionLoading.set(false);
+        this.user.update(u => u ? { ...u, conexionesCount: Math.max(0, (u.conexionesCount ?? 1) - 1) } : u);
+        this.toast.success('Conexión eliminada');
+      },
+      error: () => {
+        this.connectionLoading.set(false);
+        this.toast.error('Error al eliminar conexión');
+      },
+    });
   }
 
   rejectRequest(): void {
@@ -123,8 +147,12 @@ export class PublicProfile implements OnInit {
       next: () => {
         this.connectionStatus.set({ status: 'NONE' });
         this.connectionLoading.set(false);
+        this.toast.success('Solicitud rechazada');
       },
-      error: () => this.connectionLoading.set(false),
+      error: () => {
+        this.connectionLoading.set(false);
+        this.toast.error('Error al rechazar solicitud');
+      },
     });
   }
 
@@ -140,14 +168,19 @@ export class PublicProfile implements OnInit {
         next: () => {
           this.isBlocked.set(false);
           this.blockLoading.set(false);
+          this.toast.success('Usuario desbloqueado');
         },
-        error: () => this.blockLoading.set(false),
+        error: () => {
+          this.blockLoading.set(false);
+          this.toast.error('Error al desbloquear');
+        },
       });
     } else {
       this.blockService.block(currentUserId, targetUserId).subscribe({
         next: () => {
           this.isBlocked.set(true);
           this.blockLoading.set(false);
+          this.toast.success('Usuario bloqueado');
           if (this.connectionStatus().status === 'CONNECTED') {
             const connectionId = this.connectionStatus().connectionId;
             if (connectionId) {
@@ -157,7 +190,10 @@ export class PublicProfile implements OnInit {
             }
           }
         },
-        error: () => this.blockLoading.set(false),
+        error: () => {
+          this.blockLoading.set(false);
+          this.toast.error('Error al bloquear');
+        },
       });
     }
   }

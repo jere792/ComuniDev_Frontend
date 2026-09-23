@@ -87,7 +87,7 @@
           <span class="request-time">Enviada {{ getTimeAgo(req.createdAt) }}</span>
         </div>
         <div class="request-actions">
-          <button class="btn-cancel" (click)="cancelRequest(req.id!)">
+          <button class="btn-cancel" (click)="askCancelRequest(req.id!)">
             <span class="material-symbols-outlined">close</span>
             Cancelar
           </button>
@@ -120,7 +120,7 @@
           <span class="request-time">Conectado {{ getTimeAgo(conn.createdAt) }}</span>
         </div>
         <div class="request-actions">
-          <button class="btn-remove" (click)="removeConnection(conn.id!)">
+          <button class="btn-remove" (click)="askRemoveConnection(conn.id!)">
             <span class="material-symbols-outlined">person_remove</span>
             Eliminar
           </button>
@@ -134,3 +134,15 @@
     }
   }
 </div>
+
+<app-confirm-modal
+  [open]="confirmOpen()"
+  [title]="confirmTitle()"
+  [message]="confirmMessage()"
+  confirmText="Sí, continuar"
+  cancelText="Cancelar"
+  variant="warning"
+  icon="help"
+  (confirm)="onConfirm()"
+  (cancel)="onCancelConfirm()"
+/>

@@ -2,9 +2,9 @@ import { Component, OnInit, inject, signal, ChangeDetectorRef, effect, OnDestroy
 import { FormsModule } from '@angular/forms';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { StoryGraphqlService, SocialStory } from '../../../../../core/services/social/story-graphql.service';
-import { GraphQLService } from '../../../../../core/services/graphql.service';
-import { MusicaService, MusicTrackResponse } from '../../../../../core/services/social/musica.service';
+import { StoryGraphqlService, SocialStory } from '../../../../core/services/social/story-graphql.service';
+import { GraphQLService } from '../../../../core/services/graphql.service';
+import { MusicaService, MusicTrackResponse } from '../../../../core/services/social/musica.service';
 
 type MusicMode = 'cover' | 'audio' | 'lyrics' | 'cover+lyrics';
 

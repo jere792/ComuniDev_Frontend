@@ -1,28 +1,34 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { User } from '../../../core/domain/models/user.model';
 import { UserStore } from '../data-access/state/user.store';
+import { ToastService } from '../../../core/services/toast.service';
+import { ConfirmModal } from '../../../shared/ui/confirm-modal/confirm-modal';
 
 @Component({
   selector: 'app-users-list-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ConfirmModal],
   templateUrl: './users-list.html',
   styleUrl: './users-list.scss',
 })
 export class UsersListPage implements OnInit {
   filteredUsers = signal<User[]>([]);
   searchTerm = signal('');
-  deleteMessage = signal('');
+  confirmOpen = signal(false);
+  pendingUserId = signal<string | null>(null);
 
-  constructor(public store: UserStore) {}
+  private toast = inject(ToastService);
+
+  constructor(public store: UserStore) {
+    effect(() => {
+      const err = this.store.error();
+      if (err) this.toast.error(err);
+    });
+  }
 
   get loading(): boolean {
     return this.store.loading();
-  }
-
-  get errorMessage(): string | null {
-    return this.store.error();
   }
 
   ngOnInit(): void {
@@ -48,12 +54,24 @@ export class UsersListPage implements OnInit {
     this.filteredUsers.set(filtered);
   }
 
-  deleteUser(userId: string): void {
-    if (!confirm('¿Estás seguro de eliminar este usuario?')) return;
+  askDeleteUser(userId: string): void {
+    this.pendingUserId.set(userId);
+    this.confirmOpen.set(true);
+  }
+
+  onConfirmDelete(): void {
+    const userId = this.pendingUserId();
+    this.confirmOpen.set(false);
+    this.pendingUserId.set(null);
+    if (!userId) return;
 
     this.store.delete(userId);
-    this.deleteMessage.set('Usuario eliminado correctamente');
-    setTimeout(() => this.deleteMessage.set(''), 3000);
+    this.toast.success('Usuario eliminado correctamente');
+  }
+
+  onCancelDelete(): void {
+    this.confirmOpen.set(false);
+    this.pendingUserId.set(null);
   }
 
   getRoleBadgeClass(role: string): string {

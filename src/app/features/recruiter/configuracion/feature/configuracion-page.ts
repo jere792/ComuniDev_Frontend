@@ -1,11 +1,12 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { GraphQLService } from '../../../../../core/services/graphql.service';
-import { RecruiterProfileGraphqlService } from '../../data-access/api/recruiter-profile-graphql.service';
-import { AuthStore } from '../../../../auth/data-access/state/auth.store';
+import { GraphQLService } from '../../../../core/services/graphql.service';
+import { RecruiterProfileGraphqlService } from '../../profile/data-access/api/recruiter-profile-graphql.service';
+import { AuthStore } from '../../../auth/data-access/state/auth.store';
+import { ToastService } from '../../../../core/services/toast.service';
 import { catchError, of, tap } from 'rxjs';
-import { User } from '../../../../../core/domain/models/user.model';
+import { User } from '../../../../core/domain/models/user.model';
 
 interface SubItem {
   id: string;
@@ -39,9 +40,9 @@ export class ConfiguracionPage implements OnInit {
 
   activeSection = signal('perfil-personal');
   expandedCategory = signal<string | null>('perfil');
-  saved = signal(false);
-  saveError = signal<string | null>(null);
   loading = signal(false);
+
+  private toast = inject(ToastService);
 
   categories: ConfigCategory[] = [
     {
@@ -216,19 +217,15 @@ export class ConfiguracionPage implements OnInit {
     if (this.activeSection() === id) return;
     this.loading.set(true);
     this.activeSection.set(id);
-    this.saved.set(false);
-    this.saveError.set(null);
     setTimeout(() => this.loading.set(false), 300);
   }
 
   private showSuccess(): void {
-    this.saved.set(true);
-    setTimeout(() => this.saved.set(false), 2000);
+    this.toast.success('Cambios guardados');
   }
 
   private handleError(err: any): void {
-    this.saveError.set('Error al guardar: ' + (err?.message || 'Intente de nuevo'));
-    setTimeout(() => this.saveError.set(null), 3000);
+    this.toast.error('Error al guardar: ' + (err?.message || 'Intente de nuevo'));
   }
 
   // ─── SAVE METHODS ───
@@ -354,46 +351,39 @@ export class ConfiguracionPage implements OnInit {
   savingBio = signal(false);
 
   saveBio(): void {
-    console.log('>>> saveBio() clicked');
-    this.saveError.set(null);
-    this.saved.set(false);
     this.savingBio.set(true);
-    
+
     const userId = this.getUserId();
-    console.log('>>> userId:', userId);
-    
+
     if (!userId) {
       this.savingBio.set(false);
-      this.saveError.set('Error: Usuario no identificado');
+      this.toast.error('Usuario no identificado');
       return;
     }
 
     const formValue = this.descripcionForm.value;
     const bioValue = formValue.bio?.trim();
-    console.log('>>> bioValue:', bioValue);
-    
+
     if (!bioValue) {
       this.savingBio.set(false);
-      this.saveError.set('La bio no puede estar vacía');
+      this.toast.warning('La bio no puede estar vacía');
       return;
     }
-    
+
     this.graphql.updateUser(userId, {
       bio: bioValue,
     } as any).pipe(
       catchError(err => {
         this.savingBio.set(false);
-        console.error('>>> saveBio error:', err);
         this.handleError(err);
         return of(null);
       })
     ).subscribe((result: any) => {
       this.savingBio.set(false);
-      console.log('>>> saveBio result:', result);
       if (result) {
         this.showSuccess();
       } else {
-        this.saveError.set('No se pudo guardar la bio');
+        this.toast.error('No se pudo guardar la bio');
       }
     });
   }
@@ -428,17 +418,17 @@ export class ConfiguracionPage implements OnInit {
 
     const formValue = this.contrasenaForm.value;
     if (!formValue.actual || !formValue.nueva || !formValue.confirmar) {
-      this.saveError.set('Todos los campos son requeridos');
+      this.toast.warning('Todos los campos son requeridos');
       return;
     }
 
     if (formValue.nueva !== formValue.confirmar) {
-      this.saveError.set('Las contraseñas no coinciden');
+      this.toast.warning('Las contraseñas no coinciden');
       return;
     }
 
     if (formValue.nueva.length < 6) {
-      this.saveError.set('La contraseña debe tener al menos 6 caracteres');
+      this.toast.warning('La contraseña debe tener al menos 6 caracteres');
       return;
     }
 

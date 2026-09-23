@@ -2,11 +2,14 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { PostGraphqlService, SocialPost } from '../../../../../core/services/social/post-graphql.service';
-import { CommentGraphqlService, SocialComment } from '../../../../../core/services/social/comment-graphql.service';
-import { ReactionGraphqlService, TipoReaccion } from '../../../../../core/services/social/reaction-graphql.service';
-import { GraphQLService } from '../../../../../core/services/graphql.service';
-import { FeedSkeletonComponent } from '../../../../../shared/ui/feed-skeleton/feed-skeleton';
+import { PostGraphqlService, SocialPost } from '../../../../core/services/social/post-graphql.service';
+import { CommentGraphqlService, SocialComment } from '../../../../core/services/social/comment-graphql.service';
+import { ReactionGraphqlService, TipoReaccion } from '../../../../core/services/social/reaction-graphql.service';
+import { GraphQLService } from '../../../../core/services/graphql.service';
+import { FeedSkeletonComponent } from '../../../../shared/ui/feed-skeleton/feed-skeleton';
+import { ToastService } from '../../../../core/services/toast.service';
+import { ImageEditorService } from '../../../../core/services/image-editor.service';
+import { ConfirmModal } from '../../../../shared/ui/confirm-modal/confirm-modal';
 
 interface CommentVM {
   comment: SocialComment;
@@ -43,7 +46,7 @@ const REACTION_CONFIG: Record<TipoReaccion, { icon: string; label: string; color
 
 @Component({
   selector: 'app-reports',
-  imports: [FormsModule, DatePipe, FeedSkeletonComponent],
+  imports: [FormsModule, DatePipe, FeedSkeletonComponent, ConfirmModal],
   templateUrl: './reports.html',
   styleUrl: './reports.scss',
 })
@@ -53,6 +56,8 @@ export class ReportsComponent implements OnInit {
   private reactionService = inject(ReactionGraphqlService);
   private graphql = inject(GraphQLService);
   private router = inject(Router);
+  private toast = inject(ToastService);
+  private imageEditor = inject(ImageEditorService);
 
   posts = signal<PostVM[]>([]);
   composerText = '';
@@ -62,6 +67,8 @@ export class ReportsComponent implements OnInit {
   showComposerModal = signal(false);
   showCommentsModal = signal(false);
   modalComments = signal<CommentVM[]>([]);
+  deleteConfirmOpen = signal(false);
+  pendingDeleteId = signal<string | null>(null);
 
   reactionTypes: TipoReaccion[] = ['LIKE', 'LOVE', 'CELEBRATE', 'SUPPORT'];
   reactionConfig = REACTION_CONFIG;
@@ -173,19 +180,36 @@ export class ReportsComponent implements OnInit {
 
   // ─── Composer ───
 
-  onFileSelected(event: Event): void {
+  async onFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
+    input.value = '';
     if (!file) return;
 
+    const edited = await this.imageEditor.open(file, {
+      aspect: null,
+      aspectOptions: [
+        { label: 'Libre', value: null },
+        { label: '1:1', value: 1 },
+        { label: '4:5', value: 4 / 5 },
+        { label: '16:9', value: 16 / 9 },
+      ],
+      maxSide: 1600,
+      title: 'Editar imagen del post',
+      quality: 0.85,
+    });
+    if (!edited) return;
+
     this.uploadingImage = true;
-    this.graphql.uploadFile(file).subscribe({
+    this.graphql.uploadFile(edited).subscribe({
       next: (res: any) => {
         this.composerImage = res?.secure_url ?? res?.url ?? null;
         this.uploadingImage = false;
+        this.toast.success('Imagen lista para publicar');
       },
       error: () => {
         this.uploadingImage = false;
+        this.toast.error('Error al subir imagen');
       }
     });
   }
@@ -210,9 +234,10 @@ export class ReportsComponent implements OnInit {
           this.composerText = '';
           this.composerImage = null;
           this.showComposerModal.set(false);
+          this.toast.success('Publicación creada');
         }
       },
-      error: () => {}
+      error: () => this.toast.error('Error al crear publicación')
     });
   }
 
@@ -554,8 +579,10 @@ export class ReportsComponent implements OnInit {
             isEditing: false,
             post: { ...v.post, contenido: { ...v.post.contenido, texto: vm.editText.trim() } }
           } : v));
+          this.toast.success('Publicación actualizada');
         }
-      }
+      },
+      error: () => this.toast.error('Error al actualizar publicación')
     });
   }
 
@@ -563,13 +590,32 @@ export class ReportsComponent implements OnInit {
     this.posts.update(list => list.map(v => v.post.id === vm.post.id ? { ...v, isEditing: false, editText: '' } : v));
   }
 
-  deletePost(vm: PostVM): void {
-    this.postService.deletePost(vm.post.id).subscribe({
+  askDeletePost(vm: PostVM): void {
+    this.pendingDeleteId.set(vm.post.id);
+    this.deleteConfirmOpen.set(true);
+  }
+
+  onCancelDelete(): void {
+    this.deleteConfirmOpen.set(false);
+    this.pendingDeleteId.set(null);
+  }
+
+  onConfirmDelete(): void {
+    const postId = this.pendingDeleteId();
+    this.deleteConfirmOpen.set(false);
+    this.pendingDeleteId.set(null);
+    if (!postId) return;
+
+    this.postService.deletePost(postId).subscribe({
       next: (ok: boolean) => {
         if (ok) {
-          this.posts.update(list => list.filter(p => p.post.id !== vm.post.id));
+          this.posts.update(list => list.filter(p => p.post.id !== postId));
+          this.toast.success('Publicación eliminada');
+        } else {
+          this.toast.error('No se pudo eliminar la publicación');
         }
-      }
+      },
+      error: () => this.toast.error('Error al eliminar publicación')
     });
   }
 

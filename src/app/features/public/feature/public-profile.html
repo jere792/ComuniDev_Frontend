@@ -2,10 +2,6 @@
   <div class="loading-state">Cargando perfil...</div>
 }
 
-@if (errorMessage()) {
-  <div class="error-message">{{ errorMessage() }}</div>
-}
-
 @if (user()) {
   <div class="profile-container">
     <div class="profile-banner">
@@ -237,3 +233,15 @@
     }
   </div>
 }
+
+<app-confirm-modal
+  [open]="removeConfirmOpen()"
+  title="Eliminar conexión"
+  message="¿Estás seguro de eliminar esta conexión?"
+  confirmText="Eliminar"
+  cancelText="Cancelar"
+  variant="danger"
+  icon="link_off"
+  (confirm)="onConfirmRemoveConnection()"
+  (cancel)="onCancelRemoveConnection()"
+/>

@@ -1,0 +1,253 @@
+@if (state(); as s) {
+  <div class="editor-overlay" (click)="overlayClick($event)">
+    <div
+      class="editor-modal"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="s.title || 'Editar imagen'"
+    >
+      <header class="editor-header">
+        <h3 class="editor-title">{{ s.title || 'Editar imagen' }}</h3>
+        <button type="button" class="icon-btn" (click)="cancel()" aria-label="Cerrar">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </header>
+
+      <div class="editor-body">
+        <div class="left-col">
+          <section class="pane pane-full">
+            <span class="pane-label">Imagen completa</span>
+            <div
+              #stageWrap
+              class="editor-stage"
+              (wheel)="onWheel($event)"
+              (pointerdown)="startPan($event)"
+              (pointermove)="onPan($event)"
+              (pointerup)="endPan($event)"
+              (pointercancel)="endPan($event)"
+            >
+              <div class="img-box" [style.width.px]="imgDisplayW()" [style.height.px]="imgDisplayH()">
+                <img
+                  class="editor-image"
+                  [src]="s.previewUrl"
+                  alt="Imagen completa"
+                  draggable="false"
+                  [style.width.px]="imgDisplayW()"
+                  [style.height.px]="imgDisplayH()"
+                  [style.transform]="stageImgTransform()"
+                  [style.filter]="previewFilter()"
+                />
+              </div>
+              <div
+                class="crop-rect"
+                [style.left.px]="cropDisplayPos().x"
+                [style.top.px]="cropDisplayPos().y"
+                [style.width.px]="cropDisplay().w"
+                [style.height.px]="cropDisplay().h"
+              ></div>
+              <div class="stage-hint">Arrastra el recuadro · rueda para zoom del recorte</div>
+            </div>
+          </section>
+
+          <section class="pane pane-result">
+            <span class="pane-label">Resultado final</span>
+            <canvas
+              #resultCanvas
+              class="result-canvas"
+              [style.width.px]="resultSize().w"
+              [style.height.px]="resultSize().h"
+            ></canvas>
+            <p class="result-caption">Así se verá al subir</p>
+          </section>
+        </div>
+
+        <aside class="editor-panel">
+          @if (s.aspectOptions?.length) {
+            <div class="panel-section">
+              <span class="panel-label">Dimensión</span>
+              <div class="chip-row">
+                @for (opt of s.aspectOptions; track opt.label) {
+                  <button
+                    type="button"
+                    class="chip"
+                    [class.active]="activeAspectLabel() === opt.label"
+                    (click)="onAspectChip(opt)"
+                  >
+                    {{ opt.label }}
+                  </button>
+                }
+              </div>
+            </div>
+          } @else if (s.aspectLabel) {
+            <div class="panel-section">
+              <span class="panel-label">Dimensión</span>
+              <div class="chip-row">
+                <span class="chip active locked">{{ s.aspectLabel }}</span>
+              </div>
+            </div>
+          }
+
+          <div class="panel-section">
+            <div class="label-row">
+              <span class="panel-label">Zoom recorte</span>
+              <span class="panel-value">{{ zoomPercent() }}%</span>
+            </div>
+            <input
+              type="range"
+              class="slider"
+              min="100"
+              max="400"
+              step="1"
+              [ngModel]="zoomPercent()"
+              (ngModelChange)="onSliderZoom($event)"
+            />
+          </div>
+
+          <div class="panel-section">
+            <span class="panel-label">Transformar</span>
+            <div class="tool-row">
+              <button type="button" class="tool-btn" (click)="rotate90()" title="Rotar 90°">
+                <span class="material-symbols-outlined">rotate_90_degrees_cw</span>
+              </button>
+              <button
+                type="button"
+                class="tool-btn"
+                [class.active]="flipH()"
+                (click)="toggleFlipH()"
+                title="Espejo horizontal"
+              >
+                <span class="material-symbols-outlined">flip</span>
+              </button>
+              <button
+                type="button"
+                class="tool-btn"
+                [class.active]="flipV()"
+                (click)="toggleFlipV()"
+                title="Espejo vertical"
+              >
+                <span class="material-symbols-outlined">swap_vert</span>
+              </button>
+              <button type="button" class="tool-btn" (click)="resetAll()" title="Restablecer">
+                <span class="material-symbols-outlined">restart_alt</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="panel-section">
+            <span class="panel-label">Filtros</span>
+            <div class="chip-row">
+              @for (p of presets; track p.label) {
+                <button
+                  type="button"
+                  class="chip"
+                  [class.active]="activePreset() === p.label"
+                  (click)="applyPreset(p)"
+                >
+                  {{ p.label }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="panel-section sliders">
+            <div class="label-row">
+              <span class="panel-label">Brillo</span>
+              <span class="panel-value">{{ adjust().brightness }}%</span>
+            </div>
+            <input
+              type="range"
+              class="slider"
+              min="50"
+              max="150"
+              [ngModel]="adjust().brightness"
+              (ngModelChange)="updateAdjust('brightness', $event)"
+            />
+
+            <div class="label-row">
+              <span class="panel-label">Contraste</span>
+              <span class="panel-value">{{ adjust().contrast }}%</span>
+            </div>
+            <input
+              type="range"
+              class="slider"
+              min="50"
+              max="150"
+              [ngModel]="adjust().contrast"
+              (ngModelChange)="updateAdjust('contrast', $event)"
+            />
+
+            <div class="label-row">
+              <span class="panel-label">Saturación</span>
+              <span class="panel-value">{{ adjust().saturate }}%</span>
+            </div>
+            <input
+              type="range"
+              class="slider"
+              min="0"
+              max="200"
+              [ngModel]="adjust().saturate"
+              (ngModelChange)="updateAdjust('saturate', $event)"
+            />
+
+            <div class="label-row">
+              <span class="panel-label">Escalas de grises</span>
+              <span class="panel-value">{{ adjust().grayscale }}%</span>
+            </div>
+            <input
+              type="range"
+              class="slider"
+              min="0"
+              max="100"
+              [ngModel]="adjust().grayscale"
+              (ngModelChange)="updateAdjust('grayscale', $event)"
+            />
+
+            <div class="label-row">
+              <span class="panel-label">Desenfoque</span>
+              <span class="panel-value">{{ adjust().blur }}px</span>
+            </div>
+            <input
+              type="range"
+              class="slider"
+              min="0"
+              max="8"
+              step="0.5"
+              [ngModel]="adjust().blur"
+              (ngModelChange)="updateAdjust('blur', $event)"
+            />
+          </div>
+
+          <button
+            type="button"
+            class="original-btn"
+            (mousedown)="showOriginalOn()"
+            (mouseup)="showOriginalOff()"
+            (mouseleave)="showOriginalOff()"
+            (touchstart)="showOriginalOn()"
+            (touchend)="showOriginalOff()"
+          >
+            <span class="material-symbols-outlined">visibility</span>
+            Mantén para ver el original
+          </button>
+        </aside>
+      </div>
+
+      <footer class="editor-footer">
+        <button type="button" class="btn btn-cancel" (click)="cancel()">Cancelar</button>
+        <button
+          type="button"
+          class="btn btn-apply"
+          [disabled]="exporting()"
+          (click)="apply()"
+        >
+          @if (exporting()) {
+            Procesando…
+          } @else {
+            Aplicar y subir
+          }
+        </button>
+      </footer>
+    </div>
+  </div>
+}

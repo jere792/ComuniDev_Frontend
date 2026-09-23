@@ -2,10 +2,6 @@
   <div class="loading-state">Cargando perfil...</div>
 }
 
-@if (errorMessage) {
-  <div class="error-message">{{ errorMessage }}</div>
-}
-
 <div class="profile-container">
   <div class="profile-banner">
     @if (user()?.bannerUrl) {
@@ -46,10 +42,6 @@
         </button>
       </div>
     </div>
-
-    @if (updateMessage()) {
-      <div class="success-message">{{ updateMessage() }}</div>
-    }
 
     <div class="profile-stats">
       <div class="stat-card">

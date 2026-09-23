@@ -1,9 +1,11 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { User, DeveloperProfile } from '../../../../core/domain/models/user.model';
 import { DeveloperProfileStore } from '../data-access/state/developer-profile.store';
 import { GraphQLService } from '../../../../core/services/graphql.service';
+import { ToastService } from '../../../../core/services/toast.service';
+import { ImageEditorService } from '../../../../core/services/image-editor.service';
 
 @Component({
   selector: 'app-developer-profile-page',
@@ -16,10 +18,12 @@ export class DeveloperProfilePage implements OnInit {
   user = signal<User | null>(null);
   isEditingBasic = signal(false);
   isEditingProfile = signal(false);
-  updateMessage = signal('');
   uploadingImage = signal(false);
   basicForm: FormGroup;
   profileForm: FormGroup;
+
+  private toast = inject(ToastService);
+  private imageEditor = inject(ImageEditorService);
 
   constructor(
     private fb: FormBuilder,
@@ -45,6 +49,11 @@ export class DeveloperProfilePage implements OnInit {
       tecnologias: this.fb.array([]),
       habilidadesBlandas: [''],
     });
+
+    effect(() => {
+      const err = this.store.error();
+      if (err) this.toast.error(err);
+    });
   }
 
   get profile(): DeveloperProfile | null {
@@ -53,10 +62,6 @@ export class DeveloperProfilePage implements OnInit {
 
   get loading(): boolean {
     return this.store.loading();
-  }
-
-  get errorMessage(): string | null {
-    return this.store.error();
   }
 
   get hasProfile(): boolean {
@@ -157,8 +162,7 @@ export class DeveloperProfilePage implements OnInit {
           this.user.set(updatedUser);
           localStorage.setItem('userName', updatedUser.nombre);
           this.isEditingBasic.set(false);
-          this.updateMessage.set('Datos básicos actualizados');
-          setTimeout(() => this.updateMessage.set(''), 3000);
+          this.toast.success('Datos básicos actualizados');
         },
       });
     }
@@ -192,8 +196,7 @@ export class DeveloperProfilePage implements OnInit {
     }
 
     this.isEditingProfile.set(false);
-    this.updateMessage.set('Perfil profesional actualizado');
-    setTimeout(() => this.updateMessage.set(''), 3000);
+    this.toast.success('Perfil profesional actualizado');
   }
 
   getInitials(): string {
@@ -225,9 +228,19 @@ export class DeveloperProfilePage implements OnInit {
     input.value = '';
   }
 
-  private uploadImage(file: File, field: 'bannerUrl' | 'fotoPerfilUrl'): void {
+  private async uploadImage(file: File, field: 'bannerUrl' | 'fotoPerfilUrl'): Promise<void> {
+    const isBanner = field === 'bannerUrl';
+    const edited = await this.imageEditor.open(file, {
+      aspect: isBanner ? 16 / 9 : 1,
+      aspectLabel: isBanner ? '16:9 Banner' : '1:1 Avatar',
+      maxSide: isBanner ? 1920 : 512,
+      title: isBanner ? 'Editar banner' : 'Editar foto de perfil',
+      quality: isBanner ? 0.85 : 0.9,
+    });
+    if (!edited) return;
+
     this.uploadingImage.set(true);
-    this.graphql.uploadFile(file).subscribe({
+    this.graphql.uploadFile(edited).subscribe({
       next: (res: { url: string }) => {
         const userId = this.user()?.id;
         if (!userId) return;
@@ -236,15 +249,13 @@ export class DeveloperProfilePage implements OnInit {
             this.user.set(updatedUser);
             if (field === 'fotoPerfilUrl') localStorage.setItem('userPhoto', res.url);
             this.uploadingImage.set(false);
-            this.updateMessage.set(field === 'bannerUrl' ? 'Banner actualizado' : 'Foto de perfil actualizada');
-            setTimeout(() => this.updateMessage.set(''), 3000);
+            this.toast.success(isBanner ? 'Banner actualizado' : 'Foto de perfil actualizada');
           },
         });
       },
       error: () => {
         this.uploadingImage.set(false);
-        this.updateMessage.set('Error al subir imagen');
-        setTimeout(() => this.updateMessage.set(''), 3000);
+        this.toast.error('Error al subir imagen');
       },
     });
   }

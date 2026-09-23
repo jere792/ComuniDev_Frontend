@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { GraphQLService, User } from '../../../../core/services/graphql.service';
 import { FollowGraphqlService } from '../../../../core/services/social/follow-graphql.service';
+import { ToastService } from '../../../../core/services/toast.service';
 
 interface UserWithFollow extends User {
   isFollowing: boolean;
@@ -23,6 +24,7 @@ export class DiscoverUsers implements OnInit {
   private graphql = inject(GraphQLService);
   private followService = inject(FollowGraphqlService);
   private router = inject(Router);
+  private toast = inject(ToastService);
 
   ngOnInit(): void {
     this.loadUsers();
@@ -62,7 +64,9 @@ export class DiscoverUsers implements OnInit {
           this.users.update(list => list.map(u =>
             u.id === user.id ? { ...u, isFollowing: false } : u
           ));
+          this.toast.success('Dejaste de seguir a este usuario');
         },
+        error: () => this.toast.error('Error al dejar de seguir'),
       });
     } else {
       this.followService.follow(currentUserId, user.id).subscribe({
@@ -70,7 +74,9 @@ export class DiscoverUsers implements OnInit {
           this.users.update(list => list.map(u =>
             u.id === user.id ? { ...u, isFollowing: true } : u
           ));
+          this.toast.success('Ahora sigues a este usuario');
         },
+        error: () => this.toast.error('Error al seguir'),
       });
     }
   }

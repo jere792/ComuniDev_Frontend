@@ -1,7 +1,8 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { User, Stats } from '../../../../core/domain/models/user.model';
 import { GraphQLService } from '../../../../core/services/graphql.service';
+import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -14,9 +15,6 @@ import { GraphQLService } from '../../../../core/services/graphql.service';
       </div>
       @if (loading()) {
         <div class="loading-state">Cargando estadísticas...</div>
-      }
-      @if (errorMessage()) {
-        <div class="error-message">{{ errorMessage() }}</div>
       }
       @if (!loading() && !errorMessage()) {
         <div class="stats-grid">
@@ -47,7 +45,6 @@ import { GraphQLService } from '../../../../core/services/graphql.service';
     .stat-value { display: block; font-size: 2rem; font-weight: bold; color: var(--primary); }
     .stat-label { font-size: 0.875rem; color: var(--text-secondary); }
     .loading-state { text-align: center; padding: 2rem; color: var(--text-secondary); }
-    .error-message { padding: 1rem; background: var(--error); color: white; border-radius: 8px; }
   `],
 })
 export class AdminDashboard implements OnInit {
@@ -55,7 +52,14 @@ export class AdminDashboard implements OnInit {
   loading = signal(true);
   errorMessage = signal('');
 
-  constructor(private graphql: GraphQLService) {}
+  private toast = inject(ToastService);
+
+  constructor(private graphql: GraphQLService) {
+    effect(() => {
+      const err = this.errorMessage();
+      if (err) this.toast.error(err);
+    });
+  }
 
   ngOnInit(): void {
     this.loadStats();

@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Login } from './login/login';
-import { TranslationPipe } from '../../../../core/pipes/translation.pipe';
-import { AuthService } from '../../../../core/services/auth.service';
+import { Login } from '@landing/pages/inicio/hero/login/login';
+import { TranslationPipe } from '@core/pipes/translation.pipe';
+import { AuthService } from '@core/services/auth.service';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
@@ -13,10 +13,13 @@ import { environment } from '../../../../../environments/environment';
   styleUrl: './hero.scss',
 })
 export class Hero {
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+
   loginForm: FormGroup;
   loginError = '';
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {
+  constructor() {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],

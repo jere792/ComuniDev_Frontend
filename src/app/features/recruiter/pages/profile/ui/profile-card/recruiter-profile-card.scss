@@ -131,6 +131,8 @@
   position: relative;
   margin-top: -70px;
   flex-shrink: 0;
+  align-self: flex-start;
+  height: fit-content;
 
   @media (max-width: 640px) {
     margin-top: -50px;

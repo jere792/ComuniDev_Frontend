@@ -1,6 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AUTH_REPOSITORY, AuthRepository, LoginRequest, RegisterRequest, LoginResponse } from '../../domain/ports/auth.repository';
+import { AUTH_REPOSITORY, AuthRepository, LoginRequest, RegisterRequest, LoginResponse } from '@features/auth/domain/ports/auth.repository';
 
 @Injectable({ providedIn: 'root' })
 export class AuthStore {
@@ -22,7 +22,7 @@ export class AuthStore {
         this.loading.set(false);
         this.navigateByRole(data.rolActivo);
       },
-      error: (err: unknown) => {
+      error: () => {
         this.error.set('Credenciales incorrectas');
         this.loading.set(false);
       },
@@ -37,7 +37,7 @@ export class AuthStore {
         this.loading.set(false);
         this.router.navigate(['/']);
       },
-      error: (err: unknown) => {
+      error: () => {
         this.error.set('Error al registrar');
         this.loading.set(false);
       },
@@ -53,7 +53,7 @@ export class AuthStore {
         this.loading.set(false);
         this.navigateByRole(rol);
       },
-      error: (err: unknown) => {
+      error: () => {
         this.error.set('Error al asignar rol');
         this.loading.set(false);
       },

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { PageHero } from '../../../../shared/components/page-hero/page-hero';
-import { TranslationPipe } from '../../../../core/pipes/translation.pipe';
+import { PageHero } from '@shared/components/page-hero/page-hero';
+import { TranslationPipe } from '@core/pipes/translation.pipe';
 
 @Component({
   selector: 'app-about-hero',

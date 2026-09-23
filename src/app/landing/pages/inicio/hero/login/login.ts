@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
-import { TranslationPipe } from '../../../../../core/pipes/translation.pipe';
+import { TranslationPipe } from '@core/pipes/translation.pipe';
 
 @Component({
   selector: 'app-login',

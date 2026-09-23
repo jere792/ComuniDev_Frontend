@@ -94,4 +94,51 @@
       gap: 8px;
     }
   }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+
+    .material-symbols-outlined {
+      font-size: 16px;
+    }
+  }
+
+  .btn-outline {
+    background: transparent;
+    border-color: var(--border-color, #e9ecef);
+    color: var(--text-primary, #212529);
+
+    &:hover {
+      background: var(--bg-secondary, #f3f4f6);
+    }
+  }
+
+  .btn-primary {
+    background: var(--primary-container, #e8f0fe);
+    border: none;
+    color: var(--on-primary-container, #1a73e8);
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  .btn-saved {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #059669;
+
+    &:hover {
+      background: rgba(16, 185, 129, 0.18);
+    }
+  }
 }

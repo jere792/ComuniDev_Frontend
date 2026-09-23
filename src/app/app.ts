@@ -1,8 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Toast } from './shared/ui/toast/toast';
-import { ToastService } from './core/services/toast.service';
-import { ImageEditorModal } from './shared/ui/image-editor-modal/image-editor-modal';
+import { Toast } from '@shared/ui/toast/toast';
+import { ToastService } from '@core/services/toast.service';
+import { ImageEditorModal } from '@shared/ui/image-editor-modal/image-editor-modal';
 
 @Component({
   selector: 'app-root',

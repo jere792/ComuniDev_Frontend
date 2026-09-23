@@ -1,6 +1,6 @@
-import { Component, Input, AfterViewInit, QueryList, ViewChildren, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, AfterViewInit, QueryList, ViewChildren, ElementRef, ChangeDetectorRef, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
-import { NotificationBell } from '../../../../shared/ui/notification-bell/notification-bell';
+import { NotificationBell } from '@features/shared/ui/notification-bell/notification-bell';
 import { filter } from 'rxjs';
 
 export interface HeaderLink {
@@ -17,14 +17,15 @@ export interface HeaderLink {
   styleUrl: './recruiter-header.scss',
 })
 export class RecruiterHeader implements AfterViewInit {
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
+
   @Input() links: HeaderLink[] = [];
   @ViewChildren('tabEl') tabElements!: QueryList<ElementRef<HTMLElement>>;
 
   indicatorLeft = 0;
   indicatorWidth = 0;
   showIndicator = false;
-
-  constructor(private router: Router, private cdr: ChangeDetectorRef) {}
 
   ngAfterViewInit(): void {
     this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {

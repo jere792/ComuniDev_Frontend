@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { DownloadHero } from './hero/hero';
-import { DownloadApkSection } from './download/download';
+import { DownloadHero } from '@landing/pages/download-apk/hero/hero';
+import { DownloadApkSection } from '@landing/pages/download-apk/download/download';
 
 @Component({
   selector: 'app-download-apk',

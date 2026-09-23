@@ -1,8 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { ThemeService } from '../../../core/services/theme.service';
-import { LanguageService } from '../../../core/services/language.service';
-import { TranslationPipe } from '../../../core/pipes/translation.pipe';
+import { ThemeService } from '@core/services/theme.service';
+import { LanguageService } from '@core/services/language.service';
+import { TranslationPipe } from '@core/pipes/translation.pipe';
 
 @Component({
   selector: 'app-layout-header',

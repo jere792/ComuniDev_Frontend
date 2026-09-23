@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { Hero } from './hero/hero';
-import { Enfoque } from './enfoque/enfoque';
-import { Techstack } from './techstack/techstack';
-import { Feed } from './feed/feed';
-import { Cta } from './cta/cta';
+import { Hero } from '@landing/pages/inicio/hero/hero';
+import { Enfoque } from '@landing/pages/inicio/enfoque/enfoque';
+import { Techstack } from '@landing/pages/inicio/techstack/techstack';
+import { Feed } from '@landing/pages/inicio/feed/feed';
+import { Cta } from '@landing/pages/inicio/cta/cta';
 
 @Component({
   selector: 'app-inicio',

@@ -1,6 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthStore } from '../../../../auth/data-access/state/auth.store';
+import { AuthStore } from '@features/auth/data-access/state/auth.store';
 
 export interface SidebarLink {
   label: string;
@@ -16,9 +16,9 @@ export interface SidebarLink {
   styleUrl: './moderator-sidebar.scss',
 })
 export class ModeratorSidebar {
-  @Input() links: SidebarLink[] = [];
+  private authStore = inject(AuthStore);
 
-  constructor(private authStore: AuthStore) {}
+  @Input() links: SidebarLink[] = [];
 
   logout(): void {
     this.authStore.logout();

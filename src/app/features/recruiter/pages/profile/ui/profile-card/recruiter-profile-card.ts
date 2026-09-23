@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SocialListType } from '../social-list-modal/social-list-modal';
+import { SocialListType } from '@features/recruiter/pages/profile/ui/social-list-modal/social-list-modal';
 
 @Component({
   selector: 'app-recruiter-profile-card',

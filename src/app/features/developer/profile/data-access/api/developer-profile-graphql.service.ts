@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { DeveloperProfile } from '../../../../../core/domain/models/user.model';
+import { DeveloperProfile } from '@core/domain/models/user.model';
 import {
   DeveloperProfileRepository,
   CreateDeveloperProfileRequest,
   UpdateDeveloperProfileRequest,
-} from '../../domain/ports/developer-profile.repository';
+} from '@features/developer/profile/domain/ports/developer-profile.repository';
 
 const GET_DEVELOPER_PROFILE_BY_USER = gql`
   query GetDeveloperProfileByUser($userId: ID!) {
@@ -81,7 +81,8 @@ const UPDATE_DEVELOPER_PROFILE = gql`
 
 @Injectable({ providedIn: 'root' })
 export class DeveloperProfileGraphqlService implements DeveloperProfileRepository {
-  constructor(private apollo: Apollo) {}
+  private apollo = inject(Apollo);
+
 
   getByUserId(userId: string): Observable<DeveloperProfile | null> {
     return this.apollo

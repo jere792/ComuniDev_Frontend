@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet, ActivatedRoute } from '@angular/router';
-import { AdminHeader } from './components/header/admin-header';
-import { AdminSidebar, SidebarLink } from './components/sidebar/admin-sidebar';
+import { AdminHeader } from '@features/admin/layout/components/header/admin-header';
+import { AdminSidebar, SidebarLink } from '@features/admin/layout/components/sidebar/admin-sidebar';
 
 @Component({
   selector: 'app-admin-layout',
@@ -11,9 +11,9 @@ import { AdminSidebar, SidebarLink } from './components/sidebar/admin-sidebar';
   styleUrl: './admin-layout.scss',
 })
 export class AdminLayout implements OnInit {
-  sidebarLinks: SidebarLink[] = [];
+  private route = inject(ActivatedRoute);
 
-  constructor(private route: ActivatedRoute) {}
+  sidebarLinks: SidebarLink[] = [];
 
   ngOnInit(): void {
     const data = this.route.snapshot.data;

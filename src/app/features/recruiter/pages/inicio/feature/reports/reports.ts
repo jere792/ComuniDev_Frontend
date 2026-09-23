@@ -2,14 +2,17 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { PostGraphqlService, SocialPost } from '../../../../../../core/services/social/post-graphql.service';
-import { CommentGraphqlService, SocialComment } from '../../../../../../core/services/social/comment-graphql.service';
-import { ReactionGraphqlService, TipoReaccion } from '../../../../../../core/services/social/reaction-graphql.service';
-import { GraphQLService } from '../../../../../../core/services/graphql.service';
-import { FeedSkeletonComponent } from '../../../../../../shared/ui/feed-skeleton/feed-skeleton';
-import { ToastService } from '../../../../../../core/services/toast.service';
-import { ImageEditorService } from '../../../../../../core/services/image-editor.service';
-import { ConfirmModal } from '../../../../../../shared/ui/confirm-modal/confirm-modal';
+import { PostStore } from '@features/recruiter/pages/inicio/data-access/state/post.store';
+import { CommentStore } from '@features/shared/data-access/state/comment.store';
+import { ReactionStore } from '@features/shared/data-access/state/reaction.store';
+import { SocialPost } from '@features/recruiter/pages/inicio/domain/models/social-post.model';
+import { SocialComment } from '@features/shared/domain/models/social-comment.model';
+import { TipoReaccion } from '@features/shared/domain/models/social-reaction.model';
+import { UserStore } from '@features/users/data-access/state/user.store';
+import { FeedSkeletonComponent } from '@shared/ui/feed-skeleton/feed-skeleton';
+import { ToastService } from '@core/services/toast.service';
+import { ImageEditorService } from '@core/services/image-editor.service';
+import { ConfirmModal } from '@shared/ui/confirm-modal/confirm-modal';
 
 interface CommentVM {
   comment: SocialComment;
@@ -51,10 +54,10 @@ const REACTION_CONFIG: Record<TipoReaccion, { icon: string; label: string; color
   styleUrl: './reports.scss',
 })
 export class ReportsComponent implements OnInit {
-  private postService = inject(PostGraphqlService);
-  private commentService = inject(CommentGraphqlService);
-  private reactionService = inject(ReactionGraphqlService);
-  private graphql = inject(GraphQLService);
+  private postService = inject(PostStore);
+  private commentService = inject(CommentStore);
+  private reactionService = inject(ReactionStore);
+  private userStore = inject(UserStore);
   private router = inject(Router);
   private toast = inject(ToastService);
   private imageEditor = inject(ImageEditorService);
@@ -140,7 +143,7 @@ export class ReportsComponent implements OnInit {
       return;
     }
 
-    this.graphql.getUser(autorId).subscribe({
+    this.userStore.getById(autorId).subscribe({
       next: (user: any) => {
         if (user) {
           const info = { nombre: user.nombre ?? 'Usuario', avatar: user.fotoPerfilUrl ?? '' };
@@ -201,7 +204,7 @@ export class ReportsComponent implements OnInit {
     if (!edited) return;
 
     this.uploadingImage = true;
-    this.graphql.uploadFile(edited).subscribe({
+    this.userStore.uploadFile(edited).subscribe({
       next: (res: any) => {
         this.composerImage = res?.secure_url ?? res?.url ?? null;
         this.uploadingImage = false;
@@ -369,7 +372,7 @@ export class ReportsComponent implements OnInit {
       return;
     }
 
-    this.graphql.getUser(autorId).subscribe({
+    this.userStore.getById(autorId).subscribe({
       next: (user: any) => {
         if (user) {
           const info = { nombre: user.nombre ?? 'Usuario', avatar: user.fotoPerfilUrl ?? '' };
@@ -527,7 +530,7 @@ export class ReportsComponent implements OnInit {
       return;
     }
 
-    this.graphql.getUser(autorId).subscribe({
+    this.userStore.getById(autorId).subscribe({
       next: (user: any) => {
         if (user) {
           const info = { nombre: user.nombre ?? 'Usuario', avatar: user.fotoPerfilUrl ?? '' };

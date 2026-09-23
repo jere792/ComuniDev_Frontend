@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { DeveloperLayout } from './layout/developer-layout';
+import { DeveloperLayout } from '@features/developer/layout/developer-layout';
 
 @Component({
   selector: 'app-developer-main',

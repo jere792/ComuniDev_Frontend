@@ -1,9 +1,10 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { GraphQLService, User } from '../../../../core/services/graphql.service';
-import { FollowGraphqlService } from '../../../../core/services/social/follow-graphql.service';
-import { ToastService } from '../../../../core/services/toast.service';
+import { UserStore } from '@features/users/data-access/state/user.store';
+import { FollowStore } from '@features/shared/data-access/state/follow.store';
+import { User } from '@core/domain/models/user.model';
+import { ToastService } from '@core/services/toast.service';
 
 interface UserWithFollow extends User {
   isFollowing: boolean;
@@ -21,8 +22,8 @@ export class DiscoverUsers implements OnInit {
   users = signal<UserWithFollow[]>([]);
   loading = signal(true);
 
-  private graphql = inject(GraphQLService);
-  private followService = inject(FollowGraphqlService);
+  private userStore = inject(UserStore);
+  private followService = inject(FollowStore);
   private router = inject(Router);
   private toast = inject(ToastService);
 
@@ -34,7 +35,7 @@ export class DiscoverUsers implements OnInit {
     const currentUserId = localStorage.getItem('userId');
     if (!currentUserId) return;
 
-    this.graphql.getUsers().subscribe({
+    this.userStore.getAll().subscribe({
       next: (users: User[]) => {
         const others = users.filter(u => u.id !== currentUserId);
         const enriched = others.map(u => ({ ...u, isFollowing: false, followers: [] }));

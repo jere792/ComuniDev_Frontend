@@ -1,8 +1,8 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { AuthStore } from '../../../../auth/data-access/state/auth.store';
-import { GraphQLService } from '../../../../../core/services/graphql.service';
-import { ThemeService } from '../../../../../core/services/theme.service';
+import { AuthStore } from '@features/auth/data-access/state/auth.store';
+import { UserStore } from '@features/users/data-access/state/user.store';
+import { ThemeService } from '@core/services/theme.service';
 
 @Component({
   selector: 'app-recruiter-sidebar',
@@ -13,7 +13,7 @@ import { ThemeService } from '../../../../../core/services/theme.service';
 })
 export class RecruiterSidebar implements OnInit {
   private authStore = inject(AuthStore);
-  private graphql = inject(GraphQLService);
+  private userStore = inject(UserStore);
   private theme = inject(ThemeService);
 
   user = this.authStore.user;
@@ -23,7 +23,7 @@ export class RecruiterSidebar implements OnInit {
   ngOnInit(): void {
     const userId = localStorage.getItem('userId');
     if (userId) {
-      this.graphql.getUser(userId).subscribe(u => {
+      this.userStore.getById(userId).subscribe(u => {
         if (u?.fotoPerfilUrl) {
           this.photoUrl.set(u.fotoPerfilUrl);
         }

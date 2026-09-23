@@ -1,39 +1,48 @@
 <div class="saved-container">
   <h2 class="section-title">Guardados</h2>
 
-  <div class="tabs">
-    <button class="tab" [class.active]="activeTab === 'all'" (click)="activeTab = 'all'">
-      Todos
-    </button>
-    <button class="tab" [class.active]="activeTab === 'candidates'" (click)="activeTab = 'candidates'">
+  <div class="tabs" role="tablist">
+    <button type="button" class="tab" [class.active]="activeTab === 'candidates'" (click)="activeTab = 'candidates'">
       Candidatos
     </button>
-    <button class="tab" [class.active]="activeTab === 'reels'" (click)="activeTab = 'reels'">
+    <button type="button" class="tab" [class.active]="activeTab === 'reels'" (click)="activeTab = 'reels'">
       Reels
     </button>
   </div>
 
-  <div class="saved-list">
-    @for (item of filteredItems; track item.id) {
-      <div class="saved-card">
-        @if (item.type === 'candidate') {
-          <img [src]="item.avatar" [alt]="item.title" class="item-avatar" />
-        } @else {
-          <div class="item-thumbnail">
-            <span class="material-symbols-outlined">smart_display</span>
-          </div>
-        }
+  @if (activeTab === 'candidates') {
+    @if (loading()) {
+      <div class="state-message">Cargando guardados…</div>
+    }
 
-        <div class="item-info">
-          <h3 class="item-title">{{ item.title }}</h3>
-          <p class="item-subtitle">{{ item.subtitle }}</p>
-          <span class="item-time">{{ item.savedAt }}</span>
-        </div>
+    @if (error()) {
+      <div class="state-message error">{{ error() }}</div>
+    }
 
-        <button class="remove-btn">
-          <span class="material-symbols-outlined">bookmark_remove</span>
-        </button>
+    @if (!loading() && !error() && items.length === 0) {
+      <div class="state-message">
+        Aún no has guardado candidatos. Busca en
+        <a routerLink="/recruiter/candidates">Candidatos</a>
+        y toca “Guardar”.
       </div>
     }
-  </div>
+
+    <div class="saved-list">
+      @for (item of items; track item.id) {
+        <app-saved-card
+          [id]="item.id"
+          type="candidate"
+          [title]="item.title"
+          [subtitle]="item.subtitle"
+          [avatar]="item.avatar"
+          [savedAt]="item.savedAt"
+          (remove)="remove(item)"
+        />
+      }
+    </div>
+  } @else {
+    <div class="state-message">
+      Los reels guardados estarán disponibles próximamente.
+    </div>
+  }
 </div>

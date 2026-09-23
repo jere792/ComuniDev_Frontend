@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet, ActivatedRoute } from '@angular/router';
-import { RecruiterSidebar } from './components/sidebar/recruiter-sidebar';
-import { RecruiterHeader, HeaderLink } from './components/header/recruiter-header';
+import { RecruiterSidebar } from '@features/recruiter/layout/components/sidebar/recruiter-sidebar';
+import { RecruiterHeader, HeaderLink } from '@features/recruiter/layout/components/header/recruiter-header';
 
 @Component({
   selector: 'app-recruiter-layout',
@@ -11,9 +11,9 @@ import { RecruiterHeader, HeaderLink } from './components/header/recruiter-heade
   styleUrl: './recruiter-layout.scss',
 })
 export class RecruiterLayout implements OnInit {
-  headerLinks: HeaderLink[] = [];
+  private route = inject(ActivatedRoute);
 
-  constructor(private route: ActivatedRoute) {}
+  headerLinks: HeaderLink[] = [];
 
   ngOnInit(): void {
     const data = this.route.snapshot.data;

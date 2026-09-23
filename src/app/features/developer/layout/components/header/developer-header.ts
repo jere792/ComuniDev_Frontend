@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { NotificationBell } from '../../../../shared/ui/notification-bell/notification-bell';
+import { NotificationBell } from '@features/shared/ui/notification-bell/notification-bell';
 
 @Component({
   selector: 'app-developer-header',

@@ -1,11 +1,11 @@
 import { Component, OnInit, signal, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
-import { User, DeveloperProfile } from '../../../../core/domain/models/user.model';
-import { DeveloperProfileStore } from '../data-access/state/developer-profile.store';
-import { GraphQLService } from '../../../../core/services/graphql.service';
-import { ToastService } from '../../../../core/services/toast.service';
-import { ImageEditorService } from '../../../../core/services/image-editor.service';
+import { User, DeveloperProfile } from '@core/domain/models/user.model';
+import { DeveloperProfileStore } from '@features/developer/profile/data-access/state/developer-profile.store';
+import { UserStore } from '@features/users/data-access/state/user.store';
+import { ToastService } from '@core/services/toast.service';
+import { ImageEditorService } from '@core/services/image-editor.service';
 
 @Component({
   selector: 'app-developer-profile-page',
@@ -15,6 +15,10 @@ import { ImageEditorService } from '../../../../core/services/image-editor.servi
   styleUrl: './developer-profile.scss',
 })
 export class DeveloperProfilePage implements OnInit {
+  private fb = inject(FormBuilder);
+  private store = inject(DeveloperProfileStore);
+  private userStore = inject(UserStore);
+
   user = signal<User | null>(null);
   isEditingBasic = signal(false);
   isEditingProfile = signal(false);
@@ -25,11 +29,7 @@ export class DeveloperProfilePage implements OnInit {
   private toast = inject(ToastService);
   private imageEditor = inject(ImageEditorService);
 
-  constructor(
-    private fb: FormBuilder,
-    private store: DeveloperProfileStore,
-    private graphql: GraphQLService,
-  ) {
+  constructor() {
     this.basicForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
       nombreUsuario: ['', [Validators.required, Validators.minLength(3)]],
@@ -80,7 +80,7 @@ export class DeveloperProfilePage implements OnInit {
     const userId = localStorage.getItem('userId');
     if (!userId) return;
 
-    this.graphql.getUser(userId).subscribe({
+    this.userStore.getById(userId).subscribe({
       next: (user: User | null) => {
         this.user.set(user);
         if (user?.developerProfile) {
@@ -157,7 +157,7 @@ export class DeveloperProfilePage implements OnInit {
           distrito: formValue.ubicacionDistrito,
         },
       };
-      this.graphql.updateUser(this.user()!.id, payload).subscribe({
+      this.userStore.update(this.user()!.id, payload as Partial<User>).subscribe({
         next: (updatedUser: User) => {
           this.user.set(updatedUser);
           localStorage.setItem('userName', updatedUser.nombre);
@@ -240,11 +240,11 @@ export class DeveloperProfilePage implements OnInit {
     if (!edited) return;
 
     this.uploadingImage.set(true);
-    this.graphql.uploadFile(edited).subscribe({
+    this.userStore.uploadFile(edited).subscribe({
       next: (res: { url: string }) => {
         const userId = this.user()?.id;
         if (!userId) return;
-        this.graphql.updateUser(userId, { [field]: res.url }).subscribe({
+        this.userStore.update(userId, { [field]: res.url }).subscribe({
           next: (updatedUser: User) => {
             this.user.set(updatedUser);
             if (field === 'fotoPerfilUrl') localStorage.setItem('userPhoto', res.url);

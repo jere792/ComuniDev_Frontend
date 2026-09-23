@@ -2,17 +2,17 @@ import { Component, OnInit, signal, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { User, RecruiterProfile } from '../../../../../core/domain/models/user.model';
-import { RecruiterProfileStore } from '../data-access/state/recruiter-profile.store';
-import { GraphQLService } from '../../../../../core/services/graphql.service';
-import { ToastService } from '../../../../../core/services/toast.service';
-import { ImageEditorService } from '../../../../../core/services/image-editor.service';
-import { RecruiterProfileCard } from '../ui/profile-card/recruiter-profile-card';
-import { RecruiterContactInfo } from '../ui/contact-info/recruiter-contact-info';
-import { RecruiterCompaniesCard } from '../ui/companies-card/recruiter-companies-card';
-import { RecruiterExperienceTimeline } from '../ui/experience-timeline/recruiter-experience-timeline';
-import { SidebarCard } from '../ui/sidebar-card/sidebar-card';
-import { SocialListModal, SocialListType } from '../ui/social-list-modal/social-list-modal';
+import { User, RecruiterProfile } from '@core/domain/models/user.model';
+import { RecruiterProfileStore } from '@features/recruiter/pages/profile/data-access/state/recruiter-profile.store';
+import { UserStore } from '@features/users/data-access/state/user.store';
+import { ToastService } from '@core/services/toast.service';
+import { ImageEditorService } from '@core/services/image-editor.service';
+import { RecruiterProfileCard } from '@features/recruiter/pages/profile/ui/profile-card/recruiter-profile-card';
+import { RecruiterContactInfo } from '@features/recruiter/pages/profile/ui/contact-info/recruiter-contact-info';
+import { RecruiterCompaniesCard } from '@features/recruiter/pages/profile/ui/companies-card/recruiter-companies-card';
+import { RecruiterExperienceTimeline } from '@features/recruiter/pages/profile/ui/experience-timeline/recruiter-experience-timeline';
+import { SidebarCard } from '@features/recruiter/pages/profile/ui/sidebar-card/sidebar-card';
+import { SocialListModal, SocialListType } from '@features/recruiter/pages/profile/ui/social-list-modal/social-list-modal';
 
 @Component({
   selector: 'app-recruiter-profile-page',
@@ -32,6 +32,10 @@ import { SocialListModal, SocialListType } from '../ui/social-list-modal/social-
   styleUrl: './recruiter-profile.scss',
 })
 export class RecruiterProfilePage implements OnInit {
+  private fb = inject(FormBuilder);
+  private store = inject(RecruiterProfileStore);
+  private userStore = inject(UserStore);
+
   user = signal<User | null>(null);
   isEditingBasic = signal(false);
   isEditingProfile = signal(false);
@@ -44,11 +48,7 @@ export class RecruiterProfilePage implements OnInit {
   private toast = inject(ToastService);
   private imageEditor = inject(ImageEditorService);
 
-  constructor(
-    private fb: FormBuilder,
-    private store: RecruiterProfileStore,
-    private graphql: GraphQLService,
-  ) {
+  constructor() {
     this.basicForm = this.fb.group({
       nombre: [''],
       nombreUsuario: [''],
@@ -93,7 +93,7 @@ export class RecruiterProfilePage implements OnInit {
     const userId = localStorage.getItem('userId');
     if (!userId) return;
 
-    this.graphql.getUser(userId).subscribe({
+    this.userStore.getById(userId).subscribe({
       next: (user: User | null) => {
         this.user.set(user);
         if (user?.recruiterProfile) {
@@ -137,7 +137,7 @@ export class RecruiterProfilePage implements OnInit {
 
   onSubmitBasic(): void {
     if (this.basicForm.valid && this.user()) {
-      this.graphql.updateUser(this.user()!.id, this.basicForm.value).subscribe({
+      this.userStore.update(this.user()!.id, this.basicForm.value).subscribe({
         next: (updatedUser: User) => {
           this.user.set(updatedUser);
           localStorage.setItem('userName', updatedUser.nombre);
@@ -227,11 +227,11 @@ export class RecruiterProfilePage implements OnInit {
     if (!edited) return;
 
     this.uploadingImage.set(true);
-    this.graphql.uploadFile(edited).subscribe({
+    this.userStore.uploadFile(edited).subscribe({
       next: (res: { url: string }) => {
         const userId = this.user()?.id;
         if (!userId) return;
-        this.graphql.updateUser(userId, { [field]: res.url }).subscribe({
+        this.userStore.update(userId, { [field]: res.url }).subscribe({
           next: (updatedUser: User) => {
             this.user.set(updatedUser);
             if (field === 'fotoPerfilUrl') localStorage.setItem('userPhoto', res.url);

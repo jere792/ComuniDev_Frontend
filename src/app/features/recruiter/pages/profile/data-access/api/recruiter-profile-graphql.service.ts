@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { RecruiterProfile } from '../../../../../../core/domain/models/user.model';
+import { RecruiterProfile } from '@core/domain/models/user.model';
 import {
   RecruiterProfileRepository,
   CreateRecruiterProfileRequest,
   UpdateRecruiterProfileRequest,
-} from '../../domain/ports/recruiter-profile.repository';
+} from '@features/recruiter/pages/profile/domain/ports/recruiter-profile.repository';
 
 const GET_RECRUITER_PROFILE_BY_USER = gql`
   query GetRecruiterProfileByUser($userId: String!) {
@@ -97,7 +97,8 @@ const UPDATE_RECRUITER_PROFILE = gql`
 
 @Injectable({ providedIn: 'root' })
 export class RecruiterProfileGraphqlService implements RecruiterProfileRepository {
-  constructor(private apollo: Apollo) {}
+  private apollo = inject(Apollo);
+
 
   getByUserId(userId: string): Observable<RecruiterProfile | null> {
     return this.apollo

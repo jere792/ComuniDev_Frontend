@@ -2,12 +2,15 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { ReelGraphqlService, SocialReel } from '../../../../../core/services/social/reel-graphql.service';
-import { ReactionGraphqlService, TipoReaccion } from '../../../../../core/services/social/reaction-graphql.service';
-import { CommentGraphqlService, SocialComment } from '../../../../../core/services/social/comment-graphql.service';
-import { GraphQLService } from '../../../../../core/services/graphql.service';
-import { ToastService } from '../../../../../core/services/toast.service';
-import { ConfirmModal } from '../../../../../shared/ui/confirm-modal/confirm-modal';
+import { ReelStore } from '@features/recruiter/pages/reels/data-access/state/reel.store';
+import { ReactionStore } from '@features/shared/data-access/state/reaction.store';
+import { CommentStore } from '@features/shared/data-access/state/comment.store';
+import { SocialReel } from '@features/recruiter/pages/reels/domain/models/social-reel.model';
+import { TipoReaccion } from '@features/shared/domain/models/social-reaction.model';
+import { SocialComment } from '@features/shared/domain/models/social-comment.model';
+import { UserStore } from '@features/users/data-access/state/user.store';
+import { ToastService } from '@core/services/toast.service';
+import { ConfirmModal } from '@shared/ui/confirm-modal/confirm-modal';
 
 interface ReelVM {
   reel: SocialReel;
@@ -27,10 +30,10 @@ interface ReelVM {
   styleUrl: './reels.scss',
 })
 export class RecruiterReels implements OnInit {
-  private reelService = inject(ReelGraphqlService);
-  private reactionService = inject(ReactionGraphqlService);
-  private commentService = inject(CommentGraphqlService);
-  private graphql = inject(GraphQLService);
+  private reelService = inject(ReelStore);
+  private reactionService = inject(ReactionStore);
+  private commentService = inject(CommentStore);
+  private userStore = inject(UserStore);
   private router = inject(Router);
   private toast = inject(ToastService);
 
@@ -86,7 +89,7 @@ export class RecruiterReels implements OnInit {
       return;
     }
 
-    this.graphql.getUser(autorId).subscribe({
+    this.userStore.getById(autorId).subscribe({
       next: (user: any) => {
         if (user) {
           const info = { nombre: user.nombre ?? 'Usuario', avatar: user.fotoPerfilUrl ?? '' };
@@ -220,7 +223,7 @@ export class RecruiterReels implements OnInit {
   }
 
   private loadCommentAuthor(autorId: string, vm: ReelVM): void {
-    this.graphql.getUser(autorId).subscribe({
+    this.userStore.getById(autorId).subscribe({
       next: (user: any) => {
         if (user) {
           vm.comments = vm.comments.map(c =>

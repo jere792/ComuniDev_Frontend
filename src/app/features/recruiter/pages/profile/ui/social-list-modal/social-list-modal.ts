@@ -2,9 +2,10 @@ import { Component, Input, Output, EventEmitter, OnInit, OnChanges, inject, sign
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { GraphQLService, User } from '../../../../../../core/services/graphql.service';
-import { FollowGraphqlService } from '../../../../../../core/services/social/follow-graphql.service';
-import { ConnectionGraphqlService } from '../../../../../../core/services/social/connection-graphql.service';
+import { UserStore } from '@features/users/data-access/state/user.store';
+import { User } from '@core/domain/models/user.model';
+import { FollowStore } from '@features/shared/data-access/state/follow.store';
+import { ConnectionStore } from '@features/shared/data-access/state/connection.store';
 
 export type SocialListType = 'followers' | 'following' | 'connections';
 
@@ -25,9 +26,9 @@ export class SocialListModal implements OnInit, OnChanges {
   users = signal<User[]>([]);
   search = signal('');
 
-  private graphql = inject(GraphQLService);
-  private followService = inject(FollowGraphqlService);
-  private connService = inject(ConnectionGraphqlService);
+  private userStore = inject(UserStore);
+  private followService = inject(FollowStore);
+  private connService = inject(ConnectionStore);
   private router = inject(Router);
 
   get modalTitle(): string {
@@ -73,7 +74,7 @@ export class SocialListModal implements OnInit, OnChanges {
     if (this.type === 'followers') {
       this.followService.getFollowers(this.userId).subscribe({
         next: (follows) => {
-          const ids = follows.map(f => f.seguidorId).filter(Boolean);
+          const ids = follows.map(f => f.seguidorId).filter((id): id is string => Boolean(id));
           this.resolveUsers(ids);
         },
         error: () => this.loading.set(false),
@@ -81,7 +82,7 @@ export class SocialListModal implements OnInit, OnChanges {
     } else if (this.type === 'following') {
       this.followService.getFollowing(this.userId).subscribe({
         next: (follows) => {
-          const ids = follows.map(f => f.seguidoId).filter(Boolean);
+          const ids = follows.map(f => f.seguidoId).filter((id): id is string => Boolean(id));
           this.resolveUsers(ids);
         },
         error: () => this.loading.set(false),
@@ -105,7 +106,7 @@ export class SocialListModal implements OnInit, OnChanges {
       this.loading.set(false);
       return;
     }
-    this.graphql.getUsers().subscribe({
+    this.userStore.getAll().subscribe({
       next: (all: User[]) => {
         const idSet = new Set(ids);
         this.users.set(all.filter(u => u.id && idSet.has(u.id)));

@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { GraphQLService } from '../../../../core/services/graphql.service';
-import { FollowGraphqlService } from '../../../../core/services/social/follow-graphql.service';
+import { UserStore } from '@features/users/data-access/state/user.store';
+import { FollowStore } from '@features/shared/data-access/state/follow.store';
 
 @Component({
   selector: 'app-shared-right-panel',
@@ -17,8 +17,8 @@ export class SharedRightPanel implements OnInit {
   userUsername = signal(localStorage.getItem('userUsername') || '');
   suggestions = signal<any[]>([]);
 
-  private graphql = inject(GraphQLService);
-  private followService = inject(FollowGraphqlService);
+  private userStore = inject(UserStore);
+  private followService = inject(FollowStore);
   private router = inject(Router);
 
   ngOnInit(): void {
@@ -32,7 +32,7 @@ export class SharedRightPanel implements OnInit {
     const userId = localStorage.getItem('userId');
     if (!userId) return;
 
-    this.graphql.getUser(userId).subscribe({
+    this.userStore.getById(userId).subscribe({
       next: (user: any) => {
         if (user) {
           if (user.fotoPerfilUrl) {
@@ -56,7 +56,7 @@ export class SharedRightPanel implements OnInit {
     const currentUserId = localStorage.getItem('userId');
     if (!currentUserId) return;
 
-    this.graphql.getUsers().subscribe({
+    this.userStore.getAll().subscribe({
       next: (users: any[]) => {
         const others = users.filter(u => u.id !== currentUserId).slice(0, 5);
         const enriched = others.map(u => ({

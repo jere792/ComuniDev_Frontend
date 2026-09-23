@@ -1,26 +1,13 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { GraphQLService } from '../../../../../core/services/graphql.service';
-import { RecruiterProfileGraphqlService } from '../../profile/data-access/api/recruiter-profile-graphql.service';
-import { AuthStore } from '../../../../auth/data-access/state/auth.store';
-import { ToastService } from '../../../../../core/services/toast.service';
-import { catchError, of, tap } from 'rxjs';
-import { User } from '../../../../../core/domain/models/user.model';
-
-interface SubItem {
-  id: string;
-  icon: string;
-  label: string;
-}
-
-interface ConfigCategory {
-  id: string;
-  icon: string;
-  label: string;
-  subItems: SubItem[];
-  comingSoon?: boolean;
-}
+import { UserStore } from '@features/users/data-access/state/user.store';
+import { RECRUITER_PROFILE_REPOSITORY, RecruiterProfileRepository } from '@features/recruiter/pages/profile/domain/ports/recruiter-profile.repository';
+import { AuthStore } from '@features/auth/data-access/state/auth.store';
+import { ToastService } from '@core/services/toast.service';
+import { catchError, of } from 'rxjs';
+import { User } from '@core/domain/models/user.model';
+import { ConfigCategory } from '@features/recruiter/pages/configuracion/domain/models/config.models';
 
 @Component({
   selector: 'app-configuracion-page',
@@ -31,8 +18,8 @@ interface ConfigCategory {
 })
 export class ConfiguracionPage implements OnInit {
   private fb = inject(FormBuilder);
-  private graphql = inject(GraphQLService);
-  private recruiterService = inject(RecruiterProfileGraphqlService);
+  private userStore = inject(UserStore);
+  private recruiterService = inject<RecruiterProfileRepository>(RECRUITER_PROFILE_REPOSITORY);
   private authStore = inject(AuthStore);
 
   userData = signal<User | null>(null);
@@ -143,7 +130,7 @@ export class ConfiguracionPage implements OnInit {
     const userId = this.getUserId();
     if (!userId) return;
 
-    this.graphql.getUser(userId).subscribe({
+    this.userStore.getById(userId).subscribe({
       next: (user: User | null) => {
         if (user) {
           this.userData.set(user);
@@ -235,7 +222,7 @@ export class ConfiguracionPage implements OnInit {
     if (!userId) return;
 
     const formValue = this.perfilForm.value;
-    this.graphql.updateUser(userId, {
+    this.userStore.update(userId, {
       nombre: formValue.nombre ?? undefined,
       email: formValue.email ?? undefined,
       telefono: formValue.telefono ?? undefined,
@@ -305,7 +292,7 @@ export class ConfiguracionPage implements OnInit {
     };
 
     // Guardar sitioWeb en User
-    this.graphql.updateUser(userId, {
+    this.userStore.update(userId, {
       sitioWeb: formValue.sitioWeb ?? undefined,
     } as any).pipe(
       catchError(err => {
@@ -370,7 +357,7 @@ export class ConfiguracionPage implements OnInit {
       return;
     }
 
-    this.graphql.updateUser(userId, {
+    this.userStore.update(userId, {
       bio: bioValue,
     } as any).pipe(
       catchError(err => {
@@ -393,7 +380,7 @@ export class ConfiguracionPage implements OnInit {
     if (!userId) return;
 
     const formValue = this.ubicacionForm.value;
-    this.graphql.updateUser(userId, {
+    this.userStore.update(userId, {
       ubicacion: {
         pais: formValue.pais ?? undefined,
         departamento: formValue.departamento ?? undefined,
@@ -432,7 +419,7 @@ export class ConfiguracionPage implements OnInit {
       return;
     }
 
-    this.graphql.changePassword(userId, formValue.actual, formValue.nueva).pipe(
+    this.userStore.changePassword(userId, formValue.actual, formValue.nueva).pipe(
       catchError(err => {
         this.handleError(err);
         return of(null);
@@ -450,12 +437,12 @@ export class ConfiguracionPage implements OnInit {
     if (!userId) return;
 
     const formValue = this.notificacionesForm.value;
-    this.graphql.updateNotificationPreferences(userId, {
-      email: formValue.email,
-      push: formValue.push,
-      mensajes: formValue.mensajes,
-      comentarios: formValue.candidatos, // mapeamos candidatos a comentarios/vacantes
-      vacantes: formValue.candidatos,
+    this.userStore.updateNotificationPreferences(userId, {
+      email: !!formValue.email,
+      push: !!formValue.push,
+      mensajes: !!formValue.mensajes,
+      comentarios: !!formValue.candidatos, // mapeamos candidatos a comentarios/vacantes
+      vacantes: !!formValue.candidatos,
     }).pipe(
       catchError(err => {
         this.handleError(err);

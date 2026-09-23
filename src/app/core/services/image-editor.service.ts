@@ -1,5 +1,5 @@
-import { Injectable, signal } from '@angular/core';
-import { ToastService } from './toast.service';
+import { Injectable, signal, inject } from '@angular/core';
+import { ToastService } from '@core/services/toast.service';
 
 export interface AspectOption {
   label: string;
@@ -25,13 +25,13 @@ const MAX_BYTES = 15 * 1024 * 1024;
 
 @Injectable({ providedIn: 'root' })
 export class ImageEditorService {
+  private toast = inject(ToastService);
+
   private state = signal<ImageEditorState | null>(null);
   private resolve: ((file: File | null) => void) | null = null;
   private previewUrl: string | null = null;
 
   readonly editor = this.state.asReadonly();
-
-  constructor(private toast: ToastService) {}
 
   open(file: File, options: ImageEditorOptions): Promise<File | null> {
     if (!ALLOWED_TYPES.includes(file.type)) {

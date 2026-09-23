@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { DeveloperMain } from './main';
+import { DeveloperMain } from '@features/developer/main';
 
 export const routes: Routes = [
   {
@@ -16,10 +16,10 @@ export const routes: Routes = [
     },
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard', loadComponent: () => import('./feature/dashboard/developer-dashboard').then(m => m.DeveloperDashboard) },
-      { path: 'discover', loadComponent: () => import('../shared/feature/discover-users/discover-users').then(m => m.DiscoverUsers) },
-      { path: 'solicitudes', loadComponent: () => import('../shared/feature/solicitudes/solicitudes').then(m => m.Solicitudes) },
-      { path: 'profile', loadChildren: () => import('./profile/developer-profile.routes').then(m => m.routes) },
+      { path: 'dashboard', loadComponent: () => import('@features/developer/feature/dashboard/developer-dashboard').then(m => m.DeveloperDashboard) },
+      { path: 'discover', loadComponent: () => import('@features/shared/feature/discover-users/discover-users').then(m => m.DiscoverUsers) },
+      { path: 'solicitudes', loadComponent: () => import('@features/shared/feature/solicitudes/solicitudes').then(m => m.Solicitudes) },
+      { path: 'profile', loadChildren: () => import('@features/developer/profile/developer-profile.routes').then(m => m.routes) },
     ],
   },
 ];

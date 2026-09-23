@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../../../environments/environment';
-import { AuthRepository, LoginRequest, RegisterRequest, LoginResponse } from '../../domain/ports/auth.repository';
+import { AuthRepository, LoginRequest, RegisterRequest, LoginResponse } from '@features/auth/domain/ports/auth.repository';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -13,9 +13,9 @@ interface ApiResponse<T> {
 
 @Injectable({ providedIn: 'root' })
 export class AuthHttpService implements AuthRepository {
-  private readonly baseUrl = environment.apiUrl;
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
+  private readonly baseUrl = environment.apiUrl;
 
   login(request: LoginRequest): Observable<LoginResponse> {
     return this.http

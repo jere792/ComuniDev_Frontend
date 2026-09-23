@@ -1,42 +1,54 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { SavedStore, SavedCandidateItem } from '@features/recruiter/pages/saved/data-access/state/saved.store';
+import { SavedCard } from '@features/recruiter/ui/saved-card/saved-card';
+import { ToastService } from '@core/services/toast.service';
 
 @Component({
   selector: 'app-recruiter-saved',
+  imports: [SavedCard, RouterLink],
   templateUrl: './saved.html',
   styleUrl: './saved.scss',
 })
-export class RecruiterSaved {
-  savedItems = [
-    {
-      id: 1,
-      type: 'candidate',
-      title: 'Ana Garcia',
-      subtitle: 'Frontend Developer',
-      avatar: 'https://i.pravatar.cc/150?img=1',
-      savedAt: 'Hace 2 días',
-    },
-    {
-      id: 2,
-      type: 'reel',
-      title: 'Tip de Angular',
-      subtitle: 'Por Carlos Lopez',
-      thumbnail: 'https://i.pravatar.cc/150?img=3',
-      savedAt: 'Hace 5 días',
-    },
-    {
-      id: 3,
-      type: 'candidate',
-      title: 'Pedro Martinez',
-      subtitle: 'DevOps Engineer',
-      avatar: 'https://i.pravatar.cc/150?img=7',
-      savedAt: 'Hace 1 semana',
-    },
-  ];
+export class RecruiterSaved implements OnInit {
+  private readonly store = inject(SavedStore);
+  private readonly toast = inject(ToastService);
 
-  activeTab: 'all' | 'candidates' | 'reels' = 'all';
+  readonly loading = this.store.loading;
+  readonly error = this.store.error;
 
-  get filteredItems() {
-    if (this.activeTab === 'all') return this.savedItems;
-    return this.savedItems.filter(item => item.type === this.activeTab);
+  activeTab: 'all' | 'candidates' | 'reels' = 'candidates';
+
+  ngOnInit(): void {
+    const recruiterId = this.getRecruiterId();
+    if (!recruiterId) {
+      this.store.error.set('No se identificó al reclutador');
+      return;
+    }
+    this.store.loadSaved(recruiterId);
+  }
+
+  get items(): SavedCandidateItem[] {
+    if (this.activeTab === 'reels') return [];
+    return this.store.items();
+  }
+
+  remove(item: SavedCandidateItem): void {
+    const recruiterId = this.getRecruiterId();
+    if (!recruiterId) {
+      this.toast.error('No se identificó al reclutador');
+      return;
+    }
+
+    this.store.remove(recruiterId, item);
+    this.toast.success('Perfil quitado de guardados');
+  }
+
+  private getRecruiterId(): string | null {
+    return localStorage.getItem('userId');
+  }
+
+  trackById(_index: number, item: SavedCandidateItem): string {
+    return item.id;
   }
 }

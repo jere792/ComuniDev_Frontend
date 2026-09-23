@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { LayoutHeader } from './header/header';
-import { LayoutMain } from './main/main';
-import { LayoutFooter } from './footer/footer';
+import { LayoutHeader } from '@landing/layout/header/header';
+import { LayoutMain } from '@landing/layout/main/main';
+import { LayoutFooter } from '@landing/layout/footer/footer';
 
 @Component({
   selector: 'app-landing-layout',

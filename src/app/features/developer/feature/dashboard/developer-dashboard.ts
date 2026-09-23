@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { SharedRightPanel } from '../../../shared/ui/right-panel/right-panel';
+import { SharedRightPanel } from '@features/shared/ui/right-panel/right-panel';
 
 @Component({
   selector: 'app-developer-dashboard',

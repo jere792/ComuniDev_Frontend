@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { AuthStore } from '../../data-access/state/auth.store';
+import { AuthStore } from '@features/auth/data-access/state/auth.store';
 
 @Component({
   selector: 'app-auth-callback',

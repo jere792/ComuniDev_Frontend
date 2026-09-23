@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet, ActivatedRoute } from '@angular/router';
-import { ModeratorHeader } from './components/header/moderator-header';
-import { ModeratorSidebar, SidebarLink } from './components/sidebar/moderator-sidebar';
+import { ModeratorHeader } from '@features/moderator/layout/components/header/moderator-header';
+import { ModeratorSidebar, SidebarLink } from '@features/moderator/layout/components/sidebar/moderator-sidebar';
 
 @Component({
   selector: 'app-moderator-layout',
@@ -11,9 +11,9 @@ import { ModeratorSidebar, SidebarLink } from './components/sidebar/moderator-si
   styleUrl: './moderator-layout.scss',
 })
 export class ModeratorLayout implements OnInit {
-  sidebarLinks: SidebarLink[] = [];
+  private route = inject(ActivatedRoute);
 
-  constructor(private route: ActivatedRoute) {}
+  sidebarLinks: SidebarLink[] = [];
 
   ngOnInit(): void {
     const data = this.route.snapshot.data;

@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { ToastType } from '../../shared/ui/toast/toast';
+import { ToastType } from '@shared/ui/toast/toast';
 
 export interface ToastState {
   message: string;

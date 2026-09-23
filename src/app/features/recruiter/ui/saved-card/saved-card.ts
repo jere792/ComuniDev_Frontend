@@ -7,11 +7,11 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   styleUrl: './saved-card.scss',
 })
 export class SavedCard {
-  @Input() id = 0;
+  @Input() id = '';
   @Input() type: 'candidate' | 'reel' = 'candidate';
   @Input() title = '';
   @Input() subtitle = '';
   @Input() avatar = '';
   @Input() savedAt = '';
-  @Output() remove = new EventEmitter<number>();
+  @Output() remove = new EventEmitter<string>();
 }

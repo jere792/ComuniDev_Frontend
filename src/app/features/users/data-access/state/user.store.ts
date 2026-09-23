@@ -1,6 +1,12 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { User } from '../../../../core/domain/models/user.model';
-import { USER_REPOSITORY, UserRepository } from '../../domain/ports/user.repository';
+import { Observable } from 'rxjs';
+import { User } from '@core/domain/models/user.model';
+import {
+  NotificationPreferences,
+  UploadResponse,
+  USER_REPOSITORY,
+  UserRepository,
+} from '@features/users/domain/ports/user.repository';
 
 @Injectable({ providedIn: 'root' })
 export class UserStore {
@@ -12,6 +18,34 @@ export class UserStore {
   readonly error = signal<string | null>(null);
   readonly totalCount = computed(() => this.users().length);
 
+  getAll(): Observable<User[]> {
+    return this.repository.getAll();
+  }
+
+  getById(id: string): Observable<User | null> {
+    return this.repository.getById(id);
+  }
+
+  update(id: string, data: Partial<User>): Observable<User> {
+    return this.repository.update(id, data);
+  }
+
+  delete(id: string): Observable<boolean> {
+    return this.repository.delete(id);
+  }
+
+  uploadFile(file: File): Observable<UploadResponse> {
+    return this.repository.uploadFile(file);
+  }
+
+  changePassword(userId: string, currentPassword: string, newPassword: string): Observable<boolean> {
+    return this.repository.changePassword(userId, currentPassword, newPassword);
+  }
+
+  updateNotificationPreferences(userId: string, preferences: NotificationPreferences): Observable<unknown> {
+    return this.repository.updateNotificationPreferences(userId, preferences);
+  }
+
   loadAll(): void {
     this.loading.set(true);
     this.error.set(null);
@@ -20,40 +54,8 @@ export class UserStore {
         this.users.set(users);
         this.loading.set(false);
       },
-      error: (_err: unknown) => {
+      error: () => {
         this.error.set('Error al cargar usuarios');
-        this.loading.set(false);
-      },
-    });
-  }
-
-  update(id: string, data: Partial<User>): void {
-    this.loading.set(true);
-    this.error.set(null);
-    this.repository.update(id, data).subscribe({
-      next: (updatedUser: User) => {
-        this.users.set(this.users().map(u => u.id === id ? updatedUser : u));
-        this.loading.set(false);
-      },
-      error: (_err: unknown) => {
-        this.error.set('Error al actualizar usuario');
-        this.loading.set(false);
-      },
-    });
-  }
-
-  delete(id: string): void {
-    this.loading.set(true);
-    this.error.set(null);
-    this.repository.delete(id).subscribe({
-      next: (success: boolean) => {
-        if (success) {
-          this.users.set(this.users().filter(u => u.id !== id));
-        }
-        this.loading.set(false);
-      },
-      error: (_err: unknown) => {
-        this.error.set('Error al eliminar usuario');
         this.loading.set(false);
       },
     });

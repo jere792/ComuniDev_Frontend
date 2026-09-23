@@ -1,11 +1,13 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GraphQLService, User } from '../../../core/services/graphql.service';
-import { ConnectionGraphqlService, ConnectionStatus } from '../../../core/services/social/connection-graphql.service';
-import { BlockGraphqlService } from '../../../core/services/social/block-graphql.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { ConfirmModal } from '../../../shared/ui/confirm-modal/confirm-modal';
+import { UserStore } from '@features/users/data-access/state/user.store';
+import { User } from '@core/domain/models/user.model';
+import { ConnectionStore } from '@features/shared/data-access/state/connection.store';
+import { ConnectionStatus } from '@features/shared/domain/models/connection.model';
+import { BLOCK_REPOSITORY, BlockRepository } from '@features/shared/domain/ports/block.repository';
+import { ToastService } from '@core/services/toast.service';
+import { ConfirmModal } from '@shared/ui/confirm-modal/confirm-modal';
 
 @Component({
   selector: 'app-public-profile',
@@ -26,9 +28,9 @@ export class PublicProfile implements OnInit {
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private graphql = inject(GraphQLService);
-  private connectionService = inject(ConnectionGraphqlService);
-  private blockService = inject(BlockGraphqlService);
+  private userStore = inject(UserStore);
+  private connectionService = inject(ConnectionStore);
+  private blockService = inject<BlockRepository>(BLOCK_REPOSITORY);
   private toast = inject(ToastService);
 
   ngOnInit(): void {
@@ -43,7 +45,7 @@ export class PublicProfile implements OnInit {
     const currentUserId = localStorage.getItem('userId');
     this.isOwnProfile.set(userId === currentUserId);
 
-    this.graphql.getUser(userId).subscribe({
+    this.userStore.getById(userId).subscribe({
       next: (user: User | null) => {
         this.user.set(user);
         this.loading.set(false);

@@ -1,7 +1,9 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NotificationGraphqlService, AppNotification } from '../../../../core/services/social/notification-graphql.service';
-import { ConnectionGraphqlService, ConnectionRequest } from '../../../../core/services/social/connection-graphql.service';
+import { NOTIFICATION_REPOSITORY, NotificationRepository } from '@features/shared/domain/ports/notification.repository';
+import { AppNotification } from '@features/shared/domain/models/app-notification.model';
+import { ConnectionStore } from '@features/shared/data-access/state/connection.store';
+import { ConnectionRequest } from '@features/shared/domain/models/connection.model';
 
 @Component({
   selector: 'app-notification-bell',
@@ -16,8 +18,8 @@ export class NotificationBell implements OnInit {
   unreadCount = signal(0);
   isOpen = signal(false);
 
-  private notifService = inject(NotificationGraphqlService);
-  private connService = inject(ConnectionGraphqlService);
+  private notifService = inject<NotificationRepository>(NOTIFICATION_REPOSITORY);
+  private connService = inject(ConnectionStore);
 
   ngOnInit(): void {
     const userId = localStorage.getItem('userId');

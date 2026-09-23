@@ -7,13 +7,15 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   styleUrl: './candidate-card.scss',
 })
 export class CandidateCard {
-  @Input() id = 0;
+  @Input() id = '';
   @Input() name = '';
   @Input() role = '';
   @Input() skills: string[] = [];
   @Input() avatar = '';
   @Input() experience = '';
   @Input() available = true;
-  @Output() message = new EventEmitter<number>();
-  @Output() contact = new EventEmitter<number>();
+  @Input() saved = false;
+  @Output() message = new EventEmitter<string>();
+  @Output() contact = new EventEmitter<string>();
+  @Output() saveToggle = new EventEmitter<string>();
 }

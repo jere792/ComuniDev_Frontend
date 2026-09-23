@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router, RouterOutlet, ActivatedRoute } from '@angular/router';
-import { DeveloperSidebar, SidebarLink } from './components/sidebar/developer-sidebar';
+import { DeveloperSidebar, SidebarLink } from '@features/developer/layout/components/sidebar/developer-sidebar';
 
 @Component({
   selector: 'app-developer-layout',
@@ -10,9 +10,10 @@ import { DeveloperSidebar, SidebarLink } from './components/sidebar/developer-si
   styleUrl: './developer-layout.scss',
 })
 export class DeveloperLayout implements OnInit {
-  sidebarLinks: SidebarLink[] = [];
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  sidebarLinks: SidebarLink[] = [];
 
   ngOnInit(): void {
     const data = this.route.snapshot.data;

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ModeratorLayout } from './layout/moderator-layout';
+import { ModeratorLayout } from '@features/moderator/layout/moderator-layout';
 
 @Component({
   selector: 'app-moderator-main',

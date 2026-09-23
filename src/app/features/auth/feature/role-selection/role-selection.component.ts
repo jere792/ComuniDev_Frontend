@@ -1,7 +1,7 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { AuthStore } from '../../data-access/state/auth.store';
+import { AuthStore } from '@features/auth/data-access/state/auth.store';
 
 @Component({
   selector: 'app-role-selection',
@@ -83,13 +83,11 @@ import { AuthStore } from '../../data-access/state/auth.store';
   `],
 })
 export class RoleSelectionComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  store = inject(AuthStore);
+
   userId = '';
   token = '';
-
-  constructor(
-    private route: ActivatedRoute,
-    public store: AuthStore,
-  ) {}
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {

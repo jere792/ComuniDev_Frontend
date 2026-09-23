@@ -43,6 +43,25 @@
   gap: var(--space-md);
 }
 
+.state-message {
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--on-surface-variant);
+  background: var(--surface-container-low);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-md);
+
+  a {
+    color: var(--on-primary-container);
+    font-weight: 600;
+  }
+
+  &.error {
+    background: #fdecea;
+    color: #b3261e;
+  }
+}
+
 .saved-card {
   display: flex;
   align-items: center;

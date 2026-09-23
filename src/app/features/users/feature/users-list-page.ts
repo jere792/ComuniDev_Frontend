@@ -1,9 +1,9 @@
 import { Component, OnInit, signal, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { User } from '../../../core/domain/models/user.model';
-import { UserStore } from '../data-access/state/user.store';
-import { ToastService } from '../../../core/services/toast.service';
-import { ConfirmModal } from '../../../shared/ui/confirm-modal/confirm-modal';
+import { User } from '@core/domain/models/user.model';
+import { UserStore } from '@features/users/data-access/state/user.store';
+import { ToastService } from '@core/services/toast.service';
+import { ConfirmModal } from '@shared/ui/confirm-modal/confirm-modal';
 
 @Component({
   selector: 'app-users-list-page',
@@ -13,6 +13,8 @@ import { ConfirmModal } from '../../../shared/ui/confirm-modal/confirm-modal';
   styleUrl: './users-list.scss',
 })
 export class UsersListPage implements OnInit {
+  store = inject(UserStore);
+
   filteredUsers = signal<User[]>([]);
   searchTerm = signal('');
   confirmOpen = signal(false);
@@ -20,7 +22,7 @@ export class UsersListPage implements OnInit {
 
   private toast = inject(ToastService);
 
-  constructor(public store: UserStore) {
+  constructor() {
     effect(() => {
       const err = this.store.error();
       if (err) this.toast.error(err);
@@ -65,8 +67,10 @@ export class UsersListPage implements OnInit {
     this.pendingUserId.set(null);
     if (!userId) return;
 
-    this.store.delete(userId);
-    this.toast.success('Usuario eliminado correctamente');
+    this.store.delete(userId).subscribe({
+      next: () => this.toast.success('Usuario eliminado correctamente'),
+      error: () => this.toast.error('Error al eliminar el usuario'),
+    });
   }
 
   onCancelDelete(): void {

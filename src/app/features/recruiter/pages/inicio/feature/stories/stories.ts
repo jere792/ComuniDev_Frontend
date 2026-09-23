@@ -2,9 +2,11 @@ import { Component, OnInit, inject, signal, ChangeDetectorRef, effect, OnDestroy
 import { FormsModule } from '@angular/forms';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { StoryGraphqlService, SocialStory } from '../../../../../../core/services/social/story-graphql.service';
-import { GraphQLService } from '../../../../../../core/services/graphql.service';
-import { MusicaService, MusicTrackResponse } from '../../../../../../core/services/social/musica.service';
+import { StoryStore } from '@features/recruiter/pages/inicio/data-access/state/story.store';
+import { MusicaStore } from '@features/recruiter/pages/inicio/data-access/state/musica.store';
+import { SocialStory } from '@features/recruiter/pages/inicio/domain/models/social-story.model';
+import { MusicTrackResponse } from '@features/recruiter/pages/inicio/domain/models/music.model';
+import { UserStore } from '@features/users/data-access/state/user.store';
 
 type MusicMode = 'cover' | 'audio' | 'lyrics' | 'cover+lyrics';
 
@@ -22,11 +24,11 @@ interface StoryUser {
   styleUrl: './stories.scss',
 })
 export class StoriesComponent implements OnInit, OnDestroy {
-  private storyService = inject(StoryGraphqlService);
-  private graphql = inject(GraphQLService);
+  private storyService = inject(StoryStore);
+  private userStore = inject(UserStore);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
-  private musicaService = inject(MusicaService);
+  private musicaService = inject(MusicaStore);
 
   storyUsers = signal<StoryUser[]>([]);
   showComposer = signal(false);
@@ -149,7 +151,7 @@ export class StoriesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.graphql.getUser(group.autorId).subscribe({
+      this.userStore.getById(group.autorId).subscribe({
       next: (user: any) => {
         if (user) {
           const info = { nombre: user.nombre ?? 'Usuario', avatar: user.fotoPerfilUrl ?? '' };
@@ -205,7 +207,7 @@ export class StoriesComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
     this.resizeImage(file).then((resizedBlob) => {
       const resizedFile = new File([resizedBlob], file.name, { type: 'image/jpeg' });
-      this.graphql.uploadFile(resizedFile).subscribe({
+      this.userStore.uploadFile(resizedFile).subscribe({
         next: (res: any) => {
           this.storyImage = res?.secure_url ?? res?.url ?? null;
           this.uploading = false;

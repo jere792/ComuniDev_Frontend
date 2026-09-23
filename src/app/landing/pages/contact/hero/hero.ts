@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { PageHero } from '../../../../shared/components/page-hero/page-hero';
-import { ChatPreview } from './chat-preview/chat-preview';
-import { TranslationPipe } from '../../../../core/pipes/translation.pipe';
+import { PageHero } from '@shared/components/page-hero/page-hero';
+import { ChatPreview } from '@landing/pages/contact/hero/chat-preview/chat-preview';
+import { TranslationPipe } from '@core/pipes/translation.pipe';
 
 @Component({
   selector: 'app-contact-hero',

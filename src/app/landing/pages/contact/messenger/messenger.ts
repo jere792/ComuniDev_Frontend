@@ -1,6 +1,6 @@
 import { Component, signal, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RevealDirective } from '../../../../shared/directives/reveal/reveal.directive';
+import { RevealDirective } from '@shared/directives/reveal/reveal.directive';
 
 interface ChatMessage {
   sender: 'bot' | 'user';

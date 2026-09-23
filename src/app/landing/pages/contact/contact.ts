@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { ContactHero } from './hero/hero';
-import { ContactMessenger } from './messenger/messenger';
+import { ContactHero } from '@landing/pages/contact/hero/hero';
+import { ContactMessenger } from '@landing/pages/contact/messenger/messenger';
 
 @Component({
   selector: 'app-contact',

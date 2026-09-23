@@ -1,8 +1,8 @@
 import { Component, signal, OnInit, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { User, Stats } from '../../../../core/domain/models/user.model';
-import { GraphQLService } from '../../../../core/services/graphql.service';
-import { ToastService } from '../../../../core/services/toast.service';
+import { User, Stats } from '@core/domain/models/user.model';
+import { UserStore } from '@features/users/data-access/state/user.store';
+import { ToastService } from '@core/services/toast.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -54,7 +54,9 @@ export class AdminDashboard implements OnInit {
 
   private toast = inject(ToastService);
 
-  constructor(private graphql: GraphQLService) {
+  private userStore = inject(UserStore);
+
+  constructor() {
     effect(() => {
       const err = this.errorMessage();
       if (err) this.toast.error(err);
@@ -67,7 +69,7 @@ export class AdminDashboard implements OnInit {
 
   loadStats(): void {
     this.loading.set(true);
-    this.graphql.getUsers().subscribe({
+    this.userStore.getAll().subscribe({
       next: (users: User[]) => {
         this.stats.set({
           totalUsers: users.length,

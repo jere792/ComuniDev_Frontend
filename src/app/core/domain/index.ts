@@ -1,1 +1,1 @@
-export * from './models/user.model';
+export * from '@core/domain/models/user.model';

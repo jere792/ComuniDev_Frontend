@@ -1,6 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { DeveloperProfile } from '../../../../../core/domain/models/user.model';
-import { DEVELOPER_PROFILE_REPOSITORY, DeveloperProfileRepository, CreateDeveloperProfileRequest, UpdateDeveloperProfileRequest } from '../../domain/ports/developer-profile.repository';
+import { DeveloperProfile } from '@core/domain/models/user.model';
+import { DEVELOPER_PROFILE_REPOSITORY, DeveloperProfileRepository, CreateDeveloperProfileRequest, UpdateDeveloperProfileRequest } from '@features/developer/profile/domain/ports/developer-profile.repository';
 
 @Injectable({ providedIn: 'root' })
 export class DeveloperProfileStore {

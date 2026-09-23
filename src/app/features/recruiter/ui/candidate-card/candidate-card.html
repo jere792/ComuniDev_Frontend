@@ -22,13 +22,13 @@
       {{ experience }}
     </span>
     <div class="candidate-actions">
-      <button class="btn btn-outline" (click)="message.emit(id)">
+      <button type="button" class="btn btn-outline" (click)="message.emit(id)">
         <span class="material-symbols-outlined">chat</span>
         Mensaje
       </button>
-      <button class="btn btn-primary" (click)="contact.emit(id)">
-        <span class="material-symbols-outlined">person_add</span>
-        Contactar
+      <button type="button" class="btn" [class.btn-primary]="!saved" [class.btn-saved]="saved" (click)="saveToggle.emit(id)">
+        <span class="material-symbols-outlined">{{ saved ? 'bookmark' : 'bookmark_add' }}</span>
+        {{ saved ? 'Guardado' : 'Guardar' }}
       </button>
     </div>
   </div>

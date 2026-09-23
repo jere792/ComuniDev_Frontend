@@ -1,6 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { RecruiterProfile } from '../../../../../../core/domain/models/user.model';
-import { RECRUITER_PROFILE_REPOSITORY, RecruiterProfileRepository, CreateRecruiterProfileRequest, UpdateRecruiterProfileRequest } from '../../domain/ports/recruiter-profile.repository';
+import { RecruiterProfile } from '@core/domain/models/user.model';
+import { RECRUITER_PROFILE_REPOSITORY, RecruiterProfileRepository, CreateRecruiterProfileRequest, UpdateRecruiterProfileRequest } from '@features/recruiter/pages/profile/domain/ports/recruiter-profile.repository';
 
 @Injectable({ providedIn: 'root' })
 export class RecruiterProfileStore {

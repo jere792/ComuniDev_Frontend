@@ -1,9 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { TranslationPipe } from '../../../core/pipes/translation.pipe';
-import { RevealDirective } from '../../../shared/directives/reveal/reveal.directive';
-import { AuthService } from '../../../core/services/auth.service';
+import { TranslationPipe } from '@core/pipes/translation.pipe';
+import { RevealDirective } from '@shared/directives/reveal/reveal.directive';
+import { AuthService } from '@core/services/auth.service';
 
 interface Country {
   flag: string;
@@ -18,6 +18,9 @@ interface Country {
   styleUrl: './register.scss',
 })
 export class Register {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   nombre = signal('');
   apellido = signal('');
   nombreUsuario = signal('');
@@ -52,8 +55,6 @@ export class Register {
     { flag: 'do', code: 'DO', dial: '+1' },
     { flag: 'cu', code: 'CU', dial: '+53' },
   ];
-
-  constructor(private authService: AuthService, private router: Router) {}
 
   getFlagUrl(countryCode: string): string {
     return `https://flagcdn.io/${countryCode.toLowerCase()}.svg`;

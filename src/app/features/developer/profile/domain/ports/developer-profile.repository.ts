@@ -1,6 +1,6 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
-import { DeveloperProfile } from '../../../../../core/domain/models/user.model';
+import { DeveloperProfile } from '@core/domain/models/user.model';
 
 export interface DeveloperProfileRepository {
   getByUserId(userId: string): Observable<DeveloperProfile | null>;

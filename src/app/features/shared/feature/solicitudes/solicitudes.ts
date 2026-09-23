@@ -1,10 +1,12 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { ConnectionGraphqlService, ConnectionRequest } from '../../../../core/services/social/connection-graphql.service';
-import { GraphQLService, User } from '../../../../core/services/graphql.service';
-import { ToastService } from '../../../../core/services/toast.service';
-import { ConfirmModal } from '../../../../shared/ui/confirm-modal/confirm-modal';
+import { ConnectionStore } from '@features/shared/data-access/state/connection.store';
+import { ConnectionRequest } from '@features/shared/domain/models/connection.model';
+import { UserStore } from '@features/users/data-access/state/user.store';
+import { User } from '@core/domain/models/user.model';
+import { ToastService } from '@core/services/toast.service';
+import { ConfirmModal } from '@shared/ui/confirm-modal/confirm-modal';
 
 interface RequestWithUser extends ConnectionRequest {
   solicitante?: User;
@@ -30,8 +32,8 @@ export class Solicitudes implements OnInit {
   confirmAction = signal<'remove' | 'cancel' | null>(null);
   pendingId = signal<string | null>(null);
 
-  private connService = inject(ConnectionGraphqlService);
-  private graphql = inject(GraphQLService);
+  private connService = inject(ConnectionStore);
+  private userStore = inject(UserStore);
   private router = inject(Router);
   private toast = inject(ToastService);
 
@@ -69,8 +71,8 @@ export class Solicitudes implements OnInit {
     });
   }
 
-  private loadUsers(userIds: string[]): void {
-    this.graphql.getUsers().subscribe({
+  private loadUsers(_userIds: string[]): void {
+    this.userStore.getAll().subscribe({
       next: (users: User[]) => {
         const map = new Map<string, User>();
         users.forEach(u => { if (u.id) map.set(u.id, u); });
@@ -167,7 +169,6 @@ export class Solicitudes implements OnInit {
   }
 
   private getBaseRoute(): string {
-    const userId = localStorage.getItem('userId');
     const role = localStorage.getItem('role');
     if (role === 'RECLUTADOR') return '/recruiter/inicio';
     if (role === 'DESARROLLADOR') return '/developer/dashboard';

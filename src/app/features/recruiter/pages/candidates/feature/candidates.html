@@ -1,51 +1,112 @@
 <div class="candidates-container">
-  <div class="search-bar">
-    <span class="material-symbols-outlined">search</span>
-    <input
-      type="text"
-      placeholder="Buscar candidatos..."
-      [(ngModel)]="searchTerm"
-      class="search-input"
-    />
+  <div class="filters-panel">
+    <div class="search-bar">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        placeholder="Filtrar por nombre, rol o skill..."
+        [(ngModel)]="searchTerm"
+        class="search-input"
+      />
+    </div>
+
+    <div class="filters-row">
+      <label class="filter-field">
+        <span>Nivel</span>
+        <select [(ngModel)]="experienceLevel" (ngModelChange)="search()">
+          <option value="">Cualquiera</option>
+          @for (level of experienceLevels; track level) {
+            <option [value]="level">{{ level }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="filter-field">
+        <span>País</span>
+        <input type="text" placeholder="Ej. Perú" [(ngModel)]="locationCountry" (ngModelChange)="search()" />
+      </label>
+
+      <label class="filter-field">
+        <span>Ciudad</span>
+        <input type="text" placeholder="Ej. Lima" [(ngModel)]="locationCity" (ngModelChange)="search()" />
+      </label>
+
+      <label class="filter-field">
+        <span>Disponibilidad</span>
+        <select [(ngModel)]="availability" (ngModelChange)="search()">
+          <option value="">Cualquiera</option>
+          @for (item of availabilities; track item) {
+            <option [value]="item">{{ item }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="filter-field checkbox">
+        <input type="checkbox" [(ngModel)]="remoteAvailable" (ngModelChange)="search()" />
+        <span>Solo remoto</span>
+      </label>
+
+      <button type="button" class="btn btn-primary" (click)="search()">
+        <span class="material-symbols-outlined">search</span>
+        Buscar
+      </button>
+    </div>
+
+    <div class="tech-filter">
+      <div class="tech-input-row">
+        <input
+          type="text"
+          placeholder="Añadir tecnología..."
+          [(ngModel)]="technologyInput"
+          (keyup.enter)="addTechnology()"
+        />
+        <button type="button" class="btn btn-outline" (click)="addTechnology()">Añadir</button>
+      </div>
+      @if (techList.length > 0) {
+        <div class="tech-chips">
+          @for (tech of techList; track tech) {
+            <button type="button" class="skill-tag removable" (click)="removeTechnology(tech)">
+              {{ tech }}
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          }
+        </div>
+      }
+    </div>
   </div>
+
+  <div class="results-meta">
+    @if (loading()) {
+      <span>Buscando candidatos…</span>
+    } @else {
+      <span>{{ filteredCandidates.length }} candidato(s) · {{ total() }} en total</span>
+    }
+  </div>
+
+  @if (error()) {
+    <div class="state-message error">{{ error() }}</div>
+  }
+
+  @if (!loading() && !error() && filteredCandidates.length === 0) {
+    <div class="state-message">
+      No se encontraron candidatos con esos filtros.
+    </div>
+  }
 
   <div class="candidates-list">
     @for (candidate of filteredCandidates; track candidate.id) {
-      <div class="candidate-card">
-        <div class="candidate-header">
-          <img [src]="candidate.avatar" [alt]="candidate.name" class="candidate-avatar" />
-          <div class="candidate-info">
-            <h3 class="candidate-name">{{ candidate.name }}</h3>
-            <p class="candidate-role">{{ candidate.role }}</p>
-          </div>
-          <span class="availability-badge" [class.available]="candidate.available">
-            {{ candidate.available ? 'Disponible' : 'Ocupado' }}
-          </span>
-        </div>
-
-        <div class="candidate-skills">
-          @for (skill of candidate.skills; track skill) {
-            <span class="skill-tag">{{ skill }}</span>
-          }
-        </div>
-
-        <div class="candidate-footer">
-          <span class="experience">
-            <span class="material-symbols-outlined">work_history</span>
-            {{ candidate.experience }}
-          </span>
-          <div class="candidate-actions">
-            <button class="btn btn-outline">
-              <span class="material-symbols-outlined">chat</span>
-              Mensaje
-            </button>
-            <button class="btn btn-primary">
-              <span class="material-symbols-outlined">person_add</span>
-              Contactar
-            </button>
-          </div>
-        </div>
-      </div>
+      <app-candidate-card
+        [id]="candidate.id"
+        [name]="candidate.nombre"
+        [role]="candidate.tituloProfesional || 'Desarrollador'"
+        [skills]="skillsOf(candidate)"
+        [avatar]="avatarOf(candidate)"
+        [experience]="experienceLabel(candidate)"
+        [available]="availableOf(candidate)"
+        [saved]="store.isSaved(candidate.id)"
+        (message)="onMessage(candidate)"
+        (saveToggle)="toggleSave(candidate)"
+      />
     }
   </div>
 </div>

@@ -13,7 +13,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import {
   ImageEditorService,
-} from '../../../core/services/image-editor.service';
+} from '@core/services/image-editor.service';
 
 interface Adjustments {
   brightness: number;
@@ -147,6 +147,8 @@ export class ImageEditorModal implements AfterViewInit, OnDestroy {
     return {
       x: imgLeft + this.cropLeft() * s,
       y: imgTop + this.cropTop() * s,
+      w: Math.max(24, Math.round(c.w * s)),
+      h: Math.max(24, Math.round(c.h * s)),
     };
   });
 
@@ -540,7 +542,6 @@ export class ImageEditorModal implements AfterViewInit, OnDestroy {
     const sh = Math.min(c.h, rh);
     if (sw < 1 || sh < 1) return null;
 
-    const a = this.adjust();
     const maxSide = this.state()?.maxSide ?? 1600;
     const outScale = Math.min(1, maxSide / Math.max(sw, sh));
     const outW = Math.max(1, Math.round(sw * outScale));

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RecruiterLayout } from './layout/recruiter-layout';
+import { RecruiterLayout } from '@features/recruiter/layout/recruiter-layout';
 
 @Component({
   selector: 'app-recruiter-main',

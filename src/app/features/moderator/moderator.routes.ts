@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { ModeratorMain } from './main';
+import { ModeratorMain } from '@features/moderator/main';
 
 export const routes: Routes = [
   {
@@ -14,8 +14,8 @@ export const routes: Routes = [
     },
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-      { path: 'dashboard', loadComponent: () => import('./feature/dashboard/moderator-dashboard').then(m => m.ModeratorDashboard) },
-      { path: 'discover', loadComponent: () => import('../shared/feature/discover-users/discover-users').then(m => m.DiscoverUsers) },
+      { path: 'dashboard', loadComponent: () => import('@features/moderator/feature/dashboard/moderator-dashboard').then(m => m.ModeratorDashboard) },
+      { path: 'discover', loadComponent: () => import('@features/shared/feature/discover-users/discover-users').then(m => m.DiscoverUsers) },
     ],
   },
 ];

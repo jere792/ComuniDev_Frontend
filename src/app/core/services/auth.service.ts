@@ -1,10 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiService, LoginData } from './api.service';
+import { ApiService, LoginData } from '@core/services/api.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  constructor(private router: Router, private api: ApiService) {}
+  private router = inject(Router);
+  private api = inject(ApiService);
+
 
   isAuthenticated(): boolean {
     return !!localStorage.getItem('token');

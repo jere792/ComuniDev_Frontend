@@ -1,0 +1,71 @@
+<section class="info-card">
+  <div class="card-header">
+    <div class="card-header-left">
+      <div class="card-icon">
+        <span class="material-symbols-outlined">contact_page</span>
+      </div>
+      <div>
+        <h2 class="card-title">Información del Desarrollador</h2>
+        <p class="card-subtitle">Ficha técnica y credenciales de contacto</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="contact-list">
+    <div class="contact-row">
+      <span class="material-symbols-outlined">mail</span>
+      <span class="contact-label">Correo Electrónico</span>
+      <span class="contact-value">{{ user?.email }}</span>
+    </div>
+
+    <div class="contact-row clickable" (click)="editBasic.emit()">
+      <span class="material-symbols-outlined">phone</span>
+      <span class="contact-label">Teléfono / WhatsApp</span>
+      @if (user?.telefono) {
+        <span class="contact-value">{{ user?.telefono }}</span>
+      } @else {
+        <span class="contact-value add-field">+ Agregar teléfono</span>
+      }
+    </div>
+
+    <div class="contact-row clickable" (click)="editBasic.emit()">
+      <span class="material-symbols-outlined">location_on</span>
+      <span class="contact-label">Ubicación</span>
+      @if (user?.ubicacion?.ciudad) {
+        <span class="contact-value">{{ user?.ubicacion?.ciudad }}, {{ user?.ubicacion?.pais }}</span>
+      } @else {
+        <span class="contact-value add-field">+ Agregar ubicación</span>
+      }
+    </div>
+
+    <div class="contact-row clickable" (click)="editProfile.emit()">
+      <span class="material-symbols-outlined">code</span>
+      <span class="contact-label">Título profesional</span>
+      @if (profile?.tituloProfesional) {
+        <span class="contact-value">{{ profile?.tituloProfesional }}</span>
+      } @else {
+        <span class="contact-value add-field">+ Agregar título</span>
+      }
+    </div>
+
+    <div class="contact-row clickable" (click)="editProfile.emit()">
+      <span class="material-symbols-outlined">terminal</span>
+      <span class="contact-label">GitHub</span>
+      @if (profile?.enlaces?.github) {
+        <a class="contact-value link" [href]="profile?.enlaces?.github" target="_blank">Ver perfil</a>
+      } @else {
+        <span class="contact-value add-field">+ Agregar GitHub</span>
+      }
+    </div>
+
+    <div class="contact-row clickable" (click)="editProfile.emit()">
+      <span class="material-symbols-outlined">badge</span>
+      <span class="contact-label">Disponibilidad</span>
+      @if (profile?.disponibilidadLaboral?.buscandoEmpleo) {
+        <span class="contact-value availability">Buscando empleo</span>
+      } @else {
+        <span class="contact-value add-field">+ Actualizar disponibilidad</span>
+      }
+    </div>
+  </div>
+</section>

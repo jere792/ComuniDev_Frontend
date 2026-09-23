@@ -1,0 +1,42 @@
+<section class="sidebar-card">
+  <div class="sidebar-card-header">
+    <div class="card-icon">
+      <span class="material-symbols-outlined">deployed_code</span>
+    </div>
+    <div>
+      <h3 class="card-title">Stack & Habilidades</h3>
+      <p class="card-subtitle">Tecnologías y soft skills</p>
+    </div>
+  </div>
+
+  <div class="stack-body">
+    @if (tecnologias.length) {
+      <div class="stack-tags">
+        @for (tech of tecnologias; track tech.nombre) {
+          <button type="button" class="tech-chip" [title]="tech.nivel || ''" (click)="editProfile.emit()">
+            <span class="tech-name">{{ tech.nombre }}</span>
+            @if (tech.nivel) {
+              <span class="tech-level">{{ tech.nivel | titlecase }}</span>
+            }
+          </button>
+        }
+      </div>
+    } @else {
+      <button type="button" class="add-link" (click)="editProfile.emit()">
+        <span class="material-symbols-outlined">add</span>
+        Agregar tecnologías
+      </button>
+    }
+
+    @if (habilidadesBlandas.length) {
+      <div class="soft-skills">
+        <span class="soft-label">Habilidades blandas</span>
+        <div class="soft-tags">
+          @for (skill of habilidadesBlandas; track skill) {
+            <span class="soft-chip">{{ skill }}</span>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</section>

@@ -1,0 +1,110 @@
+<div class="profile-card">
+  <div class="banner-wrapper">
+    @if (user?.bannerUrl) {
+      <img [src]="user.bannerUrl" alt="Banner" class="banner-image" />
+    } @else {
+      <div class="banner-placeholder"></div>
+    }
+    <div class="banner-overlay"></div>
+    <div class="status-pill">
+      <span class="status-dot"></span>
+      <span class="status-text">Desarrollador ComuniDev</span>
+    </div>
+    <button class="banner-edit-btn" (click)="bannerClick.emit()" [disabled]="uploadingImage">
+      <span class="material-symbols-outlined">photo_camera</span>
+      <span>Editar portada</span>
+    </button>
+  </div>
+
+  <div class="identity-section">
+    <div class="avatar-wrapper">
+      <div class="avatar-halo">
+        @if (user?.fotoPerfilUrl) {
+          <img [src]="user.fotoPerfilUrl" alt="Foto de perfil" class="avatar-image" />
+        } @else {
+          <div class="avatar-fallback">{{ getInitials() }}</div>
+        }
+      </div>
+      <button class="avatar-edit-btn" (click)="photoClick.emit()" [disabled]="uploadingImage">
+        <span class="material-symbols-outlined">photo_camera</span>
+      </button>
+    </div>
+
+    <div class="identity-block">
+      <div class="identity-top-row">
+        <div class="identity-text">
+          <div class="identity-row">
+            <h1 class="display-name">{{ user?.nombre }}</h1>
+            @if (profile?.verificado) {
+              <div class="verified-badge" title="Desarrollador Verificado">
+                <span class="material-symbols-outlined">verified</span>
+              </div>
+            }
+          </div>
+          <div class="handle-row">
+            <span class="handle">@{{ user?.nombreUsuario }}</span>
+            @if (user?.emailVerificado) {
+              <span class="separator-dot"></span>
+              <div class="availability-badge online">
+                <span class="availability-dot"></span>
+                <span>Email verificado</span>
+              </div>
+            }
+          </div>
+          @if (profile?.tituloProfesional) {
+            <p class="headline-role">{{ profile?.tituloProfesional }}</p>
+          }
+          <div class="bio-block" (click)="bioClick.emit()">
+            @if (user?.bio) {
+              <p class="motto-text">{{ user?.bio }}</p>
+            } @else {
+              <p class="motto-text add-field">Agregar bio +</p>
+            }
+          </div>
+        </div>
+        <div class="stats-column">
+          <div class="stats-grid">
+            <button type="button" class="stat-item stat-btn" (click)="openStat('followers')">
+              <span class="stat-value">{{ user?.seguidoresCount || 0 }}</span>
+              <span class="stat-label">Seguidores</span>
+            </button>
+            <button type="button" class="stat-item stat-btn" (click)="openStat('following')">
+              <span class="stat-value">{{ user?.siguiendoCount || 0 }}</span>
+              <span class="stat-label">Siguiendo</span>
+            </button>
+            <button type="button" class="stat-item stat-btn" (click)="openStat('connections')">
+              <span class="stat-value">{{ user?.conexionesCount || 0 }}</span>
+              <span class="stat-label">Conexiones</span>
+            </button>
+          </div>
+          @if (user?.estadoCuenta) {
+            <div class="account-status-tag" [class.active]="user?.estadoCuenta === 'ACTIVE'" [class.pending]="user?.estadoCuenta === 'PENDING_VERIFICATION'">
+              <span class="material-symbols-outlined">{{ user?.estadoCuenta === 'ACTIVE' ? 'verified_user' : 'pending' }}</span>
+              <span>{{ user?.estadoCuenta === 'ACTIVE' ? 'Cuenta verificada' : user?.estadoCuenta === 'PENDING_VERIFICATION' ? 'Verificación pendiente' : user?.estadoCuenta }}</span>
+            </div>
+          }
+        </div>
+      </div>
+      <div class="badges-row">
+        @if (profile?.disponibilidadLaboral?.buscandoEmpleo) {
+          <span class="badge-chip badge-active">
+            <span class="material-symbols-outlined">work</span>
+            Buscando empleo
+          </span>
+        }
+        @if (profile?.tecnologias?.length) {
+          <span class="badge-chip">
+            <span class="material-symbols-outlined">code</span>
+            {{ profile.tecnologias.length }} tecnologías
+          </span>
+        }
+        @if (user?.ubicacion?.ciudad) {
+          <span class="badge-chip">
+            <span class="material-symbols-outlined">location_on</span>
+            {{ user.ubicacion.ciudad }}, {{ user.ubicacion.pais }}
+          </span>
+        }
+      </div>
+    </div>
+  </div>
+</div>

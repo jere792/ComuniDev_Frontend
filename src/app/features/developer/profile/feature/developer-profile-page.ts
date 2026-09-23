@@ -1,16 +1,31 @@
 import { Component, OnInit, signal, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { User, DeveloperProfile } from '@core/domain/models/user.model';
 import { DeveloperProfileStore } from '@features/developer/profile/data-access/state/developer-profile.store';
 import { UserStore } from '@features/users/data-access/state/user.store';
 import { ToastService } from '@core/services/toast.service';
 import { ImageEditorService } from '@core/services/image-editor.service';
+import { DeveloperProfileCard } from '@features/developer/profile/ui/profile-card/developer-profile-card';
+import { DeveloperContactInfo } from '@features/developer/profile/ui/contact-info/developer-contact-info';
+import { DeveloperStackCard } from '@features/developer/profile/ui/stack-card/developer-stack-card';
+import { SidebarCard } from '@features/recruiter/pages/profile/ui/sidebar-card/sidebar-card';
+import { SocialListModal, SocialListType } from '@features/recruiter/pages/profile/ui/social-list-modal/social-list-modal';
 
 @Component({
   selector: 'app-developer-profile-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    DeveloperProfileCard,
+    DeveloperContactInfo,
+    DeveloperStackCard,
+    SidebarCard,
+    SocialListModal,
+  ],
   templateUrl: './developer-profile.html',
   styleUrl: './developer-profile.scss',
 })
@@ -23,6 +38,8 @@ export class DeveloperProfilePage implements OnInit {
   isEditingBasic = signal(false);
   isEditingProfile = signal(false);
   uploadingImage = signal(false);
+  socialModalOpen = signal(false);
+  socialModalType = signal<SocialListType>('followers');
   basicForm: FormGroup;
   profileForm: FormGroup;
 
@@ -35,6 +52,7 @@ export class DeveloperProfilePage implements OnInit {
       nombreUsuario: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
       bio: [''],
+      telefono: [''],
       ubicacionPais: [''],
       ubicacionCiudad: [''],
       ubicacionDistrito: [''],
@@ -112,6 +130,7 @@ export class DeveloperProfilePage implements OnInit {
   }
 
   toggleEditBasic(): void {
+    this.isEditingProfile.set(false);
     this.isEditingBasic.update(v => !v);
     if (this.isEditingBasic() && this.user()) {
       const u = this.user()!;
@@ -120,6 +139,7 @@ export class DeveloperProfilePage implements OnInit {
         nombreUsuario: u.nombreUsuario,
         email: u.email,
         bio: u.bio || '',
+        telefono: u.telefono || '',
         ubicacionPais: u.ubicacion?.pais || '',
         ubicacionCiudad: u.ubicacion?.ciudad || '',
         ubicacionDistrito: u.ubicacion?.distrito || '',
@@ -128,7 +148,11 @@ export class DeveloperProfilePage implements OnInit {
   }
 
   toggleEditProfile(): void {
+    this.isEditingBasic.set(false);
     this.isEditingProfile.update(v => !v);
+    if (this.isEditingProfile() && this.profile) {
+      this.populateProfileForm(this.profile);
+    }
   }
 
   addTecnologia(): void {
@@ -151,6 +175,7 @@ export class DeveloperProfilePage implements OnInit {
         nombreUsuario: formValue.nombreUsuario,
         email: formValue.email,
         bio: formValue.bio,
+        telefono: formValue.telefono,
         ubicacion: {
           pais: formValue.ubicacionPais,
           ciudad: formValue.ubicacionCiudad,
@@ -202,6 +227,15 @@ export class DeveloperProfilePage implements OnInit {
   getInitials(): string {
     const name = this.user()?.nombre || '';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  }
+
+  openSocialModal(type: SocialListType): void {
+    this.socialModalType.set(type);
+    this.socialModalOpen.set(true);
+  }
+
+  closeSocialModal(): void {
+    this.socialModalOpen.set(false);
   }
 
   onBannerClick(input: HTMLInputElement): void {

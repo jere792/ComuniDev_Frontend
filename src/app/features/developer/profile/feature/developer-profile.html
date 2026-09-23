@@ -2,309 +2,297 @@
   <div class="loading-state">Cargando perfil...</div>
 }
 
-<div class="profile-container">
-  <div class="profile-banner">
-    @if (user()?.bannerUrl) {
-      <img [src]="user()?.bannerUrl" alt="Banner" class="banner-image" />
-    } @else {
-      <div class="banner-placeholder"></div>
-    }
-    <button class="banner-edit-btn" (click)="onBannerClick(bannerInput)" [disabled]="uploadingImage()">
-      <span class="material-symbols-outlined">photo_camera</span>
-    </button>
-    <input #bannerInput type="file" accept="image/*" hidden (change)="onBannerSelected($event)" />
-    <div class="profile-avatar">
-      @if (user()?.fotoPerfilUrl) {
-        <img [src]="user()?.fotoPerfilUrl" alt="Foto de perfil" class="avatar-image" />
-      } @else {
-        <div class="avatar-circle">{{ getInitials() }}</div>
-      }
-      <button class="avatar-edit-btn" (click)="onPhotoClick(photoInput)" [disabled]="uploadingImage()">
-        <span class="material-symbols-outlined">photo_camera</span>
-      </button>
+<div class="profile-page">
+  <div class="profile-grid">
+    <!-- ─── MAIN COLUMN ─── -->
+    <div class="profile-main">
+      <app-developer-profile-card
+        [user]="user()"
+        [profile]="profile"
+        [uploadingImage]="uploadingImage()"
+        (bannerClick)="onBannerClick(bannerInput)"
+        (photoClick)="onPhotoClick(photoInput)"
+        (bioClick)="toggleEditBasic()"
+        (statClick)="openSocialModal($event)"
+      />
+      <input #bannerInput type="file" accept="image/*" hidden (change)="onBannerSelected($event)" />
       <input #photoInput type="file" accept="image/*" hidden (change)="onPhotoSelected($event)" />
-    </div>
-  </div>
 
-  <div class="profile-content">
-    <div class="profile-header">
-      <div class="profile-title">
-        <h1>{{ user()?.nombre }}</h1>
-        <span class="username">&#64;{{ user()?.nombreUsuario }}</span>
-        <span class="role-badge">{{ user()?.rolActivo }}</span>
-      </div>
-      <div class="profile-actions">
-        <button class="edit-btn" (click)="toggleEditBasic()">
-          {{ isEditingBasic() ? 'Cancelar' : 'Editar datos básicos' }}
-        </button>
-        <button class="edit-btn" (click)="toggleEditProfile()">
-          {{ isEditingProfile() ? 'Cancelar' : hasProfile ? 'Editar perfil profesional' : 'Crear perfil profesional' }}
-        </button>
-      </div>
-    </div>
+      <app-developer-contact-info
+        [user]="user()"
+        [profile]="profile"
+        (editBasic)="toggleEditBasic()"
+        (editProfile)="toggleEditProfile()"
+      />
 
-    <div class="profile-stats">
-      <div class="stat-card">
-        <span class="stat-value">{{ user()?.seguidoresCount || 0 }}</span>
-        <span class="stat-label">Seguidores</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-value">{{ user()?.siguiendoCount || 0 }}</span>
-        <span class="stat-label">Siguiendo</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-value">{{ user()?.conexionesCount || 0 }}</span>
-        <span class="stat-label">Conexiones</span>
-      </div>
-    </div>
-
-    @if (isEditingBasic()) {
-      <form [formGroup]="basicForm" (ngSubmit)="onSubmitBasic()" class="profile-form">
-        <div class="form-group">
-          <label>Nombre completo</label>
-          <input type="text" formControlName="nombre" placeholder="Tu nombre">
-        </div>
-        <div class="form-group">
-          <label>Nombre de usuario</label>
-          <input type="text" formControlName="nombreUsuario" placeholder="usuario123">
-        </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" formControlName="email" placeholder="correo@ejemplo.com">
-        </div>
-        <div class="form-group">
-          <label>Bio</label>
-          <textarea formControlName="bio" rows="3" placeholder="Cuéntanos sobre ti..."></textarea>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>País</label>
-            <input type="text" formControlName="ubicacionPais" placeholder="País">
+      @if (isEditingBasic()) {
+        <section class="edit-card">
+          <div class="edit-card-header">
+            <div class="card-icon">
+              <span class="material-symbols-outlined">edit</span>
+            </div>
+            <div>
+              <h2 class="edit-title">Editar datos básicos</h2>
+              <p class="edit-subtitle">Información personal y contacto</p>
+            </div>
           </div>
-          <div class="form-group">
-            <label>Ciudad</label>
-            <input type="text" formControlName="ubicacionCiudad" placeholder="Ciudad">
-          </div>
-          <div class="form-group">
-            <label>Distrito</label>
-            <input type="text" formControlName="ubicacionDistrito" placeholder="Distrito">
-          </div>
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn-secondary" (click)="toggleEditBasic()">Cancelar</button>
-          <button type="submit" class="btn-primary" [disabled]="basicForm.invalid">Guardar</button>
-        </div>
-      </form>
-    }
-
-    @if (!isEditingBasic() && !isEditingProfile()) {
-      <div class="profile-details">
-        <div class="detail-item">
-          <span class="detail-label">Email</span>
-          <span class="detail-value">{{ user()?.email }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Estado</span>
-          <span class="detail-value">{{ user()?.estadoCuenta }}</span>
-        </div>
-      </div>
-
-      @if (user()?.bio) {
-        <div class="detail-item">
-          <span class="detail-label">Bio</span>
-          <span class="detail-value">{{ user()?.bio }}</span>
-        </div>
+          <form [formGroup]="basicForm" (ngSubmit)="onSubmitBasic()" class="edit-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Nombre completo</label>
+                <input class="form-input" type="text" formControlName="nombre" placeholder="Tu nombre">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Nombre de usuario</label>
+                <input class="form-input" type="text" formControlName="nombreUsuario" placeholder="usuario123">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input class="form-input" type="email" formControlName="email" placeholder="correo@ejemplo.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Teléfono</label>
+                <input class="form-input" type="tel" formControlName="telefono" placeholder="+51 999 888 777">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Bio</label>
+              <textarea class="form-textarea" formControlName="bio" rows="3" placeholder="Cuéntanos sobre ti..."></textarea>
+            </div>
+            <div class="form-row form-row-3">
+              <div class="form-group">
+                <label class="form-label">País</label>
+                <input class="form-input" type="text" formControlName="ubicacionPais" placeholder="País">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Ciudad</label>
+                <input class="form-input" type="text" formControlName="ubicacionCiudad" placeholder="Ciudad">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Distrito</label>
+                <input class="form-input" type="text" formControlName="ubicacionDistrito" placeholder="Distrito">
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" (click)="toggleEditBasic()">Cancelar</button>
+              <button type="submit" class="btn-primary" [disabled]="basicForm.invalid">Guardar</button>
+            </div>
+          </form>
+        </section>
       }
 
-      @if (user()?.ubicacion) {
-        <div class="detail-item">
-          <span class="detail-label">Ubicación</span>
-          <span class="detail-value">{{ user()?.ubicacion?.ciudad }}, {{ user()?.ubicacion?.pais }}</span>
-        </div>
-      }
-
-      @if (profile) {
-        <div class="profile-section">
-          <h2>Perfil Profesional</h2>
-
-          @if (profile?.tituloProfesional) {
-            <div class="detail-item">
-              <span class="detail-label">Título</span>
-              <span class="detail-value">{{ profile?.tituloProfesional }}</span>
+      @if (isEditingProfile()) {
+        <section class="edit-card">
+          <div class="edit-card-header">
+            <div class="card-icon">
+              <span class="material-symbols-outlined">code</span>
             </div>
-          }
-
-          @if (profile?.tecnologias?.length) {
-            <div class="detail-section">
-              <span class="detail-label">Tecnologías</span>
-              <div class="tags-container">
-                @for (tech of profile?.tecnologias; track tech.nombre) {
-                  <span class="tag">{{ tech.nombre }} ({{ tech.nivel }})</span>
-                }
+            <div>
+              <h2 class="edit-title">Editar perfil profesional</h2>
+              <p class="edit-subtitle">Título, stack tecnológico y enlaces</p>
+            </div>
+          </div>
+          <form [formGroup]="profileForm" (ngSubmit)="onSubmitProfile()" class="edit-form">
+            <div class="form-group">
+              <label class="form-label">Título profesional</label>
+              <input class="form-input" type="text" formControlName="tituloProfesional" placeholder="Ej: Desarrollador Full Stack">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">GitHub URL</label>
+                <input class="form-input" type="url" formControlName="github" placeholder="https://github.com/tu-usuario">
+              </div>
+              <div class="form-group">
+                <label class="form-label">LinkedIn URL</label>
+                <input class="form-input" type="url" formControlName="linkedin" placeholder="https://linkedin.com/in/tu-usuario">
               </div>
             </div>
-          }
-
-          @if (profile?.experiencias?.length) {
-            <div class="detail-section">
-              <span class="detail-label">Experiencia</span>
-              @for (exp of profile?.experiencias; track exp.empresa) {
-                <div class="experience-item">
-                  <strong>{{ exp.cargo }}</strong> en {{ exp.empresa }}
-                  <span class="metadata">{{ exp.fechaInicio }} - {{ exp.fechaFin || 'Presente' }}</span>
-                </div>
-              }
-            </div>
-          }
-
-          @if (profile?.educacion?.length) {
-            <div class="detail-section">
-              <span class="detail-label">Educación</span>
-              @for (edu of profile?.educacion; track edu.institucion) {
-                <div class="experience-item">
-                  <strong>{{ edu.titulo }}</strong> - {{ edu.institucion }}
-                  <span class="metadata">{{ edu.fechaInicio }} - {{ edu.fechaFin || 'Presente' }}</span>
-                </div>
-              }
-            </div>
-          }
-
-          @if (profile?.enlaces) {
-            <div class="detail-section">
-              <span class="detail-label">Enlaces</span>
-              <div class="links-container">
-                @if (profile?.enlaces?.github) {
-                  <a href="{{ profile?.enlaces?.github }}" target="_blank" class="link-item">GitHub</a>
-                }
-                @if (profile?.enlaces?.linkedin) {
-                  <a href="{{ profile?.enlaces?.linkedin }}" target="_blank" class="link-item">LinkedIn</a>
-                }
-                @if (profile?.enlaces?.portafolio) {
-                  <a href="{{ profile?.enlaces?.portafolio }}" target="_blank" class="link-item">Portafolio</a>
-                }
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Portafolio URL</label>
+                <input class="form-input" type="url" formControlName="portafolio" placeholder="https://tu-portafolio.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Habilidades blandas (separadas por coma)</label>
+                <input class="form-input" type="text" formControlName="habilidadesBlandas" placeholder="Trabajo en equipo, Comunicación">
               </div>
             </div>
-          }
-
-          @if (profile?.disponibilidadLaboral) {
-            <div class="detail-item">
-              <span class="detail-label">Buscando empleo</span>
-              <span class="detail-value">{{ profile?.disponibilidadLaboral?.buscandoEmpleo ? 'Sí' : 'No' }}</span>
+            <div class="form-group checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" formControlName="buscandoEmpleo">
+                Buscando empleo
+              </label>
             </div>
-          }
 
-          @if (profile?.cv?.archivoUrl) {
-            <div class="detail-section">
-              <span class="detail-label">Curriculum Vitae</span>
-              <div class="cv-container">
-                <a [href]="profile?.cv?.archivoUrl" target="_blank" class="cv-link">
-                  <span class="material-symbols-outlined">description</span>
-                  {{ profile?.cv?.nombreArchivo || 'Ver CV' }}
-                </a>
-                @if (profile?.cv?.actualizadoEn) {
-                  <span class="metadata">Actualizado: {{ profile?.cv?.actualizadoEn | date:'mediumDate' }}</span>
-                }
+            <div class="form-section">
+              <div class="section-header">
+                <label class="form-label">Tecnologías</label>
+                <button type="button" class="btn-add" (click)="addTecnologia()">+ Agregar</button>
               </div>
-            </div>
-          }
-
-          @if (profile?.certificados?.length) {
-            <div class="detail-section">
-              <span class="detail-label">Certificados</span>
-              @for (cert of profile?.certificados; track cert.nombre) {
-                <div class="experience-item">
-                  <strong>{{ cert.nombre }}</strong> - {{ cert.institucion }}
-                  <span class="metadata">{{ cert.fechaObtencion }}</span>
-                  @if (cert.url) {
-                    <a [href]="cert.url" target="_blank" class="link-item">Ver credencial</a>
-                  }
-                </div>
-              }
-            </div>
-          }
-
-          @if (profile?.proyectos?.length) {
-            <div class="detail-section">
-              <span class="detail-label">Proyectos</span>
-              @for (proy of profile?.proyectos; track proy.nombre) {
-                <div class="experience-item">
-                  <strong>{{ proy.nombre }}</strong>
-                  <p class="project-desc">{{ proy.descripcion }}</p>
-                  <div class="tags-container">
-                    @for (tech of proy.tecnologias; track tech) {
-                      <span class="tag">{{ tech }}</span>
-                    }
+              <div formArrayName="tecnologias">
+                @for (tech of tecnologias.controls; track $index; let i = $index) {
+                  <div [formGroupName]="i" class="tech-row">
+                    <input class="form-input" type="text" formControlName="nombre" placeholder="Nombre">
+                    <select class="form-input" formControlName="nivel">
+                      <option value="BASICO">Básico</option>
+                      <option value="INTERMEDIO">Intermedio</option>
+                      <option value="AVANZADO">Avanzado</option>
+                    </select>
+                    <input class="form-input" type="number" formControlName="aniosExperiencia" placeholder="Años">
+                    <button type="button" class="btn-remove" (click)="removeTecnologia(i)">×</button>
                   </div>
-                  @if (proy.url) {
-                    <a [href]="proy.url" target="_blank" class="link-item">Ver proyecto</a>
-                  }
-                </div>
-              }
+                }
+              </div>
             </div>
-          }
-        </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" (click)="toggleEditProfile()">Cancelar</button>
+              <button type="submit" class="btn-primary">Guardar perfil</button>
+            </div>
+          </form>
+        </section>
       }
-    }
+    </div>
 
-    @if (isEditingProfile()) {
-      <form [formGroup]="profileForm" (ngSubmit)="onSubmitProfile()" class="profile-form">
-        <div class="form-group">
-          <label>Título profesional</label>
-          <input type="text" formControlName="tituloProfesional" placeholder="Ej: Desarrollador Full Stack">
-        </div>
-
-        <div class="form-group">
-          <label>GitHub URL</label>
-          <input type="url" formControlName="github" placeholder="https://github.com/tu-usuario">
-        </div>
-
-        <div class="form-group">
-          <label>LinkedIn URL</label>
-          <input type="url" formControlName="linkedin" placeholder="https://linkedin.com/in/tu-usuario">
-        </div>
-
-        <div class="form-group">
-          <label>Portafolio URL</label>
-          <input type="url" formControlName="portafolio" placeholder="https://tu-portafolio.com">
-        </div>
-
-        <div class="form-group">
-          <label>
-            <input type="checkbox" formControlName="buscandoEmpleo"> Buscando empleo
-          </label>
-        </div>
-
-        <div class="form-group">
-          <label>Habilidades blandas (separadas por coma)</label>
-          <input type="text" formControlName="habilidadesBlandas" placeholder="Trabajo en equipo, Comunicación">
-        </div>
-
-        <div class="form-section">
-          <div class="section-header">
-            <label>Tecnologías</label>
-            <button type="button" class="btn-add" (click)="addTecnologia()">+ Agregar</button>
+    <!-- ─── SIDEBAR ─── -->
+    <aside class="profile-sidebar">
+      <!-- Cuenta -->
+      <app-sidebar-card icon="shield_person" title="Cuenta" subtitle="Estado de tu cuenta y verificación">
+        <div class="account-status">
+          <div class="account-status-row">
+            <span class="account-status-label">Estado</span>
+            <span class="account-status-badge" [class.active]="user()?.estadoCuenta === 'ACTIVE'" [class.pending]="user()?.estadoCuenta === 'PENDING_VERIFICATION'">
+              {{ user()?.estadoCuenta === 'ACTIVE' ? 'Activa' : user()?.estadoCuenta === 'PENDING_VERIFICATION' ? 'Pendiente de verificación' : user()?.estadoCuenta || '—' }}
+            </span>
           </div>
-          <div formArrayName="tecnologias">
-            @for (tech of tecnologias.controls; track $index; let i = $index) {
-              <div [formGroupName]="i" class="tech-row">
-                <input type="text" formControlName="nombre" placeholder="Nombre">
-                <select formControlName="nivel">
-                  <option value="BASICO">Básico</option>
-                  <option value="INTERMEDIO">Intermedio</option>
-                  <option value="AVANZADO">Avanzado</option>
-                </select>
-                <input type="number" formControlName="aniosExperiencia" placeholder="Años">
-                <button type="button" class="btn-remove" (click)="removeTecnologia(i)">×</button>
+          <div class="account-status-row">
+            <span class="account-status-label">Email</span>
+            <span class="account-status-badge" [class.active]="user()?.emailVerificado">
+              {{ user()?.emailVerificado ? 'Verificado' : 'No verificado' }}
+            </span>
+          </div>
+          <div class="account-status-row">
+            <span class="account-status-label">Rol</span>
+            <span class="account-status-badge active">Desarrollador</span>
+          </div>
+        </div>
+      </app-sidebar-card>
+
+      <!-- Stack -->
+      <app-developer-stack-card
+        [tecnologias]="profile?.tecnologias || []"
+        [habilidadesBlandas]="profile?.habilidadesBlandas || []"
+        (editProfile)="toggleEditProfile()"
+      />
+
+      <!-- Enlaces -->
+      @if (profile?.enlaces?.github || profile?.enlaces?.linkedin || profile?.enlaces?.portafolio || user()?.sitioWeb) {
+        <app-sidebar-card icon="link" title="Enlaces" subtitle="Tus perfiles externos">
+          <div class="links-list">
+            @if (profile?.enlaces?.github) {
+              <a class="external-link" [href]="profile?.enlaces?.github" target="_blank">
+                <span class="material-symbols-outlined">terminal</span>
+                <span>GitHub</span>
+                <span class="material-symbols-outlined arrow">open_in_new</span>
+              </a>
+            }
+            @if (profile?.enlaces?.linkedin) {
+              <a class="external-link" [href]="profile?.enlaces?.linkedin" target="_blank">
+                <span class="material-symbols-outlined">work</span>
+                <span>LinkedIn</span>
+                <span class="material-symbols-outlined arrow">open_in_new</span>
+              </a>
+            }
+            @if (profile?.enlaces?.portafolio) {
+              <a class="external-link" [href]="profile?.enlaces?.portafolio" target="_blank">
+                <span class="material-symbols-outlined">language</span>
+                <span>Portafolio</span>
+                <span class="material-symbols-outlined arrow">open_in_new</span>
+              </a>
+            }
+            @if (user()?.sitioWeb) {
+              <a class="external-link" [href]="user()?.sitioWeb" target="_blank">
+                <span class="material-symbols-outlined">public</span>
+                <span>Sitio web</span>
+                <span class="material-symbols-outlined arrow">open_in_new</span>
+              </a>
+            }
+          </div>
+        </app-sidebar-card>
+      }
+
+      <!-- Experiencia -->
+      @if (profile?.experiencias?.length) {
+        <app-sidebar-card icon="history_edu" title="Experiencia" subtitle="Trayectoria profesional">
+          <div class="exp-list">
+            @for (exp of profile?.experiencias; track exp.empresa) {
+              <div class="exp-item">
+                <strong class="exp-role">{{ exp.cargo }}</strong>
+                <span class="exp-company">{{ exp.empresa }}</span>
+                <span class="exp-dates">{{ exp.fechaInicio }} — {{ exp.fechaFin || 'Presente' }}</span>
               </div>
             }
           </div>
-        </div>
+        </app-sidebar-card>
+      }
 
-        <div class="form-actions">
-          <button type="button" class="btn-secondary" (click)="toggleEditProfile()">Cancelar</button>
-          <button type="submit" class="btn-primary">Guardar perfil</button>
+      <!-- Educación -->
+      @if (profile?.educacion?.length) {
+        <app-sidebar-card icon="school" title="Educación" subtitle="Formación académica">
+          <div class="exp-list">
+            @for (edu of profile?.educacion; track edu.institucion) {
+              <div class="exp-item">
+                <strong class="exp-role">{{ edu.titulo }}</strong>
+                <span class="exp-company">{{ edu.institucion }}</span>
+                <span class="exp-dates">{{ edu.fechaInicio }} — {{ edu.fechaFin || 'Presente' }}</span>
+              </div>
+            }
+          </div>
+        </app-sidebar-card>
+      }
+
+      <!-- Configuración -->
+      <app-sidebar-card icon="settings" title="Configuración" subtitle="Gestiona tu cuenta">
+        <div class="settings-list">
+          <a class="settings-item" routerLink="/developer/profile/configuracion">
+            <span class="material-symbols-outlined">person</span>
+            <span class="settings-label">Perfil</span>
+          </a>
+          <a class="settings-item" routerLink="/developer/profile/configuracion">
+            <span class="material-symbols-outlined">code</span>
+            <span class="settings-label">Perfil profesional</span>
+          </a>
+          <a class="settings-item" routerLink="/developer/profile/configuracion">
+            <span class="material-symbols-outlined">description</span>
+            <span class="settings-label">Descripción</span>
+          </a>
+          <a class="settings-item" routerLink="/developer/profile/configuracion">
+            <span class="material-symbols-outlined">location_on</span>
+            <span class="settings-label">Ubicación</span>
+          </a>
+          <a class="settings-item" routerLink="/developer/profile/configuracion">
+            <span class="material-symbols-outlined">shield</span>
+            <span class="settings-label">Privacidad</span>
+          </a>
+          <a class="settings-item" routerLink="/developer/profile/configuracion">
+            <span class="material-symbols-outlined">lock_reset</span>
+            <span class="settings-label">Contraseña</span>
+          </a>
+          <a class="settings-item" routerLink="/developer/profile/configuracion">
+            <span class="material-symbols-outlined">notifications</span>
+            <span class="settings-label">Notificaciones</span>
+          </a>
         </div>
-      </form>
-    }
+      </app-sidebar-card>
+    </aside>
   </div>
 </div>
+
+<app-social-list-modal
+  [open]="socialModalOpen()"
+  [type]="socialModalType()"
+  [userId]="user()?.id || ''"
+  (close)="closeSocialModal()"
+/>

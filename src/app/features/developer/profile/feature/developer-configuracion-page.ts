@@ -2,9 +2,10 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { UserStore } from '@features/users/data-access/state/user.store';
 import { AuthStore } from '@features/auth/data-access/state/auth.store';
+import { DeveloperProfileStore } from '@features/developer/profile/data-access/state/developer-profile.store';
 import { ToastService } from '@core/services/toast.service';
 import { catchError, of } from 'rxjs';
-import { User } from '@core/domain/models/user.model';
+import { User, DeveloperProfile } from '@core/domain/models/user.model';
 
 interface ConfigItem {
   id: string;
@@ -30,9 +31,12 @@ export class DeveloperConfiguracionPage implements OnInit {
   private fb = inject(FormBuilder);
   private userStore = inject(UserStore);
   private authStore = inject(AuthStore);
+  private profileStore = inject(DeveloperProfileStore);
   private toast = inject(ToastService);
 
   userData = signal<User | null>(null);
+  profileData = signal<DeveloperProfile | null>(null);
+  profileId = signal<string | null>(null);
   activeSection = signal('perfil-personal');
   expandedCategory = signal<string | null>('perfil');
   loading = signal(false);
@@ -44,6 +48,8 @@ export class DeveloperConfiguracionPage implements OnInit {
       label: 'Perfil',
       subItems: [
         { id: 'perfil-personal', icon: 'badge', label: 'Información personal' },
+        { id: 'perfil-profesional', icon: 'code', label: 'Perfil profesional' },
+        { id: 'perfil-enlaces', icon: 'public', label: 'Enlaces' },
         { id: 'perfil-descripcion', icon: 'description', label: 'Descripción' },
         { id: 'perfil-ubicacion', icon: 'location_on', label: 'Ubicación' },
       ],
@@ -71,6 +77,19 @@ export class DeveloperConfiguracionPage implements OnInit {
     nombre: [''],
     email: [''],
     telefono: [''],
+  });
+
+  profesionalForm = this.fb.group({
+    tituloProfesional: [''],
+    habilidadesBlandas: [''],
+    buscandoEmpleo: [false],
+  });
+
+  enlacesForm = this.fb.group({
+    github: [''],
+    linkedin: [''],
+    portafolio: [''],
+    sitioWeb: [''],
   });
 
   descripcionForm = this.fb.group({
@@ -107,6 +126,7 @@ export class DeveloperConfiguracionPage implements OnInit {
 
   ngOnInit(): void {
     this.loadUserData();
+    this.loadProfileData();
   }
 
   private getUserId(): string | null {
@@ -129,6 +149,9 @@ export class DeveloperConfiguracionPage implements OnInit {
           this.descripcionForm.patchValue({
             bio: user.bio ?? '',
           } as never);
+          this.enlacesForm.patchValue({
+            sitioWeb: user.sitioWeb ?? '',
+          } as never);
           if (user.ubicacion) {
             this.ubicacionForm.patchValue({
               pais: user.ubicacion.pais ?? 'Perú',
@@ -139,9 +162,46 @@ export class DeveloperConfiguracionPage implements OnInit {
               direccion: user.ubicacion.direccion ?? '',
             } as never);
           }
+          if (user.developerProfile) {
+            this.profileData.set(user.developerProfile);
+            this.profileId.set(user.developerProfile.id);
+            this.patchProfileForms(user.developerProfile);
+          }
         }
       },
       error: () => {},
+    });
+  }
+
+  private loadProfileData(): void {
+    const userId = this.getUserId();
+    if (!userId) return;
+
+    this.profileStore.loadByUserId(userId);
+    const interval = setInterval(() => {
+      const profile = this.profileStore.profile();
+      if (profile) {
+        this.profileData.set(profile);
+        this.profileId.set(profile.id);
+        this.patchProfileForms(profile);
+        clearInterval(interval);
+      } else if (!this.profileStore.loading()) {
+        clearInterval(interval);
+      }
+    }, 100);
+    setTimeout(() => clearInterval(interval), 5000);
+  }
+
+  private patchProfileForms(profile: DeveloperProfile): void {
+    this.profesionalForm.patchValue({
+      tituloProfesional: profile.tituloProfesional ?? '',
+      habilidadesBlandas: profile.habilidadesBlandas?.join(', ') ?? '',
+      buscandoEmpleo: profile.disponibilidadLaboral?.buscandoEmpleo ?? false,
+    });
+    this.enlacesForm.patchValue({
+      github: profile.enlaces?.github ?? '',
+      linkedin: profile.enlaces?.linkedin ?? '',
+      portafolio: profile.enlaces?.portafolio ?? '',
     });
   }
 
@@ -181,6 +241,68 @@ export class DeveloperConfiguracionPage implements OnInit {
       })
     ).subscribe(result => {
       if (result) this.showSuccess();
+    });
+  }
+
+  saveProfesional(): void {
+    const userId = this.getUserId();
+    if (!userId) return;
+
+    const formValue = this.profesionalForm.value;
+    const payload = {
+      tituloProfesional: formValue.tituloProfesional ?? undefined,
+      habilidadesBlandas: formValue.habilidadesBlandas
+        ? formValue.habilidadesBlandas.split(',').map((s: string) => s.trim()).filter(Boolean)
+        : undefined,
+      disponibilidadLaboral: {
+        buscandoEmpleo: !!formValue.buscandoEmpleo,
+        modalidades: this.profileData()?.disponibilidadLaboral?.modalidades ?? [],
+        tiposContrato: this.profileData()?.disponibilidadLaboral?.tiposContrato ?? [],
+      },
+    };
+
+    const profileId = this.profileId();
+    if (profileId) {
+      this.profileStore.update(profileId, payload);
+      this.showSuccess();
+    } else {
+      this.profileStore.create({ userId, ...payload });
+      this.showSuccess();
+    }
+  }
+
+  saveEnlaces(): void {
+    const userId = this.getUserId();
+    if (!userId) return;
+
+    const formValue = this.enlacesForm.value;
+
+    this.userStore.update(userId, {
+      sitioWeb: formValue.sitioWeb ?? undefined,
+    } as never).pipe(
+      catchError(err => {
+        this.handleError(err);
+        return of(null);
+      })
+    ).subscribe(userResult => {
+      if (!userResult) return;
+
+      const profilePayload = {
+        enlaces: {
+          github: formValue.github ?? undefined,
+          linkedin: formValue.linkedin ?? undefined,
+          portafolio: formValue.portafolio ?? undefined,
+        },
+      };
+
+      const profileId = this.profileId();
+      if (profileId) {
+        this.profileStore.update(profileId, profilePayload);
+        this.showSuccess();
+      } else {
+        this.profileStore.create({ userId, ...profilePayload });
+        this.showSuccess();
+      }
     });
   }
 

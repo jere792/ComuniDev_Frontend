@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { map, Observable } from 'rxjs';
+import { filter, map, Observable } from 'rxjs';
 import { AppNotification } from '@features/shared/domain/models/app-notification.model';
 import { NotificationRepository } from '@features/shared/domain/ports/notification.repository';
 
@@ -23,6 +23,22 @@ const GET_NOTIFICATIONS = gql`
 const GET_UNREAD_COUNT = gql`
   query UnreadCount($userId: String!) {
     unreadCount(userId: $userId)
+  }
+`;
+
+const SUBSCRIBE_NOTIFICATIONS = gql`
+  subscription NotificationReceived($userId: String!) {
+    notificationReceived(userId: $userId) {
+      id
+      destinatarioId
+      actorId
+      tipo
+      titulo
+      mensaje
+      referencia { tipo id }
+      leida
+      createdAt
+    }
   }
 `;
 
@@ -66,6 +82,18 @@ export class NotificationGraphqlService implements NotificationRepository {
         pollInterval: 30000,
       })
       .valueChanges.pipe(map((r) => r.data?.unreadCount ?? 0));
+  }
+
+  subscribeToNotifications(userId: string): Observable<AppNotification> {
+    return this.apollo
+      .subscribe<{ notificationReceived: AppNotification | null }>({
+        query: SUBSCRIBE_NOTIFICATIONS,
+        variables: { userId },
+      })
+      .pipe(
+        map((r) => r.data?.notificationReceived),
+        filter((n): n is AppNotification => n != null),
+      );
   }
 
   markAsRead(notificationId: string): Observable<boolean> {

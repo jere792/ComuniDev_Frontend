@@ -1,5 +1,6 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ConnectionStore } from '@features/shared/data-access/state/connection.store';
 import { ConnectionRequest } from '@features/shared/domain/models/connection.model';
@@ -36,9 +37,18 @@ export class Solicitudes implements OnInit {
   private userStore = inject(UserStore);
   private router = inject(Router);
   private toast = inject(ToastService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     this.loadData();
+
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      this.connService
+        .subscribeToConnectionStatus(userId)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.loadData());
+    }
   }
 
   private loadData(): void {
@@ -98,7 +108,8 @@ export class Solicitudes implements OnInit {
   }
 
   rejectRequest(requestId: string): void {
-    this.connService.rejectConnection(requestId).subscribe({
+    const userId = localStorage.getItem('userId');
+    this.connService.rejectConnection(requestId, userId ?? undefined).subscribe({
       next: () => {
         this.pendingRequests.update(reqs => reqs.filter(r => r.id !== requestId));
         this.toast.success('Solicitud rechazada');
@@ -132,7 +143,8 @@ export class Solicitudes implements OnInit {
     if (!id) return;
 
     if (action === 'cancel') {
-      this.connService.rejectConnection(id).subscribe({
+      const userId = localStorage.getItem('userId');
+      this.connService.rejectConnection(id, userId ?? undefined).subscribe({
         next: () => {
           this.sentRequests.update(reqs => reqs.filter(r => r.id !== id));
           this.toast.success('Solicitud cancelada');

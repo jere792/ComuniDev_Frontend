@@ -1,5 +1,7 @@
-import { Component, signal, OnInit, inject } from '@angular/core';
+import { Component, signal, OnInit, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserStore } from '@features/users/data-access/state/user.store';
 import { User } from '@core/domain/models/user.model';
@@ -32,6 +34,7 @@ export class PublicProfile implements OnInit {
   private connectionService = inject(ConnectionStore);
   private blockService = inject<BlockRepository>(BLOCK_REPOSITORY);
   private toast = inject(ToastService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     const userId = this.route.snapshot.paramMap.get('userId');
@@ -66,6 +69,14 @@ export class PublicProfile implements OnInit {
     this.connectionService.getConnectionStatus(userId, otherUserId).subscribe({
       next: (status) => this.connectionStatus.set(status),
     });
+
+    this.connectionService
+      .subscribeToConnectionStatus(userId)
+      .pipe(
+        filter((event) => event.otherUserId === otherUserId),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((status) => this.connectionStatus.set(status));
   }
 
   private checkBlocked(bloqueadorId: string, bloqueadoId: string): void {
@@ -144,8 +155,9 @@ export class PublicProfile implements OnInit {
     const requestId = this.connectionStatus().requestId;
     if (!requestId) return;
 
+    const currentUserId = localStorage.getItem('userId');
     this.connectionLoading.set(true);
-    this.connectionService.rejectConnection(requestId).subscribe({
+    this.connectionService.rejectConnection(requestId, currentUserId ?? undefined).subscribe({
       next: () => {
         this.connectionStatus.set({ status: 'NONE' });
         this.connectionLoading.set(false);

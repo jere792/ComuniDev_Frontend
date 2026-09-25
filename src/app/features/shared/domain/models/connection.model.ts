@@ -18,6 +18,8 @@ export interface Connection {
 
 export interface ConnectionStatus {
   status: 'NONE' | 'PENDING_SENT' | 'PENDING_RECEIVED' | 'CONNECTED';
+  userId?: string;
+  otherUserId?: string;
   requestId?: string;
   connectionId?: string;
 }

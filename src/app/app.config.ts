@@ -5,8 +5,11 @@ import { authInterceptor } from '@core/interceptors/auth.interceptor';
 import { provideApollo } from 'apollo-angular';
 import { HttpLink } from 'apollo-angular/http';
 import { inject } from '@angular/core';
-import { InMemoryCache, ApolloLink } from '@apollo/client/core';
+import { InMemoryCache, ApolloLink, split } from '@apollo/client/core';
 import { setContext } from '@apollo/client/link/context';
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+import { createClient } from 'graphql-ws';
+import { isSubscriptionOperation } from '@apollo/client/utilities';
 import { environment } from '../environments/environment';
 
 import { routes } from './app.routes';
@@ -76,8 +79,27 @@ export const appConfig: ApplicationConfig = {
         };
       });
 
+      const http = ApolloLink.from([auth, httpLink.create({ uri: `${environment.apiUrl}/graphql` })]);
+
+      const wsUrl = `${environment.apiUrl.replace(/^http/, 'ws')}/graphql`;
+      const ws = new GraphQLWsLink(
+        createClient({
+          url: wsUrl,
+          connectionParams: () => {
+            const token = localStorage.getItem('token');
+            return token ? { Authorization: `Bearer ${token}` } : {};
+          },
+        }),
+      );
+
+      const link = split(
+        ({ query }) => isSubscriptionOperation(query),
+        ws,
+        http,
+      );
+
       return {
-        link: ApolloLink.from([auth, httpLink.create({ uri: `${environment.apiUrl}/graphql` })]),
+        link,
         cache: new InMemoryCache(),
       };
     }),

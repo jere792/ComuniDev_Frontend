@@ -1,5 +1,6 @@
-import { Component, signal, OnInit, inject } from '@angular/core';
+import { Component, signal, OnInit, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NOTIFICATION_REPOSITORY, NotificationRepository } from '@features/shared/domain/ports/notification.repository';
 import { AppNotification } from '@features/shared/domain/models/app-notification.model';
 import { ConnectionStore } from '@features/shared/data-access/state/connection.store';
@@ -20,12 +21,25 @@ export class NotificationBell implements OnInit {
 
   private notifService = inject<NotificationRepository>(NOTIFICATION_REPOSITORY);
   private connService = inject(ConnectionStore);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     const userId = localStorage.getItem('userId');
     if (userId) {
       this.loadNotifications(userId);
       this.loadConnectionRequests(userId);
+      this.notifService
+        .subscribeToNotifications(userId)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((notif) => {
+          this.notifications.update((list) => [notif, ...list.filter((n) => n.id !== notif.id)]);
+          if (!notif.leida) {
+            this.unreadCount.update((c) => c + 1);
+          }
+          if (notif.tipo === 'SOLICITUD_CONEXION') {
+            this.loadConnectionRequests(userId);
+          }
+        });
     }
   }
 
@@ -86,7 +100,8 @@ export class NotificationBell implements OnInit {
   }
 
   rejectRequest(requestId: string): void {
-    this.connService.rejectConnection(requestId).subscribe({
+    const userId = localStorage.getItem('userId');
+    this.connService.rejectConnection(requestId, userId ?? undefined).subscribe({
       next: () => {
         this.connectionRequests.update(reqs => reqs.filter(r => r.id !== requestId));
       },
@@ -97,6 +112,7 @@ export class NotificationBell implements OnInit {
     switch (tipo) {
       case 'SOLICITUD_CONEXION': return 'person_add';
       case 'CONEXION_ACEPTADA': return 'check_circle';
+      case 'SOLICITUD_RECHAZADA': return 'person_cancel';
       case 'COMENTARIO': return 'comment';
       case 'REACCION': return 'favorite';
       default: return 'notifications';

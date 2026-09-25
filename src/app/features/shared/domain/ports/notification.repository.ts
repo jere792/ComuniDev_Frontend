@@ -5,6 +5,7 @@ import { AppNotification } from '@features/shared/domain/models/app-notification
 export interface NotificationRepository {
   getNotifications(userId: string, leida?: boolean): Observable<AppNotification[]>;
   getUnreadCount(userId: string): Observable<number>;
+  subscribeToNotifications(userId: string): Observable<AppNotification>;
   markAsRead(notificationId: string): Observable<boolean>;
   markAllAsRead(userId: string): Observable<boolean>;
   deleteNotification(notificationId: string): Observable<boolean>;

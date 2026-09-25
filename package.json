@@ -34,6 +34,7 @@
     "@apollo/client": "^4.2.12",
     "apollo-angular": "^14.2.0",
     "graphql": "^16.14.2",
+    "graphql-ws": "^6.2.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

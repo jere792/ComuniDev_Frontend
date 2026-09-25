@@ -17,6 +17,10 @@ export class ConnectionStore {
     return this.repository.getConnectionStatus(userId, otherUserId);
   }
 
+  subscribeToConnectionStatus(userId: string): Observable<ConnectionStatus> {
+    return this.repository.subscribeToConnectionStatus(userId);
+  }
+
   loadRequests(userId: string): void {
     this.loading.set(true);
     this.error.set(null);
@@ -63,8 +67,8 @@ export class ConnectionStore {
     return this.repository.acceptConnection(requestId);
   }
 
-  rejectConnection(requestId: string): Observable<boolean> {
-    return this.repository.rejectConnection(requestId);
+  rejectConnection(requestId: string, actorId?: string): Observable<boolean> {
+    return this.repository.rejectConnection(requestId, actorId);
   }
 
   removeConnection(connectionId: string): Observable<boolean> {

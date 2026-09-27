@@ -8,10 +8,13 @@
           <span class="body-sm">{{ 'download' | t:'ultimaVersion' }}</span>
         </div>
       </div>
-      <button class="btn btn-primary download-btn">
+      <a
+        class="btn btn-primary download-btn"
+        href="https://github.com/jere792/ComuniDev_Frontend/releases/download/v1.0.0/comunidev.V1.0.0.apk"
+        download>
         <span class="material-symbols-outlined">download</span>
         <span class="label-lg">{{ 'download' | t:'descargarApk' }}</span>
-      </button>
+      </a>
     </div>
 
     <div class="download-specs" appReveal data-reveal="fade-up" data-reveal-stagger="80">
@@ -26,7 +29,7 @@
         <span class="material-symbols-outlined">inventory_2</span>
         <div>
           <span class="label-md">{{ 'download' | t:'tamano' }}</span>
-          <span class="body-sm">~15 MB</span>
+          <span class="body-sm">~13 MB</span>
         </div>
       </div>
       <div class="spec-item">

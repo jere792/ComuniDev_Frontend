@@ -13,6 +13,7 @@ export const routes: Routes = [
       { path: 'register', loadComponent: () => import('@landing/pages/register/register').then(m => m.Register) },
       { path: 'forgot-password', loadComponent: () => import('@landing/pages/forgot-password/forgot-password').then(m => m.ForgotPassword) },
       { path: 'download-apk', loadComponent: () => import('@landing/pages/download-apk/download-apk').then(m => m.DownloadApk) },
+      { path: 'terms', loadComponent: () => import('@landing/pages/terms/terms').then(m => m.Terms) },
     ],
   },
 ];

@@ -1,0 +1,32 @@
+<app-page-hero
+  badge="{{ 'terms' | t:'badge' }}"
+  title="{{ 'terms' | t:'titulo' }}"
+  subtitle="{{ 'terms' | t:'subtitulo' }}"
+  [info]="[
+    { icon: 'gavel', text: 'terms' | t:'vigente' },
+    { icon: 'schedule', text: 'terms' | t:'lectura' },
+    { icon: 'mail', text: 'terms' | t:'contacto' }
+  ]">
+  <div class="terms-hero-visual">
+    <div class="doc-mockup">
+      <div class="doc-header">
+        <span class="material-symbols-outlined">description</span>
+        <span class="doc-brand metadata-sm">COMUNIDEV</span>
+      </div>
+      <div class="doc-title">{{ 'terms' | t:'titulo' }}</div>
+      <div class="doc-lines">
+        <span class="doc-line w-90"></span>
+        <span class="doc-line w-75"></span>
+        <span class="doc-line w-85"></span>
+        <span class="doc-line w-60"></span>
+        <span class="doc-line w-80"></span>
+        <span class="doc-line w-70"></span>
+        <span class="doc-line w-90"></span>
+        <span class="doc-line w-50"></span>
+      </div>
+      <div class="doc-stamp">
+        <span class="material-symbols-outlined">verified</span>
+      </div>
+    </div>
+  </div>
+</app-page-hero>

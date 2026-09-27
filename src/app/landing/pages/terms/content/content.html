@@ -1,0 +1,32 @@
+<section class="terms-content">
+  <div class="terms-container">
+    <p class="metadata-sm terms-updated">{{ 'terms' | t:'actualizacion' }}</p>
+
+    <div class="terms-layout">
+      <nav class="terms-sidebar">
+        @for (n of sections; track n) {
+          <button
+            type="button"
+            class="terms-nav-item"
+            [class.is-active]="activeSection === n"
+            (click)="goTo(n)">
+            <span class="terms-nav-dot metadata-sm">{{ n }}</span>
+            <span class="terms-nav-label body-sm">{{ 'terms' | t:('s' + n + 'Titulo') }}</span>
+          </button>
+        }
+      </nav>
+
+      <div class="terms-panel">
+        @for (n of sections; track n) {
+          <article class="terms-card" id="terms-section-{{ n }}">
+            <div class="terms-card-header">
+              <span class="terms-num metadata-sm">{{ n }}</span>
+              <h2 class="headline-sm">{{ 'terms' | t:('s' + n + 'Titulo') }}</h2>
+            </div>
+            <p class="body-md">{{ 'terms' | t:('s' + n + 'Texto') }}</p>
+          </article>
+        }
+      </div>
+    </div>
+  </div>
+</section>

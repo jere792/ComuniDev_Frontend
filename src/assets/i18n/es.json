@@ -45,7 +45,7 @@
     "soporte": { "es": "Soporte", "en": "Support" },
     "contacto": { "es": "Contacto", "en": "Contact" },
     "documentacion": { "es": "Documentación", "en": "Documentation" },
-    "terminos": { "es": "Términos", "en": "Terms" },
+    "terminos": { "es": "Términos y Condiciones", "en": "Terms and Conditions" },
     "privacidad": { "es": "Privacidad", "en": "Privacy" },
     "proximamente": { "es": "Próximamente", "en": "Coming soon" },
     "copyright": {
@@ -277,5 +277,85 @@
     "septiembre": { "es": "Septiembre 2026", "en": "September 2026" },
     "seguridad": { "es": "Seguridad", "en": "Security" },
     "firmado": { "es": "Firmado digitalmente", "en": "Digitally signed" }
+  },
+  "terms": {
+    "badge": { "es": "Legal", "en": "Legal" },
+    "titulo": { "es": "Términos y Condiciones", "en": "Terms and Conditions" },
+    "subtitulo": {
+      "es": "Las reglas que rigen el uso de ComuniDev. Al crear una cuenta aceptas estos términos.",
+      "en": "The rules that govern the use of ComuniDev. By creating an account you accept these terms."
+    },
+    "vigente": { "es": "Vigentes desde septiembre 2026", "en": "Effective since September 2026" },
+    "lectura": { "es": "Lectura: 5 min", "en": "Reading: 5 min" },
+    "contacto": { "es": "¿Dudas? Contáctanos", "en": "Questions? Contact us" },
+    "actualizacion": {
+      "es": "Última actualización: 26 de septiembre de 2026",
+      "en": "Last update: September 26, 2026"
+    },
+    "s1Titulo": { "es": "Aceptación de los términos", "en": "Acceptance of terms" },
+    "s1Texto": {
+      "es": "Al acceder o utilizar ComuniDev (la \"Plataforma\"), aceptas estar sujeto a estos Términos y Condiciones. Si no estás de acuerdo con alguna parte, te pedimos que no utilices la Plataforma. El uso continuado implica aceptación plena.",
+      "en": "By accessing or using ComuniDev (the \"Platform\"), you agree to be bound by these Terms and Conditions. If you do not agree with any part, please do not use the Platform. Continued use implies full acceptance."
+    },
+    "s2Titulo": { "es": "Descripción del servicio", "en": "Service description" },
+    "s2Texto": {
+      "es": "ComuniDev es una red social profesional y técnica para desarrolladores, estudiantes de tecnología, reclutadores y empresas. Permite crear perfiles profesionales, publicar contenido técnico, establecer conexiones, usar mensajería, postular a vacantes y participar en el módulo EcoDev de sostenibilidad tecnológica (ODS 12).",
+      "en": "ComuniDev is a professional and technical social network for developers, technology students, recruiters, and companies. It allows creating professional profiles, publishing technical content, establishing connections, using messaging, applying for job openings, and participating in the EcoDev technology sustainability module (SDG 12)."
+    },
+    "s3Titulo": { "es": "Registro y cuentas", "en": "Registration and accounts" },
+    "s3Texto": {
+      "es": "Para acceder a ciertas funciones debes crear una cuenta con información veraz y mantenerla actualizada. Eres responsable de la confidencialidad de tus credenciales y de todas las actividades realizadas desde tu cuenta. Deberás notificarnos de inmediato ante cualquier uso no autorizado.",
+      "en": "To access certain features you must create an account with truthful information and keep it updated. You are responsible for the confidentiality of your credentials and for all activities performed from your account. You must notify us immediately of any unauthorized use."
+    },
+    "s4Titulo": { "es": "Roles y permisos", "en": "Roles and permissions" },
+    "s4Texto": {
+      "es": "ComuniDev está dirigido a dos roles: Desarrollador y Reclutador. Cada rol define permisos específicos dentro de la Plataforma. Debes utilizar únicamente el rol con el que te registraste y queda prohibido suplantar identidades de otros usuarios o empresas.",
+      "en": "ComuniDev is designed for two roles: Developer and Recruiter. Each role defines specific permissions within the Platform. You must only use the role you registered with, and impersonating other users or companies is prohibited."
+    },
+    "s5Titulo": { "es": "Contenido del usuario", "en": "User content" },
+    "s5Texto": {
+      "es": "Eres el propietario del contenido que publicas. Al publicarlo, otorgas a ComuniDev una licencia no exclusiva para mostrarlo y distribuirlo dentro de la Plataforma. No se permite contenido ilegal, ofensivo, spam, acoso ni infracciones de derechos de terceros.",
+      "en": "You own the content you publish. By publishing it, you grant ComuniDev a non-exclusive license to display and distribute it within the Platform. Illegal, offensive, spam, harassment content, or infringement of third-party rights is not allowed."
+    },
+    "s6Titulo": { "es": "Privacidad y datos", "en": "Privacy and data" },
+    "s6Texto": {
+      "es": "Tu privacidad es prioritaria. Tus datos se almacenan de forma segura y solo se comparten según tu configuración de privacidad. Puedes definir de manera granular quién puede ver tu perfil, CV, certificados, experiencia y ubicación, y quién puede enviarte mensajes. Tratamos tus datos personales conforme a la Ley 1581 de 2012 de Protección de Datos Personales y el Decreto 1377 de 2013, con fines exclusivamente relacionados con el funcionamiento de la Plataforma, y puedes ejercer en cualquier momento tus derechos de acceso, rectificación, actualización y supresión.",
+      "en": "Your privacy is a priority. Your data is stored securely and only shared according to your privacy settings. You can granularly define who can view your profile, CV, certificates, experience, and location, and who can send you messages. We process your personal data in accordance with Colombian Data Protection Law 1581 of 2012 and Decree 1377 of 2013, solely for purposes related to the operation of the Platform, and you may exercise your rights of access, rectification, update, and deletion at any time."
+    },
+    "s7Titulo": { "es": "Conexiones y mensajería", "en": "Connections and messaging" },
+    "s7Texto": {
+      "es": "Seguir a un usuario no equivale a una conexión profesional. Las conexiones requieren solicitud y aceptación mutuas. En la mensajería privada, tú controlas quién puede iniciar conversaciones contigo según tus preferencias.",
+      "en": "Following a user does not equal a professional connection. Connections require mutual requests and acceptance. In private messaging, you control who can start conversations with you according to your preferences."
+    },
+    "s8Titulo": { "es": "Moderación y sanciones", "en": "Moderation and sanctions" },
+    "s8Texto": {
+      "es": "ComuniDev puede revisar, ocultar o eliminar contenido que infrinja estos términos o las normas de la comunidad, así como restringir cuentas que hagan uso indebido de la Plataforma. Las sanciones pueden incluir advertencias, restricciones temporales o permanentes y, en casos graves, la suspensión o eliminación de la cuenta.",
+      "en": "ComuniDev may review, hide, or remove content that violates these terms or community rules, as well as restrict accounts that misuse the Platform. Sanctions may include warnings, temporary or permanent restrictions, and in serious cases, suspension or deletion of the account."
+    },
+    "s9Titulo": { "es": "Seguridad", "en": "Security" },
+    "s9Texto": {
+      "es": "Implementamos medidas de seguridad como hash seguro de contraseñas, tokens con expiración y validación de permisos en el servidor, en línea con la Ley 1273 de 2009 de Protección de Datos en Sistemas Informáticos y la industria. Sin embargo, ningún sistema es completamente invulnerable; debes mantener tu cuenta segura y no compartir tus credenciales.",
+      "en": "We implement security measures such as secure password hashing, tokens with expiration, and server-side permission validation, in line with Colombian Cybercrime Law 1273 of 2009 and industry standards. However, no system is completely invulnerable; you must keep your account secure and not share your credentials."
+    },
+    "s10Titulo": { "es": "Propiedad intelectual", "en": "Intellectual property" },
+    "s10Texto": {
+      "es": "ComuniDev, su marca, diseño y código son propiedad de sus respectivos titulares. Las publicaciones y perfiles pertenecen a sus autores. Queda prohibida la reproducción no autorizada de la marca, el diseño o el código fuente de la Plataforma.",
+      "en": "ComuniDev, its brand, design, and code belong to their respective owners. Publications and profiles belong to their authors. Unauthorized reproduction of the Platform's brand, design, or source code is prohibited."
+    },
+    "s11Titulo": { "es": "Limitación de responsabilidad", "en": "Limitation of liability" },
+    "s11Texto": {
+      "es": "ComuniDev se proporciona \"tal cual\", sin garantías de disponibilidad ininterrumpida ni de veracidad del contenido publicado por usuarios. No seremos responsables de decisiones tomadas en base a información disponible en la Plataforma.",
+      "en": "ComuniDev is provided \"as is\", without guarantees of uninterrupted availability or veracity of content published by users. We will not be responsible for decisions made based on information available on the Platform."
+    },
+    "s12Titulo": { "es": "Cambios a estos términos", "en": "Changes to these terms" },
+    "s12Texto": {
+      "es": "Podemos actualizar estos términos periódicamente. Te notificaremos sobre cambios significativos. El uso continuado de la Plataforma después de los cambios constituye la aceptación de los nuevos términos.",
+      "en": "We may periodically update these terms. We will notify you of significant changes. Continued use of the Platform after the changes constitutes acceptance of the new terms."
+    },
+    "s13Titulo": { "es": "Contacto", "en": "Contact" },
+    "s13Texto": {
+      "es": "Si tienes preguntas o inquietudes sobre estos Términos y Condiciones, contáctanos a través de nuestra página de contacto. Estaremos encantados de ayudarte.",
+      "en": "If you have questions or concerns about these Terms and Conditions, contact us through our contact page. We will be happy to help you."
+    }
   }
 }

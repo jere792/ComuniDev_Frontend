@@ -5,6 +5,7 @@ import { SocialComment } from '@features/shared/domain/models/social-comment.mod
 export interface CommentRepository {
   getComments(contentId: string, contentType?: string): Observable<SocialComment[]>;
   getReplies(parentCommentId: string): Observable<SocialComment[]>;
+  countComments(contentId: string, contentType?: string): Observable<number>;
   createComment(
     autorId: string,
     contenidoId: string,

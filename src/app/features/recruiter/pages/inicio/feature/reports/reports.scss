@@ -362,6 +362,15 @@
   display: flex;
   gap: var(--space-sm);
   margin-bottom: var(--space-sm);
+
+  &.nested {
+    margin-bottom: var(--space-xs, 4px);
+
+    .comment-avatar {
+      width: 28px;
+      height: 28px;
+    }
+  }
 }
 
 .comment-avatar {
@@ -601,6 +610,17 @@
   flex: 1;
   overflow-y: auto;
   padding: var(--space-md) var(--space-lg);
+}
+
+.modal-footer {
+  border-top: 1px solid var(--border-subtle);
+  padding: var(--space-sm) var(--space-lg);
+
+  .add-comment {
+    padding-top: 0;
+    border-top: none;
+    margin-top: 0;
+  }
 }
 
 .empty-modal {

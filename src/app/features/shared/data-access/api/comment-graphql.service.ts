@@ -17,6 +17,7 @@ const GET_COMMENTS = gql`
       imagenes
       estadoModeracion
       reaccionesCount
+      repliesCount
       createdAt
     }
   }
@@ -34,8 +35,15 @@ const GET_REPLIES = gql`
       imagenes
       estadoModeracion
       reaccionesCount
+      repliesCount
       createdAt
     }
+  }
+`;
+
+const GET_COMMENT_COUNT = gql`
+  query GetCommentCount($contentId: String!, $contentType: String!) {
+    commentCount(contentId: $contentId, contentType: $contentType)
   }
 `;
 
@@ -51,6 +59,7 @@ const CREATE_COMMENT = gql`
       imagenes
       estadoModeracion
       reaccionesCount
+      repliesCount
       createdAt
     }
   }
@@ -87,6 +96,12 @@ export class CommentGraphqlService implements CommentRepository {
     return this.apollo
       .watchQuery<any>({ query: GET_REPLIES, variables: { parentCommentId } })
       .valueChanges.pipe(map(result => result.data?.commentReplies ?? []));
+  }
+
+  countComments(contentId: string, contentType = 'POST'): Observable<number> {
+    return this.apollo
+      .query<any>({ query: GET_COMMENT_COUNT, variables: { contentId, contentType }, fetchPolicy: 'network-only' })
+      .pipe(map(result => result.data?.commentCount ?? 0));
   }
 
   createComment(autorId: string, contenidoId: string, texto: string, tipoContenido = 'POST', parentCommentId?: string): Observable<SocialComment> {

@@ -8,5 +8,6 @@ export interface SocialComment {
   imagenes?: string[];
   estadoModeracion?: string;
   reaccionesCount?: number;
+  repliesCount?: number;
   createdAt?: string;
 }

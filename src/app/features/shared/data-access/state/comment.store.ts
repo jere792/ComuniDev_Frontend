@@ -34,6 +34,10 @@ export class CommentStore {
     return this.repository.getReplies(parentCommentId);
   }
 
+  countComments(contentId: string, contentType = 'POST'): Observable<number> {
+    return this.repository.countComments(contentId, contentType);
+  }
+
   createComment(
     autorId: string,
     contenidoId: string,

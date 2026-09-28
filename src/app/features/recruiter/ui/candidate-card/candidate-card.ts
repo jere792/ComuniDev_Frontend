@@ -18,4 +18,15 @@ export class CandidateCard {
   @Output() message = new EventEmitter<string>();
   @Output() contact = new EventEmitter<string>();
   @Output() saveToggle = new EventEmitter<string>();
+  @Output() viewProfile = new EventEmitter<string>();
+
+  get initials(): string {
+    return (this.name || '?')
+      .split(' ')
+      .filter(Boolean)
+      .map(word => word[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+  }
 }

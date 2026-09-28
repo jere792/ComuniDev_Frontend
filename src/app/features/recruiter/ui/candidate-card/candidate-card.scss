@@ -1,8 +1,8 @@
 .candidate-card {
-  background: var(--surface, #fff);
+  background: var(--surface-container-lowest);
   border-radius: 16px;
   padding: 1.25rem;
-  border: 1px solid var(--border-color, #e9ecef);
+  border: 1px solid var(--border-subtle);
   transition: transform 0.2s, box-shadow 0.2s;
 
   &:hover {
@@ -23,6 +23,17 @@
       object-fit: cover;
     }
 
+    .avatar-fallback {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      font-size: 0.9rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
     .candidate-info {
       flex: 1;
 
@@ -30,12 +41,12 @@
         font-size: 1rem;
         font-weight: 600;
         margin: 0;
-        color: var(--text-primary, #212529);
+        color: var(--on-surface);
       }
 
       .candidate-role {
         font-size: 0.875rem;
-        color: var(--text-secondary, #6c757d);
+        color: var(--on-surface-variant);
         margin: 0;
       }
     }
@@ -45,11 +56,11 @@
       border-radius: 20px;
       font-size: 0.75rem;
       font-weight: 500;
-      background: rgba(107, 114, 128, 0.1);
-      color: #6b7280;
+      background: var(--surface-container);
+      color: var(--on-surface-variant);
 
       &.available {
-        background: rgba(16, 185, 129, 0.1);
+        background: rgba(16, 185, 129, 0.15);
         color: #10b981;
       }
     }
@@ -65,8 +76,8 @@
       padding: 4px 10px;
       border-radius: 12px;
       font-size: 0.75rem;
-      background: var(--bg-secondary, #f3f4f6);
-      color: var(--text-primary, #212529);
+      background: var(--surface-container);
+      color: var(--on-surface);
     }
   }
 
@@ -75,14 +86,14 @@
     justify-content: space-between;
     align-items: center;
     padding-top: 12px;
-    border-top: 1px solid var(--border-color, #e9ecef);
+    border-top: 1px solid var(--border-subtle);
 
     .experience {
       display: flex;
       align-items: center;
       gap: 4px;
       font-size: 0.875rem;
-      color: var(--text-secondary, #6c757d);
+      color: var(--on-surface-variant);
 
       .material-symbols-outlined {
         font-size: 18px;
@@ -114,18 +125,18 @@
 
   .btn-outline {
     background: transparent;
-    border-color: var(--border-color, #e9ecef);
-    color: var(--text-primary, #212529);
+    border-color: var(--outline-variant);
+    color: var(--on-surface);
 
     &:hover {
-      background: var(--bg-secondary, #f3f4f6);
+      background: var(--surface-container);
     }
   }
 
   .btn-primary {
-    background: var(--primary-container, #e8f0fe);
+    background: var(--primary-container);
     border: none;
-    color: var(--on-primary-container, #1a73e8);
+    color: var(--on-primary-container);
 
     &:hover {
       opacity: 0.9;
@@ -133,12 +144,12 @@
   }
 
   .btn-saved {
-    background: rgba(16, 185, 129, 0.12);
+    background: rgba(16, 185, 129, 0.15);
     border: 1px solid rgba(16, 185, 129, 0.35);
-    color: #059669;
+    color: #10b981;
 
     &:hover {
-      background: rgba(16, 185, 129, 0.18);
+      background: rgba(16, 185, 129, 0.22);
     }
   }
 }

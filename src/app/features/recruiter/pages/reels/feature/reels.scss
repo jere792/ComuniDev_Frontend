@@ -1,7 +1,15 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .reels-container {
   width: 100%;
   max-width: 400px;
-  height: calc(100vh - var(--space-lg));
+  flex: 1;
+  min-height: 0;
   display: flex;
   justify-content: center;
   align-items: center;

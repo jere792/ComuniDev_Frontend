@@ -1,6 +1,10 @@
 <div class="candidate-card">
   <div class="candidate-header">
-    <img [src]="avatar" [alt]="name" class="candidate-avatar" />
+    @if (avatar) {
+      <img [src]="avatar" [alt]="name" class="candidate-avatar" />
+    } @else {
+      <div class="candidate-avatar avatar-fallback">{{ initials }}</div>
+    }
     <div class="candidate-info">
       <h3 class="candidate-name">{{ name }}</h3>
       <p class="candidate-role">{{ role }}</p>
@@ -22,6 +26,10 @@
       {{ experience }}
     </span>
     <div class="candidate-actions">
+      <button type="button" class="btn btn-outline" (click)="viewProfile.emit(id)">
+        <span class="material-symbols-outlined">person</span>
+        Ver perfil
+      </button>
       <button type="button" class="btn btn-outline" (click)="message.emit(id)">
         <span class="material-symbols-outlined">chat</span>
         Mensaje

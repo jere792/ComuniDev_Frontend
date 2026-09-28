@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { CandidateStore } from '@features/recruiter/pages/candidates/data-access/state/candidate.store';
 import { DeveloperProfile, TalentSearchFilters } from '@features/recruiter/pages/candidates/domain/models/developer-profile.model';
@@ -18,6 +19,7 @@ const AVAILABILITIES = ['DISPONIBLE', 'BUSCANDO_empleo', 'EMPLEADO'];
 export class RecruiterCandidates implements OnInit {
   private readonly candidateStore = inject(CandidateStore);
   private readonly toast = inject(ToastService);
+  private readonly router = inject(Router);
 
   readonly store = this.candidateStore;
   readonly loading = this.candidateStore.loading;
@@ -25,6 +27,8 @@ export class RecruiterCandidates implements OnInit {
   readonly total = this.candidateStore.total;
   readonly experienceLevels = EXPERIENCE_LEVELS;
   readonly availabilities = AVAILABILITIES;
+  readonly countries = ['Perú', 'México', 'Colombia', 'Chile', 'Argentina', 'España', 'Estados Unidos', 'Ecuador', 'Bolivia'];
+  readonly cities = ['Lima', 'Arequipa', 'Trujillo', 'Cusco', 'Ciudad de México', 'Guadalajara', 'Bogotá', 'Medellín', 'Santiago', 'Buenos Aires', 'Madrid', 'Barcelona'];
   readonly selectedTechnologies = new Set<string>();
 
   searchTerm = '';
@@ -34,6 +38,7 @@ export class RecruiterCandidates implements OnInit {
   locationCity = '';
   remoteAvailable = false;
   availability = '';
+  showAdvancedFilters = false;
 
   ngOnInit(): void {
     this.search();
@@ -69,6 +74,15 @@ export class RecruiterCandidates implements OnInit {
   removeTechnology(name: string): void {
     this.selectedTechnologies.delete(name);
     this.search();
+  }
+
+  toggleRemote(): void {
+    this.remoteAvailable = !this.remoteAvailable;
+    this.search();
+  }
+
+  toggleAdvancedFilters(): void {
+    this.showAdvancedFilters = !this.showAdvancedFilters;
   }
 
   search(overrides: Partial<TalentSearchFilters> = {}): void {
@@ -111,6 +125,10 @@ export class RecruiterCandidates implements OnInit {
     this.toast.info(`Mensaje a ${candidate.nombre} (próximamente)`);
   }
 
+  onViewProfile(candidate: DeveloperProfile): void {
+    this.router.navigate(['/profile', candidate.id]);
+  }
+
   private getRecruiterId(): string | null {
     return localStorage.getItem('userId');
   }
@@ -127,7 +145,7 @@ export class RecruiterCandidates implements OnInit {
     const count = (candidate.experiencias ?? []).filter(e => e.empresa || e.cargo).length;
     if (count > 0) return `${count} experiencia${count === 1 ? '' : 's'}`;
     if (candidate.remoto) return 'Remoto';
-    return candidate.ubicacionCiudad || candidate.ubicacionPais || '—';
+    return candidate.ubicacionCiudad || candidate.ubicacionPais || '0 experiencias';
   }
 
   availableOf(candidate: DeveloperProfile): boolean {
@@ -135,6 +153,6 @@ export class RecruiterCandidates implements OnInit {
   }
 
   avatarOf(candidate: DeveloperProfile): string {
-    return candidate.fotoPerfilUrl || 'https://i.pravatar.cc/150?u=' + encodeURIComponent(candidate.id);
+    return candidate.fotoPerfilUrl || '';
   }
 }

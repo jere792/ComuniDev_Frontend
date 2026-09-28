@@ -1,78 +1,134 @@
 <div class="candidates-container">
   <div class="filters-panel">
-    <div class="search-bar">
-      <span class="material-symbols-outlined">search</span>
-      <input
-        type="text"
-        placeholder="Filtrar por nombre, rol o skill..."
-        [(ngModel)]="searchTerm"
-        class="search-input"
-      />
+    <div class="filters-header">
+      <span class="material-symbols-outlined">tune</span>
+      <h2 class="filters-title">Filtros</h2>
+      <button
+        type="button"
+        class="filters-toggle"
+        [class.open]="showAdvancedFilters"
+        (click)="toggleAdvancedFilters()"
+      >
+        {{ showAdvancedFilters ? 'Menos filtros' : 'Más filtros' }}
+        <span class="material-symbols-outlined">expand_more</span>
+      </button>
     </div>
 
-    <div class="filters-row">
-      <label class="filter-field">
-        <span>Nivel</span>
-        <select [(ngModel)]="experienceLevel" (ngModelChange)="search()">
-          <option value="">Cualquiera</option>
-          @for (level of experienceLevels; track level) {
-            <option [value]="level">{{ level }}</option>
-          }
-        </select>
-      </label>
+    <!-- Fila 1: buscador (mitad) + nivel/disponibilidad (mitad) -->
+    <div class="filters-row filters-row--primary">
+      <div class="search-bar">
+        <span class="material-symbols-outlined">search</span>
+        <input
+          type="text"
+          placeholder="Filtrar por nombre, rol o skill..."
+          [(ngModel)]="searchTerm"
+          class="search-input"
+        />
+      </div>
 
+      <div class="filters-half">
+        <label class="filter-field">
+          <span>Nivel</span>
+          <div class="select-wrapper">
+            <select [(ngModel)]="experienceLevel" (ngModelChange)="search()">
+              <option value="">Cualquiera</option>
+              @for (level of experienceLevels; track level) {
+                <option [value]="level">{{ level }}</option>
+              }
+            </select>
+            <span class="material-symbols-outlined select-chevron">expand_more</span>
+          </div>
+        </label>
+
+        <label class="filter-field">
+          <span>Disponibilidad</span>
+          <div class="select-wrapper">
+            <select [(ngModel)]="availability" (ngModelChange)="search()">
+              <option value="">Cualquiera</option>
+              @for (item of availabilities; track item) {
+                <option [value]="item">{{ item }}</option>
+              }
+            </select>
+            <span class="material-symbols-outlined select-chevron">expand_more</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Fila 2: país, ciudad, modalidad, tecnologías y buscar -->
+    @if (showAdvancedFilters) {
+      <div class="filters-row filters-row--secondary">
       <label class="filter-field">
         <span>País</span>
-        <input type="text" placeholder="Ej. Perú" [(ngModel)]="locationCountry" (ngModelChange)="search()" />
+        <div class="select-wrapper">
+          <select [(ngModel)]="locationCountry" (ngModelChange)="search()">
+            <option value="">Todos</option>
+            @for (country of countries; track country) {
+              <option [value]="country">{{ country }}</option>
+            }
+          </select>
+          <span class="material-symbols-outlined select-chevron">expand_more</span>
+        </div>
       </label>
 
       <label class="filter-field">
         <span>Ciudad</span>
-        <input type="text" placeholder="Ej. Lima" [(ngModel)]="locationCity" (ngModelChange)="search()" />
+        <div class="select-wrapper">
+          <select [(ngModel)]="locationCity" (ngModelChange)="search()">
+            <option value="">Todas</option>
+            @for (city of cities; track city) {
+              <option [value]="city">{{ city }}</option>
+            }
+          </select>
+          <span class="material-symbols-outlined select-chevron">expand_more</span>
+        </div>
       </label>
 
       <label class="filter-field">
-        <span>Disponibilidad</span>
-        <select [(ngModel)]="availability" (ngModelChange)="search()">
-          <option value="">Cualquiera</option>
-          @for (item of availabilities; track item) {
-            <option [value]="item">{{ item }}</option>
-          }
-        </select>
+        <span>Modalidad</span>
+        <button
+          type="button"
+          class="switch"
+          [class.on]="remoteAvailable"
+          role="switch"
+          [attr.aria-checked]="remoteAvailable"
+          (click)="toggleRemote()"
+        >
+          <span class="switch-track"><span class="switch-thumb"></span></span>
+          <span class="switch-text">Solo remoto</span>
+        </button>
       </label>
 
-      <label class="filter-field checkbox">
-        <input type="checkbox" [(ngModel)]="remoteAvailable" (ngModelChange)="search()" />
-        <span>Solo remoto</span>
+      <label class="filter-field tech-field">
+        <span>Tecnologías</span>
+        <div class="tech-input-row">
+          <input
+            type="text"
+            placeholder="Añadir tecnología..."
+            [(ngModel)]="technologyInput"
+            (keyup.enter)="addTechnology()"
+          />
+          <button type="button" class="btn btn-outline" (click)="addTechnology()">Añadir</button>
+        </div>
       </label>
 
-      <button type="button" class="btn btn-primary" (click)="search()">
+      <button type="button" class="btn btn-primary search-btn" (click)="search()">
         <span class="material-symbols-outlined">search</span>
         Buscar
       </button>
-    </div>
-
-    <div class="tech-filter">
-      <div class="tech-input-row">
-        <input
-          type="text"
-          placeholder="Añadir tecnología..."
-          [(ngModel)]="technologyInput"
-          (keyup.enter)="addTechnology()"
-        />
-        <button type="button" class="btn btn-outline" (click)="addTechnology()">Añadir</button>
       </div>
-      @if (techList.length > 0) {
-        <div class="tech-chips">
-          @for (tech of techList; track tech) {
-            <button type="button" class="skill-tag removable" (click)="removeTechnology(tech)">
-              {{ tech }}
-              <span class="material-symbols-outlined">close</span>
-            </button>
-          }
-        </div>
-      }
-    </div>
+    }
+
+    @if (techList.length > 0) {
+      <div class="tech-chips">
+        @for (tech of techList; track tech) {
+          <button type="button" class="skill-tag removable" (click)="removeTechnology(tech)">
+            {{ tech }}
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        }
+      </div>
+    }
   </div>
 
   <div class="results-meta">
@@ -105,6 +161,7 @@
         [available]="availableOf(candidate)"
         [saved]="store.isSaved(candidate.id)"
         (message)="onMessage(candidate)"
+        (viewProfile)="onViewProfile(candidate)"
         (saveToggle)="toggleSave(candidate)"
       />
     }

@@ -23,3 +23,14 @@
   align-items: stretch;
   background-color: var(--surface);
 }
+
+.user-content {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  padding-block: var(--space-lg);
+}

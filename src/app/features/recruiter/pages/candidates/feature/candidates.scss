@@ -1,22 +1,96 @@
 .candidates-container {
   width: 100%;
-  max-width: 1200px;
 }
 
 .filters-panel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
   margin-bottom: var(--space-xl);
+}
+
+.filters-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+
+  .material-symbols-outlined {
+    color: var(--primary);
+    font-size: 22px;
+  }
+}
+
+.filters-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--on-surface);
+  margin: 0;
+}
+
+.filters-toggle {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-2xs) var(--space-sm);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--on-surface-variant);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  .material-symbols-outlined {
+    font-size: 18px;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover {
+    background: var(--surface-container);
+    color: var(--on-surface);
+  }
+
+  &.open .material-symbols-outlined {
+    transform: rotate(180deg);
+  }
+}
+
+.filters-row {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.filters-row--primary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: end;
+}
+
+.filters-half {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.filters-row--secondary {
+  flex-wrap: wrap;
+  align-items: flex-end;
 }
 
 .search-bar {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  padding: var(--space-md) var(--space-lg);
+  padding: 0 var(--space-lg);
+  height: 42px;
   background: var(--surface-container);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
 
   .material-symbols-outlined {
     color: var(--on-surface-variant);
@@ -28,20 +102,13 @@
   flex: 1;
   border: none;
   background: transparent;
-  font-size: 16px;
+  font-size: 15px;
   color: var(--on-surface);
   outline: none;
 
   &::placeholder {
     color: var(--on-surface-variant);
   }
-}
-
-.filters-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-md);
-  align-items: end;
 }
 
 .filter-field {
@@ -53,60 +120,143 @@
   color: var(--on-surface-variant);
   min-width: 140px;
 
+  > span {
+    line-height: 16px;
+  }
+
   input,
   select {
-    padding: var(--space-sm) var(--space-md);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    height: 42px;
+    padding: 0 var(--space-md);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-lg);
     background: var(--surface-container-lowest);
     color: var(--on-surface);
     font-size: 14px;
     font-weight: 400;
     outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
     &:focus {
       border-color: var(--primary-container);
-    }
-  }
-
-  &.checkbox {
-    flex-direction: row;
-    align-items: center;
-    gap: var(--space-sm);
-    min-width: auto;
-    padding-bottom: var(--space-sm);
-    font-weight: 500;
-    font-size: 13px;
-    cursor: pointer;
-
-    input {
-      width: 16px;
-      height: 16px;
+      box-shadow: 0 0 0 1px var(--primary-container);
     }
   }
 }
 
-.tech-filter {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
+.select-wrapper {
+  position: relative;
+
+  select {
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 40px;
+    cursor: pointer;
+  }
+
+  .select-chevron {
+    position: absolute;
+    top: 50%;
+    right: var(--space-md);
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--on-surface-variant);
+    font-size: 20px;
+  }
+}
+
+.tech-field {
+  flex: 1;
+  min-width: 220px;
 }
 
 .tech-input-row {
   display: flex;
+  align-items: stretch;
   gap: var(--space-sm);
 
   input {
     flex: 1;
-    max-width: 280px;
-    padding: var(--space-sm) var(--space-md);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    height: 42px;
+    padding: 0 var(--space-md);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--radius-lg);
     background: var(--surface-container-lowest);
     color: var(--on-surface);
     font-size: 14px;
     outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:focus {
+      border-color: var(--primary-container);
+      box-shadow: 0 0 0 1px var(--primary-container);
+    }
   }
+
+  .btn {
+    height: 42px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  height: 42px;
+  padding: 0 var(--space-md);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  background: var(--surface-container-lowest);
+  color: var(--on-surface-variant);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  .switch-track {
+    position: relative;
+    flex-shrink: 0;
+    width: 34px;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--surface-container-high);
+    transition: background 0.2s ease;
+  }
+
+  .switch-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s ease;
+  }
+
+  &.on {
+    color: var(--on-primary-container);
+    border-color: var(--primary-container);
+
+    .switch-track {
+      background: var(--primary);
+    }
+
+    .switch-thumb {
+      transform: translateX(16px);
+    }
+  }
+}
+
+.search-btn {
+  height: 42px;
+  padding: 0 var(--space-lg);
+  align-self: end;
+  border-radius: var(--radius-lg);
 }
 
 .tech-chips {
@@ -200,5 +350,12 @@
 
   &:hover {
     opacity: 0.9;
+  }
+}
+
+@media (max-width: 768px) {
+  .filters-row--primary,
+  .filters-half {
+    grid-template-columns: 1fr;
   }
 }

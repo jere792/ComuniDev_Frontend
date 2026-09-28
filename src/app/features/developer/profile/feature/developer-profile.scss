@@ -3,12 +3,10 @@
 // ============================================================
 
 .profile-page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--space-lg) var(--space-md);
+  padding: 0 var(--space-md);
 
   @media (min-width: 1024px) {
-    padding: var(--space-lg) 0;
+    padding: 0;
   }
 }
 

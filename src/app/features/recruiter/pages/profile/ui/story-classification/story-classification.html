@@ -1,0 +1,169 @@
+<section class="info-card">
+  <div class="card-header">
+    <div class="card-header-left">
+      <div class="card-icon">
+        <span class="material-symbols-outlined">collection_bookmark</span>
+      </div>
+      <div>
+        <h2 class="card-title">Clasificación de historias</h2>
+        <p class="card-subtitle">Crea categorías y organiza tus historias anteriores</p>
+      </div>
+    </div>
+    <button type="button" class="btn-new" (click)="startCreate()">
+      <span class="material-symbols-outlined">add</span>
+      Nueva categoría
+    </button>
+  </div>
+
+  @if (showForm()) {
+    <div class="category-form">
+      <div class="form-row">
+        <input
+          class="form-input"
+          type="text"
+          maxlength="50"
+          placeholder="Nombre de la categoría (ej. Contrataciones 2026)"
+          [ngModel]="formNombre()"
+          (ngModelChange)="formNombre.set($event)"
+          (keyup.enter)="saveForm()"
+        />
+        <div class="color-swatches">
+          @for (color of colorPresets; track color) {
+            <button
+              type="button"
+              class="swatch"
+              [class.active]="formColor() === color"
+              [style.background]="color"
+              (click)="formColor.set(color)"
+              aria-label="Elegir color"
+            ></button>
+          }
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-ghost" (click)="cancelForm()">Cancelar</button>
+        <button
+          type="button"
+          class="btn-primary"
+          [disabled]="saving() || !formNombre().trim()"
+          (click)="saveForm()"
+        >
+          {{ editingId() ? 'Guardar cambios' : 'Crear categoría' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <div class="chips-row">
+    <button type="button" class="chip" [class.active]="selected() === 'all'" (click)="select('all')">
+      <span class="chip-dot" style="background: var(--primary)"></span>
+      Todas
+      <span class="chip-count">{{ counts()['all'] }}</span>
+    </button>
+    @for (cat of categories(); track cat.id) {
+      <button type="button" class="chip" [class.active]="selected() === cat.id" (click)="select(cat.id)">
+        <span class="chip-dot" [style.background]="cat.color || 'var(--primary)'"></span>
+        {{ cat.nombre }}
+        <span class="chip-count">{{ counts()[cat.id] ?? 0 }}</span>
+      </button>
+    }
+    <button type="button" class="chip" [class.active]="selected() === 'none'" (click)="select('none')">
+      <span class="chip-dot uncategorized"></span>
+      Sin categoría
+      <span class="chip-count">{{ counts()['none'] }}</span>
+    </button>
+  </div>
+
+  @if (selectedCategory(); as cat) {
+    <div class="category-actions">
+      <span class="category-hint">Editando «{{ cat.nombre }}»</span>
+      <button type="button" class="icon-btn" title="Editar categoría" (click)="startEdit(cat)">
+        <span class="material-symbols-outlined">edit</span>
+      </button>
+      <button
+        type="button"
+        class="icon-btn danger"
+        [class.confirm]="confirmDeleteId() === cat.id"
+        [title]="confirmDeleteId() === cat.id ? 'Confirmar eliminación' : 'Eliminar categoría'"
+        (click)="requestDelete(cat)"
+      >
+        <span class="material-symbols-outlined">delete</span>
+        @if (confirmDeleteId() === cat.id) {
+          <span class="confirm-label">Confirmar</span>
+        }
+      </button>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading">Cargando historias...</div>
+  } @else if (filtered().length === 0) {
+    <div class="stories-empty">
+      <span class="material-symbols-outlined">auto_awesome</span>
+      <p>No hay historias en esta vista.</p>
+    </div>
+  } @else {
+    <div class="stories-grid">
+      @for (story of filtered(); track story.id) {
+        <article class="story-card" [class.selected]="isSelected(story.id)">
+          <label class="story-check">
+            <input type="checkbox" [checked]="isSelected(story.id)" (change)="toggleStory(story.id)" />
+          </label>
+          <div class="story-media">
+            @if (story.contenido?.imagenUrl) {
+              <img [src]="story.contenido?.imagenUrl" alt="Historia" />
+            } @else if (story.contenido?.videoUrl) {
+              <div class="media-fallback">
+                <span class="material-symbols-outlined">play_circle</span>
+              </div>
+            } @else {
+              <div class="media-fallback text">{{ story.contenido?.texto || 'Sin contenido' }}</div>
+            }
+            @if (story.contenido?.musica) {
+              <span class="music-badge">
+                <span class="material-symbols-outlined">music_note</span>
+              </span>
+            }
+          </div>
+          <div class="story-info">
+            <span class="story-date">{{ formatDate(story.createdAt) }}</span>
+            <div class="story-cats">
+              @for (id of story.categoriaIds ?? []; track id) {
+                <span
+                  class="mini-dot"
+                  [style.background]="categoryById(id)?.color || 'var(--primary)'"
+                  [title]="categoryById(id)?.nombre"
+                ></span>
+              }
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+
+  @if (selectedIds().length > 0) {
+    <div class="action-bar">
+      <span class="action-count">{{ selectedIds().length }} seleccionada(s)</span>
+      <select
+        class="action-select"
+        [ngModel]="assignTarget()"
+        (ngModelChange)="assignTarget.set($event)"
+      >
+        <option value="" disabled>Asignar a...</option>
+        @for (cat of categories(); track cat.id) {
+          <option [value]="cat.id">{{ cat.nombre }}</option>
+        }
+      </select>
+      <button type="button" class="btn-primary sm" [disabled]="!assignTarget()" (click)="assignSelected()">
+        Asignar
+      </button>
+      @if (selectedCategory()) {
+        <button type="button" class="btn-ghost sm" (click)="removeFromCategory()">
+          Quitar de esta categoría
+        </button>
+      }
+      <button type="button" class="btn-ghost sm" (click)="selectedIds.set([])">Cancelar</button>
+    </div>
+  }
+</section>

@@ -8,6 +8,7 @@ export class StoryStore {
   private repository = inject<StoryRepository>(STORY_REPOSITORY);
 
   readonly stories = signal<SocialStory[]>([]);
+  readonly userStories = signal<SocialStory[]>([]);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
 
@@ -28,6 +29,25 @@ export class StoryStore {
 
   getStories(userId: string): Observable<SocialStory[]> {
     return this.repository.getStories(userId);
+  }
+
+  loadUserStories(userId: string, categoriaId?: string): void {
+    this.loading.set(true);
+    this.error.set(null);
+    this.repository.getAllByUser(userId, categoriaId).subscribe({
+      next: (stories) => {
+        this.userStories.set(stories);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.error.set('Error al cargar historias');
+        this.loading.set(false);
+      },
+    });
+  }
+
+  updateCategorias(storyId: string, categoriaIds: string[]): Observable<SocialStory | null> {
+    return this.repository.updateCategorias(storyId, categoriaIds);
   }
 
   createStory(
@@ -52,6 +72,7 @@ export class StoryStore {
 
   clear(): void {
     this.stories.set([]);
+    this.userStories.set([]);
     this.error.set(null);
   }
 }

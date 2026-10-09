@@ -23,6 +23,7 @@ export interface SocialStory {
   };
   visibilidad?: string;
   fechaExpiracion?: string;
+  categoriaIds?: string[];
   vistasCount?: number;
   reaccionesCount?: number;
   estado?: string;

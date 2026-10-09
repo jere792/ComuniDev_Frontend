@@ -32,6 +32,43 @@ const GET_STORIES = gql`
       }
       visibilidad
       fechaExpiracion
+      categoriaIds
+      vistasCount
+      reaccionesCount
+      estado
+      createdAt
+    }
+  }
+`;
+
+const GET_USER_STORIES = gql`
+  query GetUserStories($userId: String!, $categoriaId: String) {
+    userStories(userId: $userId, categoriaId: $categoriaId) {
+      id
+      autorId
+      contenido {
+        texto
+        imagenUrl
+        videoUrl
+        musica {
+          trackId
+          trackName
+          artistName
+          coverUrl
+          previewUrl
+          musicMode
+          lyricsText
+          lyricsPosX
+          lyricsPosY
+          coverPosX
+          coverPosY
+          lyricsScale
+          coverScale
+        }
+      }
+      visibilidad
+      fechaExpiracion
+      categoriaIds
       vistasCount
       reaccionesCount
       estado
@@ -67,9 +104,20 @@ const CREATE_STORY = gql`
       }
       visibilidad
       fechaExpiracion
+      categoriaIds
       vistasCount
       reaccionesCount
       estado
+      createdAt
+    }
+  }
+`;
+
+const UPDATE_STORY_CATEGORIAS = gql`
+  mutation UpdateStoryCategorias($storyId: ID!, $categoriaIds: [String!]) {
+    updateStoryCategorias(storyId: $storyId, categoriaIds: $categoriaIds) {
+      id
+      categoriaIds
       createdAt
     }
   }
@@ -112,6 +160,22 @@ export class StoryGraphqlService implements StoryRepository {
     return this.apollo
       .watchQuery<any>({ query: GET_STORIES, variables: { userId }, fetchPolicy: 'network-only' })
       .valueChanges.pipe(map(result => result.data?.stories ?? []));
+  }
+
+  getAllByUser(userId: string, categoriaId?: string): Observable<SocialStory[]> {
+    return this.apollo
+      .watchQuery<any>({
+        query: GET_USER_STORIES,
+        variables: { userId, categoriaId: categoriaId ?? null },
+        fetchPolicy: 'network-only',
+      })
+      .valueChanges.pipe(map(result => result.data?.userStories ?? []));
+  }
+
+  updateCategorias(storyId: string, categoriaIds: string[]): Observable<SocialStory | null> {
+    return this.apollo
+      .mutate<any>({ mutation: UPDATE_STORY_CATEGORIAS, variables: { storyId, categoriaIds } })
+      .pipe(map(result => result.data?.updateStoryCategorias ?? null));
   }
 
   createStory(autorId: string, contenido: {

@@ -1,155 +1,182 @@
-.candidate-card {
+:host {
+  display: block;
+  border-bottom: 1px solid var(--border-subtle);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.candidate-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) minmax(160px, 1.6fr) 120px 140px auto;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
   background: var(--surface-container-lowest);
-  border-radius: 16px;
-  padding: 1.25rem;
-  border: 1px solid var(--border-subtle);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: background 0.15s ease;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    background: var(--surface-container-low);
+  }
+}
+
+.col-candidate {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 0;
+
+  .candidate-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
   }
 
-  .candidate-header {
+  .avatar-fallback {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
+    justify-content: center;
+    background: var(--primary-container);
+    color: var(--on-primary-container);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
 
-    .candidate-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
+  .candidate-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 
-    .avatar-fallback {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--primary-container);
-      color: var(--on-primary-container);
+    .candidate-name {
       font-size: 0.9rem;
       font-weight: 600;
-      flex-shrink: 0;
-    }
-
-    .candidate-info {
-      flex: 1;
-
-      .candidate-name {
-        font-size: 1rem;
-        font-weight: 600;
-        margin: 0;
-        color: var(--on-surface);
-      }
-
-      .candidate-role {
-        font-size: 0.875rem;
-        color: var(--on-surface-variant);
-        margin: 0;
-      }
-    }
-
-    .availability-badge {
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 500;
-      background: var(--surface-container);
-      color: var(--on-surface-variant);
-
-      &.available {
-        background: rgba(16, 185, 129, 0.15);
-        color: #10b981;
-      }
-    }
-  }
-
-  .candidate-skills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 12px;
-
-    .skill-tag {
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      background: var(--surface-container);
       color: var(--on-surface);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-  }
 
-  .candidate-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 12px;
-    border-top: 1px solid var(--border-subtle);
-
-    .experience {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.875rem;
+    .candidate-role {
+      font-size: 0.78rem;
       color: var(--on-surface-variant);
-
-      .material-symbols-outlined {
-        font-size: 18px;
-      }
-    }
-
-    .candidate-actions {
-      display: flex;
-      gap: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
+}
 
-  .btn {
+.col-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  .skill-tag {
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    background: var(--surface-container);
+    color: var(--on-surface);
+    white-space: nowrap;
+  }
+}
+
+.col-status {
+  .availability-badge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 0.8125rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: 1px solid transparent;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: var(--surface-container);
+    color: var(--on-surface-variant);
 
-    .material-symbols-outlined {
-      font-size: 16px;
+    &.available {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
     }
   }
+}
 
-  .btn-outline {
-    background: transparent;
-    border-color: var(--outline-variant);
-    color: var(--on-surface);
+.col-experience {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--on-surface-variant);
+  white-space: nowrap;
 
-    &:hover {
-      background: var(--surface-container);
-    }
+  .material-symbols-outlined {
+    font-size: 18px;
+  }
+}
+
+.col-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+
+  .material-symbols-outlined {
+    font-size: 16px;
+  }
+}
+
+.btn-outline {
+  background: transparent;
+  border-color: var(--outline-variant);
+  color: var(--on-surface);
+
+  &:hover {
+    background: var(--surface-container);
+  }
+}
+
+.btn-primary {
+  background: var(--primary-container);
+  border: none;
+  color: var(--on-primary-container);
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.btn-saved {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #10b981;
+
+  &:hover {
+    background: rgba(16, 185, 129, 0.22);
+  }
+}
+
+@media (max-width: 1024px) {
+  .candidate-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+    align-items: flex-start;
   }
 
-  .btn-primary {
-    background: var(--primary-container);
-    border: none;
-    color: var(--on-primary-container);
-
-    &:hover {
-      opacity: 0.9;
-    }
-  }
-
-  .btn-saved {
-    background: rgba(16, 185, 129, 0.15);
-    border: 1px solid rgba(16, 185, 129, 0.35);
-    color: #10b981;
-
-    &:hover {
-      background: rgba(16, 185, 129, 0.22);
-    }
+  .col-actions {
+    justify-content: flex-start;
   }
 }

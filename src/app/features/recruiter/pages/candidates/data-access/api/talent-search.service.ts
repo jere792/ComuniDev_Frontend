@@ -4,10 +4,18 @@ import { Apollo, gql } from 'apollo-angular';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../../../../../environments/environment';
 import {
+  CertificadoResponse,
+  CvResponse,
   DeveloperProfile,
+  DisponibilidadLaboral,
+  EducacionResponse,
+  EnlacesResponse,
+  ExperienciaResponse,
+  ProyectoResponse,
   SavedProfile,
   TalentSearchFilters,
   TalentSearchResult,
+  TecnologiaResponse,
 } from '@features/recruiter/pages/candidates/domain/models/developer-profile.model';
 import {
   TalentSearchRepository,
@@ -51,25 +59,41 @@ const SAVED_PROFILES = gql`
 
 function normalizeDeveloper(raw: Record<string, unknown>, index: number): DeveloperProfile {
   const id = raw['id'] ?? raw['_id'] ?? raw['nombreUsuario'] ?? `dev-${index}`;
-  const tecnologias = Array.isArray(raw['tecnologias']) ? raw['tecnologias'] : [];
-  const habilidades = Array.isArray(raw['habilidadesBlandas']) ? raw['habilidadesBlandas'] : [];
-  const disponibilidad = (raw['disponibilidadLaboral'] ?? null) as DeveloperProfile['disponibilidadLaboral'];
-  const experiencias = Array.isArray(raw['experiencias']) ? raw['experiencias'] : [];
+  const asArray = <T>(value: unknown): T[] | null => (Array.isArray(value) ? (value as T[]) : null);
+  const asString = (value: unknown): string | null => (typeof value === 'string' && value.length ? value : null);
+  const asNumber = (value: unknown): number | null => (typeof value === 'number' ? value : null);
+  const asBool = (value: unknown): boolean | null => (typeof value === 'boolean' ? value : null);
+  const asObject = <T>(value: unknown): T | null => (value && typeof value === 'object' ? (value as T) : null);
 
   return {
     id: String(id),
     nombre: String(raw['nombre'] ?? raw['nombreUsuario'] ?? 'Sin nombre'),
-    nombreUsuario: (raw['nombreUsuario'] as string | null | undefined) ?? null,
-    fotoPerfilUrl: (raw['fotoPerfilUrl'] as string | null | undefined) ?? null,
-    tituloProfesional: (raw['tituloProfesional'] as string | null | undefined) ?? null,
-    bio: (raw['bio'] as string | null | undefined) ?? null,
-    ubicacionPais: (raw['ubicacionPais'] as string | null | undefined) ?? null,
-    ubicacionCiudad: (raw['ubicacionCiudad'] as string | null | undefined) ?? null,
-    tecnologias,
-    habilidadesBlandas: habilidades as string[],
-    disponibilidadLaboral: disponibilidad,
-    remoto: (raw['remoto'] as boolean | null | undefined) ?? null,
-    experiencias,
+    nombreUsuario: asString(raw['nombreUsuario']),
+    email: asString(raw['email']),
+    telefono: asString(raw['telefono']),
+    fotoPerfilUrl: asString(raw['fotoPerfilUrl']),
+    bannerUrl: asString(raw['bannerUrl']),
+    bio: asString(raw['bio']),
+    sitioWeb: asString(raw['sitioWeb']),
+    ubicacionPais: asString(raw['ubicacionPais']),
+    ubicacionDepartamento: asString(raw['ubicacionDepartamento']),
+    ubicacionCiudad: asString(raw['ubicacionCiudad']),
+    estadoCuenta: asString(raw['estadoCuenta']),
+    createdAt: asString(raw['createdAt']),
+    seguidoresCount: asNumber(raw['seguidoresCount']),
+    siguiendoCount: asNumber(raw['siguiendoCount']),
+    conexionesCount: asNumber(raw['conexionesCount']),
+    tituloProfesional: asString(raw['tituloProfesional']),
+    tecnologias: asArray<TecnologiaResponse>(raw['tecnologias']),
+    habilidadesBlandas: asArray<string>(raw['habilidadesBlandas']),
+    experiencias: asArray<ExperienciaResponse>(raw['experiencias']),
+    educacion: asArray<EducacionResponse>(raw['educacion']),
+    certificados: asArray<CertificadoResponse>(raw['certificados']),
+    proyectos: asArray<ProyectoResponse>(raw['proyectos']),
+    cv: asObject<CvResponse>(raw['cv']),
+    enlaces: asObject<EnlacesResponse>(raw['enlaces']),
+    disponibilidadLaboral: asObject<DisponibilidadLaboral>(raw['disponibilidadLaboral']),
+    remoto: asBool(raw['remoto']),
   };
 }
 

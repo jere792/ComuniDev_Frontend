@@ -19,6 +19,8 @@ import { USER_REPOSITORY } from '@features/users/domain/ports/user.repository';
 import { UserGraphqlService } from '@features/users/data-access/api/user-graphql.service';
 import { RECRUITER_PROFILE_REPOSITORY } from '@features/recruiter/pages/profile/domain/ports/recruiter-profile.repository';
 import { RecruiterProfileGraphqlService } from '@features/recruiter/pages/profile/data-access/api/recruiter-profile-graphql.service';
+import { CATEGORY_REPOSITORY } from '@features/recruiter/pages/profile/domain/ports/category.repository';
+import { CategoryGraphqlService } from '@features/recruiter/pages/profile/data-access/api/category-graphql.service';
 import { DEVELOPER_PROFILE_REPOSITORY } from '@features/developer/profile/domain/ports/developer-profile.repository';
 import { DeveloperProfileGraphqlService } from '@features/developer/profile/data-access/api/developer-profile-graphql.service';
 import { COMMENT_REPOSITORY } from '@features/shared/domain/ports/comment.repository';
@@ -50,6 +52,7 @@ export const appConfig: ApplicationConfig = {
     { provide: AUTH_REPOSITORY, useClass: AuthHttpService },
     { provide: USER_REPOSITORY, useClass: UserGraphqlService },
     { provide: RECRUITER_PROFILE_REPOSITORY, useClass: RecruiterProfileGraphqlService },
+    { provide: CATEGORY_REPOSITORY, useClass: CategoryGraphqlService },
     { provide: DEVELOPER_PROFILE_REPOSITORY, useClass: DeveloperProfileGraphqlService },
     { provide: COMMENT_REPOSITORY, useClass: CommentGraphqlService },
     { provide: REACTION_REPOSITORY, useClass: ReactionGraphqlService },

@@ -28,6 +28,8 @@
       <app-recruiter-companies-card
         [empresas]="profile?.empresas || []"
       />
+
+      <app-story-classification [userId]="user()?.id || ''" />
     </div>
 
     <!-- ─── SIDEBAR ─── -->

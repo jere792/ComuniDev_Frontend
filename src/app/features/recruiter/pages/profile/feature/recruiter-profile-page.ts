@@ -13,6 +13,7 @@ import { RecruiterCompaniesCard } from '@features/recruiter/pages/profile/ui/com
 import { RecruiterExperienceTimeline } from '@features/recruiter/pages/profile/ui/experience-timeline/recruiter-experience-timeline';
 import { SidebarCard } from '@features/recruiter/pages/profile/ui/sidebar-card/sidebar-card';
 import { SocialListModal, SocialListType } from '@features/recruiter/pages/profile/ui/social-list-modal/social-list-modal';
+import { StoryClassification } from '@features/recruiter/pages/profile/ui/story-classification/story-classification';
 
 @Component({
   selector: 'app-recruiter-profile-page',
@@ -27,6 +28,7 @@ import { SocialListModal, SocialListType } from '@features/recruiter/pages/profi
     RecruiterExperienceTimeline,
     SidebarCard,
     SocialListModal,
+    StoryClassification,
   ],
   templateUrl: './recruiter-profile.html',
   styleUrl: './recruiter-profile.scss',

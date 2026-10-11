@@ -10,6 +10,7 @@ export class StoryStore {
   readonly stories = signal<SocialStory[]>([]);
   readonly userStories = signal<SocialStory[]>([]);
   readonly loading = signal(false);
+  readonly loadingUserStories = signal(false);
   readonly error = signal<string | null>(null);
 
   loadStories(userId: string): void {
@@ -32,16 +33,16 @@ export class StoryStore {
   }
 
   loadUserStories(userId: string, categoriaId?: string): void {
-    this.loading.set(true);
+    this.loadingUserStories.set(true);
     this.error.set(null);
     this.repository.getAllByUser(userId, categoriaId).subscribe({
       next: (stories) => {
         this.userStories.set(stories);
-        this.loading.set(false);
+        this.loadingUserStories.set(false);
       },
       error: () => {
         this.error.set('Error al cargar historias');
-        this.loading.set(false);
+        this.loadingUserStories.set(false);
       },
     });
   }
@@ -73,6 +74,7 @@ export class StoryStore {
   clear(): void {
     this.stories.set([]);
     this.userStories.set([]);
+    this.loadingUserStories.set(false);
     this.error.set(null);
   }
 }

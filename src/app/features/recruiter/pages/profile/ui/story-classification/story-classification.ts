@@ -37,7 +37,7 @@ export class StoryClassification implements OnChanges {
 
   categories = this.categoryStore.categories;
   stories = this.storyStore.userStories;
-  loading = computed(() => this.categoryStore.loading() || this.storyStore.loading());
+  loading = computed(() => this.categoryStore.loading() || this.storyStore.loadingUserStories());
 
   counts = computed(() => {
     const map: Record<string, number> = { all: this.stories().length, none: 0 };

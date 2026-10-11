@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, effect } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -14,6 +14,8 @@ import { RecruiterExperienceTimeline } from '@features/recruiter/pages/profile/u
 import { SidebarCard } from '@features/recruiter/pages/profile/ui/sidebar-card/sidebar-card';
 import { SocialListModal, SocialListType } from '@features/recruiter/pages/profile/ui/social-list-modal/social-list-modal';
 import { StoryClassification } from '@features/recruiter/pages/profile/ui/story-classification/story-classification';
+import { StoryHighlights, HighlightManageRequest } from '@features/recruiter/pages/profile/ui/story-highlights/story-highlights';
+import { StoryViewer, StoryViewerUser } from '@shared/ui/story-viewer/story-viewer';
 
 @Component({
   selector: 'app-recruiter-profile-page',
@@ -29,6 +31,8 @@ import { StoryClassification } from '@features/recruiter/pages/profile/ui/story-
     SidebarCard,
     SocialListModal,
     StoryClassification,
+    StoryHighlights,
+    StoryViewer,
   ],
   templateUrl: './recruiter-profile.html',
   styleUrl: './recruiter-profile.scss',
@@ -44,6 +48,19 @@ export class RecruiterProfilePage implements OnInit {
   uploadingImage = signal(false);
   socialModalOpen = signal(false);
   socialModalType = signal<SocialListType>('followers');
+
+  // Historias / destacados
+  viewerOpen = signal(false);
+  viewerGroup = signal<StoryViewerUser | null>(null);
+  viewerGroups = computed<StoryViewerUser[]>(() => {
+    const group = this.viewerGroup();
+    return group ? [group] : [];
+  });
+  classificationOpen = signal(false);
+  classificationInitialCategory = signal<string | null>(null);
+  classificationOpenCreate = signal(false);
+  classificationEditId = signal<string | null>(null);
+
   basicForm: FormGroup;
   profileForm: FormGroup;
 
@@ -191,6 +208,35 @@ export class RecruiterProfilePage implements OnInit {
 
   closeSocialModal(): void {
     this.socialModalOpen.set(false);
+  }
+
+  // ─── Historias / destacados ───
+
+  onViewHighlight(group: StoryViewerUser): void {
+    this.viewerGroup.set(group);
+    this.viewerOpen.set(true);
+  }
+
+  onCloseViewer(): void {
+    this.viewerOpen.set(false);
+  }
+
+  onCreateHighlight(): void {
+    this.classificationInitialCategory.set(null);
+    this.classificationOpenCreate.set(true);
+    this.classificationEditId.set(null);
+    this.classificationOpen.set(true);
+  }
+
+  onManageHighlight(request: HighlightManageRequest): void {
+    this.classificationOpenCreate.set(request.mode === 'create');
+    this.classificationEditId.set(request.mode === 'edit' ? request.category?.id ?? null : null);
+    this.classificationInitialCategory.set(request.mode === 'manage' ? request.category?.id ?? null : null);
+    this.classificationOpen.set(true);
+  }
+
+  onCloseClassification(): void {
+    this.classificationOpen.set(false);
   }
 
   onBannerClick(input: HTMLInputElement): void {

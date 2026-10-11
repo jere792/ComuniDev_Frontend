@@ -1,36 +1,28 @@
-import { Component, OnInit, inject, signal, ChangeDetectorRef, effect, OnDestroy } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Router } from '@angular/router';
 import { StoryStore } from '@features/recruiter/pages/inicio/data-access/state/story.store';
 import { MusicaStore } from '@features/recruiter/pages/inicio/data-access/state/musica.store';
 import { SocialStory } from '@features/recruiter/pages/inicio/domain/models/social-story.model';
 import { MusicTrackResponse } from '@features/recruiter/pages/inicio/domain/models/music.model';
 import { UserStore } from '@features/users/data-access/state/user.store';
+import { StoryViewer, StoryViewerUser } from '@shared/ui/story-viewer/story-viewer';
 
 type MusicMode = 'cover' | 'audio' | 'lyrics' | 'cover+lyrics';
 
-interface StoryUser {
-  autorId: string;
-  nombre: string;
-  avatar: string;
-  stories: SocialStory[];
-}
-
 @Component({
   selector: 'app-stories',
-  imports: [FormsModule, DatePipe, DecimalPipe],
+  imports: [FormsModule, DatePipe, DecimalPipe, StoryViewer],
   templateUrl: './stories.html',
   styleUrl: './stories.scss',
 })
 export class StoriesComponent implements OnInit, OnDestroy {
   private storyService = inject(StoryStore);
   private userStore = inject(UserStore);
-  private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private musicaService = inject(MusicaStore);
 
-  storyUsers = signal<StoryUser[]>([]);
+  storyUsers = signal<StoryViewerUser[]>([]);
   showComposer = signal(false);
   storyImage: string | null = null;
   storyText = '';
@@ -71,32 +63,18 @@ export class StoriesComponent implements OnInit, OnDestroy {
   hasSyncedLyrics = false;
   private timeUpdateInterval: ReturnType<typeof setInterval> | null = null;
 
-  // Audio
+  // Audio (composer music preview)
   previewAudio: HTMLAudioElement | null = null;
   playingPreview = false;
   currentTime = signal(0);
   duration = signal(0);
   volume = 0.8;
 
-  // Viewer
-  viewingUser = signal<StoryUser | null>(null);
-  viewingIndex = signal(0);
-  private storyTimer: ReturnType<typeof setTimeout> | null = null;
-  private readonly STORY_DURATION = 30000; // 30 seconds
+  // Viewer (delegado a <app-story-viewer>)
+  viewerOpen = signal(false);
+  viewerStartIndex = signal(0);
 
   private userCache = new Map<string, { nombre: string; avatar: string }>();
-
-  constructor() {
-    effect(() => {
-      const user = this.viewingUser();
-      const idx = this.viewingIndex();
-      if (user && user.stories[idx]?.contenido?.musica?.previewUrl) {
-        this.playMusic(user.stories[idx].contenido!.musica!.previewUrl!);
-      } else {
-        this.stopPreview();
-      }
-    });
-  }
 
   private getUserId(): string | null {
     return localStorage.getItem('userId');
@@ -125,7 +103,7 @@ export class StoriesComponent implements OnInit, OnDestroy {
     });
   }
 
-  private groupByAutor(stories: SocialStory[]): StoryUser[] {
+  private groupByAutor(stories: SocialStory[]): StoryViewerUser[] {
     const map = new Map<string, SocialStory[]>();
     for (const s of stories) {
       const arr = map.get(s.autorId) ?? [];
@@ -142,7 +120,7 @@ export class StoriesComponent implements OnInit, OnDestroy {
     }));
   }
 
-  private loadUserNames(group: StoryUser): void {
+  private loadUserNames(group: StoryViewerUser): void {
     if (this.userCache.has(group.autorId)) {
       const info = this.userCache.get(group.autorId)!;
       group.nombre = info.nombre;
@@ -450,7 +428,6 @@ export class StoriesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopLyricTracking();
-    this.stopStoryTimer();
     this.stopPreview();
   }
 
@@ -590,12 +567,10 @@ export class StoriesComponent implements OnInit, OnDestroy {
     if (this.previewAudio && !this.previewAudio.paused) {
       this.previewAudio.pause();
       this.playingPreview = false;
-      this.stopStoryTimer();
       this.cdr.detectChanges();
     } else if (this.previewAudio) {
       this.previewAudio.play();
       this.playingPreview = true;
-      this.resetStoryTimer();
       this.cdr.detectChanges();
     } else {
       this.playMusic(track.previewUrl);
@@ -648,133 +623,12 @@ export class StoriesComponent implements OnInit, OnDestroy {
     this.stopLyricTracking();
   }
 
-  // ─── Viewer ───
+  // ─── Viewer (delegado a <app-story-viewer>) ───
 
-  viewerSyncedLines: { time: number; text: string }[] = [];
-  viewerCurrentLyricIndex = signal(-1);
-  viewerHasSyncedLyrics = false;
-
-  openStory(user: StoryUser): void {
-    this.viewingUser.set(user);
-    this.viewingIndex.set(0);
-    this.fetchViewerSyncedLyrics();
-    this.startStoryTimer();
-  }
-
-  closeViewer(): void {
-    this.viewingUser.set(null);
-    this.viewingIndex.set(0);
-    this.stopPreview();
-    this.stopStoryTimer();
-    this.viewerSyncedLines = [];
-    this.viewerHasSyncedLyrics = false;
-    this.viewerCurrentLyricIndex.set(-1);
-  }
-
-  nextStory(): void {
-    const user = this.viewingUser();
-    if (!user) return;
-    if (this.viewingIndex() < user.stories.length - 1) {
-      this.viewingIndex.update(i => i + 1);
-      this.fetchViewerSyncedLyrics();
-      this.resetStoryTimer();
-    } else {
-      const users = this.storyUsers();
-      const currentIdx = users.indexOf(user);
-      if (currentIdx < users.length - 1) {
-        this.viewingUser.set(users[currentIdx + 1]);
-        this.viewingIndex.set(0);
-        this.fetchViewerSyncedLyrics();
-        this.resetStoryTimer();
-      } else {
-        this.closeViewer();
-      }
-    }
-  }
-
-  prevStory(): void {
-    const user = this.viewingUser();
-    if (!user) return;
-    if (this.viewingIndex() > 0) {
-      this.viewingIndex.update(i => i - 1);
-      this.fetchViewerSyncedLyrics();
-      this.resetStoryTimer();
-    } else {
-      const users = this.storyUsers();
-      const currentIdx = users.indexOf(user);
-      if (currentIdx > 0) {
-        this.viewingUser.set(users[currentIdx - 1]);
-        const prev = users[currentIdx - 1];
-        this.viewingIndex.set(prev.stories.length - 1);
-      }
-    }
-  }
-
-  private fetchViewerSyncedLyrics(): void {
-    this.viewerSyncedLines = [];
-    this.viewerHasSyncedLyrics = false;
-    this.viewerCurrentLyricIndex.set(-1);
-    this.stopLyricTracking();
-
-    const vu = this.viewingUser();
-    if (!vu) return;
-    const story = vu.stories[this.viewingIndex()];
-    const musica = story?.contenido?.musica;
-    if (!musica?.artistName || !musica?.trackName) return;
-
-    this.musicaService.fetchLyrics(musica.artistName, musica.trackName).subscribe({
-      next: (res) => {
-        if (res?.syncedLyrics) {
-          this.viewerSyncedLines = this.parseLrc(res.syncedLyrics);
-          this.viewerHasSyncedLyrics = this.viewerSyncedLines.length > 0;
-          if (this.viewerHasSyncedLyrics) {
-            this.startViewerLyricTracking();
-          }
-        }
-        this.cdr.detectChanges();
-      },
-      error: () => {}
-    });
-  }
-
-  private startViewerLyricTracking(): void {
-    this.stopLyricTracking();
-    if (!this.viewerHasSyncedLyrics) return;
-    this.timeUpdateInterval = setInterval(() => {
-      if (!this.previewAudio) return;
-      const currentTime = this.previewAudio.currentTime;
-      let idx = -1;
-      for (let i = this.viewerSyncedLines.length - 1; i >= 0; i--) {
-        if (currentTime >= this.viewerSyncedLines[i].time) {
-          idx = i;
-          break;
-        }
-      }
-      if (idx !== this.viewerCurrentLyricIndex()) {
-        this.viewerCurrentLyricIndex.set(idx);
-        this.cdr.detectChanges();
-      }
-    }, 100);
-  }
-
-  // ─── Story Auto-Advance Timer ───
-
-  private startStoryTimer(): void {
-    this.stopStoryTimer();
-    this.storyTimer = setTimeout(() => {
-      this.nextStory();
-    }, this.STORY_DURATION);
-  }
-
-  private resetStoryTimer(): void {
-    this.startStoryTimer();
-  }
-
-  private stopStoryTimer(): void {
-    if (this.storyTimer) {
-      clearTimeout(this.storyTimer);
-      this.storyTimer = null;
-    }
+  openStory(user: StoryViewerUser): void {
+    const index = this.storyUsers().indexOf(user);
+    this.viewerStartIndex.set(index >= 0 ? index : 0);
+    this.viewerOpen.set(true);
   }
 
   private resizeImage(file: File): Promise<Blob> {
@@ -814,20 +668,5 @@ export class StoriesComponent implements OnInit, OnDestroy {
       };
       reader.readAsDataURL(file);
     });
-  }
-
-  getInitials(name: string): string {
-    if (!name) return '?';
-    return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
-  }
-
-  formatTime(seconds: number): string {
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  }
-
-  goToProfile(autorId: string): void {
-    this.router.navigate(['/profile', autorId]);
   }
 }

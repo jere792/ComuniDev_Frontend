@@ -1,0 +1,172 @@
+@if (open && viewingUser(); as vu) {
+  <div class="story-viewer-overlay" (click)="onOverlayClick($event)">
+    <button class="close-outside" (click)="closeViewer()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+
+    <div class="story-phone" (click)="$event.stopPropagation()">
+      <!-- Progress bars -->
+      <div class="story-progress-bar">
+        @for (s of vu.stories; track s.id; let i = $index) {
+          <div class="progress-track">
+            <div
+              class="progress-fill"
+              [class.active]="i < viewingIndex()"
+              [class.current]="i === viewingIndex()"
+              [class.paused]="i === viewingIndex() && paused()"
+            ></div>
+          </div>
+        }
+      </div>
+
+      @if (vu.stories[viewingIndex()]?.contenido?.musica) {
+        <div class="viewer-timer">
+          <span>{{ formatTime(currentTime()) }}</span>
+          <span class="viewer-timer-sep">/</span>
+          <span>{{ formatTime(duration()) }}</span>
+        </div>
+      }
+
+      <!-- Top info -->
+      <div class="viewer-top">
+        <div
+          class="viewer-user"
+          [class.clickable]="vu.autorId && !accentColor"
+          (click)="vu.autorId && !accentColor && goToProfile(vu.autorId)"
+        >
+          @if (vu.avatar) {
+            <img [src]="vu.avatar" class="viewer-avatar" [alt]="vu.nombre" />
+          } @else if (accentColor) {
+            <div class="viewer-avatar viewer-avatar-fallback" [style.background]="accentColor">
+              {{ getInitials(vu.nombre) }}
+            </div>
+          } @else {
+            <div class="viewer-avatar viewer-avatar-fallback">{{ getInitials(vu.nombre) }}</div>
+          }
+          <span class="viewer-name">{{ vu.nombre }}</span>
+        </div>
+        <span class="viewer-time">{{ vu.stories[viewingIndex()]?.createdAt | date: 'HH:mm' }}</span>
+      </div>
+
+      <!-- Music bar (top, below user info) -->
+      @if (vu.stories[viewingIndex()]?.contenido?.musica) {
+        <div class="viewer-music-bar-top">
+          <button
+            class="viewer-music-play"
+            (click)="togglePreview(vu.stories[viewingIndex()].contenido?.musica!, $event)"
+          >
+            <span class="material-symbols-outlined">{{ playingPreview ? 'pause' : 'play_arrow' }}</span>
+          </button>
+          <div class="viewer-music-info-row">
+            <span class="viewer-music-track">{{ vu.stories[viewingIndex()].contenido?.musica?.trackName }}</span>
+            <span class="viewer-music-artist">{{ vu.stories[viewingIndex()].contenido?.musica?.artistName }}</span>
+          </div>
+          <div class="viewer-volume-wrap">
+            <span class="material-symbols-outlined viewer-volume-icon">volume_up</span>
+            <input
+              type="range"
+              class="viewer-volume-slider"
+              min="0"
+              max="1"
+              step="0.05"
+              [value]="volume"
+              (input)="onVolumeChange($event)"
+              (click)="$event.stopPropagation()"
+            />
+          </div>
+        </div>
+      }
+
+      <!-- Story content -->
+      <div
+        class="viewer-content"
+        (click)="onContentClick()"
+        (pointerdown)="onHoldStart()"
+        (pointerup)="onHoldEnd()"
+        (pointerleave)="onHoldEnd()"
+      >
+        @if (vu.stories[viewingIndex()]?.contenido?.imagenUrl) {
+          <img [src]="vu.stories[viewingIndex()].contenido?.imagenUrl" class="viewer-img" alt="Historia" />
+        }
+        @if (vu.stories[viewingIndex()]?.contenido?.texto) {
+          <div class="viewer-text-overlay">
+            <p>{{ vu.stories[viewingIndex()].contenido?.texto }}</p>
+          </div>
+        }
+
+        <!-- Viewer: Cover mode -->
+        @if (vu.stories[viewingIndex()]?.contenido?.musica?.musicMode === 'cover') {
+          <div class="viewer-cover-mode">
+            <img
+              [src]="vu.stories[viewingIndex()].contenido?.musica?.coverUrl"
+              class="viewer-cover-img"
+              [style.left.%]="vu.stories[viewingIndex()].contenido?.musica?.coverPosX ?? 50"
+              [style.top.%]="vu.stories[viewingIndex()].contenido?.musica?.coverPosY ?? 40"
+              [style.transform]="
+                'translate(-50%, -50%) scale(' + (vu.stories[viewingIndex()].contenido?.musica?.coverScale ?? 1) + ')'
+              "
+              alt="Portada"
+            />
+          </div>
+        }
+
+        <!-- Viewer: Lyrics mode -->
+        @if (
+          vu.stories[viewingIndex()]?.contenido?.musica?.musicMode === 'lyrics' &&
+          vu.stories[viewingIndex()].contenido?.musica?.lyricsText
+        ) {
+          <div
+            class="viewer-lyrics-mode"
+            [style.left.%]="vu.stories[viewingIndex()].contenido?.musica?.lyricsPosX ?? 50"
+            [style.top.%]="vu.stories[viewingIndex()].contenido?.musica?.lyricsPosY ?? 50"
+            [style.transform]="
+              'translate(-50%, -50%) scale(' + (vu.stories[viewingIndex()].contenido?.musica?.lyricsScale ?? 1) + ')'
+            "
+          >
+            @if (viewerHasSyncedLyrics && viewerCurrentLyricIndex() >= 0) {
+              {{ viewerSyncedLines[viewerCurrentLyricIndex()].text }}
+            } @else {
+              {{ vu.stories[viewingIndex()].contenido?.musica?.lyricsText }}
+            }
+          </div>
+        }
+
+        <!-- Viewer: Cover + Lyrics mode -->
+        @if (vu.stories[viewingIndex()]?.contenido?.musica?.musicMode === 'cover+lyrics') {
+          <div class="viewer-cover-mode">
+            <img
+              [src]="vu.stories[viewingIndex()].contenido?.musica?.coverUrl"
+              class="viewer-cover-img"
+              [style.left.%]="vu.stories[viewingIndex()].contenido?.musica?.coverPosX ?? 50"
+              [style.top.%]="vu.stories[viewingIndex()].contenido?.musica?.coverPosY ?? 40"
+              [style.transform]="
+                'translate(-50%, -50%) scale(' + (vu.stories[viewingIndex()].contenido?.musica?.coverScale ?? 1) + ')'
+              "
+              alt="Portada"
+            />
+          </div>
+          @if (vu.stories[viewingIndex()].contenido?.musica?.lyricsText) {
+            <div
+              class="viewer-lyrics-mode"
+              [style.left.%]="vu.stories[viewingIndex()].contenido?.musica?.lyricsPosX ?? 50"
+              [style.top.%]="vu.stories[viewingIndex()].contenido?.musica?.lyricsPosY ?? 50"
+              [style.transform]="
+                'translate(-50%, -50%) scale(' + (vu.stories[viewingIndex()].contenido?.musica?.lyricsScale ?? 1) + ')'
+              "
+            >
+              @if (viewerHasSyncedLyrics && viewerCurrentLyricIndex() >= 0) {
+                {{ viewerSyncedLines[viewerCurrentLyricIndex()].text }}
+              } @else {
+                {{ vu.stories[viewingIndex()].contenido?.musica?.lyricsText }}
+              }
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Navigation zones -->
+      <div class="nav-zone nav-prev" (click)="prevStory()"></div>
+      <div class="nav-zone nav-next" (click)="nextStory()"></div>
+    </div>
+  </div>
+}

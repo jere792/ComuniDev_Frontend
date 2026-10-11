@@ -25,11 +25,16 @@
         (editProfile)="toggleEditProfile()"
       />
 
+      <app-story-highlights
+        [userId]="user()?.id || ''"
+        (view)="onViewHighlight($event)"
+        (create)="onCreateHighlight()"
+        (manage)="onManageHighlight($event)"
+      />
+
       <app-recruiter-companies-card
         [empresas]="profile?.empresas || []"
       />
-
-      <app-story-classification [userId]="user()?.id || ''" />
     </div>
 
     <!-- ─── SIDEBAR ─── -->
@@ -180,4 +185,19 @@
   [type]="socialModalType()"
   [userId]="user()?.id || ''"
   (close)="closeSocialModal()"
+/>
+
+<app-story-viewer
+  [open]="viewerOpen()"
+  [users]="viewerGroups()"
+  (close)="onCloseViewer()"
+/>
+
+<app-story-classification
+  [userId]="user()?.id || ''"
+  [open]="classificationOpen()"
+  [initialCategoryId]="classificationInitialCategory()"
+  [openInCreate]="classificationOpenCreate()"
+  [editCategoryId]="classificationEditId()"
+  (close)="onCloseClassification()"
 />

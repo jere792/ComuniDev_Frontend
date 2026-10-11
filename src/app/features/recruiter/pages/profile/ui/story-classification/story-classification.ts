@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges, inject, signal, computed } from '@angular/core';
+import { Component, Input, OnChanges, Output, EventEmitter, SimpleChanges, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '@core/services/toast.service';
@@ -18,6 +18,11 @@ const COLOR_PRESETS = ['#7c3aed', '#2563eb', '#059669', '#d97706', '#dc2626', '#
 })
 export class StoryClassification implements OnChanges {
   @Input() userId = '';
+  @Input() open = false;
+  @Input() initialCategoryId: string | null = null;
+  @Input() openInCreate = false;
+  @Input() editCategoryId: string | null = null;
+  @Output() close = new EventEmitter<void>();
 
   private categoryStore = inject(CategoryStore);
   private storyStore = inject(StoryStore);
@@ -64,10 +69,44 @@ export class StoryClassification implements OnChanges {
   });
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['userId'] && this.userId) {
-      this.categoryStore.load(this.userId);
-      this.storyStore.loadUserStories(this.userId);
+    if (changes['open'] && this.open) {
+      if (this.userId) {
+        this.categoryStore.load(this.userId);
+        this.storyStore.loadUserStories(this.userId);
+      }
+      this.applyOpenConfig();
     }
+  }
+
+  private applyOpenConfig(): void {
+    this.confirmDeleteId.set(null);
+    this.selectedIds.set([]);
+    this.showForm.set(false);
+    this.editingId.set(null);
+
+    if (this.editCategoryId) {
+      const cat = this.categories().find(c => c.id === this.editCategoryId);
+      if (cat) {
+        this.select(cat.id);
+        this.startEdit(cat);
+        return;
+      }
+    }
+    if (this.openInCreate) {
+      this.startCreate();
+      return;
+    }
+    if (this.initialCategoryId) {
+      this.select(this.initialCategoryId);
+    }
+  }
+
+  onOverlayClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) this.closeModal();
+  }
+
+  closeModal(): void {
+    this.close.emit();
   }
 
   select(value: string): void {

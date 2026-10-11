@@ -1,3 +1,38 @@
+/* ─── Modal Overlay ─── */
+
+.classification-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  background: #00000099;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.close-btn {
+  border-color: transparent;
+
+  &:hover {
+    background: var(--surface-container-high);
+  }
+}
+
 .info-card {
   background: var(--surface-container-lowest);
   border-radius: var(--radius-xl);

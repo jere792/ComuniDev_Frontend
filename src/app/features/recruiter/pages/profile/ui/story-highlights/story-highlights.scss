@@ -1,0 +1,224 @@
+.highlights-section {
+  position: relative;
+  margin-bottom: var(--space-lg);
+}
+
+.highlights-scroll {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-lg);
+  overflow-x: auto;
+  padding: var(--space-sm) var(--space-xs) var(--space-md);
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.highlight-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* ─── Anillo gradiente (estilo Instagram) ─── */
+
+.highlight-ring {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  padding: 3px;
+  background: conic-gradient(
+    from 210deg,
+    #f09433,
+    #e6683c,
+    #dc2743,
+    #cc2366,
+    #bc1888,
+    #8a3ab9,
+    #4c68d7,
+    #f09433
+  );
+  cursor: pointer;
+  transition: transform 0.15s ease;
+
+  &:hover {
+    transform: scale(1.04);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+.highlight-circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid var(--surface-container-lowest);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.highlight-initial {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  user-select: none;
+}
+
+.empty-badge {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--surface-container-lowest);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+
+  .material-symbols-outlined {
+    font-size: 13px;
+    color: var(--outline);
+  }
+}
+
+/* ─── Botón Nuevo ─── */
+
+.create-ring {
+  background: var(--border-subtle);
+  padding: 3px;
+
+  &:hover {
+    background: var(--outline-variant);
+  }
+}
+
+.create-circle {
+  background: var(--surface-container-low);
+  border-color: var(--surface-container-lowest);
+
+  .material-symbols-outlined {
+    font-size: 28px;
+    color: var(--on-surface-variant);
+  }
+}
+
+/* ─── Nombre + contador ─── */
+
+.highlight-name {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--on-surface);
+  max-width: 76px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.highlight-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--outline);
+  margin-top: -4px;
+}
+
+.highlights-hint {
+  align-self: center;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--outline);
+  padding-left: var(--space-xs);
+}
+
+/* ─── Menú contextual ─── */
+
+.highlight-menu {
+  position: fixed;
+  transform: translateX(-50%);
+  min-width: 180px;
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-floating);
+  padding: var(--space-2xs);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 9px 12px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--on-surface);
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition: background 0.12s ease;
+
+  .material-symbols-outlined {
+    font-size: 17px;
+    color: var(--on-surface-variant);
+  }
+
+  &:hover {
+    background: var(--surface-container);
+  }
+
+  &.danger {
+    color: var(--error);
+
+    .material-symbols-outlined {
+      color: var(--error);
+    }
+
+  &:hover {
+    background: var(--error-container);
+  }
+}
+}
+
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+}
+
+@media (max-width: 640px) {
+  .highlights-scroll {
+    gap: var(--space-md);
+  }
+
+  .highlight-ring {
+    width: 64px;
+    height: 64px;
+  }
+
+  .highlight-name {
+    max-width: 68px;
+  }
+}

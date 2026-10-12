@@ -1,52 +1,85 @@
 <div class="offers-container">
   <div class="offers-header">
     <h2 class="section-title">Mis Ofertas</h2>
-    <button class="btn btn-primary" (click)="openCreateModal()">
+    <button class="btn btn-primary" (click)="createOffer()">
       <span class="material-symbols-outlined">add</span>
       Nueva Oferta
     </button>
   </div>
 
-  <div class="offers-list">
-    @for (offer of offers; track offer.id) {
-      <div class="offer-card">
-        <div class="offer-status" [class]="offer.status">
-          {{ offer.status === 'active' ? 'Activa' : 'Pausada' }}
-        </div>
+  @if (loading()) {
+    <div class="state-box">Cargando ofertas…</div>
+  } @else if (error()) {
+    <div class="state-box state-error">{{ error() }}</div>
+  } @else if (offers().length === 0) {
+    <div class="state-box">
+      Todavía no publicaste ofertas. Crea la primera con el botón «Nueva Oferta».
+    </div>
+  } @else {
+    <div class="offers-list">
+      @for (offer of offers(); track offer.id) {
+        <div class="offer-card">
+          <div class="offer-status" [class]="estadoClass(offer)">{{ estadoLabel(offer) }}</div>
 
-        <h3 class="offer-title">{{ offer.title }}</h3>
-        <p class="offer-company">{{ offer.company }}</p>
+          <h3 class="offer-title">{{ offer.titulo }}</h3>
+          <p class="offer-company">{{ offer.companyName ?? 'Empresa no encontrada' }}</p>
 
-        <div class="offer-details">
-          <span class="detail-item">
-            <span class="material-symbols-outlined">location_on</span>
-            {{ offer.location }}
-          </span>
-          <span class="detail-item">
-            <span class="material-symbols-outlined">payments</span>
-            {{ offer.salary }}
-          </span>
-          <span class="detail-item">
-            <span class="material-symbols-outlined">schedule</span>
-            {{ offer.type }}
-          </span>
-        </div>
+          <div class="offer-details">
+            @if (offer.ubicacion) {
+              <span class="detail-item">
+                <span class="material-symbols-outlined">location_on</span>
+                {{ offer.ubicacion }}
+              </span>
+            }
+            @if (modalidadLabel(offer)) {
+              <span class="detail-item">
+                <span class="material-symbols-outlined">home_work</span>
+                {{ modalidadLabel(offer) }}
+              </span>
+            }
+            @if (contratoLabel(offer)) {
+              <span class="detail-item">
+                <span class="material-symbols-outlined">schedule</span>
+                {{ contratoLabel(offer) }}
+              </span>
+            }
+            @if (salario(offer)) {
+              <span class="detail-item">
+                <span class="material-symbols-outlined">payments</span>
+                {{ salario(offer) }}
+              </span>
+            }
+            @if (vence(offer); as vencimiento) {
+              <span class="detail-item">
+                <span class="material-symbols-outlined">event</span>
+                Cierra {{ vencimiento }}
+              </span>
+            }
+          </div>
 
-        <div class="offer-footer">
-          <span class="posted-time">{{ offer.posted }}</span>
-          <div class="offer-stats">
+          @if (offer.tecnologias.length) {
+            <div class="tech-chips">
+              @for (tec of offer.tecnologias; track tec) {
+                <span class="tech-chip">{{ tec }}</span>
+              }
+            </div>
+          }
+
+          <div class="offer-footer">
+            <span class="posted-time">Publicada {{ publicado(offer) ?? 'recientemente' }}</span>
             <span class="stat">
               <span class="material-symbols-outlined">person</span>
-              {{ offer.applicants }} postulados
+              {{ offer.postulacionesCount ?? 0 }} postulados
             </span>
           </div>
-        </div>
 
-        <div class="offer-actions">
-          <button class="btn btn-outline">Editar</button>
-          <button class="btn btn-outline">Ver postulados</button>
+          <div class="offer-actions">
+            <button class="btn btn-outline" (click)="toggleEstado(offer)">
+              {{ offer.estado === 'ACTIVA' ? 'Cerrar oferta' : 'Reabrir oferta' }}
+            </button>
+          </div>
         </div>
-      </div>
-    }
-  </div>
+      }
+    </div>
+  }
 </div>

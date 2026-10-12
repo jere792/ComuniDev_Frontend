@@ -21,6 +21,7 @@ export const routes: Routes = [
       { path: 'reels', loadComponent: () => import('@features/recruiter/pages/reels/feature/reels').then(m => m.RecruiterReels) },
       { path: 'candidates', loadComponent: () => import('@features/recruiter/pages/candidates/feature/candidates').then(m => m.RecruiterCandidates) },
       { path: 'offers', loadComponent: () => import('@features/recruiter/pages/offers/feature/offers').then(m => m.RecruiterOffers) },
+      { path: 'offers/new', loadComponent: () => import('@features/recruiter/pages/offers/feature/offers-new').then(m => m.RecruiterOffersNew) },
       { path: 'messages', loadComponent: () => import('@features/recruiter/pages/messages/feature/messages').then(m => m.RecruiterMessages) },
       { path: 'saved', loadComponent: () => import('@features/recruiter/pages/saved/feature/saved').then(m => m.RecruiterSaved) },
       { path: 'discover', loadComponent: () => import('@features/shared/feature/discover-users/discover-users').then(m => m.DiscoverUsers) },

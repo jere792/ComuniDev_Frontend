@@ -1,0 +1,124 @@
+<div class="offers-new-container">
+  <div class="page-header">
+    <button class="back-btn" type="button" (click)="goBack()">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <h2 class="section-title">Nueva oferta</h2>
+  </div>
+
+  <div class="form-card">
+    <div class="form-field">
+      <label class="form-label">Empresa *</label>
+      @if (creatingCompany()) {
+        <input class="input" placeholder="Nombre de la empresa" [(ngModel)]="companyForm.nombre" />
+        <input class="input" type="email" placeholder="Correo de contacto" [(ngModel)]="companyForm.contactoEmail" />
+        <input class="input" placeholder="País" [(ngModel)]="companyForm.ubicacionPais" />
+        <button type="button" class="link-btn" (click)="toggleCreatingCompany()">
+          Usar una empresa existente
+        </button>
+      } @else {
+        <select class="input" [(ngModel)]="form.companyId">
+          <option value="" disabled>Selecciona una empresa…</option>
+          @for (company of companies(); track company.id) {
+            <option [value]="company.id">{{ company.nombre }}</option>
+          }
+        </select>
+        <button type="button" class="link-btn" (click)="toggleCreatingCompany()">
+          Crear una empresa nueva
+        </button>
+      }
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">Título *</label>
+      <input class="input" placeholder="Ej. Desarrollador Full Stack" [(ngModel)]="form.titulo" />
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">Descripción</label>
+      <textarea class="input" rows="4" [(ngModel)]="form.descripcion"></textarea>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">Tecnologías * (separadas por coma)</label>
+      <input class="input" placeholder="Java, Spring Boot, Angular" [(ngModel)]="form.tecnologias" />
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label">Modalidad *</label>
+        <select class="input" [(ngModel)]="form.modalidad">
+          <option value="REMOTO">Remoto</option>
+          <option value="PRESENCIAL">Presencial</option>
+          <option value="HIBRIDO">Híbrido</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Tipo de contrato</label>
+        <select class="input" [(ngModel)]="form.tipoContrato">
+          <option value="TIEMPO_COMPLETO">Tiempo completo</option>
+          <option value="MEDIO_TIEMPO">Medio tiempo</option>
+          <option value="POR_PROYECTO">Por proyecto</option>
+          <option value="FREELANCE">Freelance</option>
+          <option value="PRACTICAS">Prácticas</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label">Nivel de experiencia</label>
+        <select class="input" [(ngModel)]="form.nivelExperiencia">
+          <option value="">Sin especificar</option>
+          <option value="JUNIOR">Junior</option>
+          <option value="MID">Mid</option>
+          <option value="SENIOR">Senior</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Fecha límite *</label>
+        <input class="input" type="date" [(ngModel)]="form.fechaLimite" />
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">Ubicación</label>
+      <input class="input" placeholder="Lima, Perú (no hace falta si es remota)" [(ngModel)]="form.ubicacion" />
+    </div>
+
+    <div class="form-section-label">Remuneración (opcional)</div>
+
+    <div class="form-row">
+      <div class="form-field form-field-sm">
+        <label class="form-label">Moneda</label>
+        <select class="input" [(ngModel)]="form.moneda">
+          <option value="PEN">PEN</option>
+          <option value="USD">USD</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Mínimo</label>
+        <input class="input" type="number" [(ngModel)]="form.minimo" />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">Máximo</label>
+        <input class="input" type="number" [(ngModel)]="form.maximo" />
+      </div>
+    </div>
+
+    <p class="form-hint">Si dejas la remuneración vacía, no se mostrará el salario en la oferta.</p>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-outline" (click)="goBack()" [disabled]="saving()">
+        Cancelar
+      </button>
+      <button type="button" class="btn btn-primary" (click)="submit()" [disabled]="saving()">
+        {{ saving() ? 'Publicando…' : 'Publicar oferta' }}
+      </button>
+    </div>
+  </div>
+</div>

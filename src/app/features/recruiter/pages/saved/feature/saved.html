@@ -31,11 +31,15 @@
       @for (item of items; track item.id) {
         <app-saved-card
           [id]="item.id"
+          [userId]="item.developerId"
           type="candidate"
           [title]="item.title"
           [subtitle]="item.subtitle"
           [avatar]="item.avatar"
+          [buscandoEmpleo]="item.buscandoEmpleo"
+          [meta]="item.meta"
           [savedAt]="item.savedAt"
+          (viewProfile)="viewProfile(item)"
           (remove)="remove(item)"
         />
       }

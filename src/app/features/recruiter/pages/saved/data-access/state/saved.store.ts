@@ -1,5 +1,6 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { forkJoin, map, of, switchMap } from 'rxjs';
+import { first, forkJoin, map, of, switchMap } from 'rxjs';
+import { User } from '@core/domain/models/user.model';
 import { SavedProfile } from '@features/recruiter/pages/candidates/domain/models/developer-profile.model';
 import {
   TALENT_SEARCH_REPOSITORY,
@@ -15,6 +16,10 @@ export interface SavedCandidateItem {
   avatar: string;
   savedAt: string;
   notes?: string | null;
+  /** true si el candidato tiene disponibilidadLaboral.buscandoEmpleo */
+  buscandoEmpleo: boolean;
+  /** Ciudad/pais · seguidores · conexiones */
+  meta: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -38,7 +43,10 @@ export class SavedStore {
         return forkJoin(
           profiles.map(profile =>
             this.userStore.getById(profile.developerId).pipe(
-              map(user => this.toItem(profile, user?.nombre, user?.fotoPerfilUrl, user?.roles)),
+              // first() de seguridad: emite una sola vez y cierra, para que
+              // forkJoin complete cuando todos los perfiles respondan.
+              first(),
+              map(user => this.toItem(profile, user)),
             ),
           ),
         );
@@ -64,14 +72,9 @@ export class SavedStore {
     });
   }
 
-  private toItem(
-    profile: SavedProfile,
-    nombre?: string,
-    foto?: string,
-    roles?: string[],
-  ): SavedCandidateItem {
-    const role = (roles?.[0] ?? '').toLowerCase();
-    const subtitle =
+  private toItem(profile: SavedProfile, user: User | null): SavedCandidateItem {
+    const role = (user?.roles?.[0] ?? '').toLowerCase();
+    const roleLabel =
       role === 'recruiter'
         ? 'Reclutador'
         : role === 'moderator'
@@ -80,16 +83,41 @@ export class SavedStore {
             ? 'Admin'
             : 'Desarrollador';
 
+    // Cargo real del perfil de desarrollador; si no existe, el rol generico.
+    const cargo = user?.developerProfile?.tituloProfesional?.trim();
+    const subtitle = cargo && cargo.length > 0 ? cargo : roleLabel;
+
     return {
       id: profile.id,
       developerId: profile.developerId,
-      title: nombre || profile.developerId,
+      title: user?.nombre || profile.developerId,
       subtitle,
-      avatar: foto || `https://i.pravatar.cc/150?u=${encodeURIComponent(profile.developerId)}`,
+      // '' = sin foto; la tarjeta muestra iniciales (mismo patrón que candidate-card).
+      avatar: user?.fotoPerfilUrl ?? '',
       savedAt: formatRelativeDate(profile.savedAt),
       notes: profile.notes ?? null,
+      buscandoEmpleo: user?.developerProfile?.disponibilidadLaboral?.buscandoEmpleo ?? false,
+      meta: buildMeta(user),
     };
   }
+}
+
+/** "Lima, Perú · 120 seguidores · 45 conexiones" (omite lo que falte). */
+function buildMeta(user: User | null): string {
+  if (!user) return '';
+
+  const ubicacion = [user.ubicacion?.ciudad, user.ubicacion?.pais]
+    .map(part => part?.trim())
+    .filter((part): part is string => !!part)
+    .join(', ');
+
+  const parts = [
+    ubicacion,
+    user.seguidoresCount != null ? `${user.seguidoresCount} seguidores` : '',
+    user.conexionesCount != null ? `${user.conexionesCount} conexiones` : '',
+  ].filter(part => part.length > 0);
+
+  return parts.join(' · ');
 }
 
 function formatRelativeDate(iso?: string | null): string {

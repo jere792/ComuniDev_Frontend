@@ -1,5 +1,5 @@
 import { Component, signal, OnInit, inject, DestroyRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -30,6 +30,7 @@ export class PublicProfile implements OnInit {
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private location = inject(Location);
   private userStore = inject(UserStore);
   private connectionService = inject(ConnectionStore);
   private blockService = inject<BlockRepository>(BLOCK_REPOSITORY);
@@ -213,7 +214,13 @@ export class PublicProfile implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/']);
+    // history.back() si hay una ruta anterior dentro de la app;
+    // si la URL se abrió directamente, cae al inicio.
+    if (window.history.length > 1) {
+      this.location.back();
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 
   getInitials(): string {

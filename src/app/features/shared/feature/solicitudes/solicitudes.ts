@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ConnectionStore } from '@features/shared/data-access/state/connection.store';
@@ -36,6 +36,7 @@ export class Solicitudes implements OnInit {
   private connService = inject(ConnectionStore);
   private userStore = inject(UserStore);
   private router = inject(Router);
+  private location = inject(Location);
   private toast = inject(ToastService);
   private destroyRef = inject(DestroyRef);
 
@@ -177,7 +178,12 @@ export class Solicitudes implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate([this.getBaseRoute()]);
+    // history.back() si hay una ruta anterior; si no, vuelve al inicio del rol.
+    if (window.history.length > 1) {
+      this.location.back();
+    } else {
+      this.router.navigate([this.getBaseRoute()]);
+    }
   }
 
   private getBaseRoute(): string {

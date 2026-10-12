@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { UserStore } from '@features/users/data-access/state/user.store';
 import { FollowStore } from '@features/shared/data-access/state/follow.store';
@@ -25,6 +25,7 @@ export class DiscoverUsers implements OnInit {
   private userStore = inject(UserStore);
   private followService = inject(FollowStore);
   private router = inject(Router);
+  private location = inject(Location);
   private toast = inject(ToastService);
 
   ngOnInit(): void {
@@ -87,7 +88,11 @@ export class DiscoverUsers implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/']);
+    if (window.history.length > 1) {
+      this.location.back();
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 
   getInitials(name: string): string {

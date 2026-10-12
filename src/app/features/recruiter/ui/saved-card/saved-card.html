@@ -1,6 +1,15 @@
-<div class="saved-card">
+<div
+  class="saved-card"
+  [class.clickable]="!!userId"
+  [attr.title]="userId ? 'Ver perfil' : null"
+  (click)="viewProfile.emit(userId)"
+>
   @if (type === 'candidate') {
-    <img [src]="avatar" [alt]="title" class="item-avatar" />
+    @if (avatar) {
+      <img [src]="avatar" [alt]="title" class="item-avatar" />
+    } @else {
+      <div class="item-avatar avatar-fallback">{{ initials }}</div>
+    }
   } @else {
     <div class="item-thumbnail">
       <span class="material-symbols-outlined">smart_display</span>
@@ -10,10 +19,34 @@
   <div class="item-info">
     <h3 class="item-title">{{ title }}</h3>
     <p class="item-subtitle">{{ subtitle }}</p>
+    @if (buscandoEmpleo) {
+      <span class="badge available">Buscando empleo</span>
+    }
+    @if (meta) {
+      <p class="item-meta">{{ meta }}</p>
+    }
     <span class="item-time">{{ savedAt }}</span>
   </div>
 
-  <button class="remove-btn" (click)="remove.emit(id)">
-    <span class="material-symbols-outlined">bookmark_remove</span>
-  </button>
+  <div class="item-actions">
+    @if (userId) {
+      <button
+        type="button"
+        class="view-btn"
+        title="Ver perfil"
+        (click)="$event.stopPropagation(); viewProfile.emit(userId)"
+      >
+        <span class="material-symbols-outlined">person</span>
+        <span class="view-label">Ver perfil</span>
+      </button>
+    }
+    <button
+      type="button"
+      class="remove-btn"
+      title="Quitar de guardados"
+      (click)="$event.stopPropagation(); remove.emit(id)"
+    >
+      <span class="material-symbols-outlined">bookmark_remove</span>
+    </button>
+  </div>
 </div>

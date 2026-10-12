@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { SavedStore, SavedCandidateItem } from '@features/recruiter/pages/saved/data-access/state/saved.store';
 import { SavedCard } from '@features/recruiter/ui/saved-card/saved-card';
 import { ToastService } from '@core/services/toast.service';
@@ -13,6 +13,7 @@ import { ToastService } from '@core/services/toast.service';
 export class RecruiterSaved implements OnInit {
   private readonly store = inject(SavedStore);
   private readonly toast = inject(ToastService);
+  private readonly router = inject(Router);
 
   readonly loading = this.store.loading;
   readonly error = this.store.error;
@@ -31,6 +32,11 @@ export class RecruiterSaved implements OnInit {
   get items(): SavedCandidateItem[] {
     if (this.activeTab === 'reels') return [];
     return this.store.items();
+  }
+
+  viewProfile(item: SavedCandidateItem): void {
+    if (!item.developerId) return;
+    this.router.navigate(['/profile', item.developerId]);
   }
 
   remove(item: SavedCandidateItem): void {

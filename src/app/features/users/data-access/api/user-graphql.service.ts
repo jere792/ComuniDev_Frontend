@@ -175,9 +175,12 @@ export class UserGraphqlService implements UserRepository {
   }
 
   getById(id: string): Observable<User | null> {
+    // query() es one-shot: emite una sola vez con los datos y completa.
+    // watchQuery() emite primero un estado de carga (data null) y nunca
+    // completa, lo que rompia los forkJoin y mostraba IDs en vez de nombres.
     return this.apollo
-      .watchQuery<any>({ query: GET_USER_BY_ID, variables: { id } })
-      .valueChanges.pipe(map(result => result.data?.user ?? null));
+      .query<any>({ query: GET_USER_BY_ID, variables: { id }, fetchPolicy: 'network-only' })
+      .pipe(map(result => result.data?.user ?? null));
   }
 
   update(id: string, data: Partial<User>): Observable<User> {

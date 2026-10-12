@@ -18,18 +18,18 @@
       <input #bannerInput type="file" accept="image/*" hidden (change)="onBannerSelected($event)" />
       <input #photoInput type="file" accept="image/*" hidden (change)="onPhotoSelected($event)" />
 
-      <app-recruiter-contact-info
-        [user]="user()"
-        [profile]="profile"
-        (editBasic)="toggleEditBasic()"
-        (editProfile)="toggleEditProfile()"
-      />
-
       <app-story-highlights
         [userId]="user()?.id || ''"
         (view)="onViewHighlight($event)"
         (create)="onCreateHighlight()"
         (manage)="onManageHighlight($event)"
+      />
+
+      <app-recruiter-contact-info
+        [user]="user()"
+        [profile]="profile"
+        (editBasic)="toggleEditBasic()"
+        (editProfile)="toggleEditProfile()"
       />
 
       <app-recruiter-companies-card

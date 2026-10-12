@@ -163,12 +163,12 @@ export class TalentSearchService implements TalentSearchRepository {
 
   isProfileSaved(recruiterId: string, developerId: string): Observable<boolean> {
     return this.apollo
-      .watchQuery<{ isProfileSaved: boolean }>({
+      .query<{ isProfileSaved: boolean }>({
         query: IS_PROFILE_SAVED,
         variables: { recruiterId, developerId },
         fetchPolicy: 'network-only',
       })
-      .valueChanges.pipe(map(result => result.data?.isProfileSaved ?? false));
+      .pipe(map(result => result.data?.isProfileSaved ?? false));
   }
 
   savedProfiles(recruiterId: string): Observable<SavedProfile[]> {

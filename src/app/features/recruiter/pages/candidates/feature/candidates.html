@@ -22,8 +22,59 @@
         <span>Candidato {{ deckPosition() }} de {{ deck().length }}</span>
       </div>
 
-      <div class="candidate-layout">
-        <!-- Columna principal: identidad y acciones -->
+      <div
+        class="candidate-layout"
+        [class.no-nav]="!blocksNavVisible()"
+        [class.no-blocks]="currentBlocks().length === 0"
+      >
+        <!-- Navegación de bloques -->
+        @if (blocksNavVisible()) {
+          <div class="blocks-nav">
+            <button
+              type="button"
+              class="blocks-nav-btn"
+              [disabled]="blockPage() === 0"
+              (click)="prevBlocks()"
+              aria-label="Bloques anteriores"
+            >
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <div class="blocks-dots">
+              @for (page of blockPages(); track $index) {
+                <button
+                  type="button"
+                  class="blocks-dot"
+                  [class.active]="$index === blockPage()"
+                  [attr.aria-label]="'Grupo ' + ($index + 1)"
+                  (click)="goToBlockPage($index)"
+                ></button>
+              }
+            </div>
+            <button
+              type="button"
+              class="blocks-nav-btn"
+              [disabled]="blockPage() >= blockPages().length - 1"
+              (click)="nextBlocks()"
+              aria-label="Siguientes bloques"
+            >
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+          </div>
+        }
+
+        <!-- Columna izquierda: 2 bloques -->
+        <div class="blocks-col blocks-col--left">
+          @for (block of leftBlocks(); track block.key) {
+            <app-candidate-block
+              [block]="block"
+              [dev]="dev"
+              [salary]="salaryText()"
+              (expand)="openBlockModal(block)"
+            />
+          }
+        </div>
+
+        <!-- Columna central: perfil (fijo al cambiar de flecha) -->
         <article class="profile-card">
           <div class="profile-header">
             <div class="profile-banner" [class.empty]="!dev.bannerUrl">
@@ -107,6 +158,7 @@
                 type="button"
                 class="action action-save"
                 [class.saved]="isSaved(dev)"
+                [disabled]="saving"
                 (click)="save()"
               >
                 <span class="material-symbols-outlined">{{ isSaved(dev) ? 'bookmark' : 'bookmark_add' }}</span>
@@ -124,234 +176,15 @@
           </div>
         </article>
 
-        <!-- Columna derecha: cards de detalle -->
-        <div class="detail-grid">
-          @if (dev.experiencias?.length) {
-            <article class="detail-card">
-              <header class="detail-header">
-                <span class="material-symbols-outlined">work_history</span>
-                <h3>Experiencia</h3>
-              </header>
-              <div class="detail-content">
-                <ul class="timeline">
-                  @for (exp of dev.experiencias ?? []; track $index) {
-                    <li class="timeline-item">
-                      <span class="item-title">{{ exp.cargo || 'Cargo' }}</span>
-                      @if (exp.empresa) {
-                        <span class="item-subtitle">{{ exp.empresa }}</span>
-                      }
-                      <span class="item-meta">
-                        {{ exp.fechaInicio || '—' }} - {{ exp.actual ? 'Actualidad' : (exp.fechaFin || '—') }}
-                      </span>
-                      @if (exp.descripcion) {
-                        <p class="item-text">{{ exp.descripcion }}</p>
-                      }
-                    </li>
-                  }
-                </ul>
-              </div>
-            </article>
-          }
-
-          @if (dev.tecnologias?.length) {
-            <article class="detail-card">
-              <header class="detail-header">
-                <span class="material-symbols-outlined">code</span>
-                <h3>Tecnologías</h3>
-              </header>
-              <div class="detail-content">
-                <div class="chips">
-                  @for (tech of dev.tecnologias ?? []; track tech.nombre) {
-                    <span class="chip tech">{{ tech.nombre }}@if (tech.nivel) { · {{ tech.nivel }} }</span>
-                  }
-                </div>
-              </div>
-            </article>
-          }
-
-          @if (dev.habilidadesBlandas?.length) {
-            <article class="detail-card">
-              <header class="detail-header">
-                <span class="material-symbols-outlined">psychology</span>
-                <h3>Habilidades blandas</h3>
-              </header>
-              <div class="detail-content">
-                <div class="chips">
-                  @for (h of dev.habilidadesBlandas ?? []; track h) {
-                    <span class="chip">{{ h }}</span>
-                  }
-                </div>
-              </div>
-            </article>
-          }
-
-          @if (dev.educacion?.length) {
-            <article class="detail-card">
-              <header class="detail-header">
-                <span class="material-symbols-outlined">school</span>
-                <h3>Educación</h3>
-              </header>
-              <div class="detail-content">
-                <ul class="timeline">
-                  @for (edu of dev.educacion ?? []; track $index) {
-                    <li class="timeline-item">
-                      <span class="item-title">{{ edu.titulo || 'Formación' }}</span>
-                      @if (edu.institucion) {
-                        <span class="item-subtitle">{{ edu.institucion }}</span>
-                      }
-                      <span class="item-meta">
-                        {{ edu.fechaInicio || '—' }} - {{ edu.actual ? 'Actualidad' : (edu.fechaFin || '—') }}
-                      </span>
-                    </li>
-                  }
-                </ul>
-              </div>
-            </article>
-          }
-
-          @if (dev.certificados?.length) {
-            <article class="detail-card">
-              <header class="detail-header">
-                <span class="material-symbols-outlined">workspace_premium</span>
-                <h3>Certificados</h3>
-              </header>
-              <div class="detail-content">
-                <ul class="simple-list">
-                  @for (cert of dev.certificados ?? []; track $index) {
-                    <li class="simple-list-item">
-                      <span class="item-title">{{ cert.nombre }}</span>
-                      <span class="item-meta">
-                        {{ cert.institucion }}@if (cert.fechaObtencion) { · {{ cert.fechaObtencion }} }
-                      </span>
-                      @if (cert.url) {
-                        <a class="item-link" [href]="cert.url" target="_blank" rel="noopener">Ver credencial</a>
-                      }
-                    </li>
-                  }
-                </ul>
-              </div>
-            </article>
-          }
-
-          @if (dev.proyectos?.length) {
-            <article class="detail-card">
-              <header class="detail-header">
-                <span class="material-symbols-outlined">folder</span>
-                <h3>Proyectos</h3>
-              </header>
-              <div class="detail-content">
-                <ul class="simple-list">
-                  @for (proj of dev.proyectos ?? []; track $index) {
-                    <li class="simple-list-item">
-                      <span class="item-title">{{ proj.nombre }}</span>
-                      @if (proj.descripcion) {
-                        <p class="item-text">{{ proj.descripcion }}</p>
-                      }
-                      @if (proj.tecnologias?.length) {
-                        <div class="chips small">
-                          @for (t of proj.tecnologias ?? []; track t) {
-                            <span class="chip">{{ t }}</span>
-                          }
-                        </div>
-                      }
-                      @if (proj.url) {
-                        <a class="item-link" [href]="proj.url" target="_blank" rel="noopener">Ver proyecto</a>
-                      }
-                    </li>
-                  }
-                </ul>
-              </div>
-            </article>
-          }
-
-          @if (dev.disponibilidadLaboral) {
-            <article class="detail-card">
-              <header class="detail-header">
-                <span class="material-symbols-outlined">event_available</span>
-                <h3>Disponibilidad</h3>
-              </header>
-              <div class="detail-content">
-                <div class="chips">
-                  @for (m of dev.disponibilidadLaboral.modalidades ?? []; track m) {
-                    <span class="chip">{{ m }}</span>
-                  }
-                  @for (t of dev.disponibilidadLaboral.tiposContrato ?? []; track t) {
-                    <span class="chip">{{ t }}</span>
-                  }
-                  @if (salary(dev); as sal) {
-                    <span class="chip">{{ sal }}</span>
-                  }
-                </div>
-              </div>
-            </article>
-          }
-
-          @if (dev.enlaces?.github || dev.enlaces?.linkedin || dev.enlaces?.portafolio) {
-            <article class="detail-card">
-              <header class="detail-header">
-                <span class="material-symbols-outlined">share</span>
-                <h3>Redes sociales</h3>
-              </header>
-              <div class="detail-content">
-                <div class="chips">
-                  @if (dev.enlaces?.github) {
-                    <a class="chip" [href]="dev.enlaces?.github" target="_blank" rel="noopener">GitHub</a>
-                  }
-                  @if (dev.enlaces?.linkedin) {
-                    <a class="chip" [href]="dev.enlaces?.linkedin" target="_blank" rel="noopener">LinkedIn</a>
-                  }
-                  @if (dev.enlaces?.portafolio) {
-                    <a class="chip" [href]="dev.enlaces?.portafolio" target="_blank" rel="noopener">Portafolio</a>
-                  }
-                </div>
-              </div>
-            </article>
-          }
-
-          @if (dev.email || dev.telefono || dev.sitioWeb) {
-            <article class="detail-card">
-              <header class="detail-header">
-                <span class="material-symbols-outlined">contact_mail</span>
-                <h3>Contacto</h3>
-              </header>
-              <div class="detail-content">
-                <div class="contact-list">
-                  @if (dev.email) {
-                    <a class="contact-item" [href]="'mailto:' + dev.email">
-                      <span class="material-symbols-outlined">mail</span>
-                      <span>{{ dev.email }}</span>
-                    </a>
-                  }
-                  @if (dev.telefono) {
-                    <div class="contact-item">
-                      <span class="material-symbols-outlined">call</span>
-                      <span>{{ dev.telefono }}</span>
-                    </div>
-                  }
-                  @if (dev.sitioWeb) {
-                    <a class="contact-item" [href]="dev.sitioWeb" target="_blank" rel="noopener">
-                      <span class="material-symbols-outlined">public</span>
-                      <span>Sitio web</span>
-                    </a>
-                  }
-                </div>
-              </div>
-            </article>
-          }
-
-          @if (dev.cv?.archivoUrl) {
-            <article class="detail-card detail-card--cv">
-              <header class="detail-header">
-                <span class="material-symbols-outlined">description</span>
-                <h3>CV</h3>
-              </header>
-              <div class="detail-content">
-                <a class="cv-link" [href]="dev.cv?.archivoUrl" target="_blank" rel="noopener">
-                  <span class="material-symbols-outlined">description</span>
-                  <span>{{ dev.cv?.nombreArchivo || 'Descargar CV' }}</span>
-                </a>
-              </div>
-            </article>
+        <!-- Columna derecha: 2 bloques -->
+        <div class="blocks-col blocks-col--right">
+          @for (block of rightBlocks(); track block.key) {
+            <app-candidate-block
+              [block]="block"
+              [dev]="dev"
+              [salary]="salaryText()"
+              (expand)="openBlockModal(block)"
+            />
           }
         </div>
       </div>
@@ -378,6 +211,26 @@
         </div>
       }
     </div>
+
+    <!-- Modal de bloque expandido -->
+    @if (expandedBlock(); as blk) {
+      <div class="block-modal-overlay" (click)="closeBlockModal()">
+        <div class="block-modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+          <button type="button" class="block-modal-close" aria-label="Cerrar" (click)="closeBlockModal()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+          <div class="block-modal-body">
+            <app-candidate-block
+              [block]="blk"
+              [dev]="dev"
+              [salary]="salaryText()"
+              [expandable]="false"
+              [bare]="true"
+            />
+          </div>
+        </div>
+      </div>
+    }
   } @else {
     <div class="state-message">
       No hay más candidatos con esos filtros.

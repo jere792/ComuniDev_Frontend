@@ -1,5 +1,5 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { Observable, forkJoin, map, tap } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of, tap } from 'rxjs';
 import {
   DeveloperProfile,
   SavedProfile,
@@ -51,6 +51,7 @@ export class CandidateStore {
     forkJoin(
       developers.map(dev =>
         this.repository.isProfileSaved(recruiterId, dev.id).pipe(
+          catchError(() => of(false)),
           map((saved: boolean): [string, boolean] => [dev.id, saved]),
         ),
       ),
@@ -88,6 +89,21 @@ export class CandidateStore {
 
   isSaved(developerId: string): boolean {
     return this.savedIds().has(developerId);
+  }
+
+  syncSavedState(recruiterId: string, developerId: string): Observable<boolean> {
+    return this.repository.isProfileSaved(recruiterId, developerId).pipe(
+      tap(saved => {
+        const next = new Set(this.savedIds());
+        if (saved) {
+          next.add(developerId);
+        } else {
+          next.delete(developerId);
+        }
+        this.savedIds.set(next);
+      }),
+      catchError(() => of(false)),
+    );
   }
 
   clear(): void {

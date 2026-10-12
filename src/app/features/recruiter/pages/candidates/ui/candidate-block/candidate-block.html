@@ -1,0 +1,171 @@
+<article
+  class="detail-card"
+  [class.detail-card--cv]="block.key === 'cv'"
+  [class.detail-card--clamped]="expandable"
+  [class.detail-card--bare]="bare"
+>
+  <header class="detail-header">
+    <span class="material-symbols-outlined">{{ block.icon }}</span>
+    <h3>{{ block.label }}</h3>
+  </header>
+
+  <div class="detail-content" #contentEl>
+    @switch (block.key) {
+      @case ('experience') {
+        <ul class="timeline">
+          @for (exp of dev.experiencias ?? []; track $index) {
+            <li class="timeline-item">
+              <span class="item-title">{{ exp.cargo || 'Cargo' }}</span>
+              @if (exp.empresa) {
+                <span class="item-subtitle">{{ exp.empresa }}</span>
+              }
+              <span class="item-meta">
+                {{ exp.fechaInicio || '—' }} - {{ exp.actual ? 'Actualidad' : (exp.fechaFin || '—') }}
+              </span>
+              @if (exp.descripcion) {
+                <p class="item-text">{{ exp.descripcion }}</p>
+              }
+            </li>
+          }
+        </ul>
+      }
+
+      @case ('tech') {
+        <div class="chips">
+          @for (tech of dev.tecnologias ?? []; track tech.nombre) {
+            <span class="chip tech">{{ tech.nombre }}@if (tech.nivel) { · {{ tech.nivel }} }</span>
+          }
+        </div>
+      }
+
+      @case ('soft') {
+        <div class="chips">
+          @for (h of dev.habilidadesBlandas ?? []; track h) {
+            <span class="chip">{{ h }}</span>
+          }
+        </div>
+      }
+
+      @case ('education') {
+        <ul class="timeline">
+          @for (edu of dev.educacion ?? []; track $index) {
+            <li class="timeline-item">
+              <span class="item-title">{{ edu.titulo || 'Formación' }}</span>
+              @if (edu.institucion) {
+                <span class="item-subtitle">{{ edu.institucion }}</span>
+              }
+              <span class="item-meta">
+                {{ edu.fechaInicio || '—' }} - {{ edu.actual ? 'Actualidad' : (edu.fechaFin || '—') }}
+              </span>
+            </li>
+          }
+        </ul>
+      }
+
+      @case ('certs') {
+        <ul class="simple-list">
+          @for (cert of dev.certificados ?? []; track $index) {
+            <li class="simple-list-item">
+              <span class="item-title">{{ cert.nombre }}</span>
+              <span class="item-meta">
+                {{ cert.institucion }}@if (cert.fechaObtencion) { · {{ cert.fechaObtencion }} }
+              </span>
+              @if (cert.url) {
+                <a class="item-link" [href]="cert.url" target="_blank" rel="noopener">Ver credencial</a>
+              }
+            </li>
+          }
+        </ul>
+      }
+
+      @case ('projects') {
+        <ul class="simple-list">
+          @for (proj of dev.proyectos ?? []; track $index) {
+            <li class="simple-list-item">
+              <span class="item-title">{{ proj.nombre }}</span>
+              @if (proj.descripcion) {
+                <p class="item-text">{{ proj.descripcion }}</p>
+              }
+              @if (proj.tecnologias?.length) {
+                <div class="chips small">
+                  @for (t of proj.tecnologias ?? []; track t) {
+                    <span class="chip">{{ t }}</span>
+                  }
+                </div>
+              }
+              @if (proj.url) {
+                <a class="item-link" [href]="proj.url" target="_blank" rel="noopener">Ver proyecto</a>
+              }
+            </li>
+          }
+        </ul>
+      }
+
+      @case ('availability') {
+        <div class="chips">
+          @for (m of dev.disponibilidadLaboral?.modalidades ?? []; track m) {
+            <span class="chip">{{ m }}</span>
+          }
+          @for (t of dev.disponibilidadLaboral?.tiposContrato ?? []; track t) {
+            <span class="chip">{{ t }}</span>
+          }
+          @if (salary) {
+            <span class="chip">{{ salary }}</span>
+          }
+        </div>
+      }
+
+      @case ('social') {
+        <div class="chips">
+          @if (dev.enlaces?.github) {
+            <a class="chip" [href]="dev.enlaces?.github" target="_blank" rel="noopener">GitHub</a>
+          }
+          @if (dev.enlaces?.linkedin) {
+            <a class="chip" [href]="dev.enlaces?.linkedin" target="_blank" rel="noopener">LinkedIn</a>
+          }
+          @if (dev.enlaces?.portafolio) {
+            <a class="chip" [href]="dev.enlaces?.portafolio" target="_blank" rel="noopener">Portafolio</a>
+          }
+        </div>
+      }
+
+      @case ('contact') {
+        <div class="contact-list">
+          @if (dev.email) {
+            <a class="contact-item" [href]="'mailto:' + dev.email">
+              <span class="material-symbols-outlined">mail</span>
+              <span>{{ dev.email }}</span>
+            </a>
+          }
+          @if (dev.telefono) {
+            <div class="contact-item">
+              <span class="material-symbols-outlined">call</span>
+              <span>{{ dev.telefono }}</span>
+            </div>
+          }
+          @if (dev.sitioWeb) {
+            <a class="contact-item" [href]="dev.sitioWeb" target="_blank" rel="noopener">
+              <span class="material-symbols-outlined">public</span>
+              <span>Sitio web</span>
+            </a>
+          }
+        </div>
+      }
+
+      @case ('cv') {
+        <a class="cv-link" [href]="dev.cv?.archivoUrl" target="_blank" rel="noopener">
+          <span class="material-symbols-outlined">description</span>
+          <span>{{ dev.cv?.nombreArchivo || 'Descargar CV' }}</span>
+        </a>
+      }
+    }
+  </div>
+
+  @if (overflowing()) {
+    <div class="content-fade"></div>
+    <button type="button" class="show-more" (click)="expand.emit()">
+      Ver más
+      <span class="material-symbols-outlined">expand_more</span>
+    </button>
+  }
+</article>

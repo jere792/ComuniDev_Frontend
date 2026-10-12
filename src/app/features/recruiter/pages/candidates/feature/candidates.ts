@@ -1,8 +1,12 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CandidateStore } from '@features/recruiter/pages/candidates/data-access/state/candidate.store';
 import { DeveloperProfile } from '@features/recruiter/pages/candidates/domain/models/developer-profile.model';
+import {
+  CandidateBlock,
+  CandidateBlockCard,
+} from '@features/recruiter/pages/candidates/ui/candidate-block/candidate-block';
 import { FollowStore } from '@features/shared/data-access/state/follow.store';
 import { ConnectionStore } from '@features/shared/data-access/state/connection.store';
 import { ToastService } from '@core/services/toast.service';
@@ -11,7 +15,7 @@ type ComposerMode = 'message' | 'proposal';
 
 @Component({
   selector: 'app-recruiter-candidates',
-  imports: [FormsModule],
+  imports: [FormsModule, CandidateBlockCard],
   templateUrl: './candidates.html',
   styleUrl: './candidates.scss',
 })
@@ -28,23 +32,26 @@ export class RecruiterCandidates implements OnInit {
   readonly total = this.candidateStore.total;
 
   currentIndex = signal(0);
-  sectionIndex = signal(0);
+  blockPage = signal(0);
   composerMode = signal<ComposerMode | null>(null);
   composerText = '';
+  expandedBlock = signal<CandidateBlock | null>(null);
+  saving = false;
 
-  private static readonly SECTION_META: Record<string, { label: string; icon: string }> = {
-    about: { label: 'Sobre', icon: 'person' },
-    experience: { label: 'Experiencia', icon: 'work_history' },
-    tech: { label: 'Tecnologías', icon: 'code' },
-    soft: { label: 'Habilidades blandas', icon: 'psychology' },
-    social: { label: 'Redes sociales', icon: 'share' },
-    contact: { label: 'Contacto', icon: 'contact_mail' },
-    availability: { label: 'Disponibilidad', icon: 'event_available' },
-    education: { label: 'Educación', icon: 'school' },
-    certs: { label: 'Certificados', icon: 'workspace_premium' },
-    projects: { label: 'Proyectos', icon: 'folder' },
-    cv: { label: 'CV', icon: 'description' },
-  };
+  private static readonly BLOCKS_PER_PAGE = 4;
+
+  private static readonly BLOCK_META: CandidateBlock[] = [
+    { key: 'experience', label: 'Experiencia', icon: 'work_history' },
+    { key: 'tech', label: 'Tecnologías', icon: 'code' },
+    { key: 'soft', label: 'Habilidades blandas', icon: 'psychology' },
+    { key: 'education', label: 'Educación', icon: 'school' },
+    { key: 'certs', label: 'Certificados', icon: 'workspace_premium' },
+    { key: 'projects', label: 'Proyectos', icon: 'folder' },
+    { key: 'availability', label: 'Disponibilidad', icon: 'event_available' },
+    { key: 'social', label: 'Redes sociales', icon: 'share' },
+    { key: 'contact', label: 'Contacto', icon: 'contact_mail' },
+    { key: 'cv', label: 'CV', icon: 'description' },
+  ];
 
   readonly deck = computed<DeveloperProfile[]>(() => this.candidateStore.candidates());
 
@@ -58,33 +65,63 @@ export class RecruiterCandidates implements OnInit {
     return Math.min(this.currentIndex() + 1, list.length);
   });
 
-  readonly sections = computed<string[]>(() => {
+  readonly visibleBlocks = computed<CandidateBlock[]>(() => {
     const dev = this.currentCandidate();
     if (!dev) return [];
-    const keys: string[] = [];
-    if (dev.bio) keys.push('about');
-    if (dev.experiencias?.length) keys.push('experience');
-    if (dev.tecnologias?.length) keys.push('tech');
-    if (dev.habilidadesBlandas?.length) keys.push('soft');
-    if (dev.enlaces?.github || dev.enlaces?.linkedin || dev.enlaces?.portafolio) keys.push('social');
-    if (dev.email || dev.telefono || dev.sitioWeb) keys.push('contact');
-    if (dev.disponibilidadLaboral) keys.push('availability');
-    if (dev.educacion?.length) keys.push('education');
-    if (dev.certificados?.length) keys.push('certs');
-    if (dev.proyectos?.length) keys.push('projects');
-    if (dev.cv?.archivoUrl) keys.push('cv');
-    return keys;
+    return RecruiterCandidates.BLOCK_META.filter(block =>
+      RecruiterCandidates.hasBlockData(block.key, dev),
+    );
   });
 
-  readonly currentSection = computed<string | null>(
-    () => this.sections()[this.sectionIndex()] ?? null,
+  readonly blockPages = computed<CandidateBlock[][]>(() => {
+    const blocks = this.visibleBlocks();
+    const pages: CandidateBlock[][] = [];
+    for (let i = 0; i < blocks.length; i += RecruiterCandidates.BLOCKS_PER_PAGE) {
+      pages.push(blocks.slice(i, i + RecruiterCandidates.BLOCKS_PER_PAGE));
+    }
+    return pages;
+  });
+
+  readonly currentBlocks = computed<CandidateBlock[]>(
+    () => this.blockPages()[this.blockPage()] ?? [],
   );
 
-  readonly sectionPosition = computed(() => {
-    const total = this.sections().length;
-    if (total === 0) return 0;
-    return Math.min(this.sectionIndex() + 1, total);
+  readonly leftBlocks = computed<CandidateBlock[]>(() => this.currentBlocks().slice(0, 2));
+  readonly rightBlocks = computed<CandidateBlock[]>(() => this.currentBlocks().slice(2, 4));
+
+  readonly blocksNavVisible = computed(() => this.blockPages().length > 1);
+
+  readonly salaryText = computed<string | null>(() => {
+    const dev = this.currentCandidate();
+    return dev ? this.salary(dev) : null;
   });
+
+  private static hasBlockData(key: string, dev: DeveloperProfile): boolean {
+    switch (key) {
+      case 'experience':
+        return !!dev.experiencias?.length;
+      case 'tech':
+        return !!dev.tecnologias?.length;
+      case 'soft':
+        return !!dev.habilidadesBlandas?.length;
+      case 'education':
+        return !!dev.educacion?.length;
+      case 'certs':
+        return !!dev.certificados?.length;
+      case 'projects':
+        return !!dev.proyectos?.length;
+      case 'availability':
+        return !!dev.disponibilidadLaboral;
+      case 'social':
+        return !!(dev.enlaces?.github || dev.enlaces?.linkedin || dev.enlaces?.portafolio);
+      case 'contact':
+        return !!(dev.email || dev.telefono || dev.sitioWeb);
+      case 'cv':
+        return !!dev.cv?.archivoUrl;
+      default:
+        return false;
+    }
+  }
 
   ngOnInit(): void {
     this.loadCandidates();
@@ -92,7 +129,7 @@ export class RecruiterCandidates implements OnInit {
 
   private loadCandidates(): void {
     this.currentIndex.set(0);
-    this.sectionIndex.set(0);
+    this.blockPage.set(0);
     this.composerMode.set(null);
     this.composerText = '';
     this.candidateStore.loadCandidates(this.getRecruiterId(), { page: 0, size: 20 });
@@ -102,43 +139,63 @@ export class RecruiterCandidates implements OnInit {
     this.composerMode.set(null);
     this.composerText = '';
     const length = this.deck().length;
-    this.sectionIndex.set(0);
+    this.blockPage.set(0);
     this.currentIndex.update(i => Math.min(i + 1, length));
   }
 
-  nextSection(): void {
-    const total = this.sections().length;
-    if (this.sectionIndex() < total - 1) {
-      this.sectionIndex.update(i => i + 1);
-    } else {
-      this.skip();
-    }
+  prevBlocks(): void {
+    this.blockPage.update(page => Math.max(0, page - 1));
   }
 
-  sectionLabel(key: string): string {
-    return RecruiterCandidates.SECTION_META[key]?.label ?? '';
+  nextBlocks(): void {
+    this.blockPage.update(page => Math.min(this.blockPages().length - 1, page + 1));
   }
 
-  sectionIcon(key: string): string {
-    return RecruiterCandidates.SECTION_META[key]?.icon ?? 'chevron_right';
+  goToBlockPage(page: number): void {
+    this.blockPage.set(Math.max(0, Math.min(page, this.blockPages().length - 1)));
+  }
+
+  openBlockModal(block: CandidateBlock): void {
+    this.expandedBlock.set(block);
+  }
+
+  closeBlockModal(): void {
+    this.expandedBlock.set(null);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closeBlockModal();
   }
 
   save(): void {
     const dev = this.currentCandidate();
     const recruiterId = this.getRecruiterId();
-    if (!dev || !recruiterId) return;
+    if (!dev || !recruiterId || this.saving) return;
 
     if (this.candidateStore.isSaved(dev.id)) {
       this.skip();
       return;
     }
 
+    this.saving = true;
     this.candidateStore.saveCandidate(recruiterId, dev.id).subscribe({
       next: () => {
+        this.saving = false;
         this.toast.success(`${dev.nombre} guardado`);
         this.skip();
       },
-      error: () => this.toast.error('No se pudo guardar el candidato'),
+      error: () => {
+        this.candidateStore.syncSavedState(recruiterId, dev.id).subscribe(saved => {
+          this.saving = false;
+          if (saved) {
+            this.toast.info('El candidato ya estaba guardado');
+            this.skip();
+          } else {
+            this.toast.error('No se pudo guardar el candidato');
+          }
+        });
+      },
     });
   }
 

@@ -4,12 +4,9 @@
       <div class="card-header">
         <div class="card-header-left">
           <div class="card-icon">
-            <span class="material-symbols-outlined">collection_bookmark</span>
+            <span class="material-symbols-outlined">collections_bookmark</span>
           </div>
-          <div>
-            <h2 class="card-title">Clasificación de historias</h2>
-            <p class="card-subtitle">Crea categorías y organiza tus historias anteriores</p>
-          </div>
+          <h2 class="card-title">Clasificación de historias</h2>
         </div>
         <div class="header-actions">
           <button type="button" class="btn-new" (click)="startCreate()">
@@ -24,57 +21,73 @@
 
       @if (showForm()) {
         <div class="category-form">
-          <div class="form-row">
-            <input
-              class="form-input"
-              type="text"
-              maxlength="50"
-              placeholder="Nombre de la categoría (ej. Contrataciones 2026)"
-              [ngModel]="formNombre()"
-              (ngModelChange)="formNombre.set($event)"
-              (keyup.enter)="saveForm()"
-            />
-            <div class="color-swatches">
-              @for (color of colorPresets; track color) {
-                <button
-                  type="button"
-                  class="swatch"
-                  [class.active]="formColor() === color"
-                  [style.background]="color"
-                  (click)="formColor.set(color)"
-                  aria-label="Elegir color"
-                ></button>
-              }
-            </div>
+          <input
+            class="form-input"
+            type="text"
+            maxlength="50"
+            placeholder="Nombre de la categoría (ej. Contrataciones 2026)"
+            [ngModel]="formNombre()"
+            (ngModelChange)="formNombre.set($event)"
+            (keyup.enter)="saveForm()"
+          />
+          <div class="color-swatches">
+            @for (color of colorPresets; track color) {
+              <button
+                type="button"
+                class="swatch"
+                [class.active]="formColor() === color"
+                [style.background]="color"
+                (click)="formColor.set(color)"
+                aria-label="Elegir color"
+              ></button>
+            }
           </div>
           <div class="form-actions">
-            <button type="button" class="btn-ghost" (click)="cancelForm()">Cancelar</button>
+            <button type="button" class="btn-ghost sm" (click)="cancelForm()">Cancelar</button>
             <button
               type="button"
-              class="btn-primary"
+              class="btn-primary sm"
               [disabled]="saving() || !formNombre().trim()"
               (click)="saveForm()"
             >
-              {{ editingId() ? 'Guardar cambios' : 'Crear categoría' }}
+              {{ editingId() ? 'Guardar' : 'Crear' }}
             </button>
           </div>
         </div>
       }
 
       <div class="chips-row">
-        <button type="button" class="chip" [class.active]="selected() === 'all'" (click)="select('all')">
+        <button
+          type="button"
+          class="chip"
+          [class.active]="selected() === 'all'"
+          [style.--chip-color]="'var(--primary)'"
+          (click)="select('all')"
+        >
           <span class="chip-dot" style="background: var(--primary)"></span>
           Todas
           <span class="chip-count">{{ counts()['all'] }}</span>
         </button>
         @for (cat of categories(); track cat.id) {
-          <button type="button" class="chip" [class.active]="selected() === cat.id" (click)="select(cat.id)">
+          <button
+            type="button"
+            class="chip"
+            [class.active]="selected() === cat.id"
+            [style.--chip-color]="cat.color || 'var(--primary)'"
+            (click)="select(cat.id)"
+          >
             <span class="chip-dot" [style.background]="cat.color || 'var(--primary)'"></span>
             {{ cat.nombre }}
             <span class="chip-count">{{ counts()[cat.id] ?? 0 }}</span>
           </button>
         }
-        <button type="button" class="chip" [class.active]="selected() === 'none'" (click)="select('none')">
+        <button
+          type="button"
+          class="chip"
+          [class.active]="selected() === 'none'"
+          [style.--chip-color]="'var(--on-surface-variant)'"
+          (click)="select('none')"
+        >
           <span class="chip-dot uncategorized"></span>
           Sin categoría
           <span class="chip-count">{{ counts()['none'] }}</span>
@@ -82,21 +95,26 @@
       </div>
 
       @if (selectedCategory(); as cat) {
-        <div class="category-actions">
-          <span class="category-hint">Editando «{{ cat.nombre }}»</span>
-          <button type="button" class="icon-btn" title="Editar categoría" (click)="startEdit(cat)">
+        <div class="category-bar">
+          <span class="category-bar-dot" [style.background]="cat.color || 'var(--primary)'"></span>
+          <span class="category-bar-name">{{ cat.nombre }}</span>
+          <span class="category-bar-count">{{ counts()[cat.id] ?? 0 }} historias</span>
+          <span class="category-bar-spacer"></span>
+          <button type="button" class="icon-btn sm" title="Editar categoría" (click)="startEdit(cat)">
             <span class="material-symbols-outlined">edit</span>
           </button>
           <button
             type="button"
-            class="icon-btn danger"
-            [class.confirm]="confirmDeleteId() === cat.id"
+            class="icon-btn sm danger"
+            [class.confirming]="confirmDeleteId() === cat.id"
             [title]="confirmDeleteId() === cat.id ? 'Confirmar eliminación' : 'Eliminar categoría'"
             (click)="requestDelete(cat)"
           >
             <span class="material-symbols-outlined">delete</span>
             @if (confirmDeleteId() === cat.id) {
               <span class="confirm-label">Confirmar</span>
+            } @else {
+              <span class="confirm-label">Eliminar</span>
             }
           </button>
         </div>
@@ -106,8 +124,19 @@
         <div class="loading">Cargando historias...</div>
       } @else if (filtered().length === 0) {
         <div class="stories-empty">
-          <span class="material-symbols-outlined">auto_awesome</span>
-          <p>No hay historias en esta vista.</p>
+          @if (selectedCategory(); as cat) {
+            <span class="material-symbols-outlined">folder_off</span>
+            <p>«{{ cat.nombre }}» no tiene historias asignadas</p>
+            <button type="button" class="btn-ghost sm" (click)="select('all')">
+              Ver todas las historias
+            </button>
+          } @else if (selected() === 'none') {
+            <span class="material-symbols-outlined">check_circle</span>
+            <p>Todas tus historias ya tienen categoría</p>
+          } @else {
+            <span class="material-symbols-outlined">auto_awesome</span>
+            <p>Aún no tienes historias en tu perfil</p>
+          }
         </div>
       } @else {
         <div class="stories-grid">

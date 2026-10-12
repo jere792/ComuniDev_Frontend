@@ -11,7 +11,7 @@
 
   <div class="experience-timeline">
     @if (empresas?.length) {
-      @for (empresa of empresas; track empresa.companyId; let i = $index) {
+      @for (empresa of empresas; track empresa.companyId) {
         <div class="experience-item">
           <div class="experience-dot" [class.active]="empresa.activo"></div>
           <div class="experience-content">
@@ -21,8 +21,7 @@
                 {{ empresa.activo ? 'Actual' : 'Finalizado' }}
               </span>
             </div>
-            <p class="experience-company">Empresa {{ i + 1 }}</p>
-            <p class="experience-desc">Procesos de selección y gestión de talento.</p>
+            <p class="experience-company">{{ nombreDe(empresa.companyId) }}</p>
           </div>
         </div>
       }

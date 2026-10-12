@@ -22,7 +22,7 @@
           <div class="offer-status" [class]="estadoClass(offer)">{{ estadoLabel(offer) }}</div>
 
           <h3 class="offer-title">{{ offer.titulo }}</h3>
-          <p class="offer-company">{{ offer.companyName ?? 'Empresa no encontrada' }}</p>
+          <p class="offer-company">{{ empresa(offer) }}</p>
 
           <div class="offer-details">
             @if (offer.ubicacion) {

@@ -20,14 +20,14 @@
         <div class="company-card" [class.inactive]="!empresa.activo">
           <div class="company-top">
             <div class="company-avatar" [class]="'avatar-' + (i % 4)">
-              {{ empresa.companyId?.toString()?.slice(0, 2)?.toUpperCase() || 'EM' }}
+              {{ iniciales(empresa.companyId) }}
             </div>
             <span class="company-status" [class.active]="empresa.activo">
               <span class="status-dot-sm"></span>
               {{ empresa.activo ? 'Activo' : 'Inactivo' }}
             </span>
           </div>
-          <h3 class="company-name">Empresa {{ i + 1 }}</h3>
+          <h3 class="company-name">{{ nombreDe(empresa.companyId) }}</h3>
           <span class="company-role">{{ empresa.cargoEnEmpresa }}</span>
         </div>
       }

@@ -38,7 +38,8 @@ export interface OfferItem extends Vacancy {
 
 /** Petición de `createVacancy`. `fechaLimite` va como `YYYY-MM-DD`. */
 export interface VacancyInput {
-  companyId: string;
+  /** Opcional: un reclutador independiente publica sin empresa. */
+  companyId?: string;
   recruiterId: string;
   titulo: string;
   descripcion?: string;
@@ -49,17 +50,4 @@ export interface VacancyInput {
   ubicacion?: string;
   remuneracion?: { moneda: string; minimo?: number; maximo?: number };
   fechaLimite?: string;
-}
-
-/** Petición de `createCompany`, para quien aún no tiene empresa. */
-export interface CompanyInput {
-  nombre: string;
-  contactoEmail: string;
-  ubicacionPais: string;
-}
-
-/** Empresa mínima que necesita el formulario para poblar el selector. */
-export interface CompanyOption {
-  id: string;
-  nombre: string;
 }

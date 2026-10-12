@@ -1,8 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, finalize, tap } from 'rxjs';
 import {
-  CompanyInput,
-  CompanyOption,
   OfferItem,
   Vacancy,
   VacancyInput,
@@ -17,7 +15,6 @@ export class OfferStore {
   private readonly repository = inject<VacancyRepository>(VACANCY_REPOSITORY);
 
   readonly offers = signal<OfferItem[]>([]);
-  readonly companies = signal<CompanyOption[]>([]);
   readonly loading = signal(false);
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
@@ -36,21 +33,6 @@ export class OfferStore {
         this.loading.set(false);
       },
     });
-  }
-
-  loadCompanies(): void {
-    this.repository.companies().subscribe({
-      next: companies => this.companies.set(companies),
-      error: () => this.companies.set([]),
-    });
-  }
-
-  createCompany(input: CompanyInput): Observable<CompanyOption> {
-    return this.repository.createCompany(input).pipe(
-      tap(company => {
-        this.companies.update(list => [...list, company]);
-      }),
-    );
   }
 
   create(recruiterId: string, input: Omit<VacancyInput, 'recruiterId'>): Observable<Vacancy> {

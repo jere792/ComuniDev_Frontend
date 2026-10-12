@@ -13,6 +13,12 @@
       }
       @if (successMessage()) {
         <div class="form-success">{{ successMessage() }}</div>
+        @if (empresaPendiente()) {
+          <div class="form-warning">
+            Tu cuenta quedó creada, pero no se pudo registrar la empresa. Puedes crearla desde
+            «Mi empresa» en el panel del reclutador.
+          </div>
+        }
       }
       <div class="form-row">
         <div class="form-group">
@@ -92,6 +98,56 @@
           </button>
         </div>
       </div>
+
+      @if (isRecruiter) {
+        <div class="company-fields">
+          <label class="company-toggle">
+            <input type="checkbox"
+              [ngModel]="tieneEmpresa()" (ngModelChange)="tieneEmpresa.set($event)"
+              name="tieneEmpresa" />
+            Tengo una empresa
+          </label>
+
+          <p class="company-hint">
+            Puedes publicar ofertas a nombre de una empresa o hacerlo como independiente.
+          </p>
+
+          @if (tieneEmpresa()) {
+            <div class="form-group">
+              <label class="label-md" for="empresaNombre">Nombre de la empresa *</label>
+              <input class="input" type="text" id="empresaNombre" placeholder="Ej. DevSolutions Perú"
+                [ngModel]="empresaNombre()" (ngModelChange)="empresaNombre.set($event)" name="empresaNombre" required />
+              @if (submitted() && !empresaNombre().trim()) {
+                <span class="form-error">El nombre de la empresa es obligatorio</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label class="label-md" for="empresaPais">País de la empresa *</label>
+              <select class="input" id="empresaPais"
+                [ngModel]="empresaPais()" (ngModelChange)="empresaPais.set($event)" name="empresaPais" required>
+                <option value="" disabled>Selecciona un país…</option>
+                @for (country of countries; track country.code) {
+                  <option [value]="country.code">{{ country.name }}</option>
+                }
+              </select>
+              @if (submitted() && !empresaPais()) {
+                <span class="form-error">El país de la empresa es obligatorio</span>
+              }
+            </div>
+
+            <p class="company-note">
+              El correo de contacto será el de tu cuenta. Podrás completar descripción, logo y redes
+              después, en «Mi empresa».
+            </p>
+          } @else {
+            <p class="company-note">
+              Podrás crear tu empresa más adelante desde «Mi empresa», o publicar directamente
+              como independiente.
+            </p>
+          }
+        </div>
+      }
 
       <button type="submit" class="btn btn-primary register-btn" [disabled]="!formValid">{{ 'register' | t:'crearCuenta' }}</button>
     </form>

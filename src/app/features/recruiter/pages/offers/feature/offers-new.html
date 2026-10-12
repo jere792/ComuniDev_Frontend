@@ -8,24 +8,39 @@
 
   <div class="form-card">
     <div class="form-field">
-      <label class="form-label">Empresa *</label>
-      @if (creatingCompany()) {
-        <input class="input" placeholder="Nombre de la empresa" [(ngModel)]="companyForm.nombre" />
-        <input class="input" type="email" placeholder="Correo de contacto" [(ngModel)]="companyForm.contactoEmail" />
-        <input class="input" placeholder="País" [(ngModel)]="companyForm.ubicacionPais" />
-        <button type="button" class="link-btn" (click)="toggleCreatingCompany()">
-          Usar una empresa existente
-        </button>
+      <label class="form-label">Publicar como</label>
+
+      @if (miEmpresa(); as empresa) {
+        <label class="publish-option">
+          <input type="radio" name="tipoPublicacion"
+            [checked]="!independiente()" (change)="independiente.set(false)" />
+          <span class="publish-option-text">
+            <strong>{{ empresa.nombre }}</strong>
+            <span class="publish-option-hint">Tu empresa</span>
+          </span>
+        </label>
+
+        <label class="publish-option">
+          <input type="radio" name="tipoPublicacion"
+            [checked]="independiente()" (change)="independiente.set(true)" />
+          <span class="publish-option-text">
+            <strong>Independiente</strong>
+            <span class="publish-option-hint">A tu nombre, sin empresa</span>
+          </span>
+        </label>
+
+        @if (!independiente()) {
+          <button type="button" class="link-btn" (click)="goToCompany()">
+            Editar mi empresa
+          </button>
+        }
       } @else {
-        <select class="input" [(ngModel)]="form.companyId">
-          <option value="" disabled>Selecciona una empresa…</option>
-          @for (company of companies(); track company.id) {
-            <option [value]="company.id">{{ company.nombre }}</option>
-          }
-        </select>
-        <button type="button" class="link-btn" (click)="toggleCreatingCompany()">
-          Crear una empresa nueva
-        </button>
+        <div class="company-empty">
+          <p>Todavía no tienes empresa. Puedes crearla o publicar como independiente.</p>
+          <button type="button" class="link-btn" (click)="goToCompany()">
+            Crear mi empresa
+          </button>
+        </div>
       }
     </div>
 

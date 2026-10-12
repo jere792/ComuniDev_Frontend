@@ -2,14 +2,13 @@ import { Injectable, inject } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable, forkJoin, map } from 'rxjs';
 import {
-  CompanyInput,
-  CompanyOption,
   OfferItem,
   Vacancy,
   VacancyInput,
   VacancyRemuneracion,
 } from '@features/recruiter/pages/offers/domain/models/vacancy.model';
 import { VacancyRepository } from '@features/recruiter/pages/offers/domain/ports/vacancy.repository';
+import { COMPANY_REPOSITORY } from '@features/recruiter/pages/company/domain/ports/company.repository';
 
 const VACANCIES_BY_RECRUITER = gql`
   query VacanciesByRecruiter($recruiterId: String!) {
@@ -37,24 +36,6 @@ const VACANCIES_BY_RECRUITER = gql`
       destacada
       postulacionesCount
       createdAt
-    }
-  }
-`;
-
-const COMPANIES = gql`
-  query Companies {
-    companies {
-      id
-      nombre
-    }
-  }
-`;
-
-const CREATE_COMPANY = gql`
-  mutation CreateCompany($nombre: String!, $contacto: CompanyContactoInput, $ubicacion: CompanyUbicacionInput) {
-    createCompany(nombre: $nombre, contacto: $contacto, ubicacion: $ubicacion) {
-      id
-      nombre
     }
   }
 `;
@@ -145,16 +126,11 @@ function normalizeVacancy(raw: Record<string, unknown>): Vacancy {
   };
 }
 
-function normalizeCompany(raw: Record<string, unknown>): CompanyOption {
-  return {
-    id: String(raw['id'] ?? raw['_id'] ?? ''),
-    nombre: String(raw['nombre'] ?? 'Sin nombre'),
-  };
-}
-
 @Injectable({ providedIn: 'root' })
 export class VacancyGraphqlService implements VacancyRepository {
   private readonly apollo = inject(Apollo);
+  /** El selector de empresa vive en el módulo company; aquí solo se lee. */
+  private readonly companyRepository = inject(COMPANY_REPOSITORY);
 
   vacanciesByRecruiter(recruiterId: string): Observable<OfferItem[]> {
     // Se pide en paralelo para resolver el nombre de la empresa contra `companies`.
@@ -166,7 +142,7 @@ export class VacancyGraphqlService implements VacancyRepository {
           fetchPolicy: 'network-only',
         })
         .pipe(map(result => result.data?.vacanciesByRecruiter ?? [])),
-      companies: this.companies(),
+      companies: this.companyRepository.companies(),
     }).pipe(
       map(({ vacancies, companies }) => {
         const byId = new Map(companies.map(company => [company.id, company.nombre]));
@@ -178,40 +154,12 @@ export class VacancyGraphqlService implements VacancyRepository {
     );
   }
 
-  companies(): Observable<CompanyOption[]> {
-    return this.apollo
-      .query<{ companies: Array<Record<string, unknown>> | null }>({
-        query: COMPANIES,
-        fetchPolicy: 'network-only',
-      })
-      .pipe(map(result => (result.data?.companies ?? []).map(normalizeCompany)));
-  }
-
-  createCompany(input: CompanyInput): Observable<CompanyOption> {
-    return this.apollo
-      .mutate<{ createCompany: Record<string, unknown> | null }>({
-        mutation: CREATE_COMPANY,
-        variables: {
-          nombre: input.nombre,
-          contacto: { email: input.contactoEmail },
-          ubicacion: { pais: input.ubicacionPais },
-        },
-      })
-      .pipe(
-        map(result => {
-          const created = result.data?.createCompany;
-          if (!created) throw new Error('No se pudo crear la empresa');
-          return normalizeCompany(created);
-        }),
-      );
-  }
-
   createVacancy(input: VacancyInput): Observable<Vacancy> {
     return this.apollo
       .mutate<{ createVacancy: Record<string, unknown> | null }>({
         mutation: CREATE_VACANCY,
         variables: {
-          companyId: input.companyId,
+          companyId: input.companyId ?? null,
           recruiterId: input.recruiterId,
           titulo: input.titulo,
           descripcion: input.descripcion ?? null,

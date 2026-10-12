@@ -2,13 +2,12 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { map, of, switchMap } from 'rxjs';
 import { OfferStore } from '@features/recruiter/pages/offers/data-access/state/offer.store';
+import { CompanyStore } from '@features/recruiter/pages/company/data-access/state/company.store';
 import { VacancyInput } from '@features/recruiter/pages/offers/domain/models/vacancy.model';
 import { ToastService } from '@core/services/toast.service';
 
 interface OfferForm {
-  companyId: string;
   titulo: string;
   descripcion: string;
   tecnologias: string;
@@ -22,12 +21,6 @@ interface OfferForm {
   fechaLimite: string;
 }
 
-interface CompanyForm {
-  nombre: string;
-  contactoEmail: string;
-  ubicacionPais: string;
-}
-
 @Component({
   selector: 'app-recruiter-offers-new',
   imports: [FormsModule],
@@ -36,19 +29,34 @@ interface CompanyForm {
 })
 export class RecruiterOffersNew implements OnInit {
   private readonly store = inject(OfferStore);
+  private readonly companyStore = inject(CompanyStore);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
   private readonly location = inject(Location);
 
-  readonly companies = this.store.companies;
+  /**
+   * Solo la empresa del propio reclutador. Antes el selector listaba todas las
+   * empresas, lo que permitía publicar a nombre de una ajena.
+   */
+  readonly miEmpresa = this.companyStore.myCompany;
   readonly saving = this.store.saving;
-  readonly creatingCompany = signal(false);
+
+  /** Solo hay elección si existe una empresa propia. */
+  readonly independiente = signal(false);
 
   form: OfferForm = RecruiterOffersNew.emptyForm();
-  companyForm: CompanyForm = { nombre: '', contactoEmail: '', ubicacionPais: '' };
 
   ngOnInit(): void {
-    this.store.loadCompanies();
+    const recruiterId = this.getRecruiterId();
+    if (!recruiterId) {
+      this.toast.error('No se identificó al reclutador');
+      return;
+    }
+
+    this.companyStore.loadMyCompany(recruiterId).subscribe({
+      next: company => this.independiente.set(!company),
+      error: () => this.independiente.set(true),
+    });
   }
 
   goBack(): void {
@@ -59,8 +67,8 @@ export class RecruiterOffersNew implements OnInit {
     this.router.navigate(['/recruiter/offers']);
   }
 
-  toggleCreatingCompany(): void {
-    this.creatingCompany.update(value => !value);
+  goToCompany(): void {
+    this.router.navigate(['/recruiter/company']);
   }
 
   submit(): void {
@@ -76,33 +84,20 @@ export class RecruiterOffersNew implements OnInit {
       return;
     }
 
-    // Si todavía no tiene empresa, se crea en el momento y se usa la recién creada.
-    const companyId$ = this.creatingCompany()
-      ? this.store
-          .createCompany({
-            nombre: this.companyForm.nombre.trim(),
-            contactoEmail: this.companyForm.contactoEmail.trim(),
-            ubicacionPais: this.companyForm.ubicacionPais.trim(),
-          })
-          .pipe(map(company => company.id))
-      : of(this.form.companyId);
-
-    companyId$
-      .pipe(switchMap(companyId => this.store.create(recruiterId, this.buildInput(companyId))))
-      .subscribe({
-        next: () => {
-          this.toast.success('Oferta publicada');
-          this.router.navigate(['/recruiter/offers']);
-        },
-        error: () => this.toast.error('No se pudo publicar la oferta'),
-      });
+    this.store.create(recruiterId, this.buildInput()).subscribe({
+      next: () => {
+        this.toast.success('Oferta publicada');
+        this.router.navigate(['/recruiter/offers']);
+      },
+      error: () => this.toast.error('No se pudo publicar la oferta'),
+    });
   }
 
   // -------------------------------------------------------------- helpers
 
-  private buildInput(companyId: string): Omit<VacancyInput, 'recruiterId'> {
+  private buildInput(): Omit<VacancyInput, 'recruiterId'> {
     return {
-      companyId,
+      companyId: this.independiente() ? undefined : (this.miEmpresa()?.id ?? undefined),
       titulo: this.form.titulo.trim(),
       descripcion: this.form.descripcion.trim() || undefined,
       tecnologias: this.splitList(this.form.tecnologias),
@@ -116,12 +111,8 @@ export class RecruiterOffersNew implements OnInit {
   }
 
   private validate(): string | null {
-    if (this.creatingCompany()) {
-      if (!this.companyForm.nombre.trim()) return 'La empresa necesita nombre';
-      if (!this.companyForm.contactoEmail.trim()) return 'La empresa necesita correo de contacto';
-      if (!this.companyForm.ubicacionPais.trim()) return 'La empresa necesita país';
-    } else if (!this.form.companyId) {
-      return 'Selecciona una empresa';
+    if (!this.independiente() && !this.miEmpresa()) {
+      return 'Crea tu empresa o publica como independiente';
     }
 
     if (!this.form.titulo.trim()) return 'La oferta necesita título';
@@ -163,7 +154,6 @@ export class RecruiterOffersNew implements OnInit {
 
   private static emptyForm(): OfferForm {
     return {
-      companyId: '',
       titulo: '',
       descripcion: '',
       tecnologias: '',

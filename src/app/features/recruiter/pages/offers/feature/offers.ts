@@ -99,6 +99,11 @@ export class RecruiterOffers implements OnInit {
     return single != null ? `${moneda} ${this.formatNumber(single)}` : null;
   }
 
+  /** Sin empresa, la oferta se publica a nombre del reclutador independiente. */
+  empresa(offer: OfferItem): string {
+    return offer.companyName ?? this.userName();
+  }
+
   publicado(offer: OfferItem): string | null {
     return this.relativeTime(offer.createdAt);
   }
@@ -132,5 +137,9 @@ export class RecruiterOffers implements OnInit {
 
   private getRecruiterId(): string | null {
     return localStorage.getItem('userId');
+  }
+
+  private userName(): string {
+    return localStorage.getItem('userName') ?? 'Independiente';
   }
 }

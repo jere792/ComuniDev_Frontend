@@ -47,6 +47,8 @@ import { TALENT_SEARCH_REPOSITORY } from '@features/recruiter/pages/candidates/d
 import { TalentSearchService } from '@features/recruiter/pages/candidates/data-access/api/talent-search.service';
 import { VACANCY_REPOSITORY } from '@features/recruiter/pages/offers/domain/ports/vacancy.repository';
 import { VacancyGraphqlService } from '@features/recruiter/pages/offers/data-access/api/vacancy-graphql.service';
+import { COMPANY_REPOSITORY } from '@features/recruiter/pages/company/domain/ports/company.repository';
+import { CompanyGraphqlService } from '@features/recruiter/pages/company/data-access/api/company-graphql.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -68,6 +70,7 @@ export const appConfig: ApplicationConfig = {
     { provide: BLOCK_REPOSITORY, useClass: BlockGraphqlService },
     { provide: TALENT_SEARCH_REPOSITORY, useClass: TalentSearchService },
     { provide: VACANCY_REPOSITORY, useClass: VacancyGraphqlService },
+    { provide: COMPANY_REPOSITORY, useClass: CompanyGraphqlService },
     provideRouter(routes, withInMemoryScrolling({
       scrollPositionRestoration: 'top',
     })),

@@ -1,0 +1,235 @@
+.company-container {
+  width: 100%;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.page-header-text {
+  flex: 1;
+}
+
+.back-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--surface-container);
+  }
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--on-surface);
+  margin: 0;
+}
+
+.section-subtitle {
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  margin: var(--space-2xs) 0 0 0;
+}
+
+.company-summary {
+  display: flex;
+  gap: var(--space-xl);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-sm);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.summary-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.summary-label {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+
+.summary-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.status-badge {
+  align-self: flex-start;
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+
+  &.pending {
+    background: #fff3cd;
+    color: #856404;
+  }
+
+  &.verified {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  &.rejected {
+    background: #fce8e6;
+    color: #b3261e;
+  }
+}
+
+.verify-hint {
+  font-size: 12px;
+  color: var(--on-surface-variant);
+  margin: 0 0 var(--space-lg) 0;
+}
+
+.state-box {
+  padding: var(--space-xl);
+  text-align: center;
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.state-error {
+  color: #b3261e;
+  border-color: #f2b8b5;
+}
+
+.form-card {
+  width: 100%;
+  padding: var(--space-lg);
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.form-section-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-surface);
+  margin-bottom: var(--space-md);
+
+  &:not(:first-child) {
+    padding-top: var(--space-md);
+    margin-top: var(--space-md);
+    border-top: 1px solid var(--border-subtle);
+  }
+}
+
+.form-row {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  margin-bottom: var(--space-md);
+  flex: 1;
+  min-width: 0;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--on-surface);
+}
+
+.input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  background: var(--surface-container-lowest);
+  color: var(--on-surface);
+  font-family: inherit;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-container);
+  }
+}
+
+textarea.input {
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  background: var(--primary-container);
+  border: none;
+  color: var(--on-primary-container);
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--on-surface);
+
+  &:hover:not(:disabled) {
+    background: var(--surface-container);
+  }
+}
+
+@media (max-width: 640px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .company-summary {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+}

@@ -22,7 +22,22 @@
           <div class="offer-status" [class]="estadoClass(offer)">{{ estadoLabel(offer) }}</div>
 
           <h3 class="offer-title">{{ offer.titulo }}</h3>
-          <p class="offer-company">{{ empresa(offer) }}</p>
+
+          <div class="offer-company" [class.clickable]="!!offer.companyId"
+            [attr.title]="offer.companyId ? 'Ver la empresa' : null"
+            (click)="offer.companyId && verEmpresa(offer)">
+            @if (empresaLogo(offer); as logo) {
+              <img class="company-logo" [src]="logo" [alt]="empresa(offer)" />
+            } @else {
+              <span class="company-logo company-logo-fallback">{{ inicialesEmpresa(offer) }}</span>
+            }
+            <span class="company-info">
+              <span class="company-name">{{ empresa(offer) }}</span>
+              @if (empresaSector(offer); as sector) {
+                <span class="company-sector">{{ sector }}</span>
+              }
+            </span>
+          </div>
 
           <div class="offer-details">
             @if (offer.ubicacion) {

@@ -9,6 +9,8 @@ import {
 export interface VacancyRepository {
   /** "Mis Ofertas" (HU-44): las que publicó ese reclutador. */
   vacanciesByRecruiter(recruiterId: string): Observable<OfferItem[]>;
+  /** Vacantes de una empresa, con los datos de la empresa ya resueltos. */
+  vacanciesByCompany(companyId: string): Observable<OfferItem[]>;
   createVacancy(input: VacancyInput): Observable<Vacancy>;
   /** HU-41: cambia el estado manualmente (ACTIVA / PAUSADA / CERRADA). */
   updateEstado(id: string, estado: string): Observable<Vacancy>;

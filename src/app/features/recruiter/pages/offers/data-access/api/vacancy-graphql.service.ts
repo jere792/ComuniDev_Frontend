@@ -40,6 +40,36 @@ const VACANCIES_BY_RECRUITER = gql`
   }
 `;
 
+const VACANCIES_BY_COMPANY = gql`
+  query VacanciesByCompany($companyId: String!) {
+    vacanciesByCompany(companyId: $companyId) {
+      id
+      companyId
+      recruiterId
+      titulo
+      descripcion
+      tecnologias
+      nivelExperiencia
+      modalidad
+      tipoContrato
+      ubicacion
+      remuneracion {
+        visible
+        moneda
+        minimo
+        maximo
+        periodo
+      }
+      vacantesDisponibles
+      estado
+      fechaLimite
+      destacada
+      postulacionesCount
+      createdAt
+    }
+  }
+`;
+
 const CREATE_VACANCY = gql`
   mutation CreateVacancy(
     $companyId: String
@@ -133,22 +163,51 @@ export class VacancyGraphqlService implements VacancyRepository {
   private readonly companyRepository = inject(COMPANY_REPOSITORY);
 
   vacanciesByRecruiter(recruiterId: string): Observable<OfferItem[]> {
-    // Se pide en paralelo para resolver el nombre de la empresa contra `companies`.
-    return forkJoin({
-      vacancies: this.apollo
+    return this.withCompany(
+      this.apollo
         .query<{ vacanciesByRecruiter: Array<Record<string, unknown>> | null }>({
           query: VACANCIES_BY_RECRUITER,
           variables: { recruiterId },
           fetchPolicy: 'network-only',
         })
         .pipe(map(result => result.data?.vacanciesByRecruiter ?? [])),
+    );
+  }
+
+  vacanciesByCompany(companyId: string): Observable<OfferItem[]> {
+    return this.withCompany(
+      this.apollo
+        .query<{ vacanciesByCompany: Array<Record<string, unknown>> | null }>({
+          query: VACANCIES_BY_COMPANY,
+          variables: { companyId },
+          fetchPolicy: 'network-only',
+        })
+        .pipe(map(result => result.data?.vacanciesByCompany ?? [])),
+    );
+  }
+
+  /**
+   * El backend expone `companyId` como id suelto, así que se pide el listado
+   * de empresas en paralelo para resolver logo, nombre y sector de cada vacante.
+   */
+  private withCompany(
+    vacancies$: Observable<Array<Record<string, unknown>>>,
+  ): Observable<OfferItem[]> {
+    return forkJoin({
+      vacancies: vacancies$,
       companies: this.companyRepository.companies(),
     }).pipe(
       map(({ vacancies, companies }) => {
-        const byId = new Map(companies.map(company => [company.id, company.nombre]));
+        const byId = new Map(companies.map(company => [company.id, company]));
         return vacancies.map(raw => {
           const vacancy = normalizeVacancy(raw);
-          return { ...vacancy, companyName: vacancy.companyId ? (byId.get(vacancy.companyId) ?? null) : null };
+          const found = vacancy.companyId ? byId.get(vacancy.companyId) : undefined;
+          return {
+            ...vacancy,
+            company: found
+              ? { nombre: found.nombre, logoUrl: found.logoUrl, sector: found.sector }
+              : null,
+          };
         });
       }),
     );

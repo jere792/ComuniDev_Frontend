@@ -6,13 +6,7 @@ import { TranslationPipe } from '@core/pipes/translation.pipe';
 import { RevealDirective } from '@shared/directives/reveal/reveal.directive';
 import { AuthService } from '@core/services/auth.service';
 import { COMPANY_REPOSITORY } from '@features/recruiter/pages/company/domain/ports/company.repository';
-
-interface Country {
-  flag: string;
-  code: string;
-  dial: string;
-  name: string;
-}
+import { COUNTRIES, Country } from '@shared/constants/countries';
 
 @Component({
   selector: 'app-register',
@@ -46,26 +40,7 @@ export class Register {
   /** true si el registro salió pero la empresa no pudo crearse. */
   empresaPendiente = signal(false);
 
-  countries: Country[] = [
-    { flag: 'pe', code: 'PE', dial: '+51', name: 'Perú' },
-    { flag: 'mx', code: 'MX', dial: '+52', name: 'México' },
-    { flag: 'ar', code: 'AR', dial: '+54', name: 'Argentina' },
-    { flag: 'cl', code: 'CL', dial: '+56', name: 'Chile' },
-    { flag: 'co', code: 'CO', dial: '+57', name: 'Colombia' },
-    { flag: 've', code: 'VE', dial: '+58', name: 'Venezuela' },
-    { flag: 'ec', code: 'EC', dial: '+593', name: 'Ecuador' },
-    { flag: 'uy', code: 'UY', dial: '+598', name: 'Uruguay' },
-    { flag: 'us', code: 'US', dial: '+1', name: 'Estados Unidos' },
-    { flag: 'es', code: 'ES', dial: '+34', name: 'España' },
-    { flag: 'br', code: 'BR', dial: '+55', name: 'Brasil' },
-    { flag: 'bo', code: 'BO', dial: '+591', name: 'Bolivia' },
-    { flag: 'py', code: 'PY', dial: '+595', name: 'Paraguay' },
-    { flag: 'cr', code: 'CR', dial: '+506', name: 'Costa Rica' },
-    { flag: 'pa', code: 'PA', dial: '+507', name: 'Panamá' },
-    { flag: 'gt', code: 'GT', dial: '+502', name: 'Guatemala' },
-    { flag: 'do', code: 'DO', dial: '+1', name: 'República Dominicana' },
-    { flag: 'cu', code: 'CU', dial: '+53', name: 'Cuba' },
-  ];
+  readonly countries: Country[] = COUNTRIES;
 
   getFlagUrl(countryCode: string): string {
     return `https://flagcdn.io/${countryCode.toLowerCase()}.svg`;
@@ -153,7 +128,7 @@ export class Register {
   /**
    * Crea la empresa mínima con el correo de la cuenta como contacto.
    * Si falla no se bloquea el registro: queda pendiente de crear en
-   * /recruiter/company, y el formulario de oferta ya lo avisa.
+   * Configuración → Empresa, y el formulario de oferta ya lo avisa.
    */
   private async createCompany(recruiterId: string): Promise<void> {
     if (!recruiterId) {

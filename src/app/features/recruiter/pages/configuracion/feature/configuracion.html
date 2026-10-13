@@ -401,6 +401,165 @@
       </section>
     }
 
+    <!-- ═══ EMPRESA ═══ -->
+
+    @if (activeSection() === 'empresa-datos') {
+      <section class="config-section" [formGroup]="empresaForm">
+        <h2 class="section-title">Datos de la empresa</h2>
+        <p class="section-desc">
+          La empresa es la organización desde la que publicas ofertas. Si eres independiente
+          puedes dejarla vacía y publicar a tu nombre.
+        </p>
+
+        <div class="section-body">
+          <div class="form-group">
+            <label class="form-label">Nombre de la empresa *</label>
+            <input class="form-input" type="text" formControlName="nombre" placeholder="Ej. DevSolutions Perú" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group half">
+              <label class="form-label">Sector</label>
+              <select class="form-input form-select" formControlName="sector">
+                <option value="">Selecciona un sector…</option>
+                @for (sector of sectors; track sector) {
+                  <option [value]="sector">{{ sector }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group half">
+              <label class="form-label">Sitio web</label>
+              <input class="form-input" type="url" formControlName="sitioWeb" placeholder="https://" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Descripción</label>
+            <textarea class="form-textarea" formControlName="descripcion" rows="3"
+              placeholder="Qué hace la empresa"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group half">
+              <label class="form-label">Correo de contacto *</label>
+              <input class="form-input" type="email" formControlName="contactoEmail" placeholder="rrhh@empresa.com" />
+            </div>
+
+            <div class="form-group half">
+              <label class="form-label">Teléfono de contacto</label>
+              <input class="form-input" type="tel" formControlName="contactoTelefono" placeholder="+51 999 888 777" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group half">
+              <label class="form-label">País *</label>
+              <select class="form-input form-select" formControlName="pais">
+                <option value="">Selecciona un país…</option>
+                @for (country of countries; track country.code) {
+                  <option [value]="country.name">{{ country.name }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group half">
+              <label class="form-label">Ciudad</label>
+              <input class="form-input" type="text" formControlName="ciudad" placeholder="Ej. Lima" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group half">
+              <label class="form-label">Distrito</label>
+              <input class="form-input" type="text" formControlName="distrito" placeholder="Ej. San Borja" />
+            </div>
+
+            <div class="form-group half">
+              <label class="form-label">Dirección</label>
+              <input class="form-input" type="text" formControlName="direccion" placeholder="Av. Ejemplo 123" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">LinkedIn</label>
+            <input class="form-input" type="url" formControlName="linkedin" placeholder="https://linkedin.com/company/..." />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">GitHub</label>
+            <input class="form-input" type="url" formControlName="github" placeholder="https://github.com/..." />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group half">
+              <label class="form-label">Logo</label>
+              <div class="upload-panel upload-cuadrado">
+                @if (empresaForm.value.logoUrl; as logo) {
+                  <img class="upload-preview" [src]="logo" alt="Logo de la empresa" />
+                } @else {
+                  <span class="material-symbols-outlined upload-placeholder">add_photo_alternate</span>
+                }
+              </div>
+              <input #logoFileInput type="file" accept="image/*" hidden
+                (change)="onEmpresaImagenSelected($event, 'logoUrl')" />
+              <button type="button" class="upload-btn" (click)="pickEmpresaImagen('logoUrl')"
+                [disabled]="uploadingImage()">
+                {{ empresaForm.value.logoUrl ? 'Cambiar logo' : 'Subir logo' }}
+              </button>
+            </div>
+
+            <div class="form-group half">
+              <label class="form-label">Banner</label>
+              <div class="upload-panel upload-banner">
+                @if (empresaForm.value.bannerUrl; as banner) {
+                  <img class="upload-preview" [src]="banner" alt="Banner de la empresa" />
+                } @else {
+                  <span class="material-symbols-outlined upload-placeholder">add_photo_alternate</span>
+                }
+              </div>
+              <input #bannerFileInput type="file" accept="image/*" hidden
+                (change)="onEmpresaImagenSelected($event, 'bannerUrl')" />
+              <button type="button" class="upload-btn" (click)="pickEmpresaImagen('bannerUrl')"
+                [disabled]="uploadingImage()">
+                {{ empresaForm.value.bannerUrl ? 'Cambiar banner' : 'Subir banner' }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-footer">
+          <button class="btn-save" (click)="saveEmpresa()">Guardar cambios</button>
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'empresa-estado') {
+      <section class="config-section">
+        <h2 class="section-title">Estado y verificación</h2>
+        <p class="section-desc">Cómo va tu empresa</p>
+        <div class="section-body">
+          @if (empresa(); as emp) {
+            <div class="empresa-resumen">
+              <div class="resumen-item">
+                <span class="resumen-label">Ofertas activas</span>
+                <span class="resumen-value">{{ emp.vacantesActivasCount ?? 0 }}</span>
+              </div>
+              <div class="resumen-item">
+                <span class="resumen-label">Verificación</span>
+                <span class="estado-badge" [class]="estadoEmpresaClass()">{{ estadoEmpresaLabel() }}</span>
+              </div>
+            </div>
+            <p class="empresa-hint">
+              La verificación la realiza un administrador. Hasta entonces puedes publicar ofertas.
+            </p>
+          } @else {
+            <p class="placeholder">Aún no has creado tu empresa. Puedes crearla en «Datos de la empresa».</p>
+          }
+        </div>
+      </section>
+    }
+
     <!-- ═══ COMING SOON ═══ -->
 
     @if (activeSection() === 'seguridad') {

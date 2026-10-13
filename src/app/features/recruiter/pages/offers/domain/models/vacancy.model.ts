@@ -28,12 +28,20 @@ export interface Vacancy {
   createdAt: string | null;
 }
 
+/** Lo mínimo de la empresa que necesita la tarjeta de oferta. */
+export interface CompanySummary {
+  nombre: string;
+  logoUrl: string | null;
+  sector: string | null;
+}
+
 /**
- * Vacante lista para mostrar: el backend expone `companyId` (un id), así que el
- * nombre de la empresa se resuelve en el cliente contra `companies`.
+ * Vacante lista para mostrar: el backend expone `companyId` (un id), así que
+ * los datos de la empresa se resuelven en el cliente contra `companies`.
  */
 export interface OfferItem extends Vacancy {
-  companyName: string | null;
+  /** null cuando la oferta la publica un reclutador independiente. */
+  company: CompanySummary | null;
 }
 
 /** Petición de `createVacancy`. `fechaLimite` va como `YYYY-MM-DD`. */

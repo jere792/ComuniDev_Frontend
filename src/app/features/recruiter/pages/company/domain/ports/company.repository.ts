@@ -9,7 +9,9 @@ import {
 export interface CompanyRepository {
   /** "Mi empresa"; null si el reclutador todavía no creó ninguna. */
   myCompany(recruiterId: string): Observable<Company | null>;
-  /** Empresas existentes, para el selector del formulario de oferta. */
+  /** Empresa pública por id; null si no existe. */
+  companyById(id: string): Observable<Company | null>;
+  /** Empresas existentes, para quien junta empresas con otras entidades. */
   companies(): Observable<CompanyOption[]>;
   createCompany(input: CompanyInput & { recruiterId: string }): Observable<Company>;
   updateCompany(id: string, input: CompanyInput): Observable<Company>;

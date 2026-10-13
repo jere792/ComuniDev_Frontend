@@ -16,7 +16,7 @@
         @if (empresaPendiente()) {
           <div class="form-warning">
             Tu cuenta quedó creada, pero no se pudo registrar la empresa. Puedes crearla desde
-            «Mi empresa» en el panel del reclutador.
+            «Empresa» en Configuración.
           </div>
         }
       }
@@ -128,7 +128,7 @@
                 [ngModel]="empresaPais()" (ngModelChange)="empresaPais.set($event)" name="empresaPais" required>
                 <option value="" disabled>Selecciona un país…</option>
                 @for (country of countries; track country.code) {
-                  <option [value]="country.code">{{ country.name }}</option>
+                  <option [value]="country.name">{{ country.name }}</option>
                 }
               </select>
               @if (submitted() && !empresaPais()) {
@@ -138,12 +138,12 @@
 
             <p class="company-note">
               El correo de contacto será el de tu cuenta. Podrás completar descripción, logo y redes
-              después, en «Mi empresa».
+              después, en «Empresa» dentro de Configuración.
             </p>
           } @else {
             <p class="company-note">
-              Podrás crear tu empresa más adelante desde «Mi empresa», o publicar directamente
-              como independiente.
+              Podrás crear tu empresa más adelante desde «Empresa» en Configuración, o publicar
+              directamente como independiente.
             </p>
           }
         </div>

@@ -1,9 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { environment } from '../../../../../environments/environment';
+import { UploadService } from '@core/services/upload.service';
 import { User } from '@core/domain/models/user.model';
 import {
   NotificationPreferences,
@@ -165,7 +164,7 @@ const UPDATE_NOTIFICATION_PREFERENCES = gql`
 @Injectable({ providedIn: 'root' })
 export class UserGraphqlService implements UserRepository {
   private apollo = inject(Apollo);
-  private http = inject(HttpClient);
+  private uploadService = inject(UploadService);
 
 
   getAll(): Observable<User[]> {
@@ -196,9 +195,7 @@ export class UserGraphqlService implements UserRepository {
   }
 
   uploadFile(file: File): Observable<UploadResponse> {
-    const formData = new FormData();
-    formData.append('file', file);
-    return this.http.post<UploadResponse>(`${environment.apiUrl}/upload`, formData);
+    return this.uploadService.uploadFile(file);
   }
 
   changePassword(userId: string, currentPassword: string, newPassword: string): Observable<boolean> {

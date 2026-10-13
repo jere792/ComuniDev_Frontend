@@ -13,7 +13,7 @@ export const routes: Routes = [
         { label: 'Reels', route: '/recruiter/reels', icon: 'smart_display' },
         { label: 'Candidatos', route: '/recruiter/candidates', icon: 'people' },
         { label: 'Ofertas', route: '/recruiter/offers', icon: 'work' },
-        { label: 'Empresa', route: '/recruiter/company', icon: 'apartment' },
+        { label: 'Empresa', route: '/recruiter/profile/configuracion?section=empresa-datos', icon: 'apartment' },
       ],
     },
     children: [
@@ -23,7 +23,6 @@ export const routes: Routes = [
       { path: 'candidates', loadComponent: () => import('@features/recruiter/pages/candidates/feature/candidates').then(m => m.RecruiterCandidates) },
       { path: 'offers', loadComponent: () => import('@features/recruiter/pages/offers/feature/offers').then(m => m.RecruiterOffers) },
       { path: 'offers/new', loadComponent: () => import('@features/recruiter/pages/offers/feature/offers-new').then(m => m.RecruiterOffersNew) },
-      { path: 'company', loadComponent: () => import('@features/recruiter/pages/company/feature/company').then(m => m.RecruiterCompany) },
       { path: 'messages', loadComponent: () => import('@features/recruiter/pages/messages/feature/messages').then(m => m.RecruiterMessages) },
       { path: 'saved', loadComponent: () => import('@features/recruiter/pages/saved/feature/saved').then(m => m.RecruiterSaved) },
       { path: 'discover', loadComponent: () => import('@features/shared/feature/discover-users/discover-users').then(m => m.DiscoverUsers) },

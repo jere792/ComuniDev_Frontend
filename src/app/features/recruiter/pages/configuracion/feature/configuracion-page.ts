@@ -1,5 +1,5 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, ElementRef, ViewChild, inject, signal, OnInit } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { UserStore } from '@features/users/data-access/state/user.store';
 import { RECRUITER_PROFILE_REPOSITORY, RecruiterProfileRepository } from '@features/recruiter/pages/profile/domain/ports/recruiter-profile.repository';
@@ -8,6 +8,12 @@ import { ToastService } from '@core/services/toast.service';
 import { catchError, of } from 'rxjs';
 import { User } from '@core/domain/models/user.model';
 import { ConfigCategory } from '@features/recruiter/pages/configuracion/domain/models/config.models';
+import { CompanyStore } from '@features/recruiter/pages/company/data-access/state/company.store';
+import { Company } from '@features/recruiter/pages/company/domain/models/company.model';
+import { COUNTRIES, Country } from '@shared/constants/countries';
+import { SECTORS } from '@shared/constants/sectors';
+import { ImageEditorService } from '@core/services/image-editor.service';
+import { UploadService } from '@core/services/upload.service';
 
 @Component({
   selector: 'app-configuracion-page',
@@ -21,9 +27,23 @@ export class ConfiguracionPage implements OnInit {
   private userStore = inject(UserStore);
   private recruiterService = inject<RecruiterProfileRepository>(RECRUITER_PROFILE_REPOSITORY);
   private authStore = inject(AuthStore);
+  private companyStore = inject(CompanyStore);
+  private route = inject(ActivatedRoute);
+  private imageEditor = inject(ImageEditorService);
+  private uploadService = inject(UploadService);
+
+  @ViewChild('logoFileInput') logoFileInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('bannerFileInput') bannerFileInput?: ElementRef<HTMLInputElement>;
+
+  uploadingImage = signal(false);
 
   userData = signal<User | null>(null);
   profileId = signal<string | null>(null);
+  /** Empresa del reclutador; null si aún no creó ninguna. */
+  empresa = signal<Company | null>(null);
+
+  readonly countries: Country[] = COUNTRIES;
+  readonly sectors: string[] = SECTORS;
 
   activeSection = signal('perfil-personal');
   expandedCategory = signal<string | null>('perfil');
@@ -54,6 +74,15 @@ export class ConfiguracionPage implements OnInit {
         { id: 'cuenta-privacidad', icon: 'shield', label: 'Privacidad' },
         { id: 'cuenta-notificaciones', icon: 'notifications', label: 'Notificaciones' },
         { id: 'cuenta-terminos', icon: 'gavel', label: 'Términos y condiciones' },
+      ],
+    },
+    {
+      id: 'empresa',
+      icon: 'apartment',
+      label: 'Empresa',
+      subItems: [
+        { id: 'empresa-datos', icon: 'domain', label: 'Datos de la empresa' },
+        { id: 'empresa-estado', icon: 'verified', label: 'Estado y verificación' },
       ],
     },
   ];
@@ -117,9 +146,33 @@ export class ConfiguracionPage implements OnInit {
     candidatos: [true],
   });
 
+  empresaForm = this.fb.group({
+    nombre: [''],
+    sector: [''],
+    sitioWeb: [''],
+    descripcion: [''],
+    contactoEmail: [''],
+    contactoTelefono: [''],
+    pais: [''],
+    ciudad: [''],
+    distrito: [''],
+    direccion: [''],
+    linkedin: [''],
+    github: [''],
+    logoUrl: [''],
+    bannerUrl: [''],
+  });
+
   ngOnInit(): void {
     this.loadUserData();
     this.loadProfileData();
+    this.loadEmpresa();
+
+    // Permite llegar directo a una sección: /configuracion?section=empresa-datos
+    const section = this.route.snapshot.queryParamMap.get('section');
+    if (section) {
+      this.selectSubItem(section);
+    }
   }
 
   private getUserId(): string | null {
@@ -192,6 +245,143 @@ export class ConfiguracionPage implements OnInit {
     });
   }
 
+  private loadEmpresa(): void {
+    const recruiterId = this.getUserId();
+    if (!recruiterId) return;
+
+    this.companyStore.loadMyCompany(recruiterId).subscribe({
+      next: company => {
+        this.empresa.set(company);
+        if (company) {
+          this.empresaForm.patchValue({
+            nombre: company.nombre ?? '',
+            sector: company.sector ?? '',
+            sitioWeb: company.sitioWeb ?? '',
+            descripcion: company.descripcion ?? '',
+            contactoEmail: company.contacto?.email ?? '',
+            contactoTelefono: company.contacto?.telefono ?? '',
+            pais: company.ubicacion?.pais ?? '',
+            ciudad: company.ubicacion?.ciudad ?? '',
+            distrito: company.ubicacion?.distrito ?? '',
+            direccion: company.ubicacion?.direccion ?? '',
+            linkedin: company.redes?.linkedin ?? '',
+            github: company.redes?.github ?? '',
+            logoUrl: company.logoUrl ?? '',
+            bannerUrl: company.bannerUrl ?? '',
+          });
+        }
+      },
+      error: () => this.empresa.set(null),
+    });
+  }
+
+  saveEmpresa(): void {
+    const recruiterId = this.getUserId();
+    if (!recruiterId) return;
+
+    const v = this.empresaForm.value;
+    if (!v.nombre?.trim()) {
+      this.toast.error('La empresa necesita nombre');
+      return;
+    }
+    if (!v.contactoEmail?.trim()) {
+      this.toast.error('La empresa necesita correo de contacto');
+      return;
+    }
+    if (!v.pais?.trim()) {
+      this.toast.error('La empresa necesita país');
+      return;
+    }
+
+    this.companyStore
+      .save(recruiterId, this.empresa()?.id ?? null, {
+        nombre: v.nombre.trim(),
+        descripcion: v.descripcion?.trim() || undefined,
+        sector: v.sector?.trim() || undefined,
+        sitioWeb: v.sitioWeb?.trim() || undefined,
+        logoUrl: v.logoUrl?.trim() || undefined,
+        bannerUrl: v.bannerUrl?.trim() || undefined,
+        ubicacion: {
+          pais: v.pais.trim(),
+          ciudad: v.ciudad?.trim() ?? '',
+          distrito: v.distrito?.trim() ?? '',
+          direccion: v.direccion?.trim() ?? '',
+        },
+        contacto: {
+          email: v.contactoEmail.trim(),
+          telefono: v.contactoTelefono?.trim() ?? '',
+        },
+        redes: {
+          linkedin: v.linkedin?.trim() ?? '',
+          github: v.github?.trim() ?? '',
+        },
+      })
+      .subscribe({
+        next: () => this.toast.success('Empresa guardada'),
+        error: () => this.toast.error('No se pudo guardar la empresa'),
+      });
+  }
+
+  pickEmpresaImagen(campo: 'logoUrl' | 'bannerUrl'): void {
+    (campo === 'logoUrl' ? this.logoFileInput : this.bannerFileInput)?.nativeElement.click();
+  }
+
+  onEmpresaImagenSelected(event: Event, campo: 'logoUrl' | 'bannerUrl'): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (file) void this.uploadEmpresaImagen(file, campo);
+  }
+
+  /**
+   * Recorta con el editor compartido y sube al mismo endpoint que usa el
+   * perfil de usuario. El campo sigue guardando la URL resultante.
+   */
+  private async uploadEmpresaImagen(file: File, campo: 'logoUrl' | 'bannerUrl'): Promise<void> {
+    const esBanner = campo === 'bannerUrl';
+    const edited = await this.imageEditor.open(file, {
+      aspect: esBanner ? 16 / 9 : 1,
+      aspectLabel: esBanner ? '16:9 Banner' : '1:1 Logo',
+      maxSide: esBanner ? 1920 : 512,
+      title: esBanner ? 'Editar banner de la empresa' : 'Editar logo de la empresa',
+      quality: esBanner ? 0.85 : 0.9,
+    });
+    if (!edited) return;
+
+    this.uploadingImage.set(true);
+    this.uploadService.uploadFile(edited).subscribe({
+      next: res => {
+        this.empresaForm.get(campo)?.setValue(res.url);
+        this.uploadingImage.set(false);
+        this.toast.success(esBanner ? 'Banner actualizado' : 'Logo actualizado');
+      },
+      error: () => {
+        this.uploadingImage.set(false);
+        this.toast.error('No se pudo subir la imagen');
+      },
+    });
+  }
+
+  estadoEmpresaLabel(): string {
+    const estados: Record<string, string> = {
+      PENDIENTE: 'Pendiente de verificación',
+      VERIFICADA: 'Verificada',
+      RECHAZADA: 'Rechazada',
+    };
+    const estado = this.empresa()?.estadoVerificacion;
+    return estado ? (estados[estado] ?? estado) : '';
+  }
+
+  estadoEmpresaClass(): string {
+    const clases: Record<string, string> = {
+      PENDIENTE: 'pending',
+      VERIFICADA: 'verified',
+      RECHAZADA: 'rejected',
+    };
+    const estado = this.empresa()?.estadoVerificacion;
+    return estado ? (clases[estado] ?? '') : '';
+  }
+
   toggleCategory(id: string): void {
     if (this.expandedCategory() === id) {
       this.expandedCategory.set(null);
@@ -204,6 +394,9 @@ export class ConfiguracionPage implements OnInit {
     if (this.activeSection() === id) return;
     this.loading.set(true);
     this.activeSection.set(id);
+    // Al llegar por enlace directo (?section=) hay que abrir la categoría contenedora.
+    const parent = this.categories.find(cat => cat.subItems.some(sub => sub.id === id));
+    if (parent) this.expandedCategory.set(parent.id);
     setTimeout(() => this.loading.set(false), 300);
   }
 

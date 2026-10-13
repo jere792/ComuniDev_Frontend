@@ -31,10 +31,12 @@ export interface Company {
   vacantesActivasCount: number | null;
 }
 
-/** Lo mínimo que necesita el selector de empresas del formulario de oferta. */
+/** Lo mínimo que necesita quien junta empresas con otras entidades (ofertas, tarjetas). */
 export interface CompanyOption {
   id: string;
   nombre: string;
+  logoUrl: string | null;
+  sector: string | null;
 }
 
 /** Petición de `createCompany` / `updateCompany`: todos los campos son opcionales. */

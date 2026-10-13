@@ -37,6 +37,14 @@ const COMPANY_FIELDS = `
   vacantesActivasCount
 `;
 
+const COMPANY_BY_ID = gql`
+  query CompanyById($id: ID!) {
+    company(id: $id) {
+      ${COMPANY_FIELDS}
+    }
+  }
+`;
+
 const MY_COMPANY = gql`
   query MyCompany($recruiterId: String!) {
     myCompany(recruiterId: $recruiterId) {
@@ -50,6 +58,8 @@ const COMPANIES = gql`
     companies {
       id
       nombre
+      logoUrl
+      sector
     }
   }
 `;
@@ -181,6 +191,16 @@ export class CompanyGraphqlService implements CompanyRepository {
       .pipe(map(result => (result.data?.myCompany ? normalizeCompany(result.data.myCompany) : null)));
   }
 
+  companyById(id: string): Observable<Company | null> {
+    return this.apollo
+      .query<{ company: Record<string, unknown> | null }>({
+        query: COMPANY_BY_ID,
+        variables: { id },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map(result => (result.data?.company ? normalizeCompany(result.data.company) : null)));
+  }
+
   companies(): Observable<CompanyOption[]> {
     return this.apollo
       .query<{ companies: Array<Record<string, unknown>> | null }>({
@@ -192,6 +212,8 @@ export class CompanyGraphqlService implements CompanyRepository {
           (result.data?.companies ?? []).map(raw => ({
             id: String(raw['id'] ?? raw['_id'] ?? ''),
             nombre: String(raw['nombre'] ?? 'Sin nombre'),
+            logoUrl: asString(raw['logoUrl']),
+            sector: asString(raw['sector']),
           })),
         ),
       );

@@ -1,0 +1,148 @@
+<div class="company-page">
+  <button class="back-btn" type="button" (click)="goBack()">
+    <span class="material-symbols-outlined">arrow_back</span>
+  </button>
+
+  @if (loading()) {
+    <div class="state-box">Cargando empresa…</div>
+  } @else if (error()) {
+    <div class="state-box state-error">{{ error() }}</div>
+  } @else if (company(); as emp) {
+    @if (emp.bannerUrl) {
+      <div class="company-banner">
+        <img [src]="emp.bannerUrl" alt="" />
+      </div>
+    }
+
+    <header class="company-header">
+      <div class="company-avatar">
+        @if (emp.logoUrl) {
+          <img [src]="emp.logoUrl" [alt]="emp.nombre" />
+        } @else {
+          <span>{{ iniciales() }}</span>
+        }
+      </div>
+
+      <div class="company-head-text">
+        <div class="company-title-row">
+          <h1 class="company-name">{{ emp.nombre }}</h1>
+          @if (emp.estadoVerificacion === 'VERIFICADA') {
+            <span class="badge badge-verified">
+              <span class="material-symbols-outlined">verified</span>
+              Verificada
+            </span>
+          }
+        </div>
+
+        <div class="meta-row">
+          @if (emp.sector) {
+            <span class="meta-item">
+              <span class="material-symbols-outlined">category</span>
+              {{ emp.sector }}
+            </span>
+          }
+          @if (ubicacionTexto(); as ubicacion) {
+            <span class="meta-item">
+              <span class="material-symbols-outlined">location_on</span>
+              {{ ubicacion }}
+            </span>
+          }
+        </div>
+      </div>
+    </header>
+
+    @if (emp.descripcion) {
+      <section class="company-section">
+        <h2 class="section-title">Sobre la empresa</h2>
+        <p class="company-desc">{{ emp.descripcion }}</p>
+      </section>
+    }
+
+    <section class="company-section">
+      <h2 class="section-title">Contacto y enlaces</h2>
+      <div class="links-grid">
+        @if (emp.sitioWeb) {
+          <a class="link-item" [href]="emp.sitioWeb" target="_blank" rel="noopener">
+            <span class="material-symbols-outlined">language</span>
+            Sitio web
+          </a>
+        }
+        @if (emp.contacto?.email) {
+          <a class="link-item" [href]="'mailto:' + emp.contacto?.email">
+            <span class="material-symbols-outlined">mail</span>
+            {{ emp.contacto?.email }}
+          </a>
+        }
+        @if (emp.contacto?.telefono) {
+          <a class="link-item" [href]="'tel:' + emp.contacto?.telefono">
+            <span class="material-symbols-outlined">call</span>
+            {{ emp.contacto?.telefono }}
+          </a>
+        }
+        @if (emp.redes?.linkedin) {
+          <a class="link-item" [href]="emp.redes?.linkedin" target="_blank" rel="noopener">
+            <span class="material-symbols-outlined">work</span>
+            LinkedIn
+          </a>
+        }
+        @if (emp.redes?.github) {
+          <a class="link-item" [href]="emp.redes?.github" target="_blank" rel="noopener">
+            <span class="material-symbols-outlined">code</span>
+            GitHub
+          </a>
+        }
+      </div>
+    </section>
+
+    <section class="company-section">
+      <h2 class="section-title">Vacantes activas ({{ vacancies().length }})</h2>
+
+      @if (vacancies().length === 0) {
+        <p class="empty-note">Esta empresa no tiene vacantes publicadas por ahora.</p>
+      } @else {
+        <div class="vacancy-list">
+          @for (offer of vacancies(); track trackById($index, offer)) {
+            <div class="vacancy-card">
+              <h3 class="vacancy-title">{{ offer.titulo }}</h3>
+
+              <div class="meta-row">
+                @if (modalidadLabel(offer)) {
+                  <span class="meta-item">
+                    <span class="material-symbols-outlined">home_work</span>
+                    {{ modalidadLabel(offer) }}
+                  </span>
+                }
+                @if (contratoLabel(offer)) {
+                  <span class="meta-item">
+                    <span class="material-symbols-outlined">schedule</span>
+                    {{ contratoLabel(offer) }}
+                  </span>
+                }
+                @if (salario(offer)) {
+                  <span class="meta-item">
+                    <span class="material-symbols-outlined">payments</span>
+                    {{ salario(offer) }}
+                  </span>
+                }
+                @if (publicado(offer); as cuando) {
+                  <span class="meta-item">
+                    <span class="material-symbols-outlined">event</span>
+                    Publicada {{ cuando }}
+                  </span>
+                }
+              </div>
+
+              @if (offer.tecnologias.length) {
+                <div class="tech-chips">
+                  @for (tec of offer.tecnologias; track tec) {
+                    <span class="tech-chip">{{ tec }}</span>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </section>
+  }
+</div>

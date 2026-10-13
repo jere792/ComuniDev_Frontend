@@ -39,5 +39,11 @@ export const routes: Routes = [
     path: 'profile',
     loadChildren: () => import('@features/public/public.routes').then(m => m.routes),
   },
+  {
+    // Página pública de empresa: la ve cualquier visitante, no solo reclutadores.
+    path: 'company/:id',
+    loadComponent: () =>
+      import('@features/recruiter/pages/company/feature/company-public').then(m => m.CompanyPublic),
+  },
   { path: '**', redirectTo: '' },
 ];

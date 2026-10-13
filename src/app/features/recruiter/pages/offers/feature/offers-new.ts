@@ -68,7 +68,9 @@ export class RecruiterOffersNew implements OnInit {
   }
 
   goToCompany(): void {
-    this.router.navigate(['/recruiter/company']);
+    this.router.navigate(['/recruiter/profile/configuracion'], {
+      queryParams: { section: 'empresa-datos' },
+    });
   }
 
   submit(): void {

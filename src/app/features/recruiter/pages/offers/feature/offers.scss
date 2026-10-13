@@ -74,10 +74,58 @@
 }
 
 .offer-company {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+
+  &.clickable {
+    cursor: pointer;
+
+    .company-name:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.company-logo {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+
+// Fallback con iniciales, el mismo criterio que en el resto de la app.
+.company-logo-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-container);
+  color: var(--on-surface-variant);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.company-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.company-name {
   font-size: 14px;
-  color: var(--primary-container);
   font-weight: 500;
-  margin: 0 0 var(--space-md) 0;
+  color: var(--primary-container);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.company-sector {
+  font-size: 12px;
+  color: var(--on-surface-variant);
 }
 
 .offer-details {

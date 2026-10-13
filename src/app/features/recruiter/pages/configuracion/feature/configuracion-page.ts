@@ -81,6 +81,7 @@ export class ConfiguracionPage implements OnInit {
       label: 'Empresa',
       subItems: [
         { id: 'empresa-datos', icon: 'domain', label: 'Datos de la empresa' },
+        { id: 'empresa-redes', icon: 'public', label: 'Redes sociales' },
         { id: 'empresa-estado', icon: 'verified', label: 'Estado y verificación' },
       ],
     },
@@ -139,7 +140,6 @@ export class ConfiguracionPage implements OnInit {
   empresaForm = this.fb.group({
     nombre: [''],
     sector: [''],
-    sitioWeb: [''],
     descripcion: [''],
     ruc: [''],
     fechaCreacion: [''],
@@ -149,10 +149,17 @@ export class ConfiguracionPage implements OnInit {
     ciudad: [''],
     distrito: [''],
     direccion: [''],
-    linkedin: [''],
-    github: [''],
     logoUrl: [''],
     bannerUrl: [''],
+  });
+
+  /**
+   * Enlaces de la organización. Sin GitHub: una empresa no publica código,
+   * eso lo tiene el perfil del developer.
+   */
+  empresaRedesForm = this.fb.group({
+    sitioWeb: [''],
+    linkedin: [''],
   });
 
   ngOnInit(): void {
@@ -230,7 +237,6 @@ export class ConfiguracionPage implements OnInit {
           this.empresaForm.patchValue({
             nombre: company.nombre ?? '',
             sector: company.sector ?? '',
-            sitioWeb: company.sitioWeb ?? '',
             descripcion: company.descripcion ?? '',
             ruc: company.ruc ?? '',
             fechaCreacion: company.fechaCreacion ?? '',
@@ -240,10 +246,12 @@ export class ConfiguracionPage implements OnInit {
             ciudad: company.ubicacion?.ciudad ?? '',
             distrito: company.ubicacion?.distrito ?? '',
             direccion: company.ubicacion?.direccion ?? '',
-            linkedin: company.redes?.linkedin ?? '',
-            github: company.redes?.github ?? '',
             logoUrl: company.logoUrl ?? '',
             bannerUrl: company.bannerUrl ?? '',
+          });
+          this.empresaRedesForm.patchValue({
+            sitioWeb: company.sitioWeb ?? '',
+            linkedin: company.redes?.linkedin ?? '',
           });
         }
       },
@@ -252,6 +260,21 @@ export class ConfiguracionPage implements OnInit {
   }
 
   saveEmpresa(): void {
+    // Las redes no se tocan aquí: eso lo guarda su propia sección.
+    this.guardarEmpresa(this.empresa()?.sitioWeb ?? '', this.empresa()?.redes?.linkedin ?? '');
+  }
+
+  saveEmpresaRedes(): void {
+    const v = this.empresaRedesForm.value;
+    this.guardarEmpresa(v.sitioWeb?.trim() ?? '', v.linkedin?.trim() ?? '');
+  }
+
+  /**
+   * Guardado único de la empresa. El formulario de datos no envía las redes y
+   * el de redes no envía los datos; los dos pasan lo que no manejan, porque
+   * el backend reemplaza los campos que recibe y vaciaría los demás.
+   */
+  private guardarEmpresa(sitioWeb: string, linkedin: string): void {
     const recruiterId = this.getUserId();
     if (!recruiterId) return;
 
@@ -274,7 +297,7 @@ export class ConfiguracionPage implements OnInit {
         nombre: v.nombre.trim(),
         descripcion: v.descripcion?.trim() || undefined,
         sector: v.sector?.trim() || undefined,
-        sitioWeb: v.sitioWeb?.trim() || undefined,
+        sitioWeb: sitioWeb || undefined,
         logoUrl: v.logoUrl?.trim() || undefined,
         bannerUrl: v.bannerUrl?.trim() || undefined,
         ruc: v.ruc?.trim() || undefined,
@@ -289,10 +312,7 @@ export class ConfiguracionPage implements OnInit {
           email: v.contactoEmail.trim(),
           telefono: v.contactoTelefono?.trim() ?? '',
         },
-        redes: {
-          linkedin: v.linkedin?.trim() ?? '',
-          github: v.github?.trim() ?? '',
-        },
+        redes: { linkedin },
       })
       .subscribe({
         next: () => this.toast.success('Empresa guardada'),

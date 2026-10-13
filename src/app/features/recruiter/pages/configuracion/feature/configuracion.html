@@ -334,21 +334,14 @@
             <input class="form-input" type="text" formControlName="nombre" placeholder="Ej. DevSolutions Perú" />
           </div>
 
-          <div class="form-row">
-            <div class="form-group half">
-              <label class="form-label">Sector</label>
-              <select class="form-input form-select" formControlName="sector">
-                <option value="">Selecciona un sector…</option>
-                @for (sector of sectors; track sector) {
-                  <option [value]="sector">{{ sector }}</option>
-                }
-              </select>
-            </div>
-
-            <div class="form-group half">
-              <label class="form-label">Sitio web</label>
-              <input class="form-input" type="url" formControlName="sitioWeb" placeholder="https://" />
-            </div>
+          <div class="form-group">
+            <label class="form-label">Sector</label>
+            <select class="form-input form-select" formControlName="sector">
+              <option value="">Selecciona un sector…</option>
+              @for (sector of sectors; track sector) {
+                <option [value]="sector">{{ sector }}</option>
+              }
+            </select>
           </div>
 
           <div class="form-group">
@@ -412,18 +405,6 @@
 
           <div class="form-row">
             <div class="form-group half">
-              <label class="form-label">LinkedIn de la empresa</label>
-              <input class="form-input" type="url" formControlName="linkedin" placeholder="https://linkedin.com/company/..." />
-            </div>
-
-            <div class="form-group half">
-              <label class="form-label">GitHub de la empresa</label>
-              <input class="form-input" type="url" formControlName="github" placeholder="https://github.com/..." />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group half">
               <label class="form-label">Logo</label>
               <div class="upload-panel upload-cuadrado">
                 @if (empresaForm.value.logoUrl; as logo) {
@@ -461,6 +442,32 @@
 
         <div class="section-footer">
           <button class="btn-save" (click)="saveEmpresa()">Guardar cambios</button>
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'empresa-redes') {
+      <section class="config-section" [formGroup]="empresaRedesForm">
+        <h2 class="section-title">Redes sociales</h2>
+        <p class="section-desc">
+          Los enlaces públicos de la organización. Aquí no hay redes personales:
+          en este producto el reclutador es la empresa, así que todo lo público es de ella.
+        </p>
+
+        <div class="section-body">
+          <div class="form-group">
+            <label class="form-label">Sitio web</label>
+            <input class="form-input" type="url" formControlName="sitioWeb" placeholder="https://" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">LinkedIn</label>
+            <input class="form-input" type="url" formControlName="linkedin" placeholder="https://linkedin.com/company/..." />
+          </div>
+        </div>
+
+        <div class="section-footer">
+          <button class="btn-save" (click)="saveEmpresaRedes()">Guardar cambios</button>
         </div>
       </section>
     }

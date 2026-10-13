@@ -73,7 +73,7 @@ const GET_USER_BY_ID = gql`
         lema
         fechaCreacion
         modalidadTrabajo
-        redesSociales { linkedin instagram tiktok facebook }
+        redesSociales { instagram tiktok facebook }
         empresas { companyId cargoEnEmpresa activo }
         verificado
       }
@@ -122,7 +122,7 @@ const UPDATE_USER = gql`
         lema
         fechaCreacion
         modalidadTrabajo
-        redesSociales { linkedin instagram tiktok facebook }
+        redesSociales { instagram tiktok facebook }
         empresas { companyId cargoEnEmpresa activo }
         verificado
       }

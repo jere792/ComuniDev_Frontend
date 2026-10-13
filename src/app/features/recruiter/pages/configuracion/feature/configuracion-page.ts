@@ -61,7 +61,6 @@ export class ConfiguracionPage implements OnInit {
         { id: 'perfil-profesional', icon: 'work', label: 'Perfil profesional' },
         { id: 'perfil-redes', icon: 'public', label: 'Redes sociales' },
         { id: 'perfil-descripcion', icon: 'description', label: 'Descripción' },
-        { id: 'perfil-ubicacion', icon: 'location_on', label: 'Ubicación' },
       ],
     },
     {
@@ -106,9 +105,13 @@ export class ConfiguracionPage implements OnInit {
     fechaCreacion: [''],
   });
 
+  /**
+   * Sin LinkedIn: en este producto el reclutador es la empresa, y su LinkedIn
+   * vive en `companies.redes`, que se muestra en la página pública de la
+   * empresa. Aquí solo quedan las redes personales.
+   */
   redesForm = this.fb.group({
     sitioWeb: [''],
-    linkedin: [''],
     instagram: [''],
     tiktok: [''],
     facebook: [''],
@@ -116,15 +119,6 @@ export class ConfiguracionPage implements OnInit {
 
   descripcionForm = this.fb.group({
     bio: [''],
-  });
-
-  ubicacionForm = this.fb.group({
-    pais: ['Perú'],
-    departamento: [''],
-    provincia: [''],
-    ciudad: [''],
-    distrito: [''],
-    direccion: [''],
   });
 
   privacidadForm = this.fb.group({
@@ -198,16 +192,6 @@ export class ConfiguracionPage implements OnInit {
           this.redesForm.patchValue({
             sitioWeb: user.sitioWeb ?? '',
           } as any);
-          if (user.ubicacion) {
-            this.ubicacionForm.patchValue({
-              pais: user.ubicacion.pais ?? 'Perú',
-              departamento: user.ubicacion.departamento ?? '',
-              provincia: user.ubicacion.provincia ?? '',
-              ciudad: user.ubicacion.ciudad ?? '',
-              distrito: user.ubicacion.distrito ?? '',
-              direccion: user.ubicacion.direccion ?? '',
-            } as any);
-          }
         }
       },
       error: () => {
@@ -232,7 +216,6 @@ export class ConfiguracionPage implements OnInit {
             fechaCreacion: profile.fechaCreacion ?? '',
           } as any);
           this.redesForm.patchValue({
-            linkedin: profile.redesSociales?.linkedin ?? '',
             instagram: profile.redesSociales?.instagram ?? '',
             tiktok: profile.redesSociales?.tiktok ?? '',
             facebook: profile.redesSociales?.facebook ?? '',
@@ -477,8 +460,9 @@ export class ConfiguracionPage implements OnInit {
     if (!userId) return;
 
     const formValue = this.redesForm.value;
+    // Sin linkedin: el backend reemplaza el objeto completo, así que al no
+    // enviarlo se limpia el LinkedIn personal que pudiera quedar guardado.
     const redesPayload = {
-      linkedin: formValue.linkedin ?? undefined,
       instagram: formValue.instagram ?? undefined,
       tiktok: formValue.tiktok ?? undefined,
       facebook: formValue.facebook ?? undefined,
@@ -565,30 +549,6 @@ export class ConfiguracionPage implements OnInit {
       } else {
         this.toast.error('No se pudo guardar la bio');
       }
-    });
-  }
-
-  saveUbicacion(): void {
-    const userId = this.getUserId();
-    if (!userId) return;
-
-    const formValue = this.ubicacionForm.value;
-    this.userStore.update(userId, {
-      ubicacion: {
-        pais: formValue.pais ?? undefined,
-        departamento: formValue.departamento ?? undefined,
-        provincia: formValue.provincia ?? undefined,
-        ciudad: formValue.ciudad ?? undefined,
-        distrito: formValue.distrito ?? undefined,
-        direccion: formValue.direccion ?? undefined,
-      },
-    } as any).pipe(
-      catchError(err => {
-        this.handleError(err);
-        return of(null);
-      })
-    ).subscribe((result: any) => {
-      if (result) this.showSuccess();
     });
   }
 

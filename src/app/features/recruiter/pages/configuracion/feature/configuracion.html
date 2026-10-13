@@ -118,15 +118,14 @@
     @if (activeSection() === 'perfil-redes') {
       <section class="config-section" [formGroup]="redesForm">
         <h2 class="section-title">Redes sociales</h2>
-        <p class="section-desc">Conecta tus perfiles externos</p>
+        <p class="section-desc">
+          Tus perfiles personales, los que se muestran en tu perfil público. Si lo que buscas
+          son los enlaces de tu empresa, están en <strong>Empresa → Datos de la empresa</strong>.
+        </p>
         <div class="section-body">
           <div class="form-group">
             <label class="form-label">Sitio web / Portafolio</label>
             <input class="form-input" type="url" formControlName="sitioWeb" placeholder="https://tusitio.com.pe" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">LinkedIn</label>
-            <input class="form-input" type="url" formControlName="linkedin" placeholder="https://linkedin.com/in/tu-perfil" />
           </div>
           <div class="form-group">
             <label class="form-label">Instagram</label>
@@ -166,69 +165,6 @@
               Guardar cambios
             }
           </button>
-        </div>
-      </section>
-    }
-
-    @if (activeSection() === 'perfil-ubicacion') {
-      <section class="config-section" [formGroup]="ubicacionForm">
-        <h2 class="section-title">Ubicación</h2>
-        <p class="section-desc">Tu ubicación actual en el Perú</p>
-        <div class="section-body">
-          <div class="form-group">
-            <label class="form-label">País</label>
-            <input class="form-input" type="text" formControlName="pais" readonly />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Departamento</label>
-            <select class="form-input form-select" formControlName="departamento">
-              <option value="">Selecciona un departamento</option>
-              <option value="Amazonas">Amazonas</option>
-              <option value="Ancash">Áncash</option>
-              <option value="Apurimac">Apurímac</option>
-              <option value="Arequipa">Arequipa</option>
-              <option value="Ayacucho">Ayacucho</option>
-              <option value="Cajamarca">Cajamarca</option>
-              <option value="Callao">Callao</option>
-              <option value="Cusco">Cusco</option>
-              <option value="Huancavelica">Huancavelica</option>
-              <option value="Huanuco">Huánuco</option>
-              <option value="Ica">Ica</option>
-              <option value="Junin">Junín</option>
-              <option value="La Libertad">La Libertad</option>
-              <option value="Lambayeque">Lambayeque</option>
-              <option value="Lima">Lima</option>
-              <option value="Loreto">Loreto</option>
-              <option value="Madre de Dios">Madre de Dios</option>
-              <option value="Moquegua">Moquegua</option>
-              <option value="Pasco">Pasco</option>
-              <option value="Piura">Piura</option>
-              <option value="Puno">Puno</option>
-              <option value="San Martin">San Martín</option>
-              <option value="Tacna">Tacna</option>
-              <option value="Tumbes">Tumbes</option>
-              <option value="Ucayali">Ucayali</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Provincia</label>
-            <input class="form-input" type="text" formControlName="provincia" placeholder="Ej: Lima, Arequipa, Trujillo..." />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Ciudad / Distrito</label>
-            <input class="form-input" type="text" formControlName="ciudad" placeholder="Ej: Miraflores, San Isidro, Surco..." />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Distrito / Zona / Localidad</label>
-            <input class="form-input" type="text" formControlName="distrito" placeholder="Ej: Corpac, La Molina, Barranco..." />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Dirección</label>
-            <input class="form-input" type="text" formControlName="direccion" placeholder="Ej: Av. Javier Prado Este 4200, San Isidro" />
-          </div>
-        </div>
-        <div class="section-footer">
-          <button class="btn-save" (click)="saveUbicacion()">Guardar cambios</button>
         </div>
       </section>
     }
@@ -476,19 +412,21 @@
             </div>
 
             <div class="form-group half">
-              <label class="form-label">Dirección</label>
+              <label class="form-label">Dirección de la empresa</label>
               <input class="form-input" type="text" formControlName="direccion" placeholder="Av. Ejemplo 123" />
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">LinkedIn</label>
-            <input class="form-input" type="url" formControlName="linkedin" placeholder="https://linkedin.com/company/..." />
-          </div>
+          <div class="form-row">
+            <div class="form-group half">
+              <label class="form-label">LinkedIn de la empresa</label>
+              <input class="form-input" type="url" formControlName="linkedin" placeholder="https://linkedin.com/company/..." />
+            </div>
 
-          <div class="form-group">
-            <label class="form-label">GitHub</label>
-            <input class="form-input" type="url" formControlName="github" placeholder="https://github.com/..." />
+            <div class="form-group half">
+              <label class="form-label">GitHub de la empresa</label>
+              <input class="form-input" type="url" formControlName="github" placeholder="https://github.com/..." />
+            </div>
           </div>
 
           <div class="form-row">

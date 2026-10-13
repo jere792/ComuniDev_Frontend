@@ -203,9 +203,6 @@
           <div class="detail-section">
             <span class="detail-label">Redes sociales</span>
             <div class="links-container">
-              @if (user()?.recruiterProfile?.redesSociales?.linkedin) {
-                <a href="{{ user()?.recruiterProfile?.redesSociales?.linkedin }}" target="_blank" class="link-item">LinkedIn</a>
-              }
               @if (user()?.recruiterProfile?.redesSociales?.instagram) {
                 <a href="{{ user()?.recruiterProfile?.redesSociales?.instagram }}" target="_blank" class="link-item">Instagram</a>
               }

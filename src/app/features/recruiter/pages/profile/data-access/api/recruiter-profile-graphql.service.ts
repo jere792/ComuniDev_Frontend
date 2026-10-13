@@ -20,7 +20,7 @@ const GET_RECRUITER_PROFILE_BY_USER = gql`
       empresasDescripcion
       fechaCreacion
       modalidadTrabajo
-      redesSociales { linkedin instagram tiktok facebook }
+      redesSociales { instagram tiktok facebook }
       empresas { companyId cargoEnEmpresa activo }
       verificado
     }
@@ -56,7 +56,7 @@ const CREATE_RECRUITER_PROFILE = gql`
       empresasDescripcion
       fechaCreacion
       modalidadTrabajo
-      redesSociales { linkedin instagram tiktok facebook }
+      redesSociales { instagram tiktok facebook }
     }
   }
 `;
@@ -90,7 +90,7 @@ const UPDATE_RECRUITER_PROFILE = gql`
       empresasDescripcion
       fechaCreacion
       modalidadTrabajo
-      redesSociales { linkedin instagram tiktok facebook }
+      redesSociales { instagram tiktok facebook }
     }
   }
 `;

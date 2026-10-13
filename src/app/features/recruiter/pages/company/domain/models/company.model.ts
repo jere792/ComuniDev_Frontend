@@ -12,7 +12,6 @@ export interface CompanyContacto {
 
 export interface CompanyRedes {
   linkedin: string | null;
-  github: string | null;
 }
 
 /** Empresa que administra el reclutador (schema `Company`). */

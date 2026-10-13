@@ -33,7 +33,6 @@ const COMPANY_FIELDS = `
   }
   redes {
     linkedin
-    github
   }
   estadoVerificacion
   vacantesActivasCount
@@ -166,7 +165,6 @@ function normalizeRedes(value: unknown): CompanyRedes | null {
   if (!raw) return null;
   return {
     linkedin: asString(raw['linkedin']),
-    github: asString(raw['github']),
   };
 }
 
@@ -278,7 +276,6 @@ export class CompanyGraphqlService implements CompanyRepository {
       },
       redes: {
         linkedin: empty(input.redes?.linkedin),
-        github: empty(input.redes?.github),
       },
     };
   }

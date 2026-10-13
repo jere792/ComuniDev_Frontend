@@ -19,6 +19,8 @@ const COMPANY_FIELDS = `
   sitioWeb
   logoUrl
   bannerUrl
+  ruc
+  fechaCreacion
   ubicacion {
     pais
     ciudad
@@ -73,6 +75,8 @@ const CREATE_COMPANY = gql`
     $sitioWeb: String
     $logoUrl: String
     $bannerUrl: String
+    $ruc: String
+    $fechaCreacion: String
     $ubicacion: CompanyUbicacionInput
     $contacto: CompanyContactoInput
     $redes: CompanyRedesInput
@@ -85,6 +89,8 @@ const CREATE_COMPANY = gql`
       sitioWeb: $sitioWeb
       logoUrl: $logoUrl
       bannerUrl: $bannerUrl
+      ruc: $ruc
+      fechaCreacion: $fechaCreacion
       ubicacion: $ubicacion
       contacto: $contacto
       redes: $redes
@@ -103,6 +109,8 @@ const UPDATE_COMPANY = gql`
     $sitioWeb: String
     $logoUrl: String
     $bannerUrl: String
+    $ruc: String
+    $fechaCreacion: String
     $ubicacion: CompanyUbicacionInput
     $contacto: CompanyContactoInput
     $redes: CompanyRedesInput
@@ -115,6 +123,8 @@ const UPDATE_COMPANY = gql`
       sitioWeb: $sitioWeb
       logoUrl: $logoUrl
       bannerUrl: $bannerUrl
+      ruc: $ruc
+      fechaCreacion: $fechaCreacion
       ubicacion: $ubicacion
       contacto: $contacto
       redes: $redes
@@ -169,6 +179,8 @@ function normalizeCompany(raw: Record<string, unknown>): Company {
     sitioWeb: asString(raw['sitioWeb']),
     logoUrl: asString(raw['logoUrl']),
     bannerUrl: asString(raw['bannerUrl']),
+    ruc: asString(raw['ruc']),
+    fechaCreacion: asString(raw['fechaCreacion']),
     ubicacion: normalizeUbicacion(raw['ubicacion']),
     contacto: normalizeContacto(raw['contacto']),
     redes: normalizeRedes(raw['redes']),
@@ -252,6 +264,8 @@ export class CompanyGraphqlService implements CompanyRepository {
       sitioWeb: empty(input.sitioWeb),
       logoUrl: empty(input.logoUrl),
       bannerUrl: empty(input.bannerUrl),
+      ruc: empty(input.ruc),
+      fechaCreacion: empty(input.fechaCreacion),
       ubicacion: {
         pais: empty(input.ubicacion?.pais),
         ciudad: empty(input.ubicacion?.ciudad),

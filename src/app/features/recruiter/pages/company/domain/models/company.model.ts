@@ -24,6 +24,9 @@ export interface Company {
   sitioWeb: string | null;
   logoUrl: string | null;
   bannerUrl: string | null;
+  /** Datos legales de la organización; antes vivían en recruiter_profiles. */
+  ruc: string | null;
+  fechaCreacion: string | null;
   ubicacion: CompanyUbicacion | null;
   contacto: CompanyContacto | null;
   redes: CompanyRedes | null;
@@ -47,6 +50,8 @@ export interface CompanyInput {
   sitioWeb?: string;
   logoUrl?: string;
   bannerUrl?: string;
+  ruc?: string;
+  fechaCreacion?: string;
   ubicacion?: CompanyUbicacion;
   contacto?: CompanyContacto;
   redes?: CompanyRedes;

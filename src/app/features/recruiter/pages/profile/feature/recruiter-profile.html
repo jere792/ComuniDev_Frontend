@@ -27,9 +27,8 @@
 
       <app-recruiter-contact-info
         [user]="user()"
-        [profile]="profile"
-        (editBasic)="toggleEditBasic()"
-        (editProfile)="toggleEditProfile()"
+        [empresa]="empresa()"
+        (editEmpresa)="goToEmpresa()"
       />
 
       <app-recruiter-companies-card
@@ -113,8 +112,8 @@
             </div>
             <span class="social-name">Sitio web</span>
           </div>
-          @if (user()?.sitioWeb) {
-            <a [href]="user()?.sitioWeb" target="_blank" class="social-handle">{{ user()?.sitioWeb | slice:0:35 }}...</a>
+          @if (empresa()?.sitioWeb) {
+            <a [href]="empresa()?.sitioWeb" target="_blank" class="social-handle">{{ empresa()?.sitioWeb | slice:0:35 }}...</a>
           } @else {
             <span class="social-handle empty">—</span>
           }

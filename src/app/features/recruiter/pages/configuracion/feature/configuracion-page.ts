@@ -94,24 +94,20 @@ export class ConfiguracionPage implements OnInit {
   perfilForm = this.fb.group({
     nombre: [''],
     email: [''],
-    telefono: [''],
-  });
-
-  profesionalForm = this.fb.group({
-    especializacion: [''],
-    lema: [''],
-    empresas: [''],
-    ruc: [''],
-    fechaCreacion: [''],
   });
 
   /**
-   * Sin LinkedIn: en este producto el reclutador es la empresa, y su LinkedIn
-   * vive en `companies.redes`, que se muestra en la página pública de la
-   * empresa. Aquí solo quedan las redes personales.
+   * Sin teléfono, sitio web, RUC, fecha de creación ni "Empresas": son datos
+   * de la organización y viven en Company. Al ser reclutador = empresa, el
+   * perfil personal solo conserva lo que es de la persona.
    */
+  profesionalForm = this.fb.group({
+    especializacion: [''],
+    lema: [''],
+  });
+
+  /** Igual que con LinkedIn: las redes de la empresa van en Empresa. */
   redesForm = this.fb.group({
-    sitioWeb: [''],
     instagram: [''],
     tiktok: [''],
     facebook: [''],
@@ -145,6 +141,8 @@ export class ConfiguracionPage implements OnInit {
     sector: [''],
     sitioWeb: [''],
     descripcion: [''],
+    ruc: [''],
+    fechaCreacion: [''],
     contactoEmail: [''],
     contactoTelefono: [''],
     pais: [''],
@@ -184,13 +182,9 @@ export class ConfiguracionPage implements OnInit {
           this.perfilForm.patchValue({
             nombre: user.nombre ?? '',
             email: user.email ?? '',
-            telefono: user.telefono ?? '',
           } as any);
           this.descripcionForm.patchValue({
             bio: user.bio ?? '',
-          } as any);
-          this.redesForm.patchValue({
-            sitioWeb: user.sitioWeb ?? '',
           } as any);
         }
       },
@@ -211,9 +205,6 @@ export class ConfiguracionPage implements OnInit {
           this.profesionalForm.patchValue({
             especializacion: profile.cargo ?? '',
             lema: profile.lema ?? '',
-            empresas: profile.empresasDescripcion ?? '',
-            ruc: profile.ruc ?? '',
-            fechaCreacion: profile.fechaCreacion ?? '',
           } as any);
           this.redesForm.patchValue({
             instagram: profile.redesSociales?.instagram ?? '',
@@ -241,6 +232,8 @@ export class ConfiguracionPage implements OnInit {
             sector: company.sector ?? '',
             sitioWeb: company.sitioWeb ?? '',
             descripcion: company.descripcion ?? '',
+            ruc: company.ruc ?? '',
+            fechaCreacion: company.fechaCreacion ?? '',
             contactoEmail: company.contacto?.email ?? '',
             contactoTelefono: company.contacto?.telefono ?? '',
             pais: company.ubicacion?.pais ?? '',
@@ -284,6 +277,8 @@ export class ConfiguracionPage implements OnInit {
         sitioWeb: v.sitioWeb?.trim() || undefined,
         logoUrl: v.logoUrl?.trim() || undefined,
         bannerUrl: v.bannerUrl?.trim() || undefined,
+        ruc: v.ruc?.trim() || undefined,
+        fechaCreacion: v.fechaCreacion?.trim() || undefined,
         ubicacion: {
           pais: v.pais.trim(),
           ciudad: v.ciudad?.trim() ?? '',
@@ -401,7 +396,6 @@ export class ConfiguracionPage implements OnInit {
     this.userStore.update(userId, {
       nombre: formValue.nombre ?? undefined,
       email: formValue.email ?? undefined,
-      telefono: formValue.telefono ?? undefined,
     } as any).pipe(
       catchError(err => {
         this.handleError(err);
@@ -420,9 +414,6 @@ export class ConfiguracionPage implements OnInit {
     const payload = {
       cargo: formValue.especializacion ?? undefined,
       lema: formValue.lema ?? undefined,
-      empresasDescripcion: formValue.empresas ?? undefined,
-      ruc: formValue.ruc ?? undefined,
-      fechaCreacion: formValue.fechaCreacion ?? undefined,
     };
 
     const profileId = this.profileId();
@@ -468,48 +459,35 @@ export class ConfiguracionPage implements OnInit {
       facebook: formValue.facebook ?? undefined,
     };
 
-    // Guardar sitioWeb en User
-    this.userStore.update(userId, {
-      sitioWeb: formValue.sitioWeb ?? undefined,
-    } as any).pipe(
-      catchError(err => {
-        this.handleError(err);
-        return of(null);
-      })
-    ).subscribe((userResult: any) => {
-      if (!userResult) return;
-
-      // Guardar redes sociales en RecruiterProfile
-      const profileId = this.profileId();
-      if (profileId) {
-        this.recruiterService.update(profileId, {
-          redesSociales: redesPayload,
-        } as any).pipe(
-          catchError(err => {
-            this.handleError(err);
-            return of(null);
-          })
-        ).subscribe((profileResult: any) => {
-          if (profileResult || userResult) this.showSuccess();
-        });
-      } else {
-        // Crear perfil si no existe, incluyendo las redes sociales
-        this.recruiterService.create({
-          userId,
-          redesSociales: redesPayload,
-        } as any).pipe(
-          catchError(err => {
-            this.handleError(err);
-            return of(null);
-          })
-        ).subscribe((profileResult: any) => {
-          if (profileResult) {
-            this.profileId.set(profileResult.id);
-            this.showSuccess();
-          }
-        });
-      }
-    });
+    const profileId = this.profileId();
+    if (profileId) {
+      this.recruiterService.update(profileId, {
+        redesSociales: redesPayload,
+      } as any).pipe(
+        catchError(err => {
+          this.handleError(err);
+          return of(null);
+        })
+      ).subscribe((result: any) => {
+        if (result) this.showSuccess();
+      });
+    } else {
+      // Crear perfil si no existe, incluyendo las redes sociales
+      this.recruiterService.create({
+        userId,
+        redesSociales: redesPayload,
+      } as any).pipe(
+        catchError(err => {
+          this.handleError(err);
+          return of(null);
+        })
+      ).subscribe((profileResult: any) => {
+        if (profileResult) {
+          this.profileId.set(profileResult.id);
+          this.showSuccess();
+        }
+      });
+    }
   }
 
   savingBio = signal(false);

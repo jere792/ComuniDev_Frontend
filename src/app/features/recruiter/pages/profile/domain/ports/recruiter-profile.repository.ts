@@ -11,22 +11,16 @@ export interface RecruiterProfileRepository {
 export interface CreateRecruiterProfileRequest {
   userId: string;
   cargo?: string;
-  ruc?: string;
   lema?: string;
-  empresasDescripcion?: string;
-  fechaCreacion?: string;
   modalidadTrabajo?: string;
-  redesSociales?: { linkedin?: string; instagram?: string; tiktok?: string; facebook?: string };
+  redesSociales?: { instagram?: string; tiktok?: string; facebook?: string };
 }
 
 export interface UpdateRecruiterProfileRequest {
   cargo?: string;
-  ruc?: string;
   lema?: string;
-  empresasDescripcion?: string;
-  fechaCreacion?: string;
   modalidadTrabajo?: string;
-  redesSociales?: { linkedin?: string; instagram?: string; tiktok?: string; facebook?: string };
+  redesSociales?: { instagram?: string; tiktok?: string; facebook?: string };
 }
 
 export const RECRUITER_PROFILE_REPOSITORY = new InjectionToken<RecruiterProfileRepository>('RecruiterProfileRepository');

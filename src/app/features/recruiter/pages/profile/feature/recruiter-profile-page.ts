@@ -1,10 +1,12 @@
 import { Component, OnInit, signal, computed, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { User, RecruiterProfile } from '@core/domain/models/user.model';
 import { RecruiterProfileStore } from '@features/recruiter/pages/profile/data-access/state/recruiter-profile.store';
 import { UserStore } from '@features/users/data-access/state/user.store';
+import { CompanyStore } from '@features/recruiter/pages/company/data-access/state/company.store';
+import { Company } from '@features/recruiter/pages/company/domain/models/company.model';
 import { ToastService } from '@core/services/toast.service';
 import { ImageEditorService } from '@core/services/image-editor.service';
 import { RecruiterProfileCard } from '@features/recruiter/pages/profile/ui/profile-card/recruiter-profile-card';
@@ -41,9 +43,17 @@ export class RecruiterProfilePage implements OnInit {
   private fb = inject(FormBuilder);
   private store = inject(RecruiterProfileStore);
   private userStore = inject(UserStore);
+  private router = inject(Router);
+  private companyStore = inject(CompanyStore);
+
+  /**
+   * La empresa del reclutador. En este producto el reclutador es la empresa,
+   * así que los datos de contacto, el RUC y la fecha salen de aquí y no del
+   * perfil personal.
+   */
+  empresa = signal<Company | null>(null);
 
   user = signal<User | null>(null);
-  isEditingBasic = signal(false);
   isEditingProfile = signal(false);
   uploadingImage = signal(false);
   socialModalOpen = signal(false);
@@ -61,26 +71,16 @@ export class RecruiterProfilePage implements OnInit {
   classificationOpenCreate = signal(false);
   classificationEditId = signal<string | null>(null);
 
-  basicForm: FormGroup;
   profileForm: FormGroup;
 
   private toast = inject(ToastService);
   private imageEditor = inject(ImageEditorService);
 
   constructor() {
-    this.basicForm = this.fb.group({
-      nombre: [''],
-      nombreUsuario: [''],
-      email: [''],
-    });
-
     this.profileForm = this.fb.group({
       cargo: [''],
-      ruc: [''],
       lema: [''],
-      fechaCreacion: [''],
       modalidadTrabajo: [''],
-      linkedin: [''],
       instagram: [''],
       tiktok: [''],
       facebook: [''],
@@ -106,6 +106,17 @@ export class RecruiterProfilePage implements OnInit {
 
   ngOnInit(): void {
     this.loadUser();
+    this.loadCompany();
+  }
+
+  private loadCompany(): void {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    this.companyStore.loadMyCompany(userId).subscribe({
+      next: company => this.empresa.set(company),
+      error: () => this.empresa.set(null),
+    });
   }
 
   loadUser(): void {
@@ -126,45 +137,23 @@ export class RecruiterProfilePage implements OnInit {
   populateProfileForm(profile: RecruiterProfile): void {
     this.profileForm.patchValue({
       cargo: profile.cargo || '',
-      ruc: profile.ruc || '',
       lema: profile.lema || '',
-      empresasDescripcion: profile.empresasDescripcion || '',
-      fechaCreacion: profile.fechaCreacion || '',
       modalidadTrabajo: profile.modalidadTrabajo || '',
-      linkedin: profile.redesSociales?.linkedin || '',
       instagram: profile.redesSociales?.instagram || '',
       tiktok: profile.redesSociales?.tiktok || '',
       facebook: profile.redesSociales?.facebook || '',
     });
   }
 
-  toggleEditBasic(): void {
-    this.isEditingBasic.update(v => !v);
-    if (this.isEditingBasic() && this.user()) {
-      const u = this.user()!;
-      this.basicForm.patchValue({
-        nombre: u.nombre,
-        nombreUsuario: u.nombreUsuario,
-        email: u.email,
-      });
-    }
+  /** Estos datos viven en Configuración → Empresa. */
+  goToEmpresa(): void {
+    this.router.navigate(['/recruiter/profile/configuracion'], {
+      queryParams: { section: 'empresa-datos' },
+    });
   }
 
   toggleEditProfile(): void {
     this.isEditingProfile.update(v => !v);
-  }
-
-  onSubmitBasic(): void {
-    if (this.basicForm.valid && this.user()) {
-      this.userStore.update(this.user()!.id, this.basicForm.value).subscribe({
-        next: (updatedUser: User) => {
-          this.user.set(updatedUser);
-          localStorage.setItem('userName', updatedUser.nombre);
-          this.isEditingBasic.set(false);
-          this.toast.success('Datos básicos actualizados');
-        },
-      });
-    }
   }
 
   onSubmitProfile(): void {
@@ -174,12 +163,9 @@ export class RecruiterProfilePage implements OnInit {
     const formValue = this.profileForm.value;
     const profileData = {
       cargo: formValue.cargo,
-      ruc: formValue.ruc,
       lema: formValue.lema,
-      fechaCreacion: formValue.fechaCreacion || undefined,
       modalidadTrabajo: formValue.modalidadTrabajo,
       redesSociales: {
-        linkedin: formValue.linkedin,
         instagram: formValue.instagram,
         tiktok: formValue.tiktok,
         facebook: formValue.facebook,

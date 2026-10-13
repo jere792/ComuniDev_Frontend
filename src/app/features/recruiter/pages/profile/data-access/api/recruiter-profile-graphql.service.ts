@@ -15,10 +15,7 @@ const GET_RECRUITER_PROFILE_BY_USER = gql`
       id
       userId
       cargo
-      ruc
       lema
-      empresasDescripcion
-      fechaCreacion
       modalidadTrabajo
       redesSociales { instagram tiktok facebook }
       empresas { companyId cargoEnEmpresa activo }
@@ -31,30 +28,21 @@ const CREATE_RECRUITER_PROFILE = gql`
   mutation CreateRecruiterProfile(
     $userId: String!
     $cargo: String
-    $ruc: String
     $lema: String
-    $empresasDescripcion: String
-    $fechaCreacion: String
     $modalidadTrabajo: ModalidadTrabajo
     $redesSociales: RedesSocialesInput
   ) {
     createRecruiterProfile(
       userId: $userId
       cargo: $cargo
-      ruc: $ruc
       lema: $lema
-      empresasDescripcion: $empresasDescripcion
-      fechaCreacion: $fechaCreacion
       modalidadTrabajo: $modalidadTrabajo
       redesSociales: $redesSociales
     ) {
       id
       userId
       cargo
-      ruc
       lema
-      empresasDescripcion
-      fechaCreacion
       modalidadTrabajo
       redesSociales { instagram tiktok facebook }
     }
@@ -65,30 +53,21 @@ const UPDATE_RECRUITER_PROFILE = gql`
   mutation UpdateRecruiterProfile(
     $id: ID!
     $cargo: String
-    $ruc: String
     $lema: String
-    $empresasDescripcion: String
-    $fechaCreacion: String
     $modalidadTrabajo: ModalidadTrabajo
     $redesSociales: RedesSocialesInput
   ) {
     updateRecruiterProfile(
       id: $id
       cargo: $cargo
-      ruc: $ruc
       lema: $lema
-      empresasDescripcion: $empresasDescripcion
-      fechaCreacion: $fechaCreacion
       modalidadTrabajo: $modalidadTrabajo
       redesSociales: $redesSociales
     ) {
       id
       userId
       cargo
-      ruc
       lema
-      empresasDescripcion
-      fechaCreacion
       modalidadTrabajo
       redesSociales { instagram tiktok facebook }
     }

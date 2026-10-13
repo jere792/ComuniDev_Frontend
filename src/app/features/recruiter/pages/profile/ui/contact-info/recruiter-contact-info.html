@@ -5,8 +5,8 @@
         <span class="material-symbols-outlined">contact_page</span>
       </div>
       <div>
-        <h2 class="card-title">Información del Reclutador</h2>
-        <p class="card-subtitle">Ficha técnica y credenciales de contacto</p>
+        <h2 class="card-title">Datos de contacto</h2>
+        <p class="card-subtitle">Tu cuenta y la empresa que publica</p>
       </div>
     </div>
   </div>
@@ -14,45 +14,65 @@
   <div class="contact-list">
     <div class="contact-row">
       <span class="material-symbols-outlined">mail</span>
-      <span class="contact-label">Correo Electrónico</span>
+      <span class="contact-label">Correo de la cuenta</span>
       <span class="contact-value">{{ user?.email }}</span>
     </div>
 
-    <div class="contact-row clickable" (click)="editBasic.emit()">
+    <div class="contact-row clickable" (click)="editEmpresa.emit()">
+      <span class="material-symbols-outlined">apartment</span>
+      <span class="contact-label">Empresa</span>
+      @if (empresa) {
+        <span class="contact-value">{{ empresa?.nombre }}</span>
+      } @else {
+        <span class="contact-value add-field">+ Crear empresa</span>
+      }
+    </div>
+
+    <div class="contact-row clickable" (click)="editEmpresa.emit()">
+      <span class="material-symbols-outlined">mail</span>
+      <span class="contact-label">Correo de contacto</span>
+      @if (empresa?.contacto?.email) {
+        <span class="contact-value">{{ empresa?.contacto?.email }}</span>
+      } @else {
+        <span class="contact-value add-field">+ Agregar correo</span>
+      }
+    </div>
+
+    <div class="contact-row clickable" (click)="editEmpresa.emit()">
       <span class="material-symbols-outlined">phone</span>
-      <span class="contact-label">Teléfono / WhatsApp</span>
-      @if (user?.telefono) {
-        <span class="contact-value">{{ user?.telefono }}</span>
+      <span class="contact-label">Teléfono</span>
+      @if (empresa?.contacto?.telefono) {
+        <span class="contact-value">{{ empresa?.contacto?.telefono }}</span>
       } @else {
         <span class="contact-value add-field">+ Agregar teléfono</span>
       }
     </div>
 
-    <div class="contact-row clickable" (click)="editBasic.emit()">
+    <div class="contact-row clickable" (click)="editEmpresa.emit()">
       <span class="material-symbols-outlined">location_on</span>
-      <span class="contact-label">Sede Operativa</span>
-      @if (user?.ubicacion?.distrito) {
-        <span class="contact-value">{{ user?.ubicacion?.distrito }}, {{ user?.ubicacion?.ciudad }}, {{ user?.ubicacion?.pais }}</span>
+      <span class="contact-label">Ubicación</span>
+      @if (empresa?.ubicacion?.ciudad) {
+        <span class="contact-value">{{ empresa?.ubicacion?.ciudad }}, {{ empresa?.ubicacion?.pais }}</span>
       } @else {
         <span class="contact-value add-field">+ Agregar ubicación</span>
       }
     </div>
 
-    <div class="contact-row clickable" (click)="editProfile.emit()">
+    <div class="contact-row clickable" (click)="editEmpresa.emit()">
       <span class="material-symbols-outlined">badge</span>
-      <span class="contact-label">Registro Fiscal (RUC)</span>
-      @if (profile?.ruc) {
-        <span class="contact-value">{{ profile?.ruc }}</span>
+      <span class="contact-label">Registro fiscal (RUC)</span>
+      @if (empresa?.ruc) {
+        <span class="contact-value">{{ empresa?.ruc }}</span>
       } @else {
         <span class="contact-value add-field">+ Agregar RUC</span>
       }
     </div>
 
-    <div class="contact-row clickable" (click)="editProfile.emit()">
+    <div class="contact-row clickable" (click)="editEmpresa.emit()">
       <span class="material-symbols-outlined">calendar_today</span>
-      <span class="contact-label">Trayectoria</span>
-      @if (profile?.fechaCreacion) {
-        <span class="contact-value">Miembro desde {{ profile?.fechaCreacion }}</span>
+      <span class="contact-label">Fecha de fundación</span>
+      @if (empresa?.fechaCreacion) {
+        <span class="contact-value">{{ empresa?.fechaCreacion }}</span>
       } @else {
         <span class="contact-value add-field">+ Agregar año</span>
       }

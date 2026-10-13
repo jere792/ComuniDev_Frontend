@@ -69,9 +69,7 @@ const GET_USER_BY_ID = gql`
       recruiterProfile {
         id
         cargo
-        ruc
         lema
-        fechaCreacion
         modalidadTrabajo
         redesSociales { instagram tiktok facebook }
         empresas { companyId cargoEnEmpresa activo }
@@ -118,9 +116,7 @@ const UPDATE_USER = gql`
       recruiterProfile {
         id
         cargo
-        ruc
         lema
-        fechaCreacion
         modalidadTrabajo
         redesSociales { instagram tiktok facebook }
         empresas { companyId cargoEnEmpresa activo }

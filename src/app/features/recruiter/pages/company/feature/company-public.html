@@ -47,6 +47,18 @@
               {{ ubicacion }}
             </span>
           }
+          @if (emp.ruc) {
+            <span class="meta-item">
+              <span class="material-symbols-outlined">badge</span>
+              RUC {{ emp.ruc }}
+            </span>
+          }
+          @if (emp.fechaCreacion) {
+            <span class="meta-item">
+              <span class="material-symbols-outlined">calendar_today</span>
+              Fundada en {{ emp.fechaCreacion }}
+            </span>
+          }
         </div>
       </div>
     </header>

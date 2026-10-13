@@ -109,10 +109,7 @@ export interface RecruiterProfile {
   id: string;
   userId: string;
   cargo?: string;
-  ruc?: string;
   lema?: string;
-  empresasDescripcion?: string;
-  fechaCreacion?: string;
   modalidadTrabajo?: string;
   redesSociales?: RedesSociales;
   empresas?: EmpresaRecruiter[];

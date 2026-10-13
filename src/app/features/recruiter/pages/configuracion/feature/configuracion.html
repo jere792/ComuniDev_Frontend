@@ -60,7 +60,10 @@
     @if (activeSection() === 'perfil-personal') {
       <section class="config-section" [formGroup]="perfilForm">
         <h2 class="section-title">Información personal</h2>
-        <p class="section-desc">Datos básicos de tu cuenta</p>
+        <p class="section-desc">
+          Lo que identifica tu cuenta. Teléfono, ubicación y sitio web son de la
+          organización y se editan en <strong>Empresa</strong>.
+        </p>
         <div class="section-body">
           <div class="form-group">
             <label class="form-label">Nombre completo</label>
@@ -69,10 +72,6 @@
           <div class="form-group">
             <label class="form-label">Correo electrónico</label>
             <input class="form-input" type="email" formControlName="email" placeholder="tuemail@ejemplo.com" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Teléfono</label>
-            <input class="form-input" type="tel" formControlName="telefono" placeholder="+51 999 888 777" />
           </div>
         </div>
         <div class="section-footer">
@@ -94,20 +93,6 @@
             <label class="form-label">Lema / Eslogan</label>
             <input class="form-input" type="text" formControlName="lema" placeholder="Ej: Conectando talento con oportunidades" />
           </div>
-          <div class="form-group">
-            <label class="form-label">Empresas</label>
-            <textarea class="form-textarea" formControlName="empresas" placeholder="Describe las empresas con las que trabajas o tu experiencia laboral" rows="4"></textarea>
-          </div>
-          <div class="form-row">
-            <div class="form-group half">
-              <label class="form-label">Registro Fiscal (RUC)</label>
-              <input class="form-input" type="text" formControlName="ruc" placeholder="Ej: 20548756231" />
-            </div>
-            <div class="form-group half">
-              <label class="form-label">Fecha de creación</label>
-              <input class="form-input" type="date" formControlName="fechaCreacion" />
-            </div>
-          </div>
         </div>
         <div class="section-footer">
           <button class="btn-save" (click)="saveProfesional()">Guardar cambios</button>
@@ -123,10 +108,6 @@
           son los enlaces de tu empresa, están en <strong>Empresa → Datos de la empresa</strong>.
         </p>
         <div class="section-body">
-          <div class="form-group">
-            <label class="form-label">Sitio web / Portafolio</label>
-            <input class="form-input" type="url" formControlName="sitioWeb" placeholder="https://tusitio.com.pe" />
-          </div>
           <div class="form-group">
             <label class="form-label">Instagram</label>
             <input class="form-input" type="url" formControlName="instagram" placeholder="https://instagram.com/tu-usuario" />
@@ -374,6 +355,18 @@
             <label class="form-label">Descripción</label>
             <textarea class="form-textarea" formControlName="descripcion" rows="3"
               placeholder="Qué hace la empresa"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group half">
+              <label class="form-label">Registro fiscal (RUC)</label>
+              <input class="form-input" type="text" formControlName="ruc" placeholder="Ej: 20548756231" />
+            </div>
+
+            <div class="form-group half">
+              <label class="form-label">Fecha de fundación</label>
+              <input class="form-input" type="date" formControlName="fechaCreacion" />
+            </div>
           </div>
 
           <div class="form-row">

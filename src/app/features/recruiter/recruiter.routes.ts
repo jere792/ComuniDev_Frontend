@@ -13,7 +13,6 @@ export const routes: Routes = [
         { label: 'Reels', route: '/recruiter/reels', icon: 'smart_display' },
         { label: 'Candidatos', route: '/recruiter/candidates', icon: 'people' },
         { label: 'Ofertas', route: '/recruiter/offers', icon: 'work' },
-        { label: 'Empresa', route: '/recruiter/profile/configuracion?section=empresa-datos', icon: 'apartment' },
       ],
     },
     children: [

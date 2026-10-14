@@ -12,6 +12,7 @@ import { DeveloperContactInfo } from '@features/developer/profile/ui/contact-inf
 import { DeveloperStackCard } from '@features/developer/profile/ui/stack-card/developer-stack-card';
 import { SidebarCard } from '@features/recruiter/pages/profile/ui/sidebar-card/sidebar-card';
 import { SocialListModal, SocialListType } from '@features/recruiter/pages/profile/ui/social-list-modal/social-list-modal';
+import { TagInputComponent } from '@shared/ui/tag-input/tag-input';
 
 @Component({
   selector: 'app-developer-profile-page',
@@ -25,6 +26,7 @@ import { SocialListModal, SocialListType } from '@features/recruiter/pages/profi
     DeveloperStackCard,
     SidebarCard,
     SocialListModal,
+    TagInputComponent,
   ],
   templateUrl: './developer-profile.html',
   styleUrl: './developer-profile.scss',
@@ -65,7 +67,7 @@ export class DeveloperProfilePage implements OnInit {
       portafolio: [''],
       buscandoEmpleo: [false],
       tecnologias: this.fb.array([]),
-      habilidadesBlandas: [''],
+      habilidadesBlandas: [[] as string[]],
     });
 
     effect(() => {
@@ -117,7 +119,7 @@ export class DeveloperProfilePage implements OnInit {
       linkedin: profile.enlaces?.linkedin || '',
       portafolio: profile.enlaces?.portafolio || '',
       buscandoEmpleo: profile.disponibilidadLaboral?.buscandoEmpleo || false,
-      habilidadesBlandas: profile.habilidadesBlandas?.join(', ') || '',
+      habilidadesBlandas: profile.habilidadesBlandas ?? [],
     });
     this.tecnologias.clear();
     profile.tecnologias?.forEach((tech: { nombre: string; nivel: string; aniosExperiencia: number }) => {
@@ -201,7 +203,7 @@ export class DeveloperProfilePage implements OnInit {
     const profileData = {
       tituloProfesional: formValue.tituloProfesional,
       tecnologias: formValue.tecnologias,
-      habilidadesBlandas: formValue.habilidadesBlandas?.split(',').map((s: string) => s.trim()).filter(Boolean),
+      habilidadesBlandas: formValue.habilidadesBlandas ?? [],
       enlaces: {
         github: formValue.github,
         linkedin: formValue.linkedin,

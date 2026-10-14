@@ -1,0 +1,36 @@
+@if (titulo) {
+  <label class="tag-label">{{ titulo }}</label>
+}
+
+<div class="tag-box" [class.tag-box--off]="desactivado" [class.tag-box--full]="lleno">
+  @for (etiqueta of etiquetas; track etiqueta) {
+    <span class="tag">
+      <span class="tag-text">{{ etiqueta }}</span>
+      <button
+        type="button"
+        class="tag-x"
+        (click)="quitar(etiqueta)"
+        [disabled]="desactivado"
+        [attr.aria-label]="'Quitar ' + etiqueta"
+      >
+        ×
+      </button>
+    </span>
+  }
+
+  <input
+    class="tag-field"
+    type="text"
+    [value]="borrador"
+    [placeholder]="etiquetas.length === 0 ? placeholder : ''"
+    [disabled]="desactivado || lleno"
+    (input)="borrador = $any($event.target).value"
+    (keydown)="agregarEnTecla($event)"
+    (blur)="agregarAlSalir()"
+    (focus)="marcarTocado()"
+  />
+</div>
+
+@if (ayuda) {
+  <p class="tag-help">{{ ayuda }}</p>
+}

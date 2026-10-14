@@ -26,13 +26,12 @@
             class="field-textarea"
           ></textarea>
 
-          <label class="field-label">Etiquetas (separadas por coma)</label>
-          <input
-            type="text"
-            [(ngModel)]="reelEtiquetas"
+          <app-tag-input
+            titulo="Etiquetas"
             placeholder="reclutamiento, tips, programación"
-            class="field-input"
-          />
+            ayuda="Pulsa Enter o la coma para agregar cada etiqueta."
+            [(ngModel)]="reelEtiquetas"
+          ></app-tag-input>
 
           <div class="composer-actions">
             <button class="btn-cancel" (click)="toggleComposer()">Cancelar</button>

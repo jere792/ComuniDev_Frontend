@@ -10,6 +10,7 @@ import { TipoReaccion } from '@features/shared/domain/models/social-reaction.mod
 import { SocialComment } from '@features/shared/domain/models/social-comment.model';
 import { UserStore } from '@features/users/data-access/state/user.store';
 import { ToastService } from '@core/services/toast.service';
+import { TagInputComponent } from '@shared/ui/tag-input/tag-input';
 import { ConfirmModal } from '@shared/ui/confirm-modal/confirm-modal';
 
 interface ReelVM {
@@ -25,7 +26,7 @@ interface ReelVM {
 
 @Component({
   selector: 'app-recruiter-reels',
-  imports: [FormsModule, DatePipe, ConfirmModal],
+  imports: [FormsModule, DatePipe, ConfirmModal, TagInputComponent],
   templateUrl: './reels.html',
   styleUrl: './reels.scss',
 })
@@ -47,7 +48,7 @@ export class RecruiterReels implements OnInit {
   showComposer = signal(false);
   reelVideoUrl = '';
   reelDescripcion = '';
-  reelEtiquetas = '';
+  reelEtiquetas: string[] = [];
   creating = false;
 
   private userCache = new Map<string, { nombre: string; avatar: string }>();
@@ -138,16 +139,12 @@ export class RecruiterReels implements OnInit {
     if (!userId || !this.reelVideoUrl.trim()) return;
 
     this.creating = true;
-    const etiquetas = this.reelEtiquetas
-      .split(',')
-      .map(t => t.trim())
-      .filter(t => t.length > 0);
 
     this.reelService.createReel({
       autorId: userId,
       videoUrl: this.reelVideoUrl.trim(),
       descripcion: this.reelDescripcion.trim() || undefined,
-      etiquetas: etiquetas.length > 0 ? etiquetas : undefined,
+      etiquetas: this.reelEtiquetas.length > 0 ? this.reelEtiquetas : undefined,
     }).subscribe({
       next: (created: SocialReel) => {
         if (created) {
@@ -155,7 +152,7 @@ export class RecruiterReels implements OnInit {
           this.loadAuthor(created.autorId);
           this.reelVideoUrl = '';
           this.reelDescripcion = '';
-          this.reelEtiquetas = '';
+          this.reelEtiquetas = [];
           this.showComposer.set(false);
           this.currentIndex = 0;
           this.toast.success('Reel creado');

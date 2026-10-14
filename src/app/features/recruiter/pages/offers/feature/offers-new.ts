@@ -6,15 +6,20 @@ import { OfferStore } from '@features/recruiter/pages/offers/data-access/state/o
 import { CompanyStore } from '@features/recruiter/pages/company/data-access/state/company.store';
 import { VacancyInput } from '@features/recruiter/pages/offers/domain/models/vacancy.model';
 import { ToastService } from '@core/services/toast.service';
+import { TagInputComponent } from '@shared/ui/tag-input/tag-input';
+import { COUNTRIES } from '@shared/constants/countries';
+import { PERU_DEPARTAMENTOS, PERU_NOMBRE } from '@shared/constants/peru-departments';
 
 interface OfferForm {
   titulo: string;
   descripcion: string;
-  tecnologias: string;
+  tecnologias: string[];
   modalidad: string;
   tipoContrato: string;
   nivelExperiencia: string;
-  ubicacion: string;
+  pais: string;
+  departamento: string;
+  ciudad: string;
   moneda: string;
   minimo: number | null;
   maximo: number | null;
@@ -23,7 +28,7 @@ interface OfferForm {
 
 @Component({
   selector: 'app-recruiter-offers-new',
-  imports: [FormsModule],
+  imports: [FormsModule, TagInputComponent],
   templateUrl: './offers-new.html',
   styleUrl: './offers-new.scss',
 })
@@ -44,6 +49,11 @@ export class RecruiterOffersNew implements OnInit {
   /** Solo hay elección si existe una empresa propia. */
   readonly independiente = signal(false);
 
+  readonly paises = COUNTRIES;
+  readonly departamentos = PERU_DEPARTAMENTOS;
+  /** Solo el Perú tiene lista de departamentos; el resto va a mano. */
+  readonly esPeru = PERU_NOMBRE;
+
   form: OfferForm = RecruiterOffersNew.emptyForm();
 
   ngOnInit(): void {
@@ -59,18 +69,24 @@ export class RecruiterOffersNew implements OnInit {
     });
   }
 
+  /** Ubicación final que se guarda en la oferta: "Ciudad, Departamento, País". */
+  get ubicacionTexto(): string {
+    return [this.form.ciudad.trim(), this.form.departamento, this.form.pais]
+      .filter(parte => !!parte)
+      .join(', ');
+  }
+
+  /** Al cambiar de país se limpia el departamento, que es solo del Perú. */
+  cambiarPais(): void {
+    this.form.departamento = '';
+  }
+
   goBack(): void {
     if (window.history.length > 1) {
       this.location.back();
       return;
     }
     this.router.navigate(['/recruiter/offers']);
-  }
-
-  goToCompany(): void {
-    this.router.navigate(['/recruiter/profile/configuracion'], {
-      queryParams: { section: 'empresa-datos' },
-    });
   }
 
   submit(): void {
@@ -102,11 +118,11 @@ export class RecruiterOffersNew implements OnInit {
       companyId: this.independiente() ? undefined : (this.miEmpresa()?.id ?? undefined),
       titulo: this.form.titulo.trim(),
       descripcion: this.form.descripcion.trim() || undefined,
-      tecnologias: this.splitList(this.form.tecnologias),
+      tecnologias: this.form.tecnologias,
       modalidad: this.form.modalidad || undefined,
       tipoContrato: this.form.tipoContrato || undefined,
       nivelExperiencia: this.form.nivelExperiencia.trim() || undefined,
-      ubicacion: this.form.ubicacion.trim() || undefined,
+      ubicacion: this.ubicacionTexto || undefined,
       remuneracion: this.buildRemuneracion(),
       fechaLimite: this.form.fechaLimite || undefined,
     };
@@ -120,12 +136,12 @@ export class RecruiterOffersNew implements OnInit {
     if (!this.form.titulo.trim()) return 'La oferta necesita título';
     if (!this.form.fechaLimite) return 'La oferta necesita fecha límite';
     if (!this.form.modalidad) return 'La oferta necesita modalidad';
-    if (this.splitList(this.form.tecnologias).length === 0) {
+    if (this.form.tecnologias.length === 0) {
       return 'La oferta activa requiere al menos una tecnología';
     }
 
     const remota = this.form.modalidad === 'REMOTO';
-    if (!this.form.ubicacion.trim() && !remota) {
+    if (!this.ubicacionTexto && !remota) {
       return 'La oferta necesita ubicación, a menos que sea remota';
     }
 
@@ -143,13 +159,6 @@ export class RecruiterOffersNew implements OnInit {
     };
   }
 
-  private splitList(value: string): string[] {
-    return value
-      .split(',')
-      .map(item => item.trim())
-      .filter(Boolean);
-  }
-
   private getRecruiterId(): string | null {
     return localStorage.getItem('userId');
   }
@@ -158,11 +167,13 @@ export class RecruiterOffersNew implements OnInit {
     return {
       titulo: '',
       descripcion: '',
-      tecnologias: '',
+      tecnologias: [],
       modalidad: 'REMOTO',
       tipoContrato: 'TIEMPO_COMPLETO',
       nivelExperiencia: '',
-      ubicacion: '',
+      pais: '',
+      departamento: '',
+      ciudad: '',
       moneda: 'PEN',
       minimo: null,
       maximo: null,

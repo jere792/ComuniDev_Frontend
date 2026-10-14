@@ -47,6 +47,16 @@
   gap: var(--space-md);
 }
 
+.ubicacion-row {
+  display: flex;
+  gap: var(--space-md);
+
+  > * {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
 .form-field {
   display: flex;
   flex-direction: column;
@@ -207,7 +217,8 @@ textarea.input {
 }
 
 @media (max-width: 640px) {
-  .form-row {
+  .form-row,
+  .ubicacion-row {
     flex-direction: column;
     gap: 0;
   }

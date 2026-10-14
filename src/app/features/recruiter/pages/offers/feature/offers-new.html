@@ -8,43 +8,6 @@
 
   <div class="form-card">
     <div class="form-field">
-      <label class="form-label">Publicar como</label>
-
-      @if (miEmpresa(); as empresa) {
-        <label class="publish-option">
-          <input type="radio" name="tipoPublicacion"
-            [checked]="!independiente()" (change)="independiente.set(false)" />
-          <span class="publish-option-text">
-            <strong>{{ empresa.nombre }}</strong>
-            <span class="publish-option-hint">Tu empresa</span>
-          </span>
-        </label>
-
-        <label class="publish-option">
-          <input type="radio" name="tipoPublicacion"
-            [checked]="independiente()" (change)="independiente.set(true)" />
-          <span class="publish-option-text">
-            <strong>Independiente</strong>
-            <span class="publish-option-hint">A tu nombre, sin empresa</span>
-          </span>
-        </label>
-
-        @if (!independiente()) {
-          <button type="button" class="link-btn" (click)="goToCompany()">
-            Editar mi empresa
-          </button>
-        }
-      } @else {
-        <div class="company-empty">
-          <p>Todavía no tienes empresa. Puedes crearla o publicar como independiente.</p>
-          <button type="button" class="link-btn" (click)="goToCompany()">
-            Crear mi empresa
-          </button>
-        </div>
-      }
-    </div>
-
-    <div class="form-field">
       <label class="form-label">Título *</label>
       <input class="input" placeholder="Ej. Desarrollador Full Stack" [(ngModel)]="form.titulo" />
     </div>
@@ -55,8 +18,12 @@
     </div>
 
     <div class="form-field">
-      <label class="form-label">Tecnologías * (separadas por coma)</label>
-      <input class="input" placeholder="Java, Spring Boot, Angular" [(ngModel)]="form.tecnologias" />
+      <app-tag-input
+        titulo="Tecnologías *"
+        placeholder="Java, Spring Boot, Angular"
+        ayuda="Pulsa Enter o la coma para agregar cada tecnología."
+        [(ngModel)]="form.tecnologias"
+      ></app-tag-input>
     </div>
 
     <div class="form-row">
@@ -100,7 +67,31 @@
 
     <div class="form-field">
       <label class="form-label">Ubicación</label>
-      <input class="input" placeholder="Lima, Perú (no hace falta si es remota)" [(ngModel)]="form.ubicacion" />
+      <div class="ubicacion-row">
+        <select class="input" [(ngModel)]="form.pais" (ngModelChange)="cambiarPais()">
+          <option value="">País</option>
+          @for (pais of paises; track pais.code) {
+            <option [value]="pais.name">{{ pais.name }}</option>
+          }
+        </select>
+
+        @if (form.pais === esPeru) {
+          <select class="input" [(ngModel)]="form.departamento">
+            <option value="">Departamento (opcional)</option>
+            @for (departamento of departamentos; track departamento) {
+              <option [value]="departamento">{{ departamento }}</option>
+            }
+          </select>
+        }
+
+        <input class="input" placeholder="Ciudad" [(ngModel)]="form.ciudad" />
+      </div>
+
+      @if (ubicacionTexto; as ubicacion) {
+        <p class="form-hint">Se guardará como: <strong>{{ ubicacion }}</strong></p>
+      } @else {
+        <p class="form-hint">No hace falta si la oferta es remota.</p>
+      }
     </div>
 
     <div class="form-section-label">Remuneración (opcional)</div>

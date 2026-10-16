@@ -148,7 +148,7 @@ export class MessageStore {
     this.userId = userId;
 
     const abierta = this.abierta();
-    if (abierta && esElHiloAbierto(abierta, message)) {
+    if (abierta && esElHiloAbierto(abierta, message, userId)) {
       this.mensajes.update(lista => sinDuplicados([...lista, message]));
       // El hilo recién creado todavía no traía id; ahora ya lo sabemos.
       if (!abierta.id) this.abierta.set({ ...abierta, id: message.conversationId });
@@ -214,9 +214,16 @@ function sinDuplicados(lista: Message[]): Message[] {
 /**
  * El hilo abierto coincide con el mensaje si traen el mismo id, o si el abierto
  * todavía no tiene id porque se acaba de crear escribiendo el primer mensaje.
+ * En ese caso coincide tanto un mensaje propio (recién salido de este chat) como
+ * uno de la persona a la que se le escribía.
  */
-function esElHiloAbierto(abierta: MessageConversation | null, message: Message): boolean {
+function esElHiloAbierto(
+  abierta: MessageConversation | null,
+  message: Message,
+  userId: string,
+): boolean {
   if (!abierta) return false;
   if (abierta.id) return abierta.id === message.conversationId;
+  if (message.emisorId === userId) return true;
   return abierta.otroUserId != null && abierta.otroUserId === message.emisorId;
 }

@@ -1,0 +1,95 @@
+<div class="messages-container">
+  <div class="conversations-list">
+    <h2 class="section-title">Mensajes</h2>
+
+    @if (cargando()) {
+      <p class="empty-chat list-status">Cargando…</p>
+    } @else if (conversaciones().length === 0) {
+      <div class="empty-list">
+        <span class="material-symbols-outlined">forum</span>
+        <p>Todavía no tienes mensajes</p>
+      </div>
+    } @else {
+      @for (conv of conversaciones(); track conv.id) {
+        <div
+          class="conversation-item"
+          [class.active]="abierta()?.id === conv.id"
+          (click)="abrirHilo(conv)">
+          @if (fotoDe(conv.otroUserId); as foto) {
+            <img [src]="foto" [alt]="nombreDe(conv.otroUserId)" class="conv-avatar" />
+          } @else {
+            <div class="conv-avatar avatar-fallback">{{ iniciales(conv.otroUserId) }}</div>
+          }
+
+          <div class="conv-info">
+            <div class="conv-header">
+              <span class="conv-name">{{ nombreDe(conv.otroUserId) }}</span>
+              <span class="conv-time">{{ horaDe(conv.ultimoMensajeEn) }}</span>
+            </div>
+            <p class="conv-message">
+              @if (esMio(conv.ultimoMensajeEmisorId)) {
+                <span class="conv-prefix">Tú:</span>
+              }
+              {{ conv.ultimoMensajeTexto || 'Sin mensajes todavía' }}
+            </p>
+          </div>
+
+          @if (conv.mensajesNoLeidos) {
+            <span class="unread-badge">{{ conv.mensajesNoLeidos }}</span>
+          }
+        </div>
+      }
+    }
+  </div>
+
+  <div class="chat-area">
+    @if (abierta(); as conv) {
+      <div class="chat-header">
+        @if (fotoDe(conv.otroUserId); as foto) {
+          <img [src]="foto" [alt]="nombreDe(conv.otroUserId)" class="chat-avatar" />
+        } @else {
+          <div class="chat-avatar avatar-fallback small">{{ iniciales(conv.otroUserId) }}</div>
+        }
+        <span class="chat-name">{{ nombreDe(conv.otroUserId) }}</span>
+      </div>
+
+      <div class="chat-messages" #scrollChat>
+        @if (cargandoMensajes()) {
+          <p class="empty-chat">Cargando mensajes…</p>
+        } @else if (mensajes().length === 0) {
+          <p class="empty-chat">Envía el primer mensaje</p>
+        } @else {
+          @for (message of mensajes(); track message.id) {
+            <div class="bubble" [class.mine]="esMio(message.emisorId)">
+              <p class="bubble-text">{{ message.texto }}</p>
+              <span class="bubble-time">{{ horaDe(message.createdAt) }}</span>
+            </div>
+          }
+        }
+      </div>
+
+      <div class="composer">
+        <input
+          class="composer-input"
+          type="text"
+          placeholder="Escribe un mensaje…"
+          [(ngModel)]="borrador"
+          (keydown.enter)="enviar()"
+          [disabled]="enviando()" />
+        <button
+          type="button"
+          class="composer-send"
+          (click)="enviar()"
+          [disabled]="enviando() || !borrador.trim()"
+          aria-label="Enviar">
+          <span class="material-symbols-outlined">send</span>
+        </button>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <span class="material-symbols-outlined">chat</span>
+        <p>Selecciona una conversación</p>
+      </div>
+    }
+  </div>
+</div>

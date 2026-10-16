@@ -29,7 +29,7 @@ export const routes: Routes = [
       {
         path: 'messages',
         title: 'Mensajes',
-        loadComponent: () => import('@features/recruiter/pages/messages/feature/messages').then(m => m.RecruiterMessages),
+        loadComponent: () => import('@features/shared/feature/messages/messages').then(m => m.Messages),
       },
       {
         path: 'solicitudes',

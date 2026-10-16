@@ -7,9 +7,11 @@ export class MessageStore {
   private repository = inject<MessageRepository>(MESSAGE_REPOSITORY);
 
   readonly conversaciones = signal<MessageConversation[]>([]);
+  readonly solicitudes = signal<MessageConversation[]>([]);
   readonly mensajes = signal<Message[]>([]);
   readonly abierta = signal<MessageConversation | null>(null);
   readonly cargandoConversaciones = signal(false);
+  readonly cargandoSolicitudes = signal(false);
   readonly cargandoMensajes = signal(false);
   readonly enviando = signal(false);
 
@@ -25,6 +27,43 @@ export class MessageStore {
         this.cargandoConversaciones.set(false);
       },
       error: () => this.cargandoConversaciones.set(false),
+    });
+  }
+
+  /** Los hilos de alguien que todavía no sigo: quedan ocultos hasta aceptarlos. */
+  cargarSolicitudes(userId: string): void {
+    this.userId = userId;
+    this.cargandoSolicitudes.set(true);
+    this.repository.messageRequests(userId).subscribe({
+      next: lista => {
+        this.solicitudes.set(lista);
+        this.cargandoSolicitudes.set(false);
+      },
+      error: () => this.cargandoSolicitudes.set(false),
+    });
+  }
+
+  /** Pasa una solicitud a conversacion normal y la deja visible en la lista. */
+  aceptar(conversation: MessageConversation, userId: string): void {
+    this.repository.acceptConversation(userId, conversation.id).subscribe({
+      next: ok => {
+        if (!ok) return;
+        this.solicitudes.update(lista => lista.filter(c => c.id !== conversation.id));
+        this.conversaciones.update(lista => [
+          { ...conversation, esSolicitud: false },
+          ...lista.filter(c => c.id !== conversation.id),
+        ]);
+      },
+    });
+  }
+
+  /** Saca la solicitud de la vista de quien la rechaza; el otro sigue viendola. */
+  rechazar(conversation: MessageConversation, userId: string): void {
+    this.repository.rejectConversation(userId, conversation.id).subscribe({
+      next: ok => {
+        if (!ok) return;
+        this.solicitudes.update(lista => lista.filter(c => c.id !== conversation.id));
+      },
     });
   }
 
@@ -65,6 +104,7 @@ export class MessageStore {
       mensajesNoLeidos: 0,
       createdAt: null,
       updatedAt: null,
+      esSolicitud: false,
     };
     this.abierta.set(nueva);
     this.mensajes.set([]);
@@ -116,8 +156,26 @@ export class MessageStore {
 
     const indice = this.conversaciones().findIndex(c => c.id === message.conversationId);
     if (indice < 0) {
-      // Hilo recien creado: no hay nada que mover, se vuelve a pedir la lista.
+      // Puede ser un hilo recien creado, o una solicitud que recien llega.
+      const indiceSolicitud = this.solicitudes().findIndex(c => c.id === message.conversationId);
+      if (indiceSolicitud >= 0) {
+        const solicitud = this.solicitudes()[indiceSolicitud];
+        const actualizada: MessageConversation = {
+          ...solicitud,
+          ultimoMensajeTexto: message.texto,
+          ultimoMensajeEmisorId: message.emisorId,
+          ultimoMensajeEn: message.createdAt ?? solicitud.ultimoMensajeEn,
+          mensajesNoLeidos: message.emisorId === userId ? 0 : (solicitud.mensajesNoLeidos ?? 0) + 1,
+        };
+        this.solicitudes.set([
+          actualizada,
+          ...this.solicitudes().filter(c => c.id !== solicitud.id),
+        ]);
+        return;
+      }
+      // Hilo recien creado: no hay nada que mover, se vuelven a pedir las listas.
       this.cargarConversaciones(userId);
+      this.cargarSolicitudes(userId);
       return;
     }
 

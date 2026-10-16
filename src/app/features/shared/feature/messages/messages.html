@@ -2,42 +2,108 @@
   <div class="conversations-list">
     <h2 class="section-title">Mensajes</h2>
 
-    @if (cargando()) {
-      <p class="empty-chat list-status">Cargando…</p>
-    } @else if (conversaciones().length === 0) {
-      <div class="empty-list">
-        <span class="material-symbols-outlined">forum</span>
-        <p>Todavía no tienes mensajes</p>
-      </div>
-    } @else {
-      @for (conv of conversaciones(); track conv.id) {
-        <div
-          class="conversation-item"
-          [class.active]="abierta()?.id === conv.id"
-          (click)="abrirHilo(conv)">
-          @if (fotoDe(conv.otroUserId); as foto) {
-            <img [src]="foto" [alt]="nombreDe(conv.otroUserId)" class="conv-avatar" />
-          } @else {
-            <div class="conv-avatar avatar-fallback">{{ iniciales(conv.otroUserId) }}</div>
-          }
+    <div class="tabs">
+      <button
+        type="button"
+        class="tab"
+        [class.active]="pestana() === 'conversaciones'"
+        (click)="cambiarPestana('conversaciones')">
+        Conversaciones
+      </button>
+      <button
+        type="button"
+        class="tab"
+        [class.active]="pestana() === 'solicitudes'"
+        (click)="cambiarPestana('solicitudes')">
+        Solicitudes
+        @if (solicitudes().length) {
+          <span class="tab-badge">{{ solicitudes().length }}</span>
+        }
+      </button>
+    </div>
 
-          <div class="conv-info">
-            <div class="conv-header">
-              <span class="conv-name">{{ nombreDe(conv.otroUserId) }}</span>
-              <span class="conv-time">{{ horaDe(conv.ultimoMensajeEn) }}</span>
-            </div>
-            <p class="conv-message">
-              @if (esMio(conv.ultimoMensajeEmisorId)) {
-                <span class="conv-prefix">Tú:</span>
-              }
-              {{ conv.ultimoMensajeTexto || 'Sin mensajes todavía' }}
-            </p>
-          </div>
-
-          @if (conv.mensajesNoLeidos) {
-            <span class="unread-badge">{{ conv.mensajesNoLeidos }}</span>
-          }
+    @if (pestana() === 'conversaciones') {
+      @if (cargando()) {
+        <p class="empty-chat list-status">Cargando…</p>
+      } @else if (conversaciones().length === 0) {
+        <div class="empty-list">
+          <span class="material-symbols-outlined">forum</span>
+          <p>Todavía no tienes mensajes</p>
         </div>
+      } @else {
+        @for (conv of conversaciones(); track conv.id) {
+          <div
+            class="conversation-item"
+            [class.active]="abierta()?.id === conv.id"
+            (click)="abrirHilo(conv)">
+            @if (fotoDe(conv.otroUserId); as foto) {
+              <img [src]="foto" [alt]="nombreDe(conv.otroUserId)" class="conv-avatar" />
+            } @else {
+              <div class="conv-avatar avatar-fallback">{{ iniciales(conv.otroUserId) }}</div>
+            }
+
+            <div class="conv-info">
+              <div class="conv-header">
+                <span class="conv-name">{{ nombreDe(conv.otroUserId) }}</span>
+                <span class="conv-time">{{ horaDe(conv.ultimoMensajeEn) }}</span>
+              </div>
+              <p class="conv-message">
+                @if (esMio(conv.ultimoMensajeEmisorId)) {
+                  <span class="conv-prefix">Tú:</span>
+                }
+                {{ conv.ultimoMensajeTexto || 'Sin mensajes todavía' }}
+              </p>
+            </div>
+
+            @if (conv.mensajesNoLeidos) {
+              <span class="unread-badge">{{ conv.mensajesNoLeidos }}</span>
+            }
+          </div>
+        }
+      }
+    } @else {
+      @if (cargandoSolicitudes()) {
+        <p class="empty-chat list-status">Cargando…</p>
+      } @else if (solicitudes().length === 0) {
+        <div class="empty-list">
+          <span class="material-symbols-outlined"> person_check </span>
+          <p>No tienes solicitudes pendientes</p>
+        </div>
+      } @else {
+        @for (solicitud of solicitudes(); track solicitud.id) {
+          <div class="conversation-item request-item">
+            @if (fotoDe(solicitud.otroUserId); as foto) {
+              <img [src]="foto" [alt]="nombreDe(solicitud.otroUserId)" class="conv-avatar" />
+            } @else {
+              <div class="conv-avatar avatar-fallback">{{ iniciales(solicitud.otroUserId) }}</div>
+            }
+
+            <div class="conv-info" (click)="abrirHilo(solicitud)">
+              <div class="conv-header">
+                <span class="conv-name">{{ nombreDe(solicitud.otroUserId) }}</span>
+                <span class="conv-time">{{ horaDe(solicitud.ultimoMensajeEn) }}</span>
+              </div>
+              <p class="conv-message">{{ solicitud.ultimoMensajeTexto || 'Sin mensajes todavía' }}</p>
+            </div>
+
+            <div class="request-actions">
+              <button
+                type="button"
+                class="request-btn accept"
+                (click)="aceptarSolicitud(solicitud)"
+                aria-label="Aceptar">
+                <span class="material-symbols-outlined">check</span>
+              </button>
+              <button
+                type="button"
+                class="request-btn reject"
+                (click)="rechazarSolicitud(solicitud)"
+                aria-label="Rechazar">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+          </div>
+        }
       }
     }
   </div>

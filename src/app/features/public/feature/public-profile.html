@@ -85,6 +85,13 @@
               <span class="material-symbols-outlined">block</span>
             }
           </button>
+          <button
+            class="message-btn"
+            (click)="escribirMensaje()"
+            [disabled]="isBlocked()">
+            <span class="material-symbols-outlined">chat</span>
+            Mensaje
+          </button>
         </div>
       }
     </div>

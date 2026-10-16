@@ -24,11 +24,16 @@ export class Messages implements OnInit, AfterViewChecked {
   private location = inject(Location);
 
   readonly conversaciones = this.store.conversaciones;
+  readonly solicitudes = this.store.solicitudes;
   readonly mensajes = this.store.mensajes;
   readonly abierta = this.store.abierta;
   readonly cargando = this.store.cargandoConversaciones;
+  readonly cargandoSolicitudes = this.store.cargandoSolicitudes;
   readonly cargandoMensajes = this.store.cargandoMensajes;
   readonly enviando = this.store.enviando;
+
+  /** Como Instagram: la pestaña principal y la de solicitudes pendientes. */
+  readonly pestana = signal<'conversaciones' | 'solicitudes'>('conversaciones');
 
   usersMap = signal<Map<string, User>>(new Map());
   borrador = '';
@@ -43,12 +48,27 @@ export class Messages implements OnInit, AfterViewChecked {
 
     this.cargarUsuarios();
     this.store.cargarConversaciones(this.userId);
+    this.store.cargarSolicitudes(this.userId);
     // El canal de tiempo real esta abierto todo el tiempo que dure la pantalla.
     this.store.escuchar(this.userId);
 
     // /recruiter/messages?user=<id>, para escribirle a alguien desde su perfil.
     const otroUserId = this.route.snapshot.queryParamMap.get('user');
     if (otroUserId) this.store.abrirCon(this.userId, otroUserId);
+  }
+
+  cambiarPestana(pestana: 'conversaciones' | 'solicitudes'): void {
+    this.pestana.set(pestana);
+  }
+
+  aceptarSolicitud(conversation: MessageConversation): void {
+    if (!this.userId) return;
+    this.store.aceptar(conversation, this.userId);
+  }
+
+  rechazarSolicitud(conversation: MessageConversation): void {
+    if (!this.userId) return;
+    this.store.rechazar(conversation, this.userId);
   }
 
   /** Baja al ultimo mensaje cada vez que la lista crece, sin repetir el trabajo. */

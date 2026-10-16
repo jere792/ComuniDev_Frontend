@@ -223,6 +223,16 @@ export class PublicProfile implements OnInit {
     }
   }
 
+  /** Abre el chat con esa persona; si no me sigue, su mensaje cae en solicitudes. */
+  escribirMensaje(): void {
+    const targetUserId = this.user()?.id;
+    if (!targetUserId || this.isBlocked()) return;
+
+    const role = (localStorage.getItem('role') || '').toLowerCase();
+    const base = role === 'desarrollador' || role === 'developer' ? '/developer' : '/recruiter';
+    this.router.navigate([`${base}/messages`], { queryParams: { user: targetUserId } });
+  }
+
   getInitials(): string {
     const name = this.user()?.nombre || '';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);

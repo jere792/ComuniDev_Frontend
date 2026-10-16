@@ -16,6 +16,24 @@ const CONVERSATIONS = gql`
       mensajesNoLeidos
       createdAt
       updatedAt
+      esSolicitud
+    }
+  }
+`;
+
+const MESSAGE_REQUESTS = gql`
+  query MessageRequests($userId: String!) {
+    messageRequests(userId: $userId) {
+      id
+      participantes
+      otroUserId
+      ultimoMensajeTexto
+      ultimoMensajeEmisorId
+      ultimoMensajeEn
+      mensajesNoLeidos
+      createdAt
+      updatedAt
+      esSolicitud
     }
   }
 `;
@@ -52,6 +70,18 @@ const MARK_READ = gql`
   }
 `;
 
+const ACCEPT_CONVERSATION = gql`
+  mutation AcceptConversation($userId: String!, $conversationId: String!) {
+    acceptConversation(userId: $userId, conversationId: $conversationId)
+  }
+`;
+
+const REJECT_CONVERSATION = gql`
+  mutation RejectConversation($userId: String!, $conversationId: String!) {
+    rejectConversation(userId: $userId, conversationId: $conversationId)
+  }
+`;
+
 const MESSAGE_RECEIVED = gql`
   subscription MessageReceived($userId: String!) {
     messageReceived(userId: $userId) {
@@ -77,6 +107,16 @@ export class MessageGraphqlService implements MessageRepository {
         fetchPolicy: 'network-only',
       })
       .pipe(map(result => (result.data?.conversations ?? []).map(normalizeConversation)));
+  }
+
+  messageRequests(userId: string): Observable<MessageConversation[]> {
+    return this.apollo
+      .query<{ messageRequests: Array<Record<string, unknown>> | null }>({
+        query: MESSAGE_REQUESTS,
+        variables: { userId },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(map(result => (result.data?.messageRequests ?? []).map(normalizeConversation)));
   }
 
   messages(userId: string, conversationId: string): Observable<Message[]> {
@@ -107,6 +147,24 @@ export class MessageGraphqlService implements MessageRepository {
       .pipe(map(result => result.data?.markConversationRead === true));
   }
 
+  acceptConversation(userId: string, conversationId: string): Observable<boolean> {
+    return this.apollo
+      .mutate<{ acceptConversation: boolean | null }>({
+        mutation: ACCEPT_CONVERSATION,
+        variables: { userId, conversationId },
+      })
+      .pipe(map(result => result.data?.acceptConversation === true));
+  }
+
+  rejectConversation(userId: string, conversationId: string): Observable<boolean> {
+    return this.apollo
+      .mutate<{ rejectConversation: boolean | null }>({
+        mutation: REJECT_CONVERSATION,
+        variables: { userId, conversationId },
+      })
+      .pipe(map(result => result.data?.rejectConversation === true));
+  }
+
   messageReceived(userId: string): Observable<Message> {
     return this.apollo
       .subscribe<{ messageReceived: Record<string, unknown> | null }>({
@@ -132,6 +190,7 @@ function normalizeConversation(raw: Record<string, unknown>): MessageConversatio
     mensajesNoLeidos: typeof raw['mensajesNoLeidos'] === 'number' ? (raw['mensajesNoLeidos'] as number) : 0,
     createdAt: asString(raw['createdAt']),
     updatedAt: asString(raw['updatedAt']),
+    esSolicitud: raw['esSolicitud'] === true,
   };
 }
 

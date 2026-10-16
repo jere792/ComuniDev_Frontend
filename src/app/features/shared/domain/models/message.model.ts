@@ -11,6 +11,8 @@ export interface MessageConversation {
   mensajesNoLeidos: number | null;
   createdAt: string | null;
   updatedAt: string | null;
+  /** True si para el usuario que consulta el hilo esta pendiente de aceptar. */
+  esSolicitud: boolean;
 }
 
 /** Un mensaje suelto dentro de un hilo (schema `Message`). */

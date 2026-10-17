@@ -34,16 +34,36 @@ export class ReelStore {
     return this.repository.getReelsByUser(userId);
   }
 
+  savedReels(userId: string): Observable<SocialReel[]> {
+    return this.repository.savedReels(userId);
+  }
+
+  isReelSaved(userId: string, reelId: string): Observable<boolean> {
+    return this.repository.isReelSaved(userId, reelId);
+  }
+
   createReel(data: CreateReelRequest): Observable<SocialReel> {
     return this.repository.createReel(data);
   }
 
-  updateReel(id: string, data: UpdateReelRequest): Observable<SocialReel> {
-    return this.repository.updateReel(id, data);
+  updateReel(id: string, autorId: string, data: UpdateReelRequest): Observable<SocialReel> {
+    return this.repository.updateReel(id, autorId, data);
   }
 
-  deleteReel(id: string): Observable<boolean> {
-    return this.repository.deleteReel(id);
+  deleteReel(id: string, autorId: string): Observable<boolean> {
+    return this.repository.deleteReel(id, autorId);
+  }
+
+  saveReel(userId: string, reelId: string): Observable<boolean> {
+    return this.repository.saveReel(userId, reelId);
+  }
+
+  unsaveReel(userId: string, reelId: string): Observable<boolean> {
+    return this.repository.unsaveReel(userId, reelId);
+  }
+
+  incrementReelView(reelId: string, userId?: string): Observable<boolean> {
+    return this.repository.incrementReelView(reelId, userId);
   }
 
   clear(): void {

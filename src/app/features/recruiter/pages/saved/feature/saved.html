@@ -2,10 +2,10 @@
   <h2 class="section-title">Guardados</h2>
 
   <div class="tabs" role="tablist">
-    <button type="button" class="tab" [class.active]="activeTab === 'candidates'" (click)="activeTab = 'candidates'">
+    <button type="button" class="tab" [class.active]="activeTab === 'candidates'" (click)="selectTab('candidates')">
       Candidatos
     </button>
-    <button type="button" class="tab" [class.active]="activeTab === 'reels'" (click)="activeTab = 'reels'">
+    <button type="button" class="tab" [class.active]="activeTab === 'reels'" (click)="selectTab('reels')">
       Reels
     </button>
   </div>
@@ -45,8 +45,36 @@
       }
     </div>
   } @else {
-    <div class="state-message">
-      Los reels guardados estarán disponibles próximamente.
+    @if (reelsLoading()) {
+      <div class="state-message">Cargando reels guardados…</div>
+    }
+
+    @if (!reelsLoading() && error()) {
+      <div class="state-message error">{{ error() }}</div>
+    }
+
+    @if (!reelsLoading() && !error() && reels.length === 0) {
+      <div class="state-message">
+        Aún no has guardado reels. Entra a
+        <a routerLink="/recruiter/reels">Reels</a>
+        y toca el marcador para guardarlos aquí.
+      </div>
+    }
+
+    <div class="saved-list">
+      @for (reel of reels; track reel.id) {
+        <app-saved-card
+          [id]="reel.id"
+          [userId]="reel.autorId"
+          type="reel"
+          [title]="reel.title"
+          [subtitle]="reel.subtitle"
+          [meta]="reel.meta"
+          [savedAt]="reel.savedAt"
+          (viewProfile)="goToAuthor(reel)"
+          (remove)="removeReel(reel)"
+        />
+      }
     </div>
   }
 </div>

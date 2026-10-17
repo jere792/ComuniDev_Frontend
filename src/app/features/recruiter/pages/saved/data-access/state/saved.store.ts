@@ -6,6 +6,8 @@ import {
   TALENT_SEARCH_REPOSITORY,
   TalentSearchRepository,
 } from '@features/recruiter/pages/candidates/domain/ports/talent-search.repository';
+import { REEL_REPOSITORY, ReelRepository } from '@features/recruiter/pages/reels/domain/ports/reel.repository';
+import { SocialReel } from '@features/recruiter/pages/reels/domain/models/social-reel.model';
 import { UserStore } from '@features/users/data-access/state/user.store';
 
 export interface SavedCandidateItem {
@@ -22,13 +24,29 @@ export interface SavedCandidateItem {
   meta: string;
 }
 
+export interface SavedReelItem {
+  id: string;
+  autorId: string;
+  /** Nombre del autor; se resuelve despues de cargar el reel. */
+  title: string;
+  /** Descripcion del reel o la primera etiqueta. */
+  subtitle: string;
+  videoUrl: string;
+  /** 12 vistas · 3 reacciones */
+  meta: string;
+  savedAt: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class SavedStore {
   private readonly repository = inject<TalentSearchRepository>(TALENT_SEARCH_REPOSITORY);
+  private readonly reelRepository = inject<ReelRepository>(REEL_REPOSITORY);
   private readonly userStore = inject(UserStore);
 
   readonly items = signal<SavedCandidateItem[]>([]);
+  readonly reels = signal<SavedReelItem[]>([]);
   readonly loading = signal(false);
+  readonly reelsLoading = signal(false);
   readonly error = signal<string | null>(null);
 
   loadSaved(recruiterId: string): void {
@@ -70,6 +88,67 @@ export class SavedStore {
       },
       error: () => this.error.set('No se pudo quitar el guardado'),
     });
+  }
+
+  /** Carga los reels del marcador y, con cada uno, el nombre de su autor. */
+  loadSavedReels(userId: string): void {
+    this.reelsLoading.set(true);
+    this.error.set(null);
+
+    this.reelRepository.savedReels(userId).pipe(
+      switchMap((reels: SocialReel[]) => {
+        if (reels.length === 0) {
+          return of([] as SavedReelItem[]);
+        }
+        return forkJoin(
+          reels.map(reel =>
+            this.userStore.getById(reel.autorId).pipe(
+              // first() de seguridad: emite una sola vez y cierra, para que
+              // forkJoin complete aunque no todos los autores respondan.
+              first(),
+              map(user => this.toReelItem(reel, user)),
+            ),
+          ),
+        );
+      }),
+    ).subscribe({
+      next: items => {
+        this.reels.set(items);
+        this.reelsLoading.set(false);
+      },
+      error: () => {
+        this.error.set('Error al cargar reels guardados');
+        this.reelsLoading.set(false);
+      },
+    });
+  }
+
+  removeReel(userId: string, item: SavedReelItem): void {
+    this.reelRepository.unsaveReel(userId, item.id).subscribe({
+      next: () => {
+        this.reels.update(list => list.filter(r => r.id !== item.id));
+      },
+      error: () => this.error.set('No se pudo quitar el reel de guardados'),
+    });
+  }
+
+  private toReelItem(reel: SocialReel, user: User | null): SavedReelItem {
+    const stats = reel.estadisticas;
+    const meta = [
+      stats?.vistas != null ? `${stats.vistas} vista${stats.vistas === 1 ? '' : 's'}` : '',
+      stats?.reaccionesCount != null ? `${stats.reaccionesCount} reacciones` : '',
+      stats?.comentariosCount != null ? `${stats.comentariosCount} comentarios` : '',
+    ].filter(part => part.length > 0).join(' · ');
+
+    return {
+      id: reel.id,
+      autorId: reel.autorId,
+      title: user?.nombre || reel.autorId,
+      subtitle: reel.descripcion?.trim() || reel.etiquetas?.[0] || 'Reel',
+      videoUrl: reel.videoUrl,
+      meta,
+      savedAt: formatRelativeDate(reel.createdAt),
+    };
   }
 
   private toItem(profile: SavedProfile, user: User | null): SavedCandidateItem {

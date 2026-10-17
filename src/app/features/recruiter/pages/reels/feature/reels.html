@@ -10,12 +10,24 @@
         </div>
 
         <div class="composer-form">
-          <label class="field-label">URL del video *</label>
+          <label class="field-label">Video</label>
+          <input
+            type="file"
+            accept="video/*"
+            class="field-input file-input"
+            (change)="onFileSelected($event)"
+          />
+          @if (selectedFile) {
+            <p class="file-name">{{ selectedFile.name }}</p>
+          }
+
+          <label class="field-label">o pega una URL del video</label>
           <input
             type="url"
             [(ngModel)]="reelVideoUrl"
             placeholder="https://ejemplo.com/video.mp4"
             class="field-input"
+            [disabled]="!!selectedFile"
           />
 
           <label class="field-label">Descripción</label>
@@ -38,9 +50,13 @@
             <button
               class="btn-create"
               (click)="createReel()"
-              [disabled]="!reelVideoUrl.trim() || creating"
+              [disabled]="(!reelVideoUrl.trim() && !selectedFile) || creating"
             >
-              {{ creating ? 'Creando...' : 'Publicar Reel' }}
+              @if (creating) {
+                {{ uploadProgress || 'Creando...' }}
+              } @else {
+                Publicar Reel
+              }
             </button>
           </div>
         </div>
@@ -53,7 +69,7 @@
       <div class="loading-text">Cargando reels...</div>
     } @else if (reels().length === 0) {
       <div class="empty-state">
-        <span class="material-symbols-outlined" style="font-size:48px;color:var(--outline)">videocam_off</span>
+        <span class="material-symbols-outlined empty-icon">videocam_off</span>
         <p>No hay reels todavía</p>
         <button class="btn-create" (click)="toggleComposer()">Crear el primero</button>
       </div>
@@ -100,6 +116,7 @@
             >
               {{ reels()[currentIndex].saved ? 'bookmark' : 'bookmark_border' }}
             </span>
+            <span class="action-count">{{ reels()[currentIndex].reel.estadisticas?.guardadosCount ?? 0 }}</span>
           </button>
 
           <button class="action-btn">

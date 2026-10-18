@@ -17,9 +17,9 @@
 
 .reel-card {
   position: relative;
-  /* estilo TikTok: video vertical 9:16 ocupando toda la altura disponible */
+  /* estilo TikTok: video vertical 9:16, centrado como una pantalla de teléfono */
   height: 100%;
-  max-height: 100%;
+  max-height: 720px;
   aspect-ratio: 9 / 16;
   max-width: 100%;
   border-radius: var(--radius-lg);

@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://comunidev-backend.onrender.com/api/v1',
+  apiUrl: 'https://comunidevbackend-production.up.railway.app/api/v1',
 };

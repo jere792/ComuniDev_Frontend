@@ -391,10 +391,11 @@
 }
 
 /* Rightbar de conversaciones estilo TikTok: fijo al borde derecho de la
-   ventana y ocupando todo el alto, SIN mover el reel del centro. */
+   ventana, debajo del header (64px) y hasta el fondo de la pantalla,
+   SIN mover el reel del centro. */
 .comments-panel {
   position: fixed;
-  top: 0;
+  top: 64px;
   right: 0;
   bottom: 0;
   width: 400px;

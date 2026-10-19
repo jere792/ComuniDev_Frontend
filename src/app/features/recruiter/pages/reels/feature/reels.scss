@@ -406,6 +406,18 @@
   flex-direction: column;
   overflow: hidden;
   z-index: 60;
+  animation: rightbar-in 0.25s ease;
+}
+
+@keyframes rightbar-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .comments-header {

@@ -62,13 +62,28 @@
   pointer-events: none;
 }
 
-.reel-actions {
-  position: absolute;
-  right: var(--space-md);
-  bottom: 140px;
+/* Columna de acciones a la derecha del reel (fuera del video), como TikTok */
+.reel-side {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--space-lg);
+  align-self: flex-end;
+  margin-bottom: 120px;
+}
+
+.reel-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.reel-nav-arrows {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
 }
 
 .action-btn {
@@ -78,11 +93,20 @@
   gap: var(--space-2xs);
   background: none;
   border: none;
+  padding: 0;
   cursor: pointer;
-  color: #fff;
+  color: var(--on-surface);
 
   .material-symbols-outlined {
-    font-size: 28px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-container);
+    color: var(--on-surface);
+    border-radius: 50%;
+    font-size: 26px;
     transition: transform 0.2s ease;
 
     &:hover {
@@ -102,6 +126,7 @@
 .action-count {
   font-size: 12px;
   font-weight: 600;
+  color: var(--on-surface);
 }
 
 .reel-info {
@@ -176,13 +201,12 @@
 }
 
 .nav-btn {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: none;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  color: #fff;
+  background: var(--surface-container);
+  color: var(--on-surface);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -190,11 +214,11 @@
   transition: all 0.2s ease;
 
   &:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.08);
   }
 
   &:disabled {
-    opacity: 0.3;
+    opacity: 0.35;
     cursor: not-allowed;
   }
 }

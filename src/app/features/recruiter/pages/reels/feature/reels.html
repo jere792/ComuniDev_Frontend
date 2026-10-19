@@ -74,12 +74,6 @@
         <button class="btn-create" (click)="toggleComposer()">Crear el primero</button>
       </div>
     } @else {
-      @if (currentIndex > 0) {
-        <button class="nav-btn prev" (click)="prevReel()">
-          <span class="material-symbols-outlined">keyboard_arrow_up</span>
-        </button>
-      }
-
       <div class="reel-card">
         <div class="reel-video-wrapper">
           <video
@@ -96,6 +90,38 @@
           ></video>
         </div>
 
+        <div class="reel-info">
+          <div class="reel-user">
+            @if (reels()[currentIndex].autorAvatar) {
+              <img [src]="reels()[currentIndex].autorAvatar" [alt]="reels()[currentIndex].autorNombre" class="user-avatar clickable" (click)="goToProfile(reels()[currentIndex].reel.autorId)" />
+            } @else {
+              <div class="user-avatar avatar-fallback clickable" (click)="goToProfile(reels()[currentIndex].reel.autorId)">{{ getInitials(reels()[currentIndex].autorNombre || '?') }}</div>
+            }
+            <span class="user-name clickable" (click)="goToProfile(reels()[currentIndex].reel.autorId)">{{ reels()[currentIndex].autorNombre || 'Usuario' }}</span>
+          </div>
+          <p class="reel-description">{{ reels()[currentIndex].reel.descripcion }}</p>
+          @if (reels()[currentIndex].reel.etiquetas?.length) {
+            <div class="reel-tags">
+              @for (tag of reels()[currentIndex].reel.etiquetas; track tag) {
+                <span class="tag">#{{ tag }}</span>
+              }
+            </div>
+          }
+        </div>
+
+        <div
+          class="reel-progress"
+          #progressBar
+          (pointerdown)="startSeek($event, progressBar, videoEl)"
+          (pointermove)="moveSeek($event, progressBar, videoEl)"
+          (pointerup)="stopSeek()"
+          (pointercancel)="stopSeek()"
+        >
+          <div class="reel-progress-fill" [style.width.%]="progressPercent()"></div>
+        </div>
+      </div>
+
+      <div class="reel-side">
         <div class="reel-actions">
           <button class="action-btn" (click)="toggleLike(reels()[currentIndex])">
             <span
@@ -133,42 +159,25 @@
           }
         </div>
 
-        <div class="reel-info">
-          <div class="reel-user">
-            @if (reels()[currentIndex].autorAvatar) {
-              <img [src]="reels()[currentIndex].autorAvatar" [alt]="reels()[currentIndex].autorNombre" class="user-avatar clickable" (click)="goToProfile(reels()[currentIndex].reel.autorId)" />
-            } @else {
-              <div class="user-avatar avatar-fallback clickable" (click)="goToProfile(reels()[currentIndex].reel.autorId)">{{ getInitials(reels()[currentIndex].autorNombre || '?') }}</div>
-            }
-            <span class="user-name clickable" (click)="goToProfile(reels()[currentIndex].reel.autorId)">{{ reels()[currentIndex].autorNombre || 'Usuario' }}</span>
-          </div>
-          <p class="reel-description">{{ reels()[currentIndex].reel.descripcion }}</p>
-          @if (reels()[currentIndex].reel.etiquetas?.length) {
-            <div class="reel-tags">
-              @for (tag of reels()[currentIndex].reel.etiquetas; track tag) {
-                <span class="tag">#{{ tag }}</span>
-              }
-            </div>
-          }
-        </div>
-
-        <div
-          class="reel-progress"
-          #progressBar
-          (pointerdown)="startSeek($event, progressBar, videoEl)"
-          (pointermove)="moveSeek($event, progressBar, videoEl)"
-          (pointerup)="stopSeek()"
-          (pointercancel)="stopSeek()"
-        >
-          <div class="reel-progress-fill" [style.width.%]="progressPercent()"></div>
+        <div class="reel-nav-arrows">
+          <button
+            class="nav-btn"
+            [disabled]="currentIndex === 0"
+            (click)="prevReel()"
+            aria-label="Reel anterior"
+          >
+            <span class="material-symbols-outlined">keyboard_arrow_up</span>
+          </button>
+          <button
+            class="nav-btn"
+            [disabled]="currentIndex >= reels().length - 1"
+            (click)="nextReel()"
+            aria-label="Siguiente reel"
+          >
+            <span class="material-symbols-outlined">keyboard_arrow_down</span>
+          </button>
         </div>
       </div>
-
-      @if (currentIndex < reels().length - 1) {
-        <button class="nav-btn next" (click)="nextReel()">
-          <span class="material-symbols-outlined">keyboard_arrow_down</span>
-        </button>
-      }
 
       <button class="create-fab" (click)="toggleComposer()">
         <span class="material-symbols-outlined">add</span>

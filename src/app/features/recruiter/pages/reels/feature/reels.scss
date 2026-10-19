@@ -41,37 +41,71 @@
   background: #000;
 }
 
-/* Controles de volumen sobre el video (esquina superior derecha) */
+/* Control de volumen estilo TikTok: speaker + barra de rango, esquina
+   superior derecha del video */
 .reel-volume {
   position: absolute;
   top: var(--space-md);
   right: var(--space-md);
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: var(--radius-xl);
   z-index: 25;
 }
 
 .volume-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
+  width: 28px;
+  height: 28px;
   border: none;
-  background: rgba(0, 0, 0, 0.5);
+  background: transparent;
   color: #fff;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease, background 0.2s ease;
-
-  &:hover {
-    transform: scale(1.1);
-    background: rgba(0, 0, 0, 0.7);
-  }
+  padding: 0;
 
   .material-symbols-outlined {
     font-size: 22px;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}
+
+/* Barra de rango de volumen (0-100%) */
+.volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 80px;
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    border: none;
+    cursor: pointer;
+  }
+
+  &::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    border: none;
+    cursor: pointer;
   }
 }
 

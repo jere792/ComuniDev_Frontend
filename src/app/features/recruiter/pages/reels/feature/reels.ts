@@ -52,6 +52,10 @@ export class RecruiterReels implements OnInit {
   // Reproducción del video (barra de progreso estilo TikTok)
   currentTime = 0;
   duration = 0;
+  /** Volumen en porcentaje (0-100) para la barra de rango. */
+  volume = 100;
+  /** Autoplay arranca cada video en silencio. */
+  muted = true;
   private draggingSeek = false;
 
   // Composer
@@ -273,6 +277,8 @@ export class RecruiterReels implements OnInit {
 
   onLoadedMetadata(video: HTMLVideoElement): void {
     this.duration = video.duration || 0;
+    // cada reel nuevo arranca en silencio por el autoplay
+    this.muted = video.muted;
   }
 
   /** Tap sobre el video: pausa/reproduce como TikTok. */
@@ -284,16 +290,31 @@ export class RecruiterReels implements OnInit {
     }
   }
 
-  /** Sube el volumen 10%; si estaba en silencio, lo reactiva (como TikTok). */
-  volumeUp(video: HTMLVideoElement): void {
-    video.muted = false;
-    video.volume = Math.min(1, Math.round((video.volume + 0.1) * 10) / 10);
+  /** Silenciar/activar sonido con el ícono del speaker. */
+  toggleMute(video: HTMLVideoElement): void {
+    video.muted = !video.muted;
+    if (!video.muted && video.volume === 0) {
+      video.volume = 0.5;
+      this.volume = 50;
+    }
+    this.muted = video.muted;
   }
 
-  /** Baja el volumen 10%; al llegar a 0 deja el video en silencio. */
-  volumeDown(video: HTMLVideoElement): void {
-    video.volume = Math.max(0, Math.round((video.volume - 0.1) * 10) / 10);
-    if (video.volume === 0) video.muted = true;
+  /** Barra de rango de volumen (0-100%) estilo TikTok. */
+  setVolume(event: Event, video: HTMLVideoElement): void {
+    const value = Number((event.target as HTMLInputElement).value);
+    this.volume = value;
+    video.volume = value / 100;
+    video.muted = value === 0;
+    this.muted = video.muted;
+  }
+
+  volumeIcon(): string {
+    return this.muted || this.volume === 0
+      ? 'volume_off'
+      : this.volume < 50
+        ? 'volume_down'
+        : 'volume_up';
   }
 
   startSeek(event: PointerEvent, bar: HTMLElement, video: HTMLVideoElement): void {

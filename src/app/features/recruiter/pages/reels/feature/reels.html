@@ -91,12 +91,19 @@
         </div>
 
         <div class="reel-volume">
-          <button class="volume-btn" (click)="volumeUp(videoEl)" aria-label="Subir volumen">
-            <span class="material-symbols-outlined">volume_up</span>
+          <button class="volume-btn" (click)="toggleMute(videoEl)" [attr.aria-label]="muted ? 'Activar sonido' : 'Silenciar'">
+            <span class="material-symbols-outlined">{{ volumeIcon() }}</span>
           </button>
-          <button class="volume-btn" (click)="volumeDown(videoEl)" aria-label="Bajar volumen">
-            <span class="material-symbols-outlined">volume_down</span>
-          </button>
+          <input
+            type="range"
+            class="volume-slider"
+            min="0"
+            max="100"
+            [value]="volume"
+            (input)="setVolume($event, videoEl)"
+            aria-label="Volumen"
+            [style.background]="'linear-gradient(to right, #fff ' + volume + '%, rgba(255,255,255,0.35) ' + volume + '%)'"
+          />
         </div>
 
         <div class="reel-info">

@@ -40,7 +40,7 @@ export class Hero {
   }
 
   onGoogleAuth(): void {
-    console.log('Google OAuth - pendiente integracion');
+    window.location.href = `${environment.apiUrl}/auth/google`;
   }
 
   onGitHubAuth(): void {

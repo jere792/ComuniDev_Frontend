@@ -226,7 +226,7 @@
               <div class="comment-meta">
                 <span class="comment-time">{{ c.comment.createdAt | date: 'dd/MM HH:mm' }}</span>
                 <button class="comment-action" (click)="toggleReplyInput(c, reels()[currentIndex].reel.id)">Responder</button>
-                <button class="comment-action" (click)="reportComment()">Reportar</button>
+                <button class="comment-action" (click)="reportComment(c)">Reportar</button>
               </div>
 
               @if (c.repliesCount > 0) {
@@ -249,7 +249,7 @@
                         <p class="comment-text">{{ r.comment.texto }}</p>
                         <div class="comment-meta">
                           <span class="comment-time">{{ r.comment.createdAt | date: 'dd/MM HH:mm' }}</span>
-                          <button class="comment-action" (click)="reportComment()">Reportar</button>
+                          <button class="comment-action" (click)="reportComment(r)">Reportar</button>
                         </div>
                       </div>
                       <div class="comment-like">

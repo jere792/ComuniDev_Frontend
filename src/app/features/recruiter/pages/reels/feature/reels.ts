@@ -11,6 +11,7 @@ import { TipoReaccion } from '@features/shared/domain/models/social-reaction.mod
 import { SocialComment } from '@features/shared/domain/models/social-comment.model';
 import { UserStore } from '@features/users/data-access/state/user.store';
 import { ToastService } from '@core/services/toast.service';
+import { ReportService } from '@core/services/report.service';
 import { UploadService } from '@core/services/upload.service';
 import { TagInputComponent } from '@shared/ui/tag-input/tag-input';
 import { ConfirmModal } from '@shared/ui/confirm-modal/confirm-modal';
@@ -57,6 +58,7 @@ export class RecruiterReels implements OnInit {
   private uploadService = inject(UploadService);
   private router = inject(Router);
   private toast = inject(ToastService);
+  private reportService = inject(ReportService);
 
   reels = signal<ReelVM[]>([]);
   currentIndex = 0;
@@ -633,9 +635,17 @@ export class RecruiterReels implements OnInit {
     });
   }
 
-  /** Reporta un comentario (por ahora solo confirmación visual). */
-  reportComment(): void {
-    this.toast.success('Comentario reportado. Gracias por ayudar a la comunidad.');
+  /** Reporta un comentario (o respuesta) al backend para moderación. */
+  reportComment(vm: ReelCommentVM): void {
+    const userId = this.getUserId();
+    if (!userId) return;
+    this.reportService.report(userId, 'COMMENT', vm.comment.id, 'Comentario reportado desde la app').subscribe({
+      next: () => this.toast.success('Comentario reportado. Gracias por ayudar a la comunidad.'),
+      error: (err: any) => {
+        const msg = err?.error?.message ?? 'No se pudo reportar el comentario';
+        this.toast.error(msg);
+      },
+    });
   }
 
   private loadMyCommentReaction(commentId: string, reelId: string): void {

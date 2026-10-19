@@ -77,6 +77,8 @@ export class RecruiterReels implements OnInit {
   /** Autoplay arranca cada video en silencio. */
   muted = true;
   private draggingSeek = false;
+  /** Bloqueo para no saltar de reel a cada tick del scroll. */
+  private wheelLocked = false;
 
   // Composer
   showComposer = signal(false);
@@ -362,7 +364,26 @@ export class RecruiterReels implements OnInit {
     this.currentTime = video.currentTime;
   }
 
+  /** Total de comentarios + respuestas para el contador del panel. */
+  commentCount(): number {
+    const comments = this.reels()[this.currentIndex]?.comments ?? [];
+    return comments.reduce((total, c) => total + 1 + (c.repliesCount ?? 0), 0);
+  }
+
   // ─── Navegación ───
+
+  /** Scroll del mouse/touchpad: baja o sube de reel como TikTok. */
+  onWheel(event: WheelEvent): void {
+    if (this.wheelLocked || Math.abs(event.deltaY) < 20) return;
+    event.preventDefault();
+    this.wheelLocked = true;
+    if (event.deltaY > 0) {
+      this.nextReel();
+    } else {
+      this.prevReel();
+    }
+    setTimeout(() => (this.wheelLocked = false), 650);
+  }
 
   nextReel(): void {
     if (this.currentIndex < this.reels().length - 1) {

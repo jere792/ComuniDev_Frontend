@@ -64,7 +64,7 @@
     </div>
   }
 
-  <div class="reels-container">
+  <div class="reels-container" (wheel)="onWheel($event)">
     @if (loading()) {
       <div class="loading-text">Cargando reels...</div>
     } @else if (reels().length === 0) {
@@ -204,7 +204,7 @@
   @if (reels()[currentIndex]?.showComments) {
     <div class="comments-panel">
       <div class="comments-header">
-        <h4>Conversaciones ({{ reels()[currentIndex].comments.length }})</h4>
+        <h4>Conversaciones ({{ commentCount() }})</h4>
         <button class="close-btn small" (click)="toggleComments(reels()[currentIndex])">
           <span class="material-symbols-outlined">close</span>
         </button>

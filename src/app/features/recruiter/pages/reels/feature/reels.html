@@ -185,7 +185,7 @@
     }
   </div>
 
-  @if (reels()[currentIndex].showComments) {
+  @if (reels()[currentIndex]?.showComments) {
     <div class="comments-panel">
       <div class="comments-header">
         <h4>Conversaciones ({{ reels()[currentIndex].comments.length }})</h4>

@@ -22,10 +22,25 @@ interface ReelVM {
   myReaction: TipoReaccion | null;
   saved: boolean;
   showComments: boolean;
-  comments: { comment: SocialComment; autorNombre: string }[];
+  comments: ReelCommentVM[];
   newComment: string;
   /** Para no contar la vista dos veces si vuelve a entrar al mismo reel. */
   vistaContada: boolean;
+}
+
+interface ReelCommentVM {
+  comment: SocialComment;
+  autorNombre: string;
+  autorAvatar: string;
+  /** Corazón que yo dejé en este comentario (LIKE o null). */
+  myReaction: TipoReaccion | null;
+  likesCount: number;
+  replies: ReelCommentVM[];
+  repliesCount: number;
+  repliesLoaded: boolean;
+  showReplies: boolean;
+  replyText: string;
+  showReplyInput: boolean;
 }
 
 @Component({
@@ -70,8 +85,9 @@ export class RecruiterReels implements OnInit {
   uploadProgress = '';
 
   private userCache = new Map<string, { nombre: string; avatar: string }>();
-  /** Nombre del usuario logueado, para firmar sus comentarios sin inventarlo. */
+  /** Nombre y foto del usuario logueado, para firmar sus comentarios sin inventarlos. */
   private myName = 'Tú';
+  private myAvatar = '';
 
   getUserId(): string | null {
     return localStorage.getItem('userId');
@@ -115,6 +131,7 @@ export class RecruiterReels implements OnInit {
     this.userStore.getById(userId).subscribe({
       next: (user: any) => {
         if (user?.nombre) this.myName = user.nombre;
+        if (user?.fotoPerfilUrl) this.myAvatar = user.fotoPerfilUrl;
       },
       error: () => {}
     });
@@ -466,10 +483,13 @@ export class RecruiterReels implements OnInit {
         next: (comments: SocialComment[]) => {
           this.reels.update(list => list.map(v =>
             v.reel.id === vm.reel.id
-              ? { ...v, comments: comments.map(c => ({ comment: c, autorNombre: '' })) }
+              ? { ...v, comments: comments.map(c => this.buildCommentVm(c)) }
               : v
           ));
-          comments.forEach(c => this.loadCommentAuthor(c.autorId, vm.reel.id));
+          comments.forEach(c => {
+            this.loadCommentAuthor(c.autorId, vm.reel.id);
+            this.loadMyCommentReaction(c.id, vm.reel.id);
+          });
         }
       });
     }
@@ -479,19 +499,154 @@ export class RecruiterReels implements OnInit {
     this.userStore.getById(autorId).subscribe({
       next: (user: any) => {
         if (user) {
+          const nombre = user.nombre ?? 'Usuario';
+          const avatar = user.fotoPerfilUrl ?? '';
           this.reels.update(list => list.map(v =>
             v.reel.id === reelId
               ? {
                   ...v,
-                  comments: v.comments.map(c =>
-                    c.comment.autorId === autorId
-                      ? { ...c, autorNombre: user.nombre ?? 'Usuario' }
-                      : c
-                  ),
+                  comments: v.comments.map(c => this.fillAuthor(c, autorId, nombre, avatar)),
                 }
               : v
           ));
         }
+      },
+      error: () => {}
+    });
+  }
+
+  /** Rellena nombre/foto en el comentario y sus respuestas (recursivo). */
+  private fillAuthor(vm: ReelCommentVM, autorId: string, nombre: string, avatar: string): ReelCommentVM {
+    const actualizado = vm.comment.autorId === autorId
+      ? { ...vm, autorNombre: nombre, autorAvatar: avatar }
+      : vm;
+    return actualizado.replies.length > 0
+      ? { ...actualizado, replies: actualizado.replies.map(r => this.fillAuthor(r, autorId, nombre, avatar)) }
+      : actualizado;
+  }
+
+  private buildCommentVm(comment: SocialComment): ReelCommentVM {
+    return {
+      comment,
+      autorNombre: '',
+      autorAvatar: '',
+      myReaction: null,
+      likesCount: comment.reaccionesCount ?? 0,
+      replies: [],
+      repliesCount: comment.repliesCount ?? 0,
+      repliesLoaded: false,
+      showReplies: false,
+      replyText: '',
+      showReplyInput: false,
+    };
+  }
+
+  /** Aplica fn al comentario commentId buscándolo también dentro de las respuestas. */
+  private mapCommentDeep(list: ReelVM[], reelId: string, commentId: string, fn: (vm: ReelCommentVM) => ReelCommentVM): ReelVM[] {
+    const mapList = (items: ReelCommentVM[]): ReelCommentVM[] =>
+      items.map(c => {
+        if (c.comment.id === commentId) return fn(c);
+        return c.replies.length > 0 ? { ...c, replies: mapList(c.replies) } : c;
+      });
+    return list.map(v => (v.reel.id === reelId ? { ...v, comments: mapList(v.comments) } : v));
+  }
+
+  // ─── Comentarios: corazones, respuestas y reporte ───
+
+  /** Corazón en un comentario (o en una respuesta). */
+  toggleCommentLike(vm: ReelCommentVM, reelId: string): void {
+    const userId = this.getUserId();
+    if (!userId) return;
+
+    if (vm.myReaction) {
+      this.reactionService.unreact(userId, vm.comment.id, 'COMMENT').subscribe({
+        next: () => {
+          this.reels.update(list => this.mapCommentDeep(list, reelId, vm.comment.id, c => ({
+            ...c, myReaction: null, likesCount: Math.max(0, c.likesCount - 1),
+          })));
+        }
+      });
+    } else {
+      this.reactionService.react(userId, vm.comment.id, 'COMMENT', 'LIKE').subscribe({
+        next: () => {
+          this.reels.update(list => this.mapCommentDeep(list, reelId, vm.comment.id, c => ({
+            ...c, myReaction: 'LIKE', likesCount: c.likesCount + 1,
+          })));
+        }
+      });
+    }
+  }
+
+  toggleReplyInput(vm: ReelCommentVM, reelId: string): void {
+    this.reels.update(list => this.mapCommentDeep(list, reelId, vm.comment.id, c => ({
+      ...c, showReplyInput: !c.showReplyInput,
+    })));
+  }
+
+  /** Muestra/oculta las respuestas de un comentario (las carga la primera vez). */
+  toggleReplies(vm: ReelCommentVM, reelId: string): void {
+    const show = !vm.showReplies;
+    this.reels.update(list => this.mapCommentDeep(list, reelId, vm.comment.id, c => ({
+      ...c, showReplies: show,
+    })));
+    if (show && !vm.repliesLoaded) {
+      this.commentService.getReplies(vm.comment.id).subscribe({
+        next: (replies: SocialComment[]) => {
+          const vms = replies.map(r => this.buildCommentVm(r));
+          this.reels.update(list => this.mapCommentDeep(list, reelId, vm.comment.id, c => ({
+            ...c,
+            replies: vms,
+            repliesLoaded: true,
+            repliesCount: Math.max(c.repliesCount, vms.length),
+          })));
+          replies.forEach(r => {
+            this.loadCommentAuthor(r.autorId, reelId);
+            this.loadMyCommentReaction(r.id, reelId);
+          });
+        }
+      });
+    }
+  }
+
+  /** Responde un comentario (subcomentario, como en inicio). */
+  addReply(vm: ReelCommentVM, reelId: string): void {
+    const userId = this.getUserId();
+    const text = vm.replyText.trim();
+    if (!userId || !text) return;
+
+    this.commentService.createComment(userId, reelId, text, 'REEL', vm.comment.id).subscribe({
+      next: (created: SocialComment) => {
+        if (!created) return;
+        const nuevo = this.buildCommentVm(created);
+        nuevo.autorNombre = this.myName;
+        nuevo.autorAvatar = this.myAvatar;
+        this.reels.update(list => this.mapCommentDeep(list, reelId, vm.comment.id, c => ({
+          ...c,
+          replies: [...c.replies, nuevo],
+          repliesCount: c.repliesCount + 1,
+          showReplies: true,
+          repliesLoaded: true,
+          showReplyInput: false,
+          replyText: '',
+        })));
+      }
+    });
+  }
+
+  /** Reporta un comentario (por ahora solo confirmación visual). */
+  reportComment(): void {
+    this.toast.success('Comentario reportado. Gracias por ayudar a la comunidad.');
+  }
+
+  private loadMyCommentReaction(commentId: string, reelId: string): void {
+    const userId = this.getUserId();
+    if (!userId) return;
+    this.reactionService.getMyReaction(userId, commentId, 'COMMENT').subscribe({
+      next: (r: any) => {
+        if (!r) return;
+        this.reels.update(list => this.mapCommentDeep(list, reelId, commentId, c => ({
+          ...c, myReaction: r.tipoReaccion ?? null,
+        })));
       },
       error: () => {}
     });
@@ -509,7 +664,7 @@ export class RecruiterReels implements OnInit {
             v.reel.id === vm.reel.id
               ? {
                   ...v,
-                  comments: [...v.comments, { comment: created, autorNombre: this.myName }],
+                  comments: [...v.comments, { ...this.buildCommentVm(created), autorNombre: this.myName, autorAvatar: this.myAvatar }],
                   newComment: '',
                   reel: this.withStats(v.reel, s => ({
                     ...s,

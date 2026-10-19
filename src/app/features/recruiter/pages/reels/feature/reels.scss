@@ -499,17 +499,16 @@
 
 /* Rightbar de conversaciones estilo TikTok: fijo al borde derecho de la
    ventana, debajo del header (64px) y hasta el fondo de la pantalla,
-   SIN mover el reel del centro. */
+   SIN mover el reel del centro. Usa los tokens del tema (claro/oscuro). */
 .comments-panel {
   position: fixed;
   top: 64px;
   right: 0;
   bottom: 0;
   width: 400px;
-  background: rgba(18, 18, 20, 0.95);
-  backdrop-filter: blur(10px);
-  border-left: 1px solid rgba(255, 255, 255, 0.12);
-  color: #fff;
+  background: var(--surface);
+  border-left: 1px solid var(--border-subtle);
+  color: var(--on-surface);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -533,15 +532,11 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--space-md);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1px solid var(--border-subtle);
 
   h4 {
     margin: 0;
     font-size: 15px;
-  }
-
-  .close-btn {
-    color: #fff;
   }
 }
 
@@ -557,6 +552,11 @@
 .comment-item {
   display: flex;
   gap: var(--space-sm);
+  align-items: flex-start;
+
+  &.reply {
+    margin-top: var(--space-sm);
+  }
 }
 
 .comment-avatar {
@@ -573,31 +573,119 @@
   flex-shrink: 0;
 }
 
+.comment-avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
 .comment-body {
   flex: 1;
+  min-width: 0;
 }
 
 .comment-name {
   font-size: 12px;
   font-weight: 600;
-  color: #fff;
+  color: var(--on-surface);
 }
 
 .comment-text {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--on-surface-variant);
   margin: var(--space-2xs) 0;
   line-height: 1.4;
+  word-break: break-word;
+}
+
+/* fila de meta: hora, responder y reportar */
+.comment-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
 }
 
 .comment-time {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--outline);
+}
+
+.comment-action {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--outline);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--on-surface);
+  }
+}
+
+.view-replies {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: var(--space-2xs);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--outline);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--on-surface);
+  }
+}
+
+.replies-list {
+  margin-top: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* corazón del comentario (columna derecha, como TikTok) */
+.comment-like {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.like-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--outline);
+
+  .material-symbols-outlined {
+    font-size: 18px;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.15);
+    }
+
+    &.liked {
+      color: #e74c3c;
+    }
+  }
+}
+
+.like-count {
+  font-size: 10px;
+  color: var(--outline);
 }
 
 .no-comments {
   text-align: center;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--outline);
   font-size: 13px;
   padding: var(--space-lg);
 }
@@ -606,26 +694,32 @@
   display: flex;
   gap: var(--space-sm);
   padding: var(--space-md);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: 1px solid var(--border-subtle);
 
   input {
     flex: 1;
     padding: var(--space-sm) var(--space-md);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--border);
     border-radius: var(--radius-xl);
     font-size: 13px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    background: var(--surface-container);
+    color: var(--on-surface);
 
     &::placeholder {
-      color: rgba(255, 255, 255, 0.4);
+      color: var(--outline);
     }
 
     &:focus {
       outline: none;
-      border-color: rgba(255, 255, 255, 0.4);
+      border-color: var(--primary);
     }
   }
+}
+
+/* input de respuesta bajo un comentario */
+.reply-input {
+  border-top: none;
+  padding: var(--space-sm) 0 0;
 }
 
 .send-btn {

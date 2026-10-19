@@ -213,11 +213,80 @@
       <div class="comments-list">
         @for (c of reels()[currentIndex].comments; track c.comment.id) {
           <div class="comment-item">
-            <div class="comment-avatar avatar-fallback small">{{ getInitials(c.autorNombre || '?') }}</div>
+            @if (c.autorAvatar) {
+              <img [src]="c.autorAvatar" [alt]="c.autorNombre" class="comment-avatar-img clickable" (click)="goToProfile(c.comment.autorId)" />
+            } @else {
+              <div class="comment-avatar avatar-fallback small clickable" (click)="goToProfile(c.comment.autorId)">{{ getInitials(c.autorNombre || '?') }}</div>
+            }
+
             <div class="comment-body">
-              <span class="comment-name">{{ c.autorNombre || 'Usuario' }}</span>
+              <span class="comment-name clickable" (click)="goToProfile(c.comment.autorId)">{{ c.autorNombre || 'Usuario' }}</span>
               <p class="comment-text">{{ c.comment.texto }}</p>
-              <span class="comment-time">{{ c.comment.createdAt | date: 'dd/MM HH:mm' }}</span>
+
+              <div class="comment-meta">
+                <span class="comment-time">{{ c.comment.createdAt | date: 'dd/MM HH:mm' }}</span>
+                <button class="comment-action" (click)="toggleReplyInput(c, reels()[currentIndex].reel.id)">Responder</button>
+                <button class="comment-action" (click)="reportComment()">Reportar</button>
+              </div>
+
+              @if (c.repliesCount > 0) {
+                <button class="view-replies" (click)="toggleReplies(c, reels()[currentIndex].reel.id)">
+                  {{ c.showReplies ? 'Ocultar respuestas' : 'Ver ' + c.repliesCount + (c.repliesCount === 1 ? ' respuesta' : ' respuestas') }}
+                </button>
+              }
+
+              @if (c.showReplies) {
+                <div class="replies-list">
+                  @for (r of c.replies; track r.comment.id) {
+                    <div class="comment-item reply">
+                      @if (r.autorAvatar) {
+                        <img [src]="r.autorAvatar" [alt]="r.autorNombre" class="comment-avatar-img clickable" (click)="goToProfile(r.comment.autorId)" />
+                      } @else {
+                        <div class="comment-avatar avatar-fallback small clickable" (click)="goToProfile(r.comment.autorId)">{{ getInitials(r.autorNombre || '?') }}</div>
+                      }
+                      <div class="comment-body">
+                        <span class="comment-name clickable" (click)="goToProfile(r.comment.autorId)">{{ r.autorNombre || 'Usuario' }}</span>
+                        <p class="comment-text">{{ r.comment.texto }}</p>
+                        <div class="comment-meta">
+                          <span class="comment-time">{{ r.comment.createdAt | date: 'dd/MM HH:mm' }}</span>
+                          <button class="comment-action" (click)="reportComment()">Reportar</button>
+                        </div>
+                      </div>
+                      <div class="comment-like">
+                        <button class="like-btn" (click)="toggleCommentLike(r, reels()[currentIndex].reel.id)">
+                          <span class="material-symbols-outlined" [class.liked]="r.myReaction">favorite</span>
+                        </button>
+                        @if (r.likesCount > 0) {
+                          <span class="like-count">{{ r.likesCount }}</span>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (c.showReplyInput) {
+                <div class="comment-input reply-input">
+                  <input
+                    type="text"
+                    placeholder="Escribe una respuesta..."
+                    [(ngModel)]="c.replyText"
+                    (keyup.enter)="addReply(c, reels()[currentIndex].reel.id)"
+                  />
+                  <button class="send-btn" (click)="addReply(c, reels()[currentIndex].reel.id)">
+                    <span class="material-symbols-outlined">send</span>
+                  </button>
+                </div>
+              }
+            </div>
+
+            <div class="comment-like">
+              <button class="like-btn" (click)="toggleCommentLike(c, reels()[currentIndex].reel.id)">
+                <span class="material-symbols-outlined" [class.liked]="c.myReaction">favorite</span>
+              </button>
+              @if (c.likesCount > 0) {
+                <span class="like-count">{{ c.likesCount }}</span>
+              }
             </div>
           </div>
         } @empty {

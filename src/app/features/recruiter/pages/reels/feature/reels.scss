@@ -36,7 +36,9 @@
 .reel-video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  /* el video se muestra completo y el sobrante queda en negro (como TikTok) */
+  object-fit: contain;
+  background: #000;
 }
 
 /* Barra de progreso estilo TikTok: fina abajo, se puede arrastrar para adelantar */
@@ -576,7 +578,9 @@
 
 .tag {
   font-size: 12px;
-  color: var(--primary);
+  /* blanco fijo: el tag se dibuja sobre el degradado oscuro del video,
+     y --primary en tema claro es casi negro y no se ve */
+  color: #fff;
   font-weight: 600;
 }
 

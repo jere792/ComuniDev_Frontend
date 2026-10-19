@@ -39,6 +39,29 @@
   object-fit: cover;
 }
 
+/* Barra de progreso estilo TikTok: fina abajo, se puede arrastrar para adelantar */
+.reel-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  z-index: 20;
+  transition: height 0.15s ease;
+
+  &:hover {
+    height: 10px;
+  }
+}
+
+.reel-progress-fill {
+  height: 100%;
+  background: #fff;
+  pointer-events: none;
+}
+
 .reel-actions {
   position: absolute;
   right: var(--space-md);
@@ -366,18 +389,18 @@
   color: var(--outline);
 }
 
+/* Panel de conversaciones a la derecha del reel, como TikTok */
 .comments-panel {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 280px;
+  width: 320px;
+  height: 100%;
+  max-height: 800px;
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(10px);
+  border-radius: var(--radius-lg);
   color: #fff;
   display: flex;
   flex-direction: column;
-  z-index: 10;
+  overflow: hidden;
 }
 
 .comments-header {

@@ -49,6 +49,11 @@ export class RecruiterReels implements OnInit {
   deleteConfirmOpen = signal(false);
   pendingDeleteId = signal<string | null>(null);
 
+  // Reproducción del video (barra de progreso estilo TikTok)
+  currentTime = 0;
+  duration = 0;
+  private draggingSeek = false;
+
   // Composer
   showComposer = signal(false);
   reelVideoUrl = '';
@@ -256,11 +261,59 @@ export class RecruiterReels implements OnInit {
     });
   }
 
+  // ─── Reproducción del video ───
+
+  progressPercent(): number {
+    return this.duration > 0 ? (this.currentTime / this.duration) * 100 : 0;
+  }
+
+  onTimeUpdate(video: HTMLVideoElement): void {
+    this.currentTime = video.currentTime;
+  }
+
+  onLoadedMetadata(video: HTMLVideoElement): void {
+    this.duration = video.duration || 0;
+  }
+
+  /** Tap sobre el video: pausa/reproduce como TikTok. */
+  togglePlay(video: HTMLVideoElement): void {
+    if (video.paused) {
+      video.play().catch(() => {});
+    } else {
+      video.pause();
+    }
+  }
+
+  startSeek(event: PointerEvent, bar: HTMLElement, video: HTMLVideoElement): void {
+    this.draggingSeek = true;
+    (event.currentTarget as HTMLElement)?.setPointerCapture?.(event.pointerId);
+    this.seekTo(event, bar, video);
+  }
+
+  moveSeek(event: PointerEvent, bar: HTMLElement, video: HTMLVideoElement): void {
+    if (!this.draggingSeek) return;
+    this.seekTo(event, bar, video);
+  }
+
+  stopSeek(): void {
+    this.draggingSeek = false;
+  }
+
+  private seekTo(event: PointerEvent, bar: HTMLElement, video: HTMLVideoElement): void {
+    if (!this.duration) return;
+    const rect = bar.getBoundingClientRect();
+    const ratio = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+    video.currentTime = ratio * this.duration;
+    this.currentTime = video.currentTime;
+  }
+
   // ─── Navegación ───
 
   nextReel(): void {
     if (this.currentIndex < this.reels().length - 1) {
       this.currentIndex++;
+      this.currentTime = 0;
+      this.duration = 0;
       this.registrarVistaActual();
     }
   }
@@ -268,6 +321,8 @@ export class RecruiterReels implements OnInit {
   prevReel(): void {
     if (this.currentIndex > 0) {
       this.currentIndex--;
+      this.currentTime = 0;
+      this.duration = 0;
       this.registrarVistaActual();
     }
   }

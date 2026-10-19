@@ -15,6 +15,7 @@ import { ReportService } from '@core/services/report.service';
 import { UploadService } from '@core/services/upload.service';
 import { TagInputComponent } from '@shared/ui/tag-input/tag-input';
 import { ConfirmModal } from '@shared/ui/confirm-modal/confirm-modal';
+import { ReportModal, ReportPayload } from '@shared/ui/report-modal/report-modal';
 
 interface ReelVM {
   reel: SocialReel;
@@ -46,7 +47,7 @@ interface ReelCommentVM {
 
 @Component({
   selector: 'app-recruiter-reels',
-  imports: [FormsModule, DatePipe, ConfirmModal, TagInputComponent],
+  imports: [FormsModule, DatePipe, ConfirmModal, ReportModal, TagInputComponent],
   templateUrl: './reels.html',
   styleUrl: './reels.scss',
 })
@@ -65,6 +66,8 @@ export class RecruiterReels implements OnInit {
   loading = signal(true);
   deleteConfirmOpen = signal(false);
   pendingDeleteId = signal<string | null>(null);
+  /** Comentario que se está reportando (null = modal cerrado). */
+  reportTarget: ReelCommentVM | null = null;
 
   // Reproducción del video (barra de progreso estilo TikTok)
   currentTime = 0;
@@ -635,17 +638,30 @@ export class RecruiterReels implements OnInit {
     });
   }
 
-  /** Reporta un comentario (o respuesta) al backend para moderación. */
-  reportComment(vm: ReelCommentVM): void {
+  /** Abre el modal de reporte con el comentario elegido (o su respuesta). */
+  openReport(vm: ReelCommentVM): void {
+    this.reportTarget = vm;
+  }
+
+  /** Envía el reporte elegido en el modal (motivo + descripción) al backend. */
+  onReportConfirm(payload: ReportPayload): void {
     const userId = this.getUserId();
-    if (!userId) return;
-    this.reportService.report(userId, 'COMMENT', vm.comment.id, 'Comentario reportado desde la app').subscribe({
-      next: () => this.toast.success('Comentario reportado. Gracias por ayudar a la comunidad.'),
+    const vm = this.reportTarget;
+    this.reportTarget = null;
+    if (!userId || !vm) return;
+
+    const motivo = payload.descripcion ? `${payload.motivo} — ${payload.descripcion}` : payload.motivo;
+    this.reportService.report(userId, 'COMMENT', vm.comment.id, motivo).subscribe({
+      next: () => this.toast.success('Reporte enviado. Gracias por ayudar a la comunidad.'),
       error: (err: any) => {
-        const msg = err?.error?.message ?? 'No se pudo reportar el comentario';
+        const msg = err?.error?.message ?? 'No se pudo enviar el reporte';
         this.toast.error(msg);
       },
     });
+  }
+
+  onReportCancel(): void {
+    this.reportTarget = null;
   }
 
   private loadMyCommentReaction(commentId: string, reelId: string): void {

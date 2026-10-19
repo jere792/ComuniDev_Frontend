@@ -1,0 +1,53 @@
+@if (open) {
+  <div class="report-overlay" (click)="onOverlayClick($event)">
+    <div class="report-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="report-header">
+        <div class="report-icon-wrap">
+          <span class="material-symbols-outlined">flag</span>
+        </div>
+        <div class="report-heading">
+          <h3 class="report-title">{{ title }}</h3>
+          <p class="report-subtitle">Selecciona el motivo del reporte</p>
+        </div>
+        <button type="button" class="report-close" (click)="onCancel()" aria-label="Cerrar">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="report-reasons">
+        @for (m of motivos; track m) {
+          <label class="report-reason" [class.selected]="motivo === m">
+            <input
+              type="radio"
+              name="motivo-reporte"
+              [value]="m"
+              [checked]="motivo === m"
+              (change)="selectMotivo(m)"
+            />
+            <span class="report-reason-label">{{ m }}</span>
+          </label>
+        }
+      </div>
+
+      <div class="report-description">
+        <label class="report-field-label" for="report-descripcion">Descripción (opcional)</label>
+        <textarea
+          id="report-descripcion"
+          [(ngModel)]="descripcion"
+          rows="3"
+          maxlength="300"
+          placeholder="Cuéntanos qué pasó..."
+        ></textarea>
+      </div>
+
+      <div class="report-actions">
+        <button type="button" class="btn btn-cancel" (click)="onCancel()">
+          {{ cancelText }}
+        </button>
+        <button type="button" class="btn btn-send" [disabled]="!motivo" (click)="onConfirm()">
+          {{ confirmText }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

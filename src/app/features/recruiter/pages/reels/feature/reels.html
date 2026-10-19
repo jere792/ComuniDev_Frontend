@@ -90,6 +90,15 @@
           ></video>
         </div>
 
+        <div class="reel-volume">
+          <button class="volume-btn" (click)="volumeUp(videoEl)" aria-label="Subir volumen">
+            <span class="material-symbols-outlined">volume_up</span>
+          </button>
+          <button class="volume-btn" (click)="volumeDown(videoEl)" aria-label="Bajar volumen">
+            <span class="material-symbols-outlined">volume_down</span>
+          </button>
+        </div>
+
         <div class="reel-info">
           <div class="reel-user">
             @if (reels()[currentIndex].autorAvatar) {
@@ -159,7 +168,7 @@
           }
         </div>
 
-        <div class="reel-nav-arrows">
+        <div class="reel-nav-arrows" [class.next-to-panel]="reels()[currentIndex]?.showComments">
           <button
             class="nav-btn"
             [disabled]="currentIndex === 0"

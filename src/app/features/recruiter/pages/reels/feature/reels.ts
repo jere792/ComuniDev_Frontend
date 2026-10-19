@@ -284,6 +284,18 @@ export class RecruiterReels implements OnInit {
     }
   }
 
+  /** Sube el volumen 10%; si estaba en silencio, lo reactiva (como TikTok). */
+  volumeUp(video: HTMLVideoElement): void {
+    video.muted = false;
+    video.volume = Math.min(1, Math.round((video.volume + 0.1) * 10) / 10);
+  }
+
+  /** Baja el volumen 10%; al llegar a 0 deja el video en silencio. */
+  volumeDown(video: HTMLVideoElement): void {
+    video.volume = Math.max(0, Math.round((video.volume - 0.1) * 10) / 10);
+    if (video.volume === 0) video.muted = true;
+  }
+
   startSeek(event: PointerEvent, bar: HTMLElement, video: HTMLVideoElement): void {
     this.draggingSeek = true;
     (event.currentTarget as HTMLElement)?.setPointerCapture?.(event.pointerId);

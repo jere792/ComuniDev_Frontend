@@ -41,6 +41,40 @@
   background: #000;
 }
 
+/* Controles de volumen sobre el video (esquina superior derecha) */
+.reel-volume {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  z-index: 25;
+}
+
+.volume-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  .material-symbols-outlined {
+    font-size: 22px;
+  }
+}
+
 /* Barra de progreso estilo TikTok: fina abajo, se puede arrastrar para adelantar */
 .reel-progress {
   position: absolute;
@@ -81,11 +115,24 @@
   gap: var(--space-lg);
 }
 
+/* Flechas ↑↓ fijas al lado derecho de la pantalla; cuando se abre el
+   rightbar de conversaciones se corren para quedar justo al lado de él,
+   como TikTok. */
 .reel-nav-arrows {
+  position: fixed;
+  top: 50%;
+  right: var(--space-lg);
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-sm);
+  z-index: 50;
+  transition: right 0.25s ease;
+
+  &.next-to-panel {
+    right: calc(400px + var(--space-lg));
+  }
 }
 
 .action-btn {

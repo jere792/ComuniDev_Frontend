@@ -56,6 +56,28 @@
         </div>
       </app-sidebar-card>
 
+      <!-- Privacidad -->
+      <app-sidebar-card icon="lock" title="Privacidad" subtitle="Quién puede ver tu perfil">
+        <div class="account-status">
+          <div class="account-status-row">
+            <span class="account-status-label">Visibilidad</span>
+            <select
+              class="visibility-select"
+              [value]="user()?.perfilPublico !== false ? 'true' : 'false'"
+              (change)="cambiarVisibilidad($event)"
+            >
+              <option value="true">Público</option>
+              <option value="false">Privado</option>
+            </select>
+          </div>
+          <p class="visibility-hint">
+            {{ user()?.perfilPublico === false
+              ? 'Solo tus conexiones aceptadas pueden ver tu información, empresas y publicaciones.'
+              : 'Cualquiera puede ver tu perfil, historial y empresas.' }}
+          </p>
+        </div>
+      </app-sidebar-card>
+
       <!-- Redes Sociales -->
       <app-sidebar-card icon="public" title="Redes Sociales" subtitle="Enlaces a tus perfiles">
         <div class="social-grid">

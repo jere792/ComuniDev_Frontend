@@ -66,9 +66,13 @@
 
               @if (headline()) {
                 <p class="headline-role">{{ headline() }}</p>
+              } @else if (mostrarProfesional() || mostrarReclutador()) {
+                <p class="headline-role placeholder">—</p>
               }
               @if (user()?.bio) {
                 <p class="motto-text">{{ user()?.bio }}</p>
+              } @else {
+                <p class="motto-text placeholder">—</p>
               }
             </div>
 
@@ -216,51 +220,61 @@
           <h2>Contacto</h2>
         </div>
         <div class="info-list">
-            @if (user()?.email) {
-              <div class="info-item">
-                <span class="material-symbols-outlined">mail</span>
-                <div class="info-body">
-                  <span class="info-label">Email</span>
+            <div class="info-item">
+              <span class="material-symbols-outlined">mail</span>
+              <div class="info-body">
+                <span class="info-label">Email</span>
+                @if (user()?.email) {
                   <a class="info-value link" [href]="'mailto:' + user()?.email">{{ user()?.email }}</a>
-                </div>
+                } @else {
+                  <span class="info-value placeholder">—</span>
+                }
               </div>
-            }
-            @if (user()?.telefono) {
-              <div class="info-item">
-                <span class="material-symbols-outlined">call</span>
-                <div class="info-body">
-                  <span class="info-label">Teléfono</span>
+            </div>
+            <div class="info-item">
+              <span class="material-symbols-outlined">call</span>
+              <div class="info-body">
+                <span class="info-label">Teléfono</span>
+                @if (user()?.telefono) {
                   <span class="info-value">{{ user()?.telefono }}</span>
-                </div>
+                } @else {
+                  <span class="info-value placeholder">—</span>
+                }
               </div>
-            }
-            @if (user()?.sitioWeb) {
-              <div class="info-item">
-                <span class="material-symbols-outlined">language</span>
-                <div class="info-body">
-                  <span class="info-label">Sitio web</span>
+            </div>
+            <div class="info-item">
+              <span class="material-symbols-outlined">language</span>
+              <div class="info-body">
+                <span class="info-label">Sitio web</span>
+                @if (user()?.sitioWeb) {
                   <a class="info-value link" [href]="webLink()" target="_blank" rel="noopener">{{ user()?.sitioWeb }}</a>
-                </div>
+                } @else {
+                  <span class="info-value placeholder">—</span>
+                }
               </div>
-            }
-            @if (ubicacionTexto()) {
-              <div class="info-item">
-                <span class="material-symbols-outlined">location_on</span>
-                <div class="info-body">
-                  <span class="info-label">Ubicación</span>
+            </div>
+            <div class="info-item">
+              <span class="material-symbols-outlined">location_on</span>
+              <div class="info-body">
+                <span class="info-label">Ubicación</span>
+                @if (ubicacionTexto()) {
                   <span class="info-value">{{ ubicacionTexto() }}</span>
-                </div>
+                } @else {
+                  <span class="info-value placeholder">—</span>
+                }
               </div>
-            }
-            @if (user()?.createdAt) {
-              <div class="info-item">
-                <span class="material-symbols-outlined">event_available</span>
-                <div class="info-body">
-                  <span class="info-label">Miembro desde</span>
+            </div>
+            <div class="info-item">
+              <span class="material-symbols-outlined">event_available</span>
+              <div class="info-body">
+                <span class="info-label">Miembro desde</span>
+                @if (user()?.createdAt) {
                   <span class="info-value">{{ user()?.createdAt | date: 'dd/MM/yyyy' }}</span>
-                </div>
+                } @else {
+                  <span class="info-value placeholder">—</span>
+                }
               </div>
-            }
+            </div>
             <div class="info-item">
               <span class="material-symbols-outlined">badge</span>
               <div class="info-body">
@@ -273,16 +287,14 @@
     </div>
 
     <div class="profile-main">
-        @if (user()?.developerProfile) {
+        @if (mostrarProfesional()) {
           <section class="profile-section">
             <div class="section-head">
               <span class="section-icon"><span class="material-symbols-outlined">code</span></span>
               <h2>Perfil profesional</h2>
             </div>
 
-            @if (user()?.developerProfile?.tituloProfesional) {
-              <p class="section-subtitle">{{ user()?.developerProfile?.tituloProfesional }}</p>
-            }
+            <p class="section-subtitle">{{ user()?.developerProfile?.tituloProfesional || '—' }}</p>
 
             @if (user()?.developerProfile?.tecnologias?.length) {
               <div class="detail-section">
@@ -298,6 +310,8 @@
                   }
                 </div>
               </div>
+            } @else {
+              <p class="detail-placeholder">—</p>
             }
 
             @if (user()?.developerProfile?.habilidadesBlandas?.length) {
@@ -309,6 +323,8 @@
                   }
                 </div>
               </div>
+            } @else {
+              <p class="detail-placeholder">—</p>
             }
 
             @if (user()?.developerProfile?.disponibilidadLaboral) {
@@ -331,6 +347,8 @@
                   </div>
                 }
               </div>
+            } @else {
+              <p class="detail-placeholder">—</p>
             }
 
             @if (user()?.developerProfile?.experiencias?.length) {
@@ -346,6 +364,8 @@
                   </div>
                 }
               </div>
+            } @else {
+              <p class="detail-placeholder">—</p>
             }
 
             @if (user()?.developerProfile?.educacion?.length) {
@@ -358,6 +378,8 @@
                   </div>
                 }
               </div>
+            } @else {
+              <p class="detail-placeholder">—</p>
             }
 
             @if (user()?.developerProfile?.certificados?.length) {
@@ -375,6 +397,8 @@
                   </div>
                 }
               </div>
+            } @else {
+              <p class="detail-placeholder">—</p>
             }
 
             @if (user()?.developerProfile?.proyectos?.length) {
@@ -400,6 +424,8 @@
                   </div>
                 }
               </div>
+            } @else {
+              <p class="detail-placeholder">—</p>
             }
 
             @if (user()?.developerProfile?.cv?.archivoUrl) {
@@ -410,6 +436,8 @@
                   {{ user()?.developerProfile?.cv?.nombreArchivo || 'Ver CV' }}
                 </a>
               </div>
+            } @else {
+              <p class="detail-placeholder">—</p>
             }
 
             @if (user()?.developerProfile?.enlaces) {
@@ -433,34 +461,30 @@
                   }
                 </div>
               </div>
+            } @else {
+              <p class="detail-placeholder">—</p>
             }
           </section>
         }
 
-        @if (user()?.recruiterProfile) {
+        @if (mostrarReclutador()) {
           <section class="profile-section">
             <div class="section-head">
               <span class="section-icon"><span class="material-symbols-outlined">handshake</span></span>
               <h2>Perfil de reclutador</h2>
             </div>
 
-            @if (user()?.recruiterProfile?.cargo) {
-              <p class="section-subtitle">{{ user()?.recruiterProfile?.cargo }}</p>
-            }
+            <p class="section-subtitle">{{ user()?.recruiterProfile?.cargo || '—' }}</p>
 
-            @if (user()?.recruiterProfile?.lema) {
-              <div class="detail-item">
-                <span class="detail-label">Lema</span>
-                <span class="detail-value">{{ user()?.recruiterProfile?.lema }}</span>
-              </div>
-            }
+            <div class="detail-item">
+              <span class="detail-label">Lema</span>
+              <span class="detail-value">{{ user()?.recruiterProfile?.lema || '—' }}</span>
+            </div>
 
-            @if (user()?.recruiterProfile?.modalidadTrabajo) {
-              <div class="detail-item">
-                <span class="detail-label">Modalidad</span>
-                <span class="detail-value">{{ user()?.recruiterProfile?.modalidadTrabajo }}</span>
-              </div>
-            }
+            <div class="detail-item">
+              <span class="detail-label">Modalidad</span>
+              <span class="detail-value">{{ user()?.recruiterProfile?.modalidadTrabajo || '—' }}</span>
+            </div>
 
             @if (user()?.recruiterProfile?.empresas?.length) {
               <div class="detail-section">
@@ -474,6 +498,8 @@
                   </div>
                 }
               </div>
+            } @else {
+              <p class="detail-placeholder">—</p>
             }
 
             @if (user()?.recruiterProfile?.redesSociales) {
@@ -502,6 +528,8 @@
                   }
                 </div>
               </div>
+            } @else {
+              <p class="detail-placeholder">—</p>
             }
           </section>
         }

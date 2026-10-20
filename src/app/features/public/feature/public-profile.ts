@@ -248,6 +248,18 @@ export class PublicProfile implements OnInit {
     return this.user()?.developerProfile?.tituloProfesional || this.user()?.recruiterProfile?.cargo || '';
   }
 
+  /** Muestra la sección profesional si existe el perfil o el rol lo indica. */
+  mostrarProfesional(): boolean {
+    const rol = (this.user()?.rolActivo || '').toUpperCase();
+    return !!this.user()?.developerProfile || rol === 'DEVELOPER';
+  }
+
+  /** Igual que mostrarProfesional, para el perfil de reclutador. */
+  mostrarReclutador(): boolean {
+    const rol = (this.user()?.rolActivo || '').toUpperCase();
+    return !!this.user()?.recruiterProfile || rol === 'RECRUITER';
+  }
+
   /** "Lima, Perú" armado desde la ubicación (con fallbacks). */
   ubicacionTexto(): string {
     const u = this.user()?.ubicacion;

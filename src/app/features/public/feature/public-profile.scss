@@ -875,6 +875,17 @@ a.link {
   }
 }
 
+/* campos sin llenar: guion tenue (se muestran igual, no se ocultan) */
+.placeholder {
+  color: var(--outline);
+}
+
+.detail-placeholder {
+  margin: 0;
+  color: var(--outline);
+  font-size: 14px;
+}
+
 /* redes sociales con iconos y colores de marca */
 .social-links {
   display: flex;

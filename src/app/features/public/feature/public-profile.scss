@@ -588,6 +588,19 @@
   }
 }
 
+/* fila superior: header + contacto en la misma fila (8fr / 4fr) */
+.profile-top-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl);
+  align-items: start;
+  margin-bottom: var(--space-xl);
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 8fr 4fr;
+  }
+}
+
 /* lista de contacto en el sidebar */
 .info-list {
   display: flex;

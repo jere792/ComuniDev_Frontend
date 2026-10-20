@@ -4,8 +4,9 @@
 
 @if (user()) {
   <div class="profile-container" [class.standalone]="!isLoggedIn">
-    <!-- Header: mismo diseño que el perfil propio -->
-    <div class="profile-card">
+    <div class="profile-top-row">
+      <!-- Header: mismo diseño que el perfil propio -->
+      <div class="profile-card">
       <div class="banner-wrapper">
         @if (user()?.bannerUrl) {
           <img [src]="user()?.bannerUrl" alt="Banner" class="banner-image" />
@@ -205,17 +206,16 @@
               </div>
             </div>
           }
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="profile-main">
-        <section class="profile-section">
-          <div class="section-head">
-            <span class="section-icon"><span class="material-symbols-outlined">contacts</span></span>
-            <h2>Contacto</h2>
-          </div>
-          <div class="info-grid">
+      <section class="profile-section">
+        <div class="section-head">
+          <span class="section-icon"><span class="material-symbols-outlined">contacts</span></span>
+          <h2>Contacto</h2>
+        </div>
+        <div class="info-list">
             @if (user()?.email) {
               <div class="info-item">
                 <span class="material-symbols-outlined">mail</span>
@@ -268,9 +268,11 @@
                 <span class="info-value">{{ estadoCuentaLabel() }}</span>
               </div>
             </div>
-          </div>
-        </section>
+        </div>
+      </section>
+    </div>
 
+    <div class="profile-main">
         @if (user()?.developerProfile) {
           <section class="profile-section">
             <div class="section-head">

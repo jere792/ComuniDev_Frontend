@@ -67,12 +67,12 @@
               @if (headline()) {
                 <p class="headline-role">{{ headline() }}</p>
               } @else if (mostrarProfesional() || mostrarReclutador()) {
-                <p class="headline-role placeholder">—</p>
+                <p class="headline-role placeholder">Sin título registrado</p>
               }
               @if (user()?.bio) {
                 <p class="motto-text">{{ user()?.bio }}</p>
               } @else {
-                <p class="motto-text placeholder">—</p>
+                <p class="motto-text placeholder">Sin biografía</p>
               }
             </div>
 
@@ -111,6 +111,10 @@
                 {{ roleLabel() }}
               </span>
             }
+            <span class="badge-chip" [class.badge-private]="user()?.perfilPublico === false">
+              <span class="material-symbols-outlined">{{ user()?.perfilPublico === false ? 'lock' : 'public' }}</span>
+              {{ user()?.perfilPublico === false ? 'Perfil privado' : 'Perfil público' }}
+            </span>
             @if (ubicacionTexto()) {
               <span class="badge-chip">
                 <span class="material-symbols-outlined">location_on</span>
@@ -214,6 +218,7 @@
         </div>
       </div>
 
+      @if (perfilVisible()) {
       <section class="profile-section">
         <div class="section-head">
           <span class="section-icon"><span class="material-symbols-outlined">contacts</span></span>
@@ -227,7 +232,7 @@
                 @if (user()?.email) {
                   <a class="info-value link" [href]="'mailto:' + user()?.email">{{ user()?.email }}</a>
                 } @else {
-                  <span class="info-value placeholder">—</span>
+                  <span class="info-value placeholder">Sin email registrado</span>
                 }
               </div>
             </div>
@@ -238,7 +243,7 @@
                 @if (user()?.telefono) {
                   <span class="info-value">{{ user()?.telefono }}</span>
                 } @else {
-                  <span class="info-value placeholder">—</span>
+                  <span class="info-value placeholder">Sin teléfono registrado</span>
                 }
               </div>
             </div>
@@ -249,7 +254,7 @@
                 @if (user()?.sitioWeb) {
                   <a class="info-value link" [href]="webLink()" target="_blank" rel="noopener">{{ user()?.sitioWeb }}</a>
                 } @else {
-                  <span class="info-value placeholder">—</span>
+                  <span class="info-value placeholder">Sin sitio web registrado</span>
                 }
               </div>
             </div>
@@ -260,7 +265,7 @@
                 @if (ubicacionTexto()) {
                   <span class="info-value">{{ ubicacionTexto() }}</span>
                 } @else {
-                  <span class="info-value placeholder">—</span>
+                  <span class="info-value placeholder">Sin ubicación registrada</span>
                 }
               </div>
             </div>
@@ -271,7 +276,7 @@
                 @if (user()?.createdAt) {
                   <span class="info-value">{{ user()?.createdAt | date: 'dd/MM/yyyy' }}</span>
                 } @else {
-                  <span class="info-value placeholder">—</span>
+                  <span class="info-value placeholder">Fecha no disponible</span>
                 }
               </div>
             </div>
@@ -284,9 +289,11 @@
             </div>
         </div>
       </section>
+      }
     </div>
 
     <div class="profile-main">
+        @if (perfilVisible()) {
         @if (mostrarProfesional()) {
           <section class="profile-section">
             <div class="section-head">
@@ -294,7 +301,7 @@
               <h2>Perfil profesional</h2>
             </div>
 
-            <p class="section-subtitle">{{ user()?.developerProfile?.tituloProfesional || '—' }}</p>
+            <p class="section-subtitle">{{ user()?.developerProfile?.tituloProfesional || 'Sin título profesional' }}</p>
 
             @if (user()?.developerProfile?.tecnologias?.length) {
               <div class="detail-section">
@@ -311,7 +318,7 @@
                 </div>
               </div>
             } @else {
-              <p class="detail-placeholder">—</p>
+              <p class="detail-placeholder">Sin tecnologías registradas</p>
             }
 
             @if (user()?.developerProfile?.habilidadesBlandas?.length) {
@@ -324,7 +331,7 @@
                 </div>
               </div>
             } @else {
-              <p class="detail-placeholder">—</p>
+              <p class="detail-placeholder">Sin habilidades registradas</p>
             }
 
             @if (user()?.developerProfile?.disponibilidadLaboral) {
@@ -348,7 +355,7 @@
                 }
               </div>
             } @else {
-              <p class="detail-placeholder">—</p>
+              <p class="detail-placeholder">Sin disponibilidad registrada</p>
             }
 
             @if (user()?.developerProfile?.experiencias?.length) {
@@ -365,7 +372,7 @@
                 }
               </div>
             } @else {
-              <p class="detail-placeholder">—</p>
+              <p class="detail-placeholder">Sin experiencia registrada</p>
             }
 
             @if (user()?.developerProfile?.educacion?.length) {
@@ -379,7 +386,7 @@
                 }
               </div>
             } @else {
-              <p class="detail-placeholder">—</p>
+              <p class="detail-placeholder">Sin educación registrada</p>
             }
 
             @if (user()?.developerProfile?.certificados?.length) {
@@ -398,7 +405,7 @@
                 }
               </div>
             } @else {
-              <p class="detail-placeholder">—</p>
+              <p class="detail-placeholder">Sin certificados registrados</p>
             }
 
             @if (user()?.developerProfile?.proyectos?.length) {
@@ -425,7 +432,7 @@
                 }
               </div>
             } @else {
-              <p class="detail-placeholder">—</p>
+              <p class="detail-placeholder">Sin proyectos registrados</p>
             }
 
             @if (user()?.developerProfile?.cv?.archivoUrl) {
@@ -437,7 +444,7 @@
                 </a>
               </div>
             } @else {
-              <p class="detail-placeholder">—</p>
+              <p class="detail-placeholder">Sin CV adjunto</p>
             }
 
             @if (user()?.developerProfile?.enlaces) {
@@ -462,7 +469,7 @@
                 </div>
               </div>
             } @else {
-              <p class="detail-placeholder">—</p>
+              <p class="detail-placeholder">Sin enlaces registrados</p>
             }
           </section>
         }
@@ -474,16 +481,16 @@
               <h2>Perfil de reclutador</h2>
             </div>
 
-            <p class="section-subtitle">{{ user()?.recruiterProfile?.cargo || '—' }}</p>
+            <p class="section-subtitle">{{ user()?.recruiterProfile?.cargo || 'Sin cargo registrado' }}</p>
 
             <div class="detail-item">
               <span class="detail-label">Lema</span>
-              <span class="detail-value">{{ user()?.recruiterProfile?.lema || '—' }}</span>
+              <span class="detail-value">{{ user()?.recruiterProfile?.lema || 'Sin lema registrado' }}</span>
             </div>
 
             <div class="detail-item">
               <span class="detail-label">Modalidad</span>
-              <span class="detail-value">{{ user()?.recruiterProfile?.modalidadTrabajo || '—' }}</span>
+              <span class="detail-value">{{ user()?.recruiterProfile?.modalidadTrabajo || 'Sin modalidad definida' }}</span>
             </div>
 
             @if (user()?.recruiterProfile?.empresas?.length) {
@@ -499,7 +506,7 @@
                 }
               </div>
             } @else {
-              <p class="detail-placeholder">—</p>
+              <p class="detail-placeholder">Sin empresas registradas</p>
             }
 
             @if (user()?.recruiterProfile?.redesSociales) {
@@ -529,8 +536,19 @@
                 </div>
               </div>
             } @else {
-              <p class="detail-placeholder">—</p>
+              <p class="detail-placeholder">Sin redes sociales registradas</p>
             }
+          </section>
+        }
+        } @else {
+          <section class="profile-section locked-panel">
+            <div class="section-head">
+              <span class="section-icon"><span class="material-symbols-outlined">lock</span></span>
+              <h2>Perfil privado</h2>
+            </div>
+            <p class="locked-text">
+              Este perfil es privado. Conéctate con {{ user()?.nombre || 'este usuario' }} y espera que acepte tu solicitud para ver su información, publicaciones e historial.
+            </p>
           </section>
         }
     </div>

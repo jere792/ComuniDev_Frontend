@@ -55,6 +55,7 @@ export class DeveloperProfilePage implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       bio: [''],
       telefono: [''],
+      perfilPublico: [true],
       ubicacionPais: [''],
       ubicacionCiudad: [''],
       ubicacionDistrito: [''],
@@ -142,6 +143,7 @@ export class DeveloperProfilePage implements OnInit {
         email: u.email,
         bio: u.bio || '',
         telefono: u.telefono || '',
+        perfilPublico: u.perfilPublico !== false,
         ubicacionPais: u.ubicacion?.pais || '',
         ubicacionCiudad: u.ubicacion?.ciudad || '',
         ubicacionDistrito: u.ubicacion?.distrito || '',
@@ -178,6 +180,7 @@ export class DeveloperProfilePage implements OnInit {
         email: formValue.email,
         bio: formValue.bio,
         telefono: formValue.telefono,
+        perfilPublico: formValue.perfilPublico,
         ubicacion: {
           pais: formValue.ubicacionPais,
           ciudad: formValue.ubicacionCiudad,

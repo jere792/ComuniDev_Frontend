@@ -260,6 +260,15 @@ export class PublicProfile implements OnInit {
     return !!this.user()?.recruiterProfile || rol === 'RECRUITER';
   }
 
+  /** El contenido se ve si el perfil es público, soy yo, o soy conexión aceptada. */
+  perfilVisible(): boolean {
+    const u = this.user();
+    if (!u) return false;
+    if (this.isOwnProfile()) return true;
+    if (u.perfilPublico !== false) return true;
+    return this.connectionStatus().status === 'CONNECTED';
+  }
+
   /** "Lima, Perú" armado desde la ubicación (con fallbacks). */
   ubicacionTexto(): string {
     const u = this.user()?.ubicacion;

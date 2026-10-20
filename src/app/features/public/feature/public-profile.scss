@@ -875,6 +875,25 @@ a.link {
   }
 }
 
+/* perfil privado: chip rojo y panel de contenido bloqueado */
+.badge-chip.badge-private {
+  background: rgba(186, 26, 26, 0.1);
+  color: var(--error);
+}
+
+.locked-panel {
+  text-align: center;
+}
+
+.locked-text {
+  margin: 0;
+  color: var(--on-surface-variant);
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 480px;
+  margin-inline: auto;
+}
+
 /* campos sin llenar: guion tenue (se muestran igual, no se ocultan) */
 .placeholder {
   color: var(--outline);

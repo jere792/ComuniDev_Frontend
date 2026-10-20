@@ -8,6 +8,7 @@ export interface User {
   bannerUrl?: string;
   bio?: string;
   sitioWeb?: string;
+  perfilPublico?: boolean;
   ubicacion?: Ubicacion;
   roles: string[];
   rolActivo: string;

@@ -44,6 +44,7 @@ const GET_USER_BY_ID = gql`
       bannerUrl
       bio
       sitioWeb
+      perfilPublico
       ubicacion { pais departamento provincia ciudad distrito direccion }
       roles
       rolActivo
@@ -80,8 +81,8 @@ const GET_USER_BY_ID = gql`
 `;
 
 const UPDATE_USER = gql`
-  mutation UpdateUser($id: ID!, $nombre: String, $nombreUsuario: String, $email: String, $telefono: String, $fotoPerfilUrl: String, $bannerUrl: String, $bio: String, $sitioWeb: String, $ubicacion: UserUbicacionInput) {
-    updateUser(id: $id, nombre: $nombre, nombreUsuario: $nombreUsuario, email: $email, telefono: $telefono, fotoPerfilUrl: $fotoPerfilUrl, bannerUrl: $bannerUrl, bio: $bio, sitioWeb: $sitioWeb, ubicacion: $ubicacion) {
+  mutation UpdateUser($id: ID!, $nombre: String, $nombreUsuario: String, $email: String, $telefono: String, $fotoPerfilUrl: String, $bannerUrl: String, $bio: String, $sitioWeb: String, $perfilPublico: Boolean, $ubicacion: UserUbicacionInput) {
+    updateUser(id: $id, nombre: $nombre, nombreUsuario: $nombreUsuario, email: $email, telefono: $telefono, fotoPerfilUrl: $fotoPerfilUrl, bannerUrl: $bannerUrl, bio: $bio, sitioWeb: $sitioWeb, perfilPublico: $perfilPublico, ubicacion: $ubicacion) {
       id
       nombre
       nombreUsuario
@@ -91,6 +92,7 @@ const UPDATE_USER = gql`
       bannerUrl
       bio
       sitioWeb
+      perfilPublico
       ubicacion { pais departamento provincia ciudad distrito direccion }
       roles
       rolActivo

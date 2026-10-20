@@ -57,6 +57,14 @@
                 <input class="form-input" type="tel" formControlName="telefono" placeholder="+51 999 888 777">
               </div>
             </div>
+
+            <div class="form-group">
+              <label class="form-label">Visibilidad del perfil</label>
+              <select class="form-input" formControlName="perfilPublico">
+                <option [ngValue]="true">Público — cualquiera puede ver tu perfil</option>
+                <option [ngValue]="false">Privado — solo tus conexiones aceptadas</option>
+              </select>
+            </div>
             <div class="form-group">
               <label class="form-label">Bio</label>
               <textarea class="form-textarea" formControlName="bio" rows="3" placeholder="Cuéntanos sobre ti..."></textarea>

@@ -209,9 +209,68 @@
       </div>
     </div>
 
-    <div class="profile-columns">
-      <!-- Columna principal -->
-      <div class="profile-main">
+    <div class="profile-main">
+        <section class="profile-section">
+          <div class="section-head">
+            <span class="section-icon"><span class="material-symbols-outlined">contacts</span></span>
+            <h2>Contacto</h2>
+          </div>
+          <div class="info-grid">
+            @if (user()?.email) {
+              <div class="info-item">
+                <span class="material-symbols-outlined">mail</span>
+                <div class="info-body">
+                  <span class="info-label">Email</span>
+                  <a class="info-value link" [href]="'mailto:' + user()?.email">{{ user()?.email }}</a>
+                </div>
+              </div>
+            }
+            @if (user()?.telefono) {
+              <div class="info-item">
+                <span class="material-symbols-outlined">call</span>
+                <div class="info-body">
+                  <span class="info-label">Teléfono</span>
+                  <span class="info-value">{{ user()?.telefono }}</span>
+                </div>
+              </div>
+            }
+            @if (user()?.sitioWeb) {
+              <div class="info-item">
+                <span class="material-symbols-outlined">language</span>
+                <div class="info-body">
+                  <span class="info-label">Sitio web</span>
+                  <a class="info-value link" [href]="webLink()" target="_blank" rel="noopener">{{ user()?.sitioWeb }}</a>
+                </div>
+              </div>
+            }
+            @if (ubicacionTexto()) {
+              <div class="info-item">
+                <span class="material-symbols-outlined">location_on</span>
+                <div class="info-body">
+                  <span class="info-label">Ubicación</span>
+                  <span class="info-value">{{ ubicacionTexto() }}</span>
+                </div>
+              </div>
+            }
+            @if (user()?.createdAt) {
+              <div class="info-item">
+                <span class="material-symbols-outlined">event_available</span>
+                <div class="info-body">
+                  <span class="info-label">Miembro desde</span>
+                  <span class="info-value">{{ user()?.createdAt | date: 'dd/MM/yyyy' }}</span>
+                </div>
+              </div>
+            }
+            <div class="info-item">
+              <span class="material-symbols-outlined">badge</span>
+              <div class="info-body">
+                <span class="info-label">Estado de la cuenta</span>
+                <span class="info-value">{{ estadoCuentaLabel() }}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
         @if (user()?.developerProfile) {
           <section class="profile-section">
             <div class="section-head">
@@ -444,71 +503,6 @@
             }
           </section>
         }
-      </div>
-
-      <!-- Sidebar -->
-      <aside class="profile-side">
-        <section class="profile-section side">
-          <div class="section-head">
-            <span class="section-icon"><span class="material-symbols-outlined">contacts</span></span>
-            <h2>Contacto</h2>
-          </div>
-          <div class="info-list">
-            @if (user()?.email) {
-              <div class="info-item">
-                <span class="material-symbols-outlined">mail</span>
-                <div class="info-body">
-                  <span class="info-label">Email</span>
-                  <a class="info-value link" [href]="'mailto:' + user()?.email">{{ user()?.email }}</a>
-                </div>
-              </div>
-            }
-            @if (user()?.telefono) {
-              <div class="info-item">
-                <span class="material-symbols-outlined">call</span>
-                <div class="info-body">
-                  <span class="info-label">Teléfono</span>
-                  <span class="info-value">{{ user()?.telefono }}</span>
-                </div>
-              </div>
-            }
-            @if (user()?.sitioWeb) {
-              <div class="info-item">
-                <span class="material-symbols-outlined">language</span>
-                <div class="info-body">
-                  <span class="info-label">Sitio web</span>
-                  <a class="info-value link" [href]="webLink()" target="_blank" rel="noopener">{{ user()?.sitioWeb }}</a>
-                </div>
-              </div>
-            }
-            @if (ubicacionTexto()) {
-              <div class="info-item">
-                <span class="material-symbols-outlined">location_on</span>
-                <div class="info-body">
-                  <span class="info-label">Ubicación</span>
-                  <span class="info-value">{{ ubicacionTexto() }}</span>
-                </div>
-              </div>
-            }
-            @if (user()?.createdAt) {
-              <div class="info-item">
-                <span class="material-symbols-outlined">event_available</span>
-                <div class="info-body">
-                  <span class="info-label">Miembro desde</span>
-                  <span class="info-value">{{ user()?.createdAt | date: 'dd/MM/yyyy' }}</span>
-                </div>
-              </div>
-            }
-            <div class="info-item">
-              <span class="material-symbols-outlined">badge</span>
-              <div class="info-body">
-                <span class="info-label">Estado de la cuenta</span>
-                <span class="info-value">{{ estadoCuentaLabel() }}</span>
-              </div>
-            </div>
-          </div>
-        </section>
-      </aside>
     </div>
   </div>
 }

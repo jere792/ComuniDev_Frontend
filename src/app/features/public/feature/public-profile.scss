@@ -57,7 +57,7 @@
 
 .banner-wrapper {
   position: relative;
-  height: 220px;
+  height: 150px;
 }
 
 .banner-image {
@@ -157,13 +157,13 @@
 
 .avatar-wrapper {
   position: relative;
-  margin-top: -70px;
+  margin-top: -60px;
   flex-shrink: 0;
   align-self: flex-start;
   height: fit-content;
 
   @media (max-width: 640px) {
-    margin-top: -50px;
+    margin-top: -40px;
   }
 }
 

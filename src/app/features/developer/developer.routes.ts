@@ -50,6 +50,10 @@ export const routes: Routes = [
         path: 'profile',
         loadChildren: () => import('@features/developer/profile/developer-profile.routes').then(m => m.routes),
       },
+      {
+        path: 'u/:userId',
+        loadComponent: () => import('@features/public/feature/public-profile').then(m => m.PublicProfile),
+      },
     ],
   },
 ];

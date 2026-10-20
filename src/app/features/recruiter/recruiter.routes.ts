@@ -27,6 +27,7 @@ export const routes: Routes = [
       { path: 'discover', loadComponent: () => import('@features/shared/feature/discover-users/discover-users').then(m => m.DiscoverUsers) },
       { path: 'solicitudes', loadComponent: () => import('@features/shared/feature/solicitudes/solicitudes').then(m => m.Solicitudes) },
       { path: 'profile', loadChildren: () => import('@features/recruiter/pages/profile/recruiter-profile.routes').then(m => m.routes) },
+      { path: 'u/:userId', loadComponent: () => import('@features/public/feature/public-profile').then(m => m.PublicProfile) },
     ],
   },
 ];

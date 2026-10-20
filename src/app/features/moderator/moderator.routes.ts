@@ -16,6 +16,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', loadComponent: () => import('@features/moderator/feature/dashboard/moderator-dashboard').then(m => m.ModeratorDashboard) },
       { path: 'discover', loadComponent: () => import('@features/shared/feature/discover-users/discover-users').then(m => m.DiscoverUsers) },
+      { path: 'u/:userId', loadComponent: () => import('@features/public/feature/public-profile').then(m => m.PublicProfile) },
     ],
   },
 ];

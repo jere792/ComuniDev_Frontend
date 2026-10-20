@@ -1,7 +1,28 @@
 .profile-container {
-  max-width: 800px;
+  width: 100%;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: var(--space-lg);
+  padding: var(--space-lg) var(--space-xl) var(--space-2xl);
+}
+
+/* layout de 2 columnas: contenido + sidebar */
+.profile-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+.profile-main {
+  min-width: 0;
+}
+
+.profile-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  position: sticky;
+  top: var(--space-lg);
 }
 
 .profile-banner {
@@ -11,15 +32,19 @@
 
 .banner-img {
   width: 100%;
-  height: 200px;
+  height: 260px;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
 }
 
 .banner-placeholder {
-  height: 200px;
-  background: linear-gradient(135deg, var(--primary), var(--tertiary));
-  border-radius: 12px;
+  height: 260px;
+  background:
+    radial-gradient(1200px 300px at 10% -20%, rgba(255, 255, 255, 0.18), transparent 60%),
+    linear-gradient(135deg, var(--primary), var(--tertiary));
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
 }
 
 .back-btn {
@@ -79,8 +104,13 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 0 var(--space-md);
-  margin-bottom: var(--space-md);
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-xl);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 }
 
 .profile-info {
@@ -235,32 +265,38 @@
   }
 }
 
-.profile-stats {
+/* estadísticas en el sidebar (filas) */
+.side-stats {
   display: flex;
-  gap: 1rem;
-  margin: 1.5rem 0;
-  padding: 0 var(--space-md);
+  flex-direction: column;
+  gap: var(--space-xs);
 }
 
-.stat-card {
-  flex: 1;
-  text-align: center;
-  padding: 1rem;
-  background: var(--surface-container-lowest);
-  border-radius: 8px;
-  border: 1px solid var(--border-subtle);
+.side-stat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface-container);
+  border-radius: var(--radius-md);
+
+  .stat-value {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    color: var(--on-surface-variant);
+  }
 }
 
-.stat-value {
-  display: block;
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--primary);
-}
-
-.stat-label {
-  font-size: 0.875rem;
-  color: var(--on-surface-variant);
+/* lista de contacto en el sidebar */
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 }
 
 .bio-section {
@@ -274,14 +310,50 @@
   }
 }
 
+/* tarjeta de sección (tonalidad tipo card) */
 .profile-section {
-  padding: 0 var(--space-md);
-  margin-top: var(--space-lg);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-lg);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 
   h2 {
-    font-size: 1.25rem;
-    margin: 0 0 var(--space-md) 0;
+    font-size: 1.15rem;
+    margin: 0;
     color: var(--on-surface);
+  }
+
+  &.side {
+    padding: var(--space-lg);
+    margin-bottom: 0;
+  }
+}
+
+/* encabezado de sección con chip de icono */
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.section-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  .material-symbols-outlined {
+    font-size: 20px;
   }
 }
 

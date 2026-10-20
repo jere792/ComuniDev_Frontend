@@ -38,10 +38,13 @@ export class PublicProfile implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    const userId = this.route.snapshot.paramMap.get('userId');
-    if (userId) {
-      this.loadUser(userId);
-    }
+    // se suscribe a los params para recargar si se navega de un perfil a otro
+    this.route.paramMap.subscribe((params) => {
+      const userId = params.get('userId');
+      if (userId) {
+        this.loadUser(userId);
+      }
+    });
   }
 
   loadUser(userId: string): void {

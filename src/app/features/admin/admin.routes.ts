@@ -17,6 +17,7 @@ export const routes: Routes = [
       { path: 'dashboard', loadComponent: () => import('@features/admin/feature/dashboard/admin-dashboard').then(m => m.AdminDashboard) },
       { path: 'users', loadChildren: () => import('@features/users/users.routes').then(m => m.routes) },
       { path: 'discover', loadComponent: () => import('@features/shared/feature/discover-users/discover-users').then(m => m.DiscoverUsers) },
+      { path: 'u/:userId', loadComponent: () => import('@features/public/feature/public-profile').then(m => m.PublicProfile) },
     ],
   },
 ];

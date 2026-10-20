@@ -134,298 +134,324 @@
       }
     </div>
 
-    <div class="profile-stats">
-      <div class="stat-card">
-        <span class="stat-value">{{ user()?.seguidoresCount || 0 }}</span>
-        <span class="stat-label">Seguidores</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-value">{{ user()?.siguiendoCount || 0 }}</span>
-        <span class="stat-label">Siguiendo</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-value">{{ user()?.conexionesCount || 0 }}</span>
-        <span class="stat-label">Conexiones</span>
-      </div>
-    </div>
-
-    @if (user()?.bio || user()?.email || user()?.telefono) {
-      <div class="profile-section">
-        <h2>Acerca de</h2>
-
+    <div class="profile-columns">
+      <!-- Columna principal -->
+      <div class="profile-main">
         @if (user()?.bio) {
-          <p class="bio-text">{{ user()?.bio }}</p>
+          <section class="profile-section">
+            <div class="section-head">
+              <span class="section-icon"><span class="material-symbols-outlined">person</span></span>
+              <h2>Acerca de</h2>
+            </div>
+            <p class="bio-text">{{ user()?.bio }}</p>
+          </section>
         }
 
-        <div class="info-grid">
-          @if (user()?.email) {
-            <div class="info-item">
-              <span class="material-symbols-outlined">mail</span>
-              <div class="info-body">
-                <span class="info-label">Email</span>
-                <a class="info-value link" [href]="'mailto:' + user()?.email">{{ user()?.email }}</a>
-              </div>
+        @if (user()?.developerProfile) {
+          <section class="profile-section">
+            <div class="section-head">
+              <span class="section-icon"><span class="material-symbols-outlined">code</span></span>
+              <h2>Perfil profesional</h2>
             </div>
-          }
-          @if (user()?.telefono) {
-            <div class="info-item">
-              <span class="material-symbols-outlined">call</span>
-              <div class="info-body">
-                <span class="info-label">Teléfono</span>
-                <span class="info-value">{{ user()?.telefono }}</span>
-              </div>
-            </div>
-          }
-          @if (user()?.sitioWeb) {
-            <div class="info-item">
-              <span class="material-symbols-outlined">language</span>
-              <div class="info-body">
-                <span class="info-label">Sitio web</span>
-                <a class="info-value link" [href]="webLink()" target="_blank" rel="noopener">{{ user()?.sitioWeb }}</a>
-              </div>
-            </div>
-          }
-          @if (ubicacionTexto()) {
-            <div class="info-item">
-              <span class="material-symbols-outlined">location_on</span>
-              <div class="info-body">
-                <span class="info-label">Ubicación</span>
-                <span class="info-value">{{ ubicacionTexto() }}</span>
-              </div>
-            </div>
-          }
-          @if (user()?.createdAt) {
-            <div class="info-item">
-              <span class="material-symbols-outlined">event_available</span>
-              <div class="info-body">
-                <span class="info-label">Miembro desde</span>
-                <span class="info-value">{{ user()?.createdAt | date: 'dd/MM/yyyy' }}</span>
-              </div>
-            </div>
-          }
-          <div class="info-item">
-            <span class="material-symbols-outlined">badge</span>
-            <div class="info-body">
-              <span class="info-label">Estado de la cuenta</span>
-              <span class="info-value">{{ estadoCuentaLabel() }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    }
 
-    @if (user()?.developerProfile) {
-      <div class="profile-section">
-        <h2>Perfil profesional</h2>
+            @if (user()?.developerProfile?.tituloProfesional) {
+              <p class="section-subtitle">{{ user()?.developerProfile?.tituloProfesional }}</p>
+            }
 
-        @if (user()?.developerProfile?.tituloProfesional) {
-          <p class="section-subtitle">{{ user()?.developerProfile?.tituloProfesional }}</p>
-        }
-
-        @if (user()?.developerProfile?.tecnologias?.length) {
-          <div class="detail-section">
-            <span class="detail-label">Tecnologías</span>
-            <div class="tags-container">
-              @for (tech of user()?.developerProfile?.tecnologias; track tech.nombre) {
-                <span class="tag" [title]="'Nivel: ' + tech.nivel + ' · ' + tech.aniosExperiencia + ' año(s)'">
-                  {{ tech.nombre }}
-                  @if (tech.nivel) {
-                    <span class="tag-level">{{ tech.nivel }}</span>
+            @if (user()?.developerProfile?.tecnologias?.length) {
+              <div class="detail-section">
+                <span class="detail-label">Tecnologías</span>
+                <div class="tags-container">
+                  @for (tech of user()?.developerProfile?.tecnologias; track tech.nombre) {
+                    <span class="tag" [title]="'Nivel: ' + tech.nivel + ' · ' + tech.aniosExperiencia + ' año(s)'">
+                      {{ tech.nombre }}
+                      @if (tech.nivel) {
+                        <span class="tag-level">{{ tech.nivel }}</span>
+                      }
+                    </span>
                   }
-                </span>
-              }
-            </div>
-          </div>
-        }
-
-        @if (user()?.developerProfile?.habilidadesBlandas?.length) {
-          <div class="detail-section">
-            <span class="detail-label">Habilidades blandas</span>
-            <div class="tags-container">
-              @for (hab of user()?.developerProfile?.habilidadesBlandas; track hab) {
-                <span class="tag soft">{{ hab }}</span>
-              }
-            </div>
-          </div>
-        }
-
-        @if (user()?.developerProfile?.disponibilidadLaboral) {
-          <div class="detail-section">
-            <span class="detail-label">Disponibilidad laboral</span>
-            <div class="detail-item">
-              <span class="detail-label small">Buscando empleo</span>
-              <span class="detail-value">{{ user()?.developerProfile?.disponibilidadLaboral?.buscandoEmpleo ? 'Sí' : 'No' }}</span>
-            </div>
-            @if (user()?.developerProfile?.disponibilidadLaboral?.modalidades?.length) {
-              <div class="detail-item">
-                <span class="detail-label small">Modalidades</span>
-                <span class="detail-value">{{ user()?.developerProfile?.disponibilidadLaboral?.modalidades?.join(', ') }}</span>
+                </div>
               </div>
             }
-            @if (user()?.developerProfile?.disponibilidadLaboral?.tiposContrato?.length) {
-              <div class="detail-item">
-                <span class="detail-label small">Tipos de contrato</span>
-                <span class="detail-value">{{ user()?.developerProfile?.disponibilidadLaboral?.tiposContrato?.join(', ') }}</span>
+
+            @if (user()?.developerProfile?.habilidadesBlandas?.length) {
+              <div class="detail-section">
+                <span class="detail-label">Habilidades blandas</span>
+                <div class="tags-container">
+                  @for (hab of user()?.developerProfile?.habilidadesBlandas; track hab) {
+                    <span class="tag soft">{{ hab }}</span>
+                  }
+                </div>
               </div>
             }
-          </div>
-        }
 
-        @if (user()?.developerProfile?.experiencias?.length) {
-          <div class="detail-section">
-            <span class="detail-label">Experiencia</span>
-            @for (exp of user()?.developerProfile?.experiencias; track exp.empresa) {
-              <div class="experience-item">
-                <strong>{{ exp.cargo }}</strong> en {{ exp.empresa }}
-                <span class="metadata">{{ exp.fechaInicio }} - {{ exp.fechaFin || 'Presente' }}</span>
-                @if (exp.descripcion) {
-                  <p class="experience-desc">{{ exp.descripcion }}</p>
+            @if (user()?.developerProfile?.disponibilidadLaboral) {
+              <div class="detail-section">
+                <span class="detail-label">Disponibilidad laboral</span>
+                <div class="detail-item">
+                  <span class="detail-label small">Buscando empleo</span>
+                  <span class="detail-value">{{ user()?.developerProfile?.disponibilidadLaboral?.buscandoEmpleo ? 'Sí' : 'No' }}</span>
+                </div>
+                @if (user()?.developerProfile?.disponibilidadLaboral?.modalidades?.length) {
+                  <div class="detail-item">
+                    <span class="detail-label small">Modalidades</span>
+                    <span class="detail-value">{{ user()?.developerProfile?.disponibilidadLaboral?.modalidades?.join(', ') }}</span>
+                  </div>
+                }
+                @if (user()?.developerProfile?.disponibilidadLaboral?.tiposContrato?.length) {
+                  <div class="detail-item">
+                    <span class="detail-label small">Tipos de contrato</span>
+                    <span class="detail-value">{{ user()?.developerProfile?.disponibilidadLaboral?.tiposContrato?.join(', ') }}</span>
+                  </div>
                 }
               </div>
             }
-          </div>
-        }
 
-        @if (user()?.developerProfile?.educacion?.length) {
-          <div class="detail-section">
-            <span class="detail-label">Educación</span>
-            @for (edu of user()?.developerProfile?.educacion; track edu.institucion) {
-              <div class="experience-item">
-                <strong>{{ edu.titulo }}</strong> — {{ edu.institucion }}
-                <span class="metadata">{{ edu.fechaInicio }} - {{ edu.fechaFin || 'Presente' }}</span>
-              </div>
-            }
-          </div>
-        }
-
-        @if (user()?.developerProfile?.certificados?.length) {
-          <div class="detail-section">
-            <span class="detail-label">Certificados</span>
-            @for (cert of user()?.developerProfile?.certificados; track cert.nombre) {
-              <div class="experience-item">
-                @if (cert.url) {
-                  <a class="link" [href]="cert.url" target="_blank" rel="noopener"><strong>{{ cert.nombre }}</strong></a>
-                } @else {
-                  <strong>{{ cert.nombre }}</strong>
-                }
-                — {{ cert.institucion }}
-                <span class="metadata">{{ cert.fechaObtencion }}</span>
-              </div>
-            }
-          </div>
-        }
-
-        @if (user()?.developerProfile?.proyectos?.length) {
-          <div class="detail-section">
-            <span class="detail-label">Proyectos</span>
-            @for (proy of user()?.developerProfile?.proyectos; track proy.nombre) {
-              <div class="experience-item">
-                @if (proy.url) {
-                  <a class="link" [href]="proy.url" target="_blank" rel="noopener"><strong>{{ proy.nombre }}</strong></a>
-                } @else {
-                  <strong>{{ proy.nombre }}</strong>
-                }
-                @if (proy.descripcion) {
-                  <p class="experience-desc">{{ proy.descripcion }}</p>
-                }
-                @if (proy.tecnologias?.length) {
-                  <div class="tags-container">
-                    @for (tec of proy.tecnologias; track tec) {
-                      <span class="tag soft">{{ tec }}</span>
+            @if (user()?.developerProfile?.experiencias?.length) {
+              <div class="detail-section">
+                <span class="detail-label">Experiencia</span>
+                @for (exp of user()?.developerProfile?.experiencias; track exp.empresa) {
+                  <div class="experience-item">
+                    <strong>{{ exp.cargo }}</strong> en {{ exp.empresa }}
+                    <span class="metadata">{{ exp.fechaInicio }} - {{ exp.fechaFin || 'Presente' }}</span>
+                    @if (exp.descripcion) {
+                      <p class="experience-desc">{{ exp.descripcion }}</p>
                     }
                   </div>
                 }
               </div>
             }
-          </div>
-        }
 
-        @if (user()?.developerProfile?.cv?.archivoUrl) {
-          <div class="detail-section">
-            <span class="detail-label">Currículum</span>
-            <a class="cv-link" [href]="user()?.developerProfile?.cv?.archivoUrl" target="_blank" rel="noopener">
-              <span class="material-symbols-outlined">description</span>
-              {{ user()?.developerProfile?.cv?.nombreArchivo || 'Ver CV' }}
-            </a>
-          </div>
-        }
-
-        @if (user()?.developerProfile?.enlaces) {
-          <div class="detail-section">
-            <span class="detail-label">Enlaces</span>
-            <div class="links-container">
-              @if (user()?.developerProfile?.enlaces?.github) {
-                <a href="{{ user()?.developerProfile?.enlaces?.github }}" target="_blank" rel="noopener" class="link-item">GitHub</a>
-              }
-              @if (user()?.developerProfile?.enlaces?.linkedin) {
-                <a href="{{ user()?.developerProfile?.enlaces?.linkedin }}" target="_blank" rel="noopener" class="link-item">LinkedIn</a>
-              }
-              @if (user()?.developerProfile?.enlaces?.portafolio) {
-                <a href="{{ user()?.developerProfile?.enlaces?.portafolio }}" target="_blank" rel="noopener" class="link-item">Portafolio</a>
-              }
-            </div>
-          </div>
-        }
-      </div>
-    }
-
-    @if (user()?.recruiterProfile) {
-      <div class="profile-section">
-        <h2>Perfil de reclutador</h2>
-
-        @if (user()?.recruiterProfile?.cargo) {
-          <p class="section-subtitle">{{ user()?.recruiterProfile?.cargo }}</p>
-        }
-
-        @if (user()?.recruiterProfile?.lema) {
-          <div class="detail-item">
-            <span class="detail-label">Lema</span>
-            <span class="detail-value">{{ user()?.recruiterProfile?.lema }}</span>
-          </div>
-        }
-
-        @if (user()?.recruiterProfile?.modalidadTrabajo) {
-          <div class="detail-item">
-            <span class="detail-label">Modalidad</span>
-            <span class="detail-value">{{ user()?.recruiterProfile?.modalidadTrabajo }}</span>
-          </div>
-        }
-
-        @if (user()?.recruiterProfile?.empresas?.length) {
-          <div class="detail-section">
-            <span class="detail-label">Empresas</span>
-            @for (empresa of user()?.recruiterProfile?.empresas; track empresa.companyId) {
-              <div class="experience-item">
-                <strong>{{ empresa.cargoEnEmpresa }}</strong>
-                @if (!empresa.activo) {
-                  <span class="metadata">(finalizado)</span>
+            @if (user()?.developerProfile?.educacion?.length) {
+              <div class="detail-section">
+                <span class="detail-label">Educación</span>
+                @for (edu of user()?.developerProfile?.educacion; track edu.institucion) {
+                  <div class="experience-item">
+                    <strong>{{ edu.titulo }}</strong> — {{ edu.institucion }}
+                    <span class="metadata">{{ edu.fechaInicio }} - {{ edu.fechaFin || 'Presente' }}</span>
+                  </div>
                 }
               </div>
             }
-          </div>
+
+            @if (user()?.developerProfile?.certificados?.length) {
+              <div class="detail-section">
+                <span class="detail-label">Certificados</span>
+                @for (cert of user()?.developerProfile?.certificados; track cert.nombre) {
+                  <div class="experience-item">
+                    @if (cert.url) {
+                      <a class="link" [href]="cert.url" target="_blank" rel="noopener"><strong>{{ cert.nombre }}</strong></a>
+                    } @else {
+                      <strong>{{ cert.nombre }}</strong>
+                    }
+                    — {{ cert.institucion }}
+                    <span class="metadata">{{ cert.fechaObtencion }}</span>
+                  </div>
+                }
+              </div>
+            }
+
+            @if (user()?.developerProfile?.proyectos?.length) {
+              <div class="detail-section">
+                <span class="detail-label">Proyectos</span>
+                @for (proy of user()?.developerProfile?.proyectos; track proy.nombre) {
+                  <div class="experience-item">
+                    @if (proy.url) {
+                      <a class="link" [href]="proy.url" target="_blank" rel="noopener"><strong>{{ proy.nombre }}</strong></a>
+                    } @else {
+                      <strong>{{ proy.nombre }}</strong>
+                    }
+                    @if (proy.descripcion) {
+                      <p class="experience-desc">{{ proy.descripcion }}</p>
+                    }
+                    @if (proy.tecnologias?.length) {
+                      <div class="tags-container">
+                        @for (tec of proy.tecnologias; track tec) {
+                          <span class="tag soft">{{ tec }}</span>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            @if (user()?.developerProfile?.cv?.archivoUrl) {
+              <div class="detail-section">
+                <span class="detail-label">Currículum</span>
+                <a class="cv-link" [href]="user()?.developerProfile?.cv?.archivoUrl" target="_blank" rel="noopener">
+                  <span class="material-symbols-outlined">description</span>
+                  {{ user()?.developerProfile?.cv?.nombreArchivo || 'Ver CV' }}
+                </a>
+              </div>
+            }
+
+            @if (user()?.developerProfile?.enlaces) {
+              <div class="detail-section">
+                <span class="detail-label">Enlaces</span>
+                <div class="links-container">
+                  @if (user()?.developerProfile?.enlaces?.github) {
+                    <a href="{{ user()?.developerProfile?.enlaces?.github }}" target="_blank" rel="noopener" class="link-item">GitHub</a>
+                  }
+                  @if (user()?.developerProfile?.enlaces?.linkedin) {
+                    <a href="{{ user()?.developerProfile?.enlaces?.linkedin }}" target="_blank" rel="noopener" class="link-item">LinkedIn</a>
+                  }
+                  @if (user()?.developerProfile?.enlaces?.portafolio) {
+                    <a href="{{ user()?.developerProfile?.enlaces?.portafolio }}" target="_blank" rel="noopener" class="link-item">Portafolio</a>
+                  }
+                </div>
+              </div>
+            }
+          </section>
         }
 
-        @if (user()?.recruiterProfile?.redesSociales) {
-          <div class="detail-section">
-            <span class="detail-label">Redes sociales</span>
-            <div class="links-container">
-              @if (user()?.recruiterProfile?.redesSociales?.linkedin) {
-                <a href="{{ user()?.recruiterProfile?.redesSociales?.linkedin }}" target="_blank" rel="noopener" class="link-item">LinkedIn</a>
-              }
-              @if (user()?.recruiterProfile?.redesSociales?.instagram) {
-                <a href="{{ user()?.recruiterProfile?.redesSociales?.instagram }}" target="_blank" rel="noopener" class="link-item">Instagram</a>
-              }
-              @if (user()?.recruiterProfile?.redesSociales?.tiktok) {
-                <a href="{{ user()?.recruiterProfile?.redesSociales?.tiktok }}" target="_blank" rel="noopener" class="link-item">TikTok</a>
-              }
-              @if (user()?.recruiterProfile?.redesSociales?.facebook) {
-                <a href="{{ user()?.recruiterProfile?.redesSociales?.facebook }}" target="_blank" rel="noopener" class="link-item">Facebook</a>
-              }
+        @if (user()?.recruiterProfile) {
+          <section class="profile-section">
+            <div class="section-head">
+              <span class="section-icon"><span class="material-symbols-outlined">handshake</span></span>
+              <h2>Perfil de reclutador</h2>
             </div>
-          </div>
+
+            @if (user()?.recruiterProfile?.cargo) {
+              <p class="section-subtitle">{{ user()?.recruiterProfile?.cargo }}</p>
+            }
+
+            @if (user()?.recruiterProfile?.lema) {
+              <div class="detail-item">
+                <span class="detail-label">Lema</span>
+                <span class="detail-value">{{ user()?.recruiterProfile?.lema }}</span>
+              </div>
+            }
+
+            @if (user()?.recruiterProfile?.modalidadTrabajo) {
+              <div class="detail-item">
+                <span class="detail-label">Modalidad</span>
+                <span class="detail-value">{{ user()?.recruiterProfile?.modalidadTrabajo }}</span>
+              </div>
+            }
+
+            @if (user()?.recruiterProfile?.empresas?.length) {
+              <div class="detail-section">
+                <span class="detail-label">Empresas</span>
+                @for (empresa of user()?.recruiterProfile?.empresas; track empresa.companyId) {
+                  <div class="experience-item">
+                    <strong>{{ empresa.cargoEnEmpresa }}</strong>
+                    @if (!empresa.activo) {
+                      <span class="metadata">(finalizado)</span>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            @if (user()?.recruiterProfile?.redesSociales) {
+              <div class="detail-section">
+                <span class="detail-label">Redes sociales</span>
+                <div class="links-container">
+                  @if (user()?.recruiterProfile?.redesSociales?.linkedin) {
+                    <a href="{{ user()?.recruiterProfile?.redesSociales?.linkedin }}" target="_blank" rel="noopener" class="link-item">LinkedIn</a>
+                  }
+                  @if (user()?.recruiterProfile?.redesSociales?.instagram) {
+                    <a href="{{ user()?.recruiterProfile?.redesSociales?.instagram }}" target="_blank" rel="noopener" class="link-item">Instagram</a>
+                  }
+                  @if (user()?.recruiterProfile?.redesSociales?.tiktok) {
+                    <a href="{{ user()?.recruiterProfile?.redesSociales?.tiktok }}" target="_blank" rel="noopener" class="link-item">TikTok</a>
+                  }
+                  @if (user()?.recruiterProfile?.redesSociales?.facebook) {
+                    <a href="{{ user()?.recruiterProfile?.redesSociales?.facebook }}" target="_blank" rel="noopener" class="link-item">Facebook</a>
+                  }
+                </div>
+              </div>
+            }
+          </section>
         }
       </div>
-    }
+
+      <!-- Sidebar -->
+      <aside class="profile-side">
+        <section class="profile-section side">
+          <div class="section-head">
+            <span class="section-icon"><span class="material-symbols-outlined">analytics</span></span>
+            <h2>Estadísticas</h2>
+          </div>
+          <div class="side-stats">
+            <div class="side-stat">
+              <span class="stat-value">{{ user()?.seguidoresCount || 0 }}</span>
+              <span class="stat-label">Seguidores</span>
+            </div>
+            <div class="side-stat">
+              <span class="stat-value">{{ user()?.siguiendoCount || 0 }}</span>
+              <span class="stat-label">Siguiendo</span>
+            </div>
+            <div class="side-stat">
+              <span class="stat-value">{{ user()?.conexionesCount || 0 }}</span>
+              <span class="stat-label">Conexiones</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="profile-section side">
+          <div class="section-head">
+            <span class="section-icon"><span class="material-symbols-outlined">contacts</span></span>
+            <h2>Contacto</h2>
+          </div>
+          <div class="info-list">
+            @if (user()?.email) {
+              <div class="info-item">
+                <span class="material-symbols-outlined">mail</span>
+                <div class="info-body">
+                  <span class="info-label">Email</span>
+                  <a class="info-value link" [href]="'mailto:' + user()?.email">{{ user()?.email }}</a>
+                </div>
+              </div>
+            }
+            @if (user()?.telefono) {
+              <div class="info-item">
+                <span class="material-symbols-outlined">call</span>
+                <div class="info-body">
+                  <span class="info-label">Teléfono</span>
+                  <span class="info-value">{{ user()?.telefono }}</span>
+                </div>
+              </div>
+            }
+            @if (user()?.sitioWeb) {
+              <div class="info-item">
+                <span class="material-symbols-outlined">language</span>
+                <div class="info-body">
+                  <span class="info-label">Sitio web</span>
+                  <a class="info-value link" [href]="webLink()" target="_blank" rel="noopener">{{ user()?.sitioWeb }}</a>
+                </div>
+              </div>
+            }
+            @if (ubicacionTexto()) {
+              <div class="info-item">
+                <span class="material-symbols-outlined">location_on</span>
+                <div class="info-body">
+                  <span class="info-label">Ubicación</span>
+                  <span class="info-value">{{ ubicacionTexto() }}</span>
+                </div>
+              </div>
+            }
+            @if (user()?.createdAt) {
+              <div class="info-item">
+                <span class="material-symbols-outlined">event_available</span>
+                <div class="info-body">
+                  <span class="info-label">Miembro desde</span>
+                  <span class="info-value">{{ user()?.createdAt | date: 'dd/MM/yyyy' }}</span>
+                </div>
+              </div>
+            }
+            <div class="info-item">
+              <span class="material-symbols-outlined">badge</span>
+              <div class="info-body">
+                <span class="info-label">Estado de la cuenta</span>
+                <span class="info-value">{{ estadoCuentaLabel() }}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
   </div>
 }
 

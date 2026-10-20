@@ -243,6 +243,11 @@ export class PublicProfile implements OnInit {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   }
 
+  /** Título profesional (developer) o cargo (reclutador) para el header. */
+  headline(): string {
+    return this.user()?.developerProfile?.tituloProfesional || this.user()?.recruiterProfile?.cargo || '';
+  }
+
   /** "Lima, Perú" armado desde la ubicación (con fallbacks). */
   ubicacionTexto(): string {
     const u = this.user()?.ubicacion;

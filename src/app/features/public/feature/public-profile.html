@@ -4,154 +4,208 @@
 
 @if (user()) {
   <div class="profile-container" [class.standalone]="!isLoggedIn">
-    <div class="profile-banner">
-      @if (user()?.bannerUrl) {
-        <img [src]="user()?.bannerUrl" alt="Banner" class="banner-img" />
-      } @else {
-        <div class="banner-placeholder"></div>
-      }
-      <button class="back-btn" (click)="goBack()">
-        <span class="material-symbols-outlined">arrow_back</span>
-      </button>
-      <div class="profile-avatar">
-        @if (user()?.fotoPerfilUrl) {
-          <img [src]="user()?.fotoPerfilUrl" alt="Foto" class="avatar-img" />
+    <!-- Header: mismo diseño que el perfil propio -->
+    <div class="profile-card">
+      <div class="banner-wrapper">
+        @if (user()?.bannerUrl) {
+          <img [src]="user()?.bannerUrl" alt="Banner" class="banner-image" />
         } @else {
-          <div class="avatar-circle">{{ getInitials() }}</div>
+          <div class="banner-placeholder"></div>
         }
-      </div>
-    </div>
-
-    <div class="profile-header">
-      <div class="profile-info">
-        <div class="name-row">
-          <h1>{{ user()?.nombre }}</h1>
-          @if (user()?.emailVerificado) {
-            <span class="material-symbols-outlined verified-icon" title="Email verificado">verified</span>
-          }
+        <div class="banner-overlay"></div>
+        <button class="back-btn" (click)="goBack()">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          <span class="status-text">{{ roleLabel() }} · ComuniDev</span>
         </div>
-        <span class="username">&#64;{{ user()?.nombreUsuario }}</span>
-
-        <div class="badge-row">
-          <span class="role-badge">{{ roleLabel() }}</span>
-          @if (user()?.recruiterProfile?.verificado) {
-            <span class="verified-badge">
-              <span class="material-symbols-outlined">workspace_premium</span>
-              Verificado
-            </span>
-          }
-          @if (user()?.developerProfile?.disponibilidadLaboral?.buscandoEmpleo) {
-            <span class="open-to-work-badge">Abierto a trabajar</span>
-          }
-        </div>
-
-        <div class="meta-row">
-          @if (ubicacionTexto()) {
-            <span class="meta-item">
-              <span class="material-symbols-outlined">location_on</span>
-              {{ ubicacionTexto() }}
-            </span>
-          }
-          @if (user()?.sitioWeb) {
-            <a class="meta-item link" [href]="webLink()" target="_blank" rel="noopener">
-              <span class="material-symbols-outlined">link</span>
-              {{ user()?.sitioWeb }}
-            </a>
-          }
-          @if (user()?.createdAt) {
-            <span class="meta-item">
-              <span class="material-symbols-outlined">calendar_month</span>
-              Se unió en {{ user()?.createdAt | date: 'MMMM yyyy' }}
-            </span>
-          }
-        </div>
-
-        @if (user()?.bio) {
-          <p class="header-bio">{{ user()?.bio }}</p>
-        }
       </div>
 
-      <div class="header-side">
-        <div class="header-stats">
-          <div class="header-stat">
-            <span class="stat-value">{{ user()?.seguidoresCount || 0 }}</span>
-            <span class="stat-label">Seguidores</span>
-          </div>
-          <div class="header-stat">
-            <span class="stat-value">{{ user()?.siguiendoCount || 0 }}</span>
-            <span class="stat-label">Siguiendo</span>
-          </div>
-          <div class="header-stat">
-            <span class="stat-value">{{ user()?.conexionesCount || 0 }}</span>
-            <span class="stat-label">Conexiones</span>
-          </div>
-        </div>
-
-        @if (!isOwnProfile()) {
-        <div class="action-buttons">
-          @if (connectionStatus().status === 'PENDING_RECEIVED') {
-            <button
-              class="connect-btn accept"
-              (click)="handleConnection()"
-              [disabled]="connectionLoading()"
-            >
-              @if (connectionLoading()) {
-                <span class="material-symbols-outlined spinning">progress_activity</span>
-              } @else {
-                <span class="material-symbols-outlined">person_add</span>
-                Aceptar
-              }
-            </button>
-            <button
-              class="connect-btn reject"
-              (click)="rejectRequest()"
-              [disabled]="connectionLoading()"
-            >
-              Rechazar
-            </button>
-          } @else {
-            <button
-              class="connect-btn"
-              [class.pending]="connectionStatus().status === 'PENDING_SENT'"
-              [class.connected]="connectionStatus().status === 'CONNECTED'"
-              [class.blocked]="isBlocked()"
-              (click)="handleConnection()"
-              [disabled]="connectionLoading() || isBlocked()"
-            >
-              @if (connectionLoading()) {
-                <span class="material-symbols-outlined spinning">progress_activity</span>
-              } @else if (isBlocked()) {
-                Bloqueado
-              } @else if (connectionStatus().status === 'PENDING_SENT') {
-                <span class="material-symbols-outlined">hourglass_top</span>
-                Solicitud enviada
-              } @else if (connectionStatus().status === 'CONNECTED') {
-                <span class="material-symbols-outlined">check_circle</span>
-                Conectado
-              } @else {
-                <span class="material-symbols-outlined">person_add</span>
-                Conectar
-              }
-            </button>
-          }
-          <button class="block-btn" [class.blocked]="isBlocked()" (click)="toggleBlock()" [disabled]="blockLoading()">
-            @if (blockLoading()) {
-              <span class="material-symbols-outlined spinning">progress_activity</span>
-            } @else if (isBlocked()) {
-              <span class="material-symbols-outlined">lock_open</span>
+      <div class="identity-section">
+        <div class="avatar-wrapper">
+          <div class="avatar-halo">
+            @if (user()?.fotoPerfilUrl) {
+              <img [src]="user()?.fotoPerfilUrl" alt="Foto de perfil" class="avatar-image" />
             } @else {
-              <span class="material-symbols-outlined">block</span>
+              <div class="avatar-fallback">{{ getInitials() }}</div>
             }
-          </button>
-          <button
-            class="message-btn"
-            (click)="escribirMensaje()"
-            [disabled]="isBlocked()">
-            <span class="material-symbols-outlined">chat</span>
-            Mensaje
-          </button>
+          </div>
         </div>
-      }
+
+        <div class="identity-block">
+          <div class="identity-top-row">
+            <div class="identity-text">
+              <div class="identity-row">
+                <h1 class="display-name">{{ user()?.nombre }}</h1>
+                @if (user()?.emailVerificado) {
+                  <div class="verified-badge" title="Email verificado">
+                    <span class="material-symbols-outlined">verified</span>
+                  </div>
+                }
+              </div>
+
+              <div class="handle-row">
+                <span class="handle">&#64;{{ user()?.nombreUsuario }}</span>
+                @if (user()?.recruiterProfile?.verificado) {
+                  <span class="separator-dot"></span>
+                  <div class="availability-badge online">
+                    <span class="availability-dot"></span>
+                    <span>Verificado</span>
+                  </div>
+                }
+                @if (user()?.developerProfile?.disponibilidadLaboral?.buscandoEmpleo) {
+                  <span class="separator-dot"></span>
+                  <div class="availability-badge online">
+                    <span class="availability-dot"></span>
+                    <span>Abierto a trabajar</span>
+                  </div>
+                }
+              </div>
+
+              @if (headline()) {
+                <p class="headline-role">{{ headline() }}</p>
+              }
+              @if (user()?.bio) {
+                <p class="motto-text">{{ user()?.bio }}</p>
+              }
+            </div>
+
+            <div class="stats-column">
+              <div class="stats-grid">
+                <div class="stat-item">
+                  <span class="stat-value">{{ user()?.seguidoresCount || 0 }}</span>
+                  <span class="stat-label">Seguidores</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-value">{{ user()?.siguiendoCount || 0 }}</span>
+                  <span class="stat-label">Siguiendo</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-value">{{ user()?.conexionesCount || 0 }}</span>
+                  <span class="stat-label">Conexiones</span>
+                </div>
+              </div>
+              @if (user()?.estadoCuenta) {
+                <div
+                  class="account-status-tag"
+                  [class.active]="user()?.estadoCuenta === 'ACTIVE'"
+                  [class.pending]="user()?.estadoCuenta === 'PENDING_VERIFICATION'"
+                >
+                  <span class="material-symbols-outlined">{{ user()?.estadoCuenta === 'ACTIVE' ? 'verified_user' : 'pending' }}</span>
+                  <span>{{ estadoCuentaLabel() }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="badges-row">
+            @if (user()?.rolActivo) {
+              <span class="badge-chip">
+                <span class="material-symbols-outlined">badge</span>
+                {{ roleLabel() }}
+              </span>
+            }
+            @if (ubicacionTexto()) {
+              <span class="badge-chip">
+                <span class="material-symbols-outlined">location_on</span>
+                {{ ubicacionTexto() }}
+              </span>
+            }
+            @if (user()?.sitioWeb) {
+              <a class="badge-chip" [href]="webLink()" target="_blank" rel="noopener">
+                <span class="material-symbols-outlined">link</span>
+                {{ user()?.sitioWeb }}
+              </a>
+            }
+            @if (user()?.createdAt) {
+              <span class="badge-chip">
+                <span class="material-symbols-outlined">calendar_month</span>
+                Se unió en {{ user()?.createdAt | date: 'MMMM yyyy' }}
+              </span>
+            }
+            @if (user()?.developerProfile?.tecnologias?.length) {
+              <span class="badge-chip">
+                <span class="material-symbols-outlined">code</span>
+                {{ user()?.developerProfile?.tecnologias?.length }} tecnologías
+              </span>
+            }
+            @if (user()?.developerProfile?.disponibilidadLaboral?.buscandoEmpleo) {
+              <span class="badge-chip badge-active">
+                <span class="material-symbols-outlined">work</span>
+                Buscando empleo
+              </span>
+            }
+          </div>
+
+          @if (!isOwnProfile()) {
+            <div class="profile-actions-row">
+              <div class="action-buttons">
+                @if (connectionStatus().status === 'PENDING_RECEIVED') {
+                  <button
+                    class="connect-btn accept"
+                    (click)="handleConnection()"
+                    [disabled]="connectionLoading()"
+                  >
+                    @if (connectionLoading()) {
+                      <span class="material-symbols-outlined spinning">progress_activity</span>
+                    } @else {
+                      <span class="material-symbols-outlined">person_add</span>
+                      Aceptar
+                    }
+                  </button>
+                  <button
+                    class="connect-btn reject"
+                    (click)="rejectRequest()"
+                    [disabled]="connectionLoading()"
+                  >
+                    Rechazar
+                  </button>
+                } @else {
+                  <button
+                    class="connect-btn"
+                    [class.pending]="connectionStatus().status === 'PENDING_SENT'"
+                    [class.connected]="connectionStatus().status === 'CONNECTED'"
+                    [class.blocked]="isBlocked()"
+                    (click)="handleConnection()"
+                    [disabled]="connectionLoading() || isBlocked()"
+                  >
+                    @if (connectionLoading()) {
+                      <span class="material-symbols-outlined spinning">progress_activity</span>
+                    } @else if (isBlocked()) {
+                      Bloqueado
+                    } @else if (connectionStatus().status === 'PENDING_SENT') {
+                      <span class="material-symbols-outlined">hourglass_top</span>
+                      Solicitud enviada
+                    } @else if (connectionStatus().status === 'CONNECTED') {
+                      <span class="material-symbols-outlined">check_circle</span>
+                      Conectado
+                    } @else {
+                      <span class="material-symbols-outlined">person_add</span>
+                      Conectar
+                    }
+                  </button>
+                }
+                <button class="block-btn" [class.blocked]="isBlocked()" (click)="toggleBlock()" [disabled]="blockLoading()">
+                  @if (blockLoading()) {
+                    <span class="material-symbols-outlined spinning">progress_activity</span>
+                  } @else if (isBlocked()) {
+                    <span class="material-symbols-outlined">lock_open</span>
+                  } @else {
+                    <span class="material-symbols-outlined">block</span>
+                  }
+                </button>
+                <button
+                  class="message-btn"
+                  (click)="escribirMensaje()"
+                  [disabled]="isBlocked()">
+                  <span class="material-symbols-outlined">chat</span>
+                  Mensaje
+                </button>
+              </div>
+            </div>
+          }
+        </div>
       </div>
     </div>
 

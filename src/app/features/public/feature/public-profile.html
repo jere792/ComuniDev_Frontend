@@ -67,7 +67,23 @@
         </div>
       </div>
 
-      @if (!isOwnProfile()) {
+      <div class="header-side">
+        <div class="header-stats">
+          <div class="header-stat">
+            <span class="stat-value">{{ user()?.seguidoresCount || 0 }}</span>
+            <span class="stat-label">Seguidores</span>
+          </div>
+          <div class="header-stat">
+            <span class="stat-value">{{ user()?.siguiendoCount || 0 }}</span>
+            <span class="stat-label">Siguiendo</span>
+          </div>
+          <div class="header-stat">
+            <span class="stat-value">{{ user()?.conexionesCount || 0 }}</span>
+            <span class="stat-label">Conexiones</span>
+          </div>
+        </div>
+
+        @if (!isOwnProfile()) {
         <div class="action-buttons">
           @if (connectionStatus().status === 'PENDING_RECEIVED') {
             <button
@@ -132,6 +148,7 @@
           </button>
         </div>
       }
+      </div>
     </div>
 
     <div class="profile-columns">
@@ -369,27 +386,6 @@
 
       <!-- Sidebar -->
       <aside class="profile-side">
-        <section class="profile-section side">
-          <div class="section-head">
-            <span class="section-icon"><span class="material-symbols-outlined">analytics</span></span>
-            <h2>Estadísticas</h2>
-          </div>
-          <div class="side-stats">
-            <div class="side-stat">
-              <span class="stat-value">{{ user()?.seguidoresCount || 0 }}</span>
-              <span class="stat-label">Seguidores</span>
-            </div>
-            <div class="side-stat">
-              <span class="stat-value">{{ user()?.siguiendoCount || 0 }}</span>
-              <span class="stat-label">Siguiendo</span>
-            </div>
-            <div class="side-stat">
-              <span class="stat-value">{{ user()?.conexionesCount || 0 }}</span>
-              <span class="stat-label">Conexiones</span>
-            </div>
-          </div>
-        </section>
-
         <section class="profile-section side">
           <div class="section-head">
             <span class="section-icon"><span class="material-symbols-outlined">contacts</span></span>

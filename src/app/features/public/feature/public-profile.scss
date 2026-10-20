@@ -284,22 +284,33 @@
   }
 }
 
-/* estadísticas en el sidebar (filas) */
-.side-stats {
+/* estadísticas en el header (como el perfil propio) */
+.header-side {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  align-items: flex-end;
+  gap: var(--space-md);
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    align-items: flex-start;
+    width: 100%;
+  }
 }
 
-.side-stat {
+.header-stats {
   display: flex;
+  gap: var(--space-xl);
+}
+
+.header-stat {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: var(--space-sm) var(--space-md);
-  background: var(--surface-container);
-  border-radius: var(--radius-md);
+  gap: 2px;
 
   .stat-value {
+    font-family: var(--font-display);
     font-size: 1.15rem;
     font-weight: 700;
     color: var(--primary);

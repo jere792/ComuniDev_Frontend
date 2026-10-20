@@ -237,4 +237,43 @@ export class PublicProfile implements OnInit {
     const name = this.user()?.nombre || '';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   }
+
+  /** "Lima, Perú" armado desde la ubicación (con fallbacks). */
+  ubicacionTexto(): string {
+    const u = this.user()?.ubicacion;
+    if (!u) return '';
+    const ciudad = u.ciudad || u.provincia || u.departamento || u.distrito;
+    const pais = u.pais;
+    return [ciudad, pais].filter(Boolean).join(', ');
+  }
+
+  /** Asegura que el sitio web sea un enlace válido (agrega https:// si falta). */
+  webLink(): string {
+    const web = this.user()?.sitioWeb || '';
+    return web.startsWith('http') ? web : `https://${web}`;
+  }
+
+  /** Rol en texto legible. */
+  roleLabel(): string {
+    const rol = (this.user()?.rolActivo || '').toUpperCase();
+    switch (rol) {
+      case 'ADMIN': return 'Administrador';
+      case 'MODERATOR': return 'Moderador';
+      case 'RECRUITER': return 'Reclutador';
+      case 'DEVELOPER': return 'Desarrollador';
+      default: return rol || 'Usuario';
+    }
+  }
+
+  /** Estado de la cuenta en texto legible. */
+  estadoCuentaLabel(): string {
+    const estado = (this.user()?.estadoCuenta || '').toUpperCase();
+    switch (estado) {
+      case 'ACTIVE': return 'Activa';
+      case 'PENDING_VERIFICATION': return 'Pendiente de verificación';
+      case 'SUSPENDED': return 'Suspendida';
+      case 'DELETED': return 'Eliminada';
+      default: return estado || 'Activa';
+    }
+  }
 }

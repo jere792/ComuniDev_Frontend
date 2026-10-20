@@ -27,6 +27,8 @@ export class PublicProfile implements OnInit {
   isBlocked = signal(false);
   blockLoading = signal(false);
   removeConfirmOpen = signal(false);
+  /** Con sesión se muestra dentro del layout de la app; sin sesión, como página pública. */
+  isLoggedIn = !!localStorage.getItem('userId');
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);

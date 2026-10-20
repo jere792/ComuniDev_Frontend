@@ -3,7 +3,7 @@
 }
 
 @if (user()) {
-  <div class="profile-container">
+  <div class="profile-container" [class.standalone]="!isLoggedIn">
     <div class="profile-banner">
       @if (user()?.bannerUrl) {
         <img [src]="user()?.bannerUrl" alt="Banner" class="banner-img" />

@@ -134,21 +134,6 @@ export class RecruiterProfilePage implements OnInit {
     });
   }
 
-  /** Cambia la visibilidad del perfil (público/privado) y la guarda al instante. */
-  cambiarVisibilidad(event: Event): void {
-    const userId = this.user()?.id;
-    if (!userId) return;
-
-    const esPublico = (event.target as HTMLSelectElement).value === 'true';
-    this.userStore.update(userId, { perfilPublico: esPublico }).subscribe({
-      next: (updated: User) => {
-        this.user.set(updated);
-        this.toast.success(esPublico ? 'Perfil público: cualquiera puede verlo' : 'Perfil privado: solo conexiones aceptadas');
-      },
-      error: () => this.toast.error('No se pudo actualizar la visibilidad'),
-    });
-  }
-
   populateProfileForm(profile: RecruiterProfile): void {
     this.profileForm.patchValue({
       cargo: profile.cargo || '',

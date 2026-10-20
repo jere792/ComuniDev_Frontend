@@ -240,28 +240,3 @@
   font-family: var(--font-body);
   font-size: 16px;
 }
-
-/* Privacidad del perfil */
-.visibility-select {
-  padding: 4px 8px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--on-surface);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-
-  &:focus {
-    outline: none;
-    border-color: var(--primary);
-  }
-}
-
-.visibility-hint {
-  margin: var(--space-sm) 0 0;
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--on-surface-variant);
-}
-

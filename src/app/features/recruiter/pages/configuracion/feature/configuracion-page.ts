@@ -193,11 +193,29 @@ export class ConfiguracionPage implements OnInit {
           this.descripcionForm.patchValue({
             bio: user.bio ?? '',
           } as any);
+          this.privacidadForm.patchValue({
+            perfilPublico: user.perfilPublico !== false,
+          } as any);
         }
       },
       error: () => {
         // Silently fail
       }
+    });
+  }
+
+  /** Guarda la visibilidad del perfil (público/privado). */
+  onSubmitPrivacidad(): void {
+    const userId = this.getUserId();
+    if (!userId) return;
+
+    const esPublico = this.privacidadForm.value.perfilPublico !== false;
+    this.userStore.update(userId, { perfilPublico: esPublico }).subscribe({
+      next: (updated: User) => {
+        this.userData.set(updated);
+        this.toast.success(esPublico ? 'Perfil público: cualquiera puede verlo' : 'Perfil privado: solo conexiones aceptadas');
+      },
+      error: () => this.toast.error('No se pudo actualizar la visibilidad'),
     });
   }
 

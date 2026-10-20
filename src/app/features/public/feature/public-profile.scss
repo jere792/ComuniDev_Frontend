@@ -672,3 +672,64 @@ a.link {
     text-decoration: underline;
   }
 }
+
+/* biografía dentro del header (como el lema del perfil propio) */
+.header-bio {
+  margin: var(--space-md) 0 0;
+  max-width: 640px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--on-surface-variant);
+  white-space: pre-line;
+}
+
+/* redes sociales con iconos y colores de marca */
+.social-links {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.social-link {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 19px;
+  text-decoration: none;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+
+  &:hover {
+    transform: translateY(-3px) scale(1.06);
+    opacity: 0.92;
+  }
+
+  &.github {
+    background: #181717;
+  }
+
+  &.linkedin {
+    background: #0a66c2;
+  }
+
+  &.instagram {
+    background: linear-gradient(45deg, #833ab4, #fd1d1d, #fcaf45);
+  }
+
+  &.tiktok {
+    background: #010101;
+    color: #25f4ee;
+  }
+
+  &.facebook {
+    background: #1877f2;
+  }
+
+  &.portfolio {
+    background: var(--primary);
+  }
+}

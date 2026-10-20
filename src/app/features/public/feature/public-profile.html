@@ -65,6 +65,10 @@
             </span>
           }
         </div>
+
+        @if (user()?.bio) {
+          <p class="header-bio">{{ user()?.bio }}</p>
+        }
       </div>
 
       <div class="header-side">
@@ -154,16 +158,6 @@
     <div class="profile-columns">
       <!-- Columna principal -->
       <div class="profile-main">
-        @if (user()?.bio) {
-          <section class="profile-section">
-            <div class="section-head">
-              <span class="section-icon"><span class="material-symbols-outlined">person</span></span>
-              <h2>Acerca de</h2>
-            </div>
-            <p class="bio-text">{{ user()?.bio }}</p>
-          </section>
-        }
-
         @if (user()?.developerProfile) {
           <section class="profile-section">
             <div class="section-head">
@@ -306,15 +300,21 @@
             @if (user()?.developerProfile?.enlaces) {
               <div class="detail-section">
                 <span class="detail-label">Enlaces</span>
-                <div class="links-container">
+                <div class="social-links">
                   @if (user()?.developerProfile?.enlaces?.github) {
-                    <a href="{{ user()?.developerProfile?.enlaces?.github }}" target="_blank" rel="noopener" class="link-item">GitHub</a>
+                    <a class="social-link github" href="{{ user()?.developerProfile?.enlaces?.github }}" target="_blank" rel="noopener" title="GitHub">
+                      <i class="fa-brands fa-github"></i>
+                    </a>
                   }
                   @if (user()?.developerProfile?.enlaces?.linkedin) {
-                    <a href="{{ user()?.developerProfile?.enlaces?.linkedin }}" target="_blank" rel="noopener" class="link-item">LinkedIn</a>
+                    <a class="social-link linkedin" href="{{ user()?.developerProfile?.enlaces?.linkedin }}" target="_blank" rel="noopener" title="LinkedIn">
+                      <i class="fa-brands fa-linkedin-in"></i>
+                    </a>
                   }
                   @if (user()?.developerProfile?.enlaces?.portafolio) {
-                    <a href="{{ user()?.developerProfile?.enlaces?.portafolio }}" target="_blank" rel="noopener" class="link-item">Portafolio</a>
+                    <a class="social-link portfolio" href="{{ user()?.developerProfile?.enlaces?.portafolio }}" target="_blank" rel="noopener" title="Portafolio">
+                      <i class="fa-solid fa-globe"></i>
+                    </a>
                   }
                 </div>
               </div>
@@ -364,18 +364,26 @@
             @if (user()?.recruiterProfile?.redesSociales) {
               <div class="detail-section">
                 <span class="detail-label">Redes sociales</span>
-                <div class="links-container">
+                <div class="social-links">
                   @if (user()?.recruiterProfile?.redesSociales?.linkedin) {
-                    <a href="{{ user()?.recruiterProfile?.redesSociales?.linkedin }}" target="_blank" rel="noopener" class="link-item">LinkedIn</a>
+                    <a class="social-link linkedin" href="{{ user()?.recruiterProfile?.redesSociales?.linkedin }}" target="_blank" rel="noopener" title="LinkedIn">
+                      <i class="fa-brands fa-linkedin-in"></i>
+                    </a>
                   }
                   @if (user()?.recruiterProfile?.redesSociales?.instagram) {
-                    <a href="{{ user()?.recruiterProfile?.redesSociales?.instagram }}" target="_blank" rel="noopener" class="link-item">Instagram</a>
+                    <a class="social-link instagram" href="{{ user()?.recruiterProfile?.redesSociales?.instagram }}" target="_blank" rel="noopener" title="Instagram">
+                      <i class="fa-brands fa-instagram"></i>
+                    </a>
                   }
                   @if (user()?.recruiterProfile?.redesSociales?.tiktok) {
-                    <a href="{{ user()?.recruiterProfile?.redesSociales?.tiktok }}" target="_blank" rel="noopener" class="link-item">TikTok</a>
+                    <a class="social-link tiktok" href="{{ user()?.recruiterProfile?.redesSociales?.tiktok }}" target="_blank" rel="noopener" title="TikTok">
+                      <i class="fa-brands fa-tiktok"></i>
+                    </a>
                   }
                   @if (user()?.recruiterProfile?.redesSociales?.facebook) {
-                    <a href="{{ user()?.recruiterProfile?.redesSociales?.facebook }}" target="_blank" rel="noopener" class="link-item">Facebook</a>
+                    <a class="social-link facebook" href="{{ user()?.recruiterProfile?.redesSociales?.facebook }}" target="_blank" rel="noopener" title="Facebook">
+                      <i class="fa-brands fa-facebook-f"></i>
+                    </a>
                   }
                 </div>
               </div>

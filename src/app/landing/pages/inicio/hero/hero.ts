@@ -34,7 +34,10 @@ export class Hero {
         const data = await this.authService.login(email, password);
         this.authService.navigateByRole(data.rolActivo);
       } catch (err: any) {
-        this.loginError = err?.error?.message || 'Credenciales invalidas';
+        //sin conexión (servidor apagado) no es lo mismo que credenciales incorrectas
+        this.loginError =
+          err?.error?.message ||
+          (err?.status === 0 ? 'No hay conexión con el servidor' : 'Credenciales invalidas');
       }
     }
   }

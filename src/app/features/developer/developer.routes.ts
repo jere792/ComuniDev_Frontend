@@ -11,6 +11,7 @@ export const routes: Routes = [
         { label: 'Reels', route: '/developer/reels', icon: 'smart_display' },
         { label: 'Mensajes', route: '/developer/messages', icon: 'chat' },
         { label: 'Solicitudes', route: '/developer/solicitudes', icon: 'person_add' },
+        { label: 'Perfil', route: '/developer/profile', icon: 'person' },
       ],
     },
     children: [

@@ -14,6 +14,7 @@ import { COUNTRIES, Country } from '@shared/constants/countries';
 import { SECTORS } from '@shared/constants/sectors';
 import { ImageEditorService } from '@core/services/image-editor.service';
 import { UploadService } from '@core/services/upload.service';
+import { ThemeService } from '@core/services/theme.service';
 
 @Component({
   selector: 'app-configuracion-page',
@@ -50,6 +51,14 @@ export class ConfiguracionPage implements OnInit {
   loading = signal(false);
 
   private toast = inject(ToastService);
+  private theme = inject(ThemeService);
+
+  /** Tema oscuro/claro (igual que el interruptor de la barra lateral). */
+  isDark = this.theme.dark;
+
+  toggleTheme(): void {
+    this.theme.toggle();
+  }
 
   categories: ConfigCategory[] = [
     {
@@ -71,6 +80,7 @@ export class ConfiguracionPage implements OnInit {
         { id: 'cuenta-estado', icon: 'verified', label: 'Estado de cuenta' },
         { id: 'cuenta-contrasena', icon: 'lock_reset', label: 'Cambio de contraseña' },
         { id: 'cuenta-privacidad', icon: 'shield', label: 'Privacidad' },
+        { id: 'cuenta-apariencia', icon: 'dark_mode', label: 'Apariencia' },
         { id: 'cuenta-notificaciones', icon: 'notifications', label: 'Notificaciones' },
         { id: 'cuenta-terminos', icon: 'gavel', label: 'Términos y condiciones' },
       ],

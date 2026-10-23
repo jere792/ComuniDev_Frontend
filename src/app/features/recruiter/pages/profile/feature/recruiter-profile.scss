@@ -240,3 +240,29 @@
   font-family: var(--font-body);
   font-size: 16px;
 }
+
+/* boton de configuracion flotante del perfil */
+.config-fab {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border-subtle);
+  color: var(--on-surface-variant);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: var(--shadow-floating);
+
+  &:hover {
+    color: var(--primary);
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+  }
+}

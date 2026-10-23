@@ -49,3 +49,10 @@
   width: 100%;
   text-align: left;
 }
+
+/* en pantallas chicas la barra lateral se oculta: la navegacion va en el footer */
+@media (max-width: 768px) {
+  :host {
+    display: none;
+  }
+}

@@ -197,6 +197,27 @@
       </section>
     }
 
+    @if (activeSection() === 'cuenta-apariencia') {
+      <section class="config-section">
+        <h2 class="section-title">Apariencia</h2>
+        <p class="section-desc">Cambia el tema de la aplicación</p>
+        <div class="section-body">
+          <div class="toggle-group">
+            <div class="toggle-row">
+              <div>
+                <span class="toggle-label">Modo oscuro</span>
+                <span class="toggle-desc">Usa la aplicación con colores oscuros</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" [checked]="isDark()" (change)="toggleTheme()" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+    }
+
     @if (activeSection() === 'cuenta-privacidad') {
       <section class="config-section" [formGroup]="privacidadForm">
         <h2 class="section-title">Privacidad</h2>

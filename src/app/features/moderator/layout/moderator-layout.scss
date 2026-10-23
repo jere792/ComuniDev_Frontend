@@ -22,3 +22,9 @@
     padding-bottom: 76px;
   }
 }
+
+@media (max-width: 768px) {
+  .user-main {
+    margin-left: 0;
+  }
+}

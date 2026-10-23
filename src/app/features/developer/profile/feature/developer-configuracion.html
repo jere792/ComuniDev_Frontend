@@ -106,6 +106,26 @@
               </label>
             </div>
           </div>
+          <div class="form-group">
+            <label class="form-label">Currículum (PDF)</label>
+            <div class="cv-fila">
+              <input
+                class="form-input"
+                type="file"
+                accept="application/pdf"
+                (change)="onCvSelected($event)"
+              />
+              @if (cvNombre()) {
+                <span class="cv-nombre">{{ cvNombre() }}</span>
+              }
+              @if (cvUrl()) {
+                <a class="cv-ver" [href]="cvUrl()" target="_blank" rel="noopener">Ver CV</a>
+              }
+            </div>
+            @if (cvSubiendo()) {
+              <span class="cv-hint">Subiendo CV…</span>
+            }
+          </div>
         </div>
         <div class="section-footer">
           <button class="btn-save" (click)="saveProfesional()">Guardar cambios</button>

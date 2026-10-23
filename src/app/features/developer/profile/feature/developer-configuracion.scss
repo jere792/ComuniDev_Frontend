@@ -642,3 +642,44 @@
     padding: var(--space-lg);
   }
 }
+
+/* CV en PDF (seccion profesional) */
+.cv-fila {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+
+  input[type='file'] {
+    flex: 1;
+    min-width: 220px;
+  }
+}
+
+.cv-nombre {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-surface);
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cv-ver {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.cv-hint {
+  display: block;
+  margin-top: var(--space-2xs);
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}

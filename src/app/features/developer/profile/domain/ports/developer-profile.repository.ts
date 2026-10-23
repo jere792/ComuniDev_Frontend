@@ -15,6 +15,7 @@ export interface CreateDeveloperProfileRequest {
   habilidadesBlandas?: string[];
   disponibilidadLaboral?: { buscandoEmpleo: boolean; modalidades: string[]; tiposContrato: string[] };
   enlaces?: { github?: string; linkedin?: string; portafolio?: string };
+  cv?: { archivoUrl?: string; nombreArchivo?: string; actualizadoEn?: string; visiblePara?: string };
 }
 
 export interface UpdateDeveloperProfileRequest {
@@ -23,6 +24,7 @@ export interface UpdateDeveloperProfileRequest {
   habilidadesBlandas?: string[];
   disponibilidadLaboral?: { buscandoEmpleo: boolean; modalidades: string[]; tiposContrato: string[] };
   enlaces?: { github?: string; linkedin?: string; portafolio?: string };
+  cv?: { archivoUrl?: string; nombreArchivo?: string; actualizadoEn?: string; visiblePara?: string };
 }
 
 export const DEVELOPER_PROFILE_REPOSITORY = new InjectionToken<DeveloperProfileRepository>('DeveloperProfileRepository');

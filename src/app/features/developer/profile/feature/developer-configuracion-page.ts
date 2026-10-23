@@ -4,6 +4,7 @@ import { UserStore } from '@features/users/data-access/state/user.store';
 import { AuthStore } from '@features/auth/data-access/state/auth.store';
 import { DeveloperProfileStore } from '@features/developer/profile/data-access/state/developer-profile.store';
 import { ToastService } from '@core/services/toast.service';
+import { UploadService } from '@core/services/upload.service';
 import { catchError, of } from 'rxjs';
 import { User, DeveloperProfile } from '@core/domain/models/user.model';
 import { PERU_DEPARTAMENTOS } from '@shared/constants/peru-departments';
@@ -35,6 +36,7 @@ export class DeveloperConfiguracionPage implements OnInit {
   private authStore = inject(AuthStore);
   private profileStore = inject(DeveloperProfileStore);
   private toast = inject(ToastService);
+  private uploadService = inject(UploadService);
 
   userData = signal<User | null>(null);
   profileData = signal<DeveloperProfile | null>(null);
@@ -82,6 +84,11 @@ export class DeveloperConfiguracionPage implements OnInit {
     email: [''],
     telefono: [''],
   });
+
+  // CV en PDF: se sube al cargarlo y su URL viaja junto al perfil al guardar
+  cvUrl = signal('');
+  cvNombre = signal('');
+  cvSubiendo = signal(false);
 
   profesionalForm = this.fb.group({
     tituloProfesional: [''],
@@ -202,6 +209,9 @@ export class DeveloperConfiguracionPage implements OnInit {
       habilidadesBlandas: profile.habilidadesBlandas ?? [],
       buscandoEmpleo: profile.disponibilidadLaboral?.buscandoEmpleo ?? false,
     });
+    //el CV actual (si existe) se muestra en la sección profesional
+    this.cvUrl.set(profile.cv?.archivoUrl ?? '');
+    this.cvNombre.set(profile.cv?.nombreArchivo ?? '');
     this.enlacesForm.patchValue({
       github: profile.enlaces?.github ?? '',
       linkedin: profile.enlaces?.linkedin ?? '',
@@ -261,6 +271,16 @@ export class DeveloperConfiguracionPage implements OnInit {
         modalidades: this.profileData()?.disponibilidadLaboral?.modalidades ?? [],
         tiposContrato: this.profileData()?.disponibilidadLaboral?.tiposContrato ?? [],
       },
+      //si se cargó un CV, su URL pública viaja con el perfil
+      ...(this.cvUrl()
+        ? {
+            cv: {
+              archivoUrl: this.cvUrl(),
+              nombreArchivo: this.cvNombre(),
+              actualizadoEn: new Date().toISOString(),
+            },
+          }
+        : {}),
     };
 
     const profileId = this.profileId();
@@ -271,6 +291,30 @@ export class DeveloperConfiguracionPage implements OnInit {
       this.profileStore.create({ userId, ...payload });
       this.showSuccess();
     }
+  }
+
+  //el PDF se sube al elegirlo (Cloudinary vía backend); "Guardar cambios" guarda la URL
+  onCvSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      this.toast.error('El CV debe ser un archivo PDF');
+      return;
+    }
+    this.cvSubiendo.set(true);
+    this.uploadService.uploadFile(file).subscribe({
+      next: (res) => {
+        this.cvUrl.set(res.url ?? '');
+        this.cvNombre.set(file.name);
+        this.cvSubiendo.set(false);
+        this.toast.success('CV subido. Guarda los cambios para completar.');
+      },
+      error: () => {
+        this.cvSubiendo.set(false);
+        this.toast.error('No se pudo subir el CV');
+      },
+    });
   }
 
   saveEnlaces(): void {

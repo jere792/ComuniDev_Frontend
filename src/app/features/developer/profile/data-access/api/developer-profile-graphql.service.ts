@@ -19,6 +19,7 @@ const GET_DEVELOPER_PROFILE_BY_USER = gql`
       habilidadesBlandas
       disponibilidadLaboral { buscandoEmpleo modalidades tiposContrato }
       enlaces { github linkedin portafolio }
+      cv { archivoUrl nombreArchivo actualizadoEn visiblePara }
     }
   }
 `;
@@ -31,6 +32,7 @@ const CREATE_DEVELOPER_PROFILE = gql`
     $habilidadesBlandas: [String]
     $disponibilidadLaboral: DeveloperDisponibilidadInput
     $enlaces: DeveloperEnlacesInput
+    $cv: DeveloperCvInput
   ) {
     createDeveloperProfile(
       userId: $userId
@@ -39,6 +41,7 @@ const CREATE_DEVELOPER_PROFILE = gql`
       habilidadesBlandas: $habilidadesBlandas
       disponibilidadLaboral: $disponibilidadLaboral
       enlaces: $enlaces
+      cv: $cv
     ) {
       id
       userId
@@ -47,6 +50,7 @@ const CREATE_DEVELOPER_PROFILE = gql`
       habilidadesBlandas
       disponibilidadLaboral { buscandoEmpleo modalidades tiposContrato }
       enlaces { github linkedin portafolio }
+      cv { archivoUrl nombreArchivo actualizadoEn visiblePara }
     }
   }
 `;
@@ -59,6 +63,7 @@ const UPDATE_DEVELOPER_PROFILE = gql`
     $habilidadesBlandas: [String]
     $disponibilidadLaboral: DeveloperDisponibilidadInput
     $enlaces: DeveloperEnlacesInput
+    $cv: DeveloperCvInput
   ) {
     updateDeveloperProfile(
       id: $id
@@ -67,6 +72,7 @@ const UPDATE_DEVELOPER_PROFILE = gql`
       habilidadesBlandas: $habilidadesBlandas
       disponibilidadLaboral: $disponibilidadLaboral
       enlaces: $enlaces
+      cv: $cv
     ) {
       id
       userId
@@ -75,6 +81,7 @@ const UPDATE_DEVELOPER_PROFILE = gql`
       habilidadesBlandas
       disponibilidadLaboral { buscandoEmpleo modalidades tiposContrato }
       enlaces { github linkedin portafolio }
+      cv { archivoUrl nombreArchivo actualizadoEn visiblePara }
     }
   }
 `;

@@ -87,6 +87,7 @@ export class Register {
   get formValid(): boolean {
     const cuentaValida =
       this.nombre().trim().length > 0 &&
+      this.apellido().trim().length > 0 &&
       this.usernameValid &&
       this.emailValid &&
       this.passwordValid &&

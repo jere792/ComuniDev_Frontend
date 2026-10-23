@@ -26,8 +26,11 @@
           <input class="input" type="text" id="nombre" placeholder="Carlos" [ngModel]="nombre()" (ngModelChange)="nombre.set($event)" name="nombre" required />
         </div>
         <div class="form-group">
-          <label class="label-md" for="apellido">{{ 'register' | t:'apellido' }}</label>
-          <input class="input" type="text" id="apellido" placeholder="Ruiz" [ngModel]="apellido()" (ngModelChange)="apellido.set($event)" name="apellido" />
+          <label class="label-md" for="apellido">{{ 'register' | t:'apellido' }} *</label>
+          <input class="input" type="text" id="apellido" placeholder="Ruiz" [ngModel]="apellido()" (ngModelChange)="apellido.set($event)" name="apellido" required />
+          @if (submitted() && !apellido().trim()) {
+            <span class="form-error">El apellido es obligatorio</span>
+          }
         </div>
       </div>
 

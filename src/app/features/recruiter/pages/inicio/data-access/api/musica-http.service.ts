@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../../../../environments/environment';
 import { LyricsResponse, MusicTrackResponse } from '@features/recruiter/pages/inicio/domain/models/music.model';
 import { MusicaRepository } from '@features/recruiter/pages/inicio/domain/ports/musica.repository';
 
@@ -8,7 +9,7 @@ import { MusicaRepository } from '@features/recruiter/pages/inicio/domain/ports/
 export class MusicaHttpService implements MusicaRepository {
   private http = inject(HttpClient);
 
-  private readonly API = '/api/v1/musica';
+  private readonly API = `${environment.apiUrl}/musica`;
 
   buscar(query: string): Observable<MusicTrackResponse[]> {
     const params = new HttpParams().set('q', query);

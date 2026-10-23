@@ -8,7 +8,17 @@
   </div>
   <div class="form-field">
     <label class="label-md" for="login-password">{{ 'login' | t:'contrasena' }}</label>
-    <input class="input" type="password" id="login-password" formControlName="password" [placeholder]="'login' | t:'contrasenaPlaceholder'">
+    <div class="password-wrap">
+      <input class="input" [type]="verPassword ? 'text' : 'password'" id="login-password" formControlName="password" [placeholder]="'login' | t:'contrasenaPlaceholder'">
+      <button
+        type="button"
+        class="password-toggle"
+        (click)="verPassword = !verPassword"
+        [attr.aria-label]="verPassword ? 'Ocultar contraseña' : 'Ver contraseña'"
+      >
+        <span class="material-symbols-outlined">{{ verPassword ? 'visibility_off' : 'visibility' }}</span>
+      </button>
+    </div>
   </div>
   <label class="auth-recordar">
     <input type="checkbox" [checked]="recordar" (change)="recordar = $any($event.target).checked" />

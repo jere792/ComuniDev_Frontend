@@ -19,6 +19,9 @@ export class Login implements OnInit {
   /** "Recordarme": guarda y prellena correo y contraseña (solo prototipo/demo). */
   recordar = false;
 
+  /** Muestra/oculta la contraseña en el input. */
+  verPassword = false;
+
   ngOnInit(): void {
     try {
       const guardado = localStorage.getItem('recordarme');

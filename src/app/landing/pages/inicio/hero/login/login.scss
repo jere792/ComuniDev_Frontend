@@ -108,3 +108,36 @@
     cursor: pointer;
   }
 }
+
+/* ver/ocultar contrasena */
+.password-wrap {
+  position: relative;
+
+  .input {
+    width: 100%;
+    padding-right: 42px;
+  }
+}
+
+.password-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--on-surface-variant);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+
+  .material-symbols-outlined {
+    font-size: 20px;
+  }
+
+  &:hover {
+    color: var(--on-surface);
+  }
+}

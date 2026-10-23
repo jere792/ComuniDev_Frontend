@@ -149,9 +149,46 @@
         </div>
       }
 
+      <div class="terminos-row">
+        <input
+          type="checkbox"
+          id="aceptaTerminos"
+          name="aceptaTerminos"
+          [ngModel]="aceptaTerminos()"
+          (ngModelChange)="aceptaTerminos.set($event)"
+        />
+        <label for="aceptaTerminos" class="body-sm">
+          Acepto los
+          <a href="javascript:void(0)" class="register-link" (click)="verTerminos.set(true); $event.preventDefault()">términos y condiciones</a>
+          y la política de privacidad *
+        </label>
+      </div>
+      @if (submitted() && !aceptaTerminos()) {
+        <span class="form-error">Debes aceptar los términos y condiciones</span>
+      }
+
       <button type="submit" class="btn btn-primary register-btn" [disabled]="!formValid">{{ 'register' | t:'crearCuenta' }}</button>
     </form>
 
     <p class="body-sm register-footer">{{ 'register' | t:'yaTienesCuenta' }} <a routerLink="/login" class="register-link">{{ 'register' | t:'iniciarSesion' }}</a></p>
   </div>
+
+  @if (verTerminos()) {
+    <div class="terminos-overlay" (click)="verTerminos.set(false)">
+      <div class="terminos-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+        <h3 class="terminos-titulo">Términos y condiciones</h3>
+        <div class="terminos-texto">
+          <p><strong>1. Uso de la plataforma</strong> — ComuniDev es una red profesional para desarrolladores, reclutadores y empresas. Al crear una cuenta te comprometes a usarla de forma lícita y respetuosa.</p>
+          <p><strong>2. Cuenta y seguridad</strong> — Eres responsable de tus credenciales y de la actividad que ocurra en tu cuenta. Notifícanos ante cualquier acceso no autorizado.</p>
+          <p><strong>3. Protección de datos</strong> — Tratamos tus datos personales conforme a la normativa de protección de datos vigente. Puedes solicitar su corrección o eliminación en cualquier momento desde Configuración.</p>
+          <p><strong>4. Contenido y conducta</strong> — No se permite contenido ofensivo, spam ni suplantación de identidad. Podemos retirar contenido o cuentas que incumplan estas reglas.</p>
+          <p><strong>5. Comunicaciones</strong> — Al registrarte aceptas recibir notificaciones relacionadas con tu actividad profesional en la plataforma. Puedes ajustarlas desde Preferencias.</p>
+        </div>
+        <div class="terminos-acciones">
+          <button type="button" class="btn btn-secondary" (click)="verTerminos.set(false)">Cerrar</button>
+          <button type="button" class="btn btn-primary" (click)="aceptaTerminos.set(true); verTerminos.set(false)">Aceptar términos</button>
+        </div>
+      </div>
+    </div>
+  }
 </section>

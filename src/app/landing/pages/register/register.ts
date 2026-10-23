@@ -33,6 +33,10 @@ export class Register {
   errorMessage = signal('');
   successMessage = signal('');
 
+  /** Términos y condiciones: el registro queda bloqueado hasta aceptarlos. */
+  aceptaTerminos = signal(false);
+  verTerminos = signal(false);
+
   /** Datos de empresa, solo cuando el rol es RECRUITER y declara tener una. */
   tieneEmpresa = signal(false);
   empresaNombre = signal('');
@@ -88,9 +92,10 @@ export class Register {
       this.passwordValid &&
       this.passwordsMatch;
 
-    if (!this.isRecruiter || !this.tieneEmpresa()) return cuentaValida;
+    const conTerminos = cuentaValida && this.aceptaTerminos();
+    if (!this.isRecruiter || !this.tieneEmpresa()) return conTerminos;
 
-    return cuentaValida && this.empresaNombre().trim().length > 0 && !!this.empresaPais();
+    return conTerminos && this.empresaNombre().trim().length > 0 && !!this.empresaPais();
   }
 
   async onSubmit(): Promise<void> {

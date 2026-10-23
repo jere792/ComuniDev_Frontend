@@ -3,10 +3,12 @@ import { RouterOutlet, ActivatedRoute } from '@angular/router';
 import { DeveloperSidebar } from '@features/developer/layout/components/sidebar/developer-sidebar';
 import { DeveloperHeader, HeaderLink } from '@features/developer/layout/components/header/developer-header';
 
+import { BottomNav } from '@shared/ui/bottom-nav/bottom-nav';
+
 @Component({
   selector: 'app-developer-layout',
   standalone: true,
-  imports: [RouterOutlet, DeveloperSidebar, DeveloperHeader],
+  imports: [BottomNav, RouterOutlet, DeveloperSidebar, DeveloperHeader],
   templateUrl: './developer-layout.html',
   styleUrl: './developer-layout.scss',
 })

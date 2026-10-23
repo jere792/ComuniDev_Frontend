@@ -15,3 +15,10 @@
   background-color: var(--surface);
   overflow-y: auto;
 }
+
+/* espacio para la barra de navegacion inferior en pantallas chicas */
+@media (max-width: 768px) {
+  .user-content {
+    padding-bottom: 76px;
+  }
+}

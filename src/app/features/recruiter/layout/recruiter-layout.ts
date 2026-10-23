@@ -3,10 +3,12 @@ import { RouterOutlet, ActivatedRoute } from '@angular/router';
 import { RecruiterSidebar } from '@features/recruiter/layout/components/sidebar/recruiter-sidebar';
 import { RecruiterHeader, HeaderLink } from '@features/recruiter/layout/components/header/recruiter-header';
 
+import { BottomNav } from '@shared/ui/bottom-nav/bottom-nav';
+
 @Component({
   selector: 'app-recruiter-layout',
   standalone: true,
-  imports: [RouterOutlet, RecruiterSidebar, RecruiterHeader],
+  imports: [BottomNav, RouterOutlet, RecruiterSidebar, RecruiterHeader],
   templateUrl: './recruiter-layout.html',
   styleUrl: './recruiter-layout.scss',
 })

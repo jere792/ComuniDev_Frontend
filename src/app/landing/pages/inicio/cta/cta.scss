@@ -93,3 +93,22 @@
     color: #10b981;
   }
 }
+
+/* responsive */
+@media (max-width: 768px) {
+  .cta-title {
+    font-size: 26px;
+    line-height: 1.25;
+  }
+
+  .cta-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .cta-meta {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-sm);
+  }
+}

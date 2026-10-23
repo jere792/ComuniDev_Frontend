@@ -292,3 +292,21 @@
 .clickable {
   cursor: pointer;
 }
+
+/* responsive */
+@media (max-width: 768px) {
+  .solicitudes-header {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .request-card {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+}

@@ -243,3 +243,25 @@
     background: var(--surface-container);
   }
 }
+
+/* responsive */
+@media (max-width: 768px) {
+  .offers-header {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .section-title {
+    font-size: 20px;
+  }
+
+  .offer-details {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .offer-footer {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+}

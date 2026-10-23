@@ -241,3 +241,20 @@
     }
   }
 }
+
+/* responsive */
+@media (max-width: 768px) {
+  .users-header {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .users-toolbar {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .users-table-container {
+    overflow-x: auto;
+  }
+}

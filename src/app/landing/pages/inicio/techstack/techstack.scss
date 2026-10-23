@@ -75,3 +75,22 @@
   font-weight: 600;
   color: var(--on-surface);
 }
+
+/* responsive */
+@media (max-width: 768px) {
+  .tech-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .tech-grid {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .tech-title {
+    font-size: 24px;
+    line-height: 1.3;
+  }
+}

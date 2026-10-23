@@ -149,3 +149,25 @@
   border-radius: var(--radius-full);
   border: 2px solid var(--surface-container-lowest);
 }
+
+/* responsive: la busqueda baja a su propia linea y la navegacion se desliza */
+@media (max-width: 768px) {
+  .user-header {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .header-center {
+    order: 3;
+    width: 100%;
+  }
+
+  .search-bar {
+    width: 100%;
+  }
+
+  .header-nav {
+    overflow-x: auto;
+  }
+}

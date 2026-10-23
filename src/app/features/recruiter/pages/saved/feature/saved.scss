@@ -133,3 +133,20 @@
     color: var(--error);
   }
 }
+
+/* responsive */
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 20px;
+  }
+
+  .tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .saved-card {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+}

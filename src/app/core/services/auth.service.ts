@@ -36,7 +36,17 @@ export class AuthService {
 
   register(nombre: string, nombreUsuario: string, email: string, password: string, rol: string, telefono?: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.api.register({ nombre, nombreUsuario, email, password, rol, telefono }).subscribe({
+      this.api.register({
+        nombre,
+        nombreUsuario,
+        email,
+        password,
+        rol,
+        telefono,
+        //prueba de aceptación de términos: versión y fecha quedan en el usuario
+        terminosVersion: '2026-10',
+        terminosAceptadosEn: new Date().toISOString(),
+      }).subscribe({
         next: (data) => resolve(data),
         error: (err) => reject(err),
       });

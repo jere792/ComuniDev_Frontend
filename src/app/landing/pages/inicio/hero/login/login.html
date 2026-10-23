@@ -10,6 +10,10 @@
     <label class="label-md" for="login-password">{{ 'login' | t:'contrasena' }}</label>
     <input class="input" type="password" id="login-password" formControlName="password" [placeholder]="'login' | t:'contrasenaPlaceholder'">
   </div>
+  <label class="auth-recordar">
+    <input type="checkbox" [checked]="recordar" (change)="recordar = $any($event.target).checked" />
+    <span class="metadata-sm">Recordarme</span>
+  </label>
   <a routerLink="/forgot-password" class="auth-forgot">{{ 'login' | t:'olvidaste' }}</a>
   <button type="submit" class="btn btn-primary auth-submit">{{ 'login' | t:'iniciarSesion' }}</button>
 </form>

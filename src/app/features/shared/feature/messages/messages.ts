@@ -49,14 +49,15 @@ export class Messages implements OnInit, AfterViewChecked {
   private totalVisto = 0;
 
   ngOnInit(): void {
-    this.userId = localStorage.getItem('userId');
-    if (!this.userId) return;
+    const userId = localStorage.getItem('userId');
+    this.userId = userId;
+    if (!userId) return;
 
     this.cargarUsuarios();
-    this.store.cargarConversaciones(this.userId);
-    this.store.cargarSolicitudes(this.userId);
+    this.store.cargarConversaciones(userId);
+    this.store.cargarSolicitudes(userId);
     // El canal de tiempo real esta abierto todo el tiempo que dure la pantalla.
-    this.store.escuchar(this.userId);
+    this.store.escuchar(userId);
 
     // /recruiter/messages/<otroUserId>: la subruta define el chat abierto.
     // Si el id cambia (u otro clic en la lista) se abre ese hilo; sin id
@@ -65,7 +66,7 @@ export class Messages implements OnInit, AfterViewChecked {
       const id = params.get('id');
       if (id) {
         this.mostrarChat.set(true);
-        if (this.abierta()?.otroUserId !== id) this.store.abrirCon(this.userId, id);
+        if (this.abierta()?.otroUserId !== id) this.store.abrirCon(userId, id);
       } else {
         this.mostrarChat.set(false);
       }
@@ -75,7 +76,7 @@ export class Messages implements OnInit, AfterViewChecked {
     const otroUserId = this.route.snapshot.queryParamMap.get('user');
     if (otroUserId) {
       this.mostrarChat.set(true);
-      this.store.abrirCon(this.userId, otroUserId);
+      this.store.abrirCon(userId, otroUserId);
     }
   }
 

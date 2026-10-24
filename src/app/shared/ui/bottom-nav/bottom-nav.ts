@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { UserStore } from '@features/users/data-access/state/user.store';
 
 export interface BottomNavLink {
   label: string;
@@ -8,13 +9,34 @@ export interface BottomNavLink {
 }
 
 //barra de navegación inferior para pantallas chicas: muestra las mismas rutas
-//del header, como en la app móvil
+//del header, como en la app móvil. El ítem de perfil muestra la foto del usuario.
 @Component({
   selector: 'app-bottom-nav',
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './bottom-nav.html',
   styleUrl: './bottom-nav.scss',
 })
-export class BottomNav {
+export class BottomNav implements OnInit {
   @Input() links: BottomNavLink[] = [];
+
+  private userStore = inject(UserStore);
+
+  /** Foto de perfil del usuario logueado (se muestra en el ítem de perfil). */
+  avatarUrl = '';
+
+  ngOnInit(): void {
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      this.userStore.getById(userId).subscribe({
+        next: (user) => {
+          this.avatarUrl = user?.fotoPerfilUrl ?? '';
+        },
+      });
+    }
+  }
+
+  /** El perfil muestra la foto del usuario; el resto, su ícono. */
+  esPerfil(route: string): boolean {
+    return route.includes('profile');
+  }
 }

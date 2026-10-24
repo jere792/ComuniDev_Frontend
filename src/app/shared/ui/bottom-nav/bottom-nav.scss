@@ -58,3 +58,16 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* la foto del usuario ocupa el lugar del ícono en el ítem de perfil */
+.bottom-nav-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid transparent;
+}
+
+.bottom-nav-item.active .bottom-nav-avatar {
+  border-color: var(--primary);
+}

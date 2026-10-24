@@ -70,7 +70,9 @@
 
 .contact-row {
   display: grid;
-  grid-template-columns: 24px 140px 1fr;
+  /* minmax(0, ...) para que un email largo rompa linea en vez de estirar
+     la fila mas alla de la pantalla */
+  grid-template-columns: 24px minmax(0, 140px) minmax(0, 1fr);
   align-items: center;
   gap: var(--space-md);
   padding: var(--space-md) 0;
@@ -129,4 +131,9 @@
     font-weight: 400;
     font-style: italic;
   }
+}
+
+/* movil: emails o valores largos rompen linea dentro de la celda */
+.contact-value {
+  overflow-wrap: anywhere;
 }

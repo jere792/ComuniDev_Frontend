@@ -16,11 +16,13 @@
 
 .profile-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  /* minmax(0, ...) evita que el contenido ancho (emails, urls) estire la
+     pagina en movil */
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-xl);
 
   @media (min-width: 1024px) {
-    grid-template-columns: 8fr 4fr;
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
   }
 }
 
@@ -82,7 +84,7 @@
 // ─── Social Grid ───
 .social-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--space-sm);
 }
 

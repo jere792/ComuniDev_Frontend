@@ -823,4 +823,9 @@
   .create-fab {
     bottom: 76px;
   }
+
+  /* las flechas de navegacion arriba/abajo sobran en movil */
+  .reel-nav-arrows {
+    display: none;
+  }
 }

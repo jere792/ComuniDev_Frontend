@@ -27,6 +27,11 @@ export class RecruiterOffers implements OnInit {
   readonly loading = this.store.loading;
   readonly error = this.store.error;
 
+  /** En móvil se llega a Candidatos desde aquí (el footer no incluye esa ruta). */
+  irACandidatos(): void {
+    this.router.navigate(['/recruiter/candidates']);
+  }
+
   ngOnInit(): void {
     const recruiterId = this.getRecruiterId();
     if (!recruiterId) {

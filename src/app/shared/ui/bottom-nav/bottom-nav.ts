@@ -39,4 +39,12 @@ export class BottomNav implements OnInit {
   esPerfil(route: string): boolean {
     return route.includes('profile');
   }
+
+  /**
+   * En móvil el footer se mantiene en 5 rutas: Candidatos se busca desde
+   * Ofertas y Solicitudes vive como pestaña dentro de Mensajes.
+   */
+  get linksMovil(): BottomNavLink[] {
+    return this.links.filter(l => l.label !== 'Candidatos' && l.label !== 'Solicitudes');
+  }
 }

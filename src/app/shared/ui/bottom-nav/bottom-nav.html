@@ -1,5 +1,5 @@
 <nav class="bottom-nav">
-  @for (link of links; track link.route) {
+  @for (link of linksMovil; track link.route) {
     <a class="bottom-nav-item" [routerLink]="link.route" routerLinkActive="active">
       @if (esPerfil(link.route) && avatarUrl) {
         <img class="bottom-nav-avatar" [src]="avatarUrl" alt="Perfil" />

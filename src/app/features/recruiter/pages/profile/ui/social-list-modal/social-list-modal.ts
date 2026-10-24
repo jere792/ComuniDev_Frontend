@@ -51,6 +51,14 @@ export class SocialListModal implements OnInit, OnChanges {
     );
   });
 
+  /** El "ver más" lleva al listado completo de solicitudes según el rol. */
+  verMas(): void {
+    const rol = (localStorage.getItem('role') || '').toLowerCase();
+    const base = rol === 'developer' ? '/developer' : '/recruiter';
+    this.router.navigate([`${base}/solicitudes`]);
+    this.close.emit();
+  }
+
   ngOnInit(): void {
     if (this.open) {
       this.load();

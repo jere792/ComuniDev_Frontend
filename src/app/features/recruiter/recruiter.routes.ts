@@ -13,6 +13,7 @@ export const routes: Routes = [
         { label: 'Reels', route: '/recruiter/reels', icon: 'smart_display' },
         { label: 'Candidatos', route: '/recruiter/candidates', icon: 'people' },
         { label: 'Ofertas', route: '/recruiter/offers', icon: 'work' },
+        { label: 'Mensajes', route: '/recruiter/messages', icon: 'chat' },
         { label: 'Perfil', route: '/recruiter/profile', icon: 'person' },
       ],
     },

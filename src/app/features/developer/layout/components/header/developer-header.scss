@@ -115,24 +115,22 @@
   gap: var(--space-sm);
 }
 
-/* responsive: la busqueda baja a su propia linea y la navegacion se desliza */
+/* en movil el header queda solo con el logotipo y las notificaciones */
 @media (max-width: 768px) {
   .user-header {
-    flex-wrap: wrap;
-    gap: var(--space-sm);
+    justify-content: space-between;
     padding: var(--space-sm) var(--space-md);
   }
 
   .header-center {
-    order: 3;
-    width: 100%;
-  }
-
-  .search-bar {
-    width: 100%;
+    display: none;
   }
 
   .header-nav {
+    display: none;
+  }
+
+  .icon-btn {
     display: none;
   }
 }

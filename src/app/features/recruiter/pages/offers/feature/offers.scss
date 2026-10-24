@@ -265,3 +265,18 @@
     gap: var(--space-sm);
   }
 }
+
+/* "Buscar candidatos" solo en movil: el footer no incluye esa ruta */
+.buscar-candidatos {
+  display: none;
+  align-items: center;
+  gap: var(--space-xs);
+
+  .material-symbols-outlined {
+    font-size: 18px;
+  }
+
+  @media (max-width: 768px) {
+    display: inline-flex;
+  }
+}

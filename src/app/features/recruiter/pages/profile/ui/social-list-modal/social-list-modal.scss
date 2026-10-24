@@ -210,3 +210,34 @@
     font-size: 14px;
   }
 }
+
+/* boton ver listado completo */
+.modal-footer {
+  display: flex;
+  justify-content: center;
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.ver-mas-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 10px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--surface);
+  color: var(--on-surface);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+
+  .material-symbols-outlined {
+    font-size: 18px;
+  }
+
+  &:hover {
+    background: var(--surface-container);
+    color: var(--primary);
+  }
+}

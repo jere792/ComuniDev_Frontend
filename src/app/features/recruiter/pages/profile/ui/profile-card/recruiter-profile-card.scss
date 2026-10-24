@@ -485,3 +485,22 @@
     }
   }
 }
+
+/* ─── movil ─── */
+@media (max-width: 640px) {
+  /* la pilla de estado baja a la esquina inferior derecha para no chocar
+     con el boton de editar portada */
+  .status-pill {
+    top: auto;
+    bottom: var(--space-md);
+    left: auto;
+    right: var(--space-md);
+  }
+
+  /* los stats y la etiqueta de verificacion pasan debajo del texto,
+     en su propia linea */
+  .identity-top-row {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+}

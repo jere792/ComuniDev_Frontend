@@ -1,5 +1,10 @@
 .offers-container {
   width: 100%;
+
+  /* en movil el contenido respira de los bordes de la pantalla */
+  @media (max-width: 768px) {
+    padding: 0 var(--space-md);
+  }
 }
 
 .offers-header {

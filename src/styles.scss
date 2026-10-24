@@ -220,6 +220,8 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  /* ninguna vista debe generar scroll horizontal en movil */
+  overflow-x: hidden;
 }
 
 body {
@@ -229,6 +231,7 @@ body {
   color: var(--on-surface);
   background-color: var(--background);
   transition: background-color 0.2s ease, color 0.2s ease;
+  overflow-x: hidden;
 }
 
 // ============================================================

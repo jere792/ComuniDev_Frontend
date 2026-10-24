@@ -800,3 +800,27 @@
     font-size: 28px;
   }
 }
+
+/* en movil las acciones se superponen al video (estilo TikTok), el panel de
+   comentarios ocupa toda la pantalla y el FAB sube sobre la barra inferior */
+@media (max-width: 768px) {
+  .reels-container {
+    gap: 0;
+  }
+
+  .reel-side {
+    position: absolute;
+    right: var(--space-sm);
+    bottom: 150px;
+    margin-bottom: 0;
+    z-index: 20;
+  }
+
+  .comments-panel {
+    width: 100%;
+  }
+
+  .create-fab {
+    bottom: 76px;
+  }
+}

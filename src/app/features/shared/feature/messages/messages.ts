@@ -35,6 +35,12 @@ export class Messages implements OnInit, AfterViewChecked {
   /** Como Instagram: la pestaña principal y la de solicitudes pendientes. */
   readonly pestana = signal<'conversaciones' | 'solicitudes'>('conversaciones');
 
+  /**
+   * Como Instagram en movil: cuando hay un chat abierto (/messages/:id)
+   * se oculta la lista y la conversacion ocupa toda la pantalla.
+   */
+  readonly mostrarChat = signal(false);
+
   usersMap = signal<Map<string, User>>(new Map());
   borrador = '';
 
@@ -52,9 +58,25 @@ export class Messages implements OnInit, AfterViewChecked {
     // El canal de tiempo real esta abierto todo el tiempo que dure la pantalla.
     this.store.escuchar(this.userId);
 
+    // /recruiter/messages/<otroUserId>: la subruta define el chat abierto.
+    // Si el id cambia (u otro clic en la lista) se abre ese hilo; sin id
+    // se vuelve a la lista. El guard evita reabrir el que ya esta abierto.
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (id) {
+        this.mostrarChat.set(true);
+        if (this.abierta()?.otroUserId !== id) this.store.abrirCon(this.userId, id);
+      } else {
+        this.mostrarChat.set(false);
+      }
+    });
+
     // /recruiter/messages?user=<id>, para escribirle a alguien desde su perfil.
     const otroUserId = this.route.snapshot.queryParamMap.get('user');
-    if (otroUserId) this.store.abrirCon(this.userId, otroUserId);
+    if (otroUserId) {
+      this.mostrarChat.set(true);
+      this.store.abrirCon(this.userId, otroUserId);
+    }
   }
 
   cambiarPestana(pestana: 'conversaciones' | 'solicitudes'): void {
@@ -84,6 +106,15 @@ export class Messages implements OnInit, AfterViewChecked {
   abrirHilo(conversation: MessageConversation): void {
     if (!this.userId) return;
     this.store.abrir(conversation, this.userId);
+    // Instagram: la URL refleja la conversacion abierta (subruta con el id
+    // del otro usuario). En escritorio no cambia el layout.
+    this.router.navigate([this.rutaMensajes(), conversation.otroUserId]);
+  }
+
+  /** En movil, la flecha del header vuelve a la lista de conversaciones. */
+  volverALista(): void {
+    this.mostrarChat.set(false);
+    this.router.navigate([this.rutaMensajes()]);
   }
 
   enviar(): void {
@@ -139,6 +170,13 @@ export class Messages implements OnInit, AfterViewChecked {
     const role = (localStorage.getItem('role') || '').toLowerCase();
     if (role === 'desarrollador' || role === 'developer') return '/developer/inicio';
     return '/recruiter/inicio';
+  }
+
+  /** Base de la ruta de mensajes segun el rol (/developer o /recruiter). */
+  private rutaMensajes(): string {
+    const role = (localStorage.getItem('role') || '').toLowerCase();
+    if (role === 'desarrollador' || role === 'developer') return '/developer/messages';
+    return '/recruiter/messages';
   }
 
   private cargarUsuarios(): void {

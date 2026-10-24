@@ -28,7 +28,9 @@ export const routes: Routes = [
         loadComponent: () => import('@features/recruiter/pages/reels/feature/reels').then(m => m.RecruiterReels),
       },
       {
-        path: 'messages',
+        // ':id?' opcional: /developer/messages y /developer/messages/<userId>
+        // usan la misma entrada, asi el componente no se recrea al cambiar de chat
+        path: 'messages/:id?',
         title: 'Mensajes',
         loadComponent: () => import('@features/shared/feature/messages/messages').then(m => m.Messages),
       },

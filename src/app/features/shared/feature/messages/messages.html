@@ -1,4 +1,4 @@
-<div class="messages-container">
+<div class="messages-container" [class.chat-abierto]="mostrarChat()">
   <div class="conversations-list">
     <h2 class="section-title">Mensajes</h2>
 
@@ -111,6 +111,10 @@
   <div class="chat-area">
     @if (abierta(); as conv) {
       <div class="chat-header">
+        <!-- En movil (con chat abierto) vuelve a la lista, estilo Instagram -->
+        <button type="button" class="back-btn" (click)="volverALista()" aria-label="Volver">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
         @if (fotoDe(conv.otroUserId); as foto) {
           <img [src]="foto" [alt]="nombreDe(conv.otroUserId)" class="chat-avatar" />
         } @else {

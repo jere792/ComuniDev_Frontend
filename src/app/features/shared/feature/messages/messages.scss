@@ -243,6 +243,30 @@
   border-bottom: 1px solid var(--border-subtle);
 }
 
+/* Flecha de volver: solo visible en movil con el chat abierto (Instagram) */
+.back-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  margin-left: calc(-1 * var(--space-sm));
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--on-surface);
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:hover {
+    background: var(--surface-container);
+  }
+
+  .material-symbols-outlined {
+    font-size: 24px;
+  }
+}
+
 .chat-avatar {
   width: 36px;
   height: 36px;
@@ -415,5 +439,23 @@
 
   .bubble {
     max-width: 85%;
+  }
+
+  /* Instagram: sin chat abierto se ve solo la lista a pantalla completa */
+  .messages-container:not(.chat-abierto) .chat-area {
+    display: none;
+  }
+
+  .messages-container:not(.chat-abierto) .conversations-list {
+    max-height: none;
+  }
+
+  /* Con el chat abierto se oculta la lista y la conversacion llena la pantalla */
+  .chat-abierto .conversations-list {
+    display: none;
+  }
+
+  .chat-abierto .back-btn {
+    display: flex;
   }
 }

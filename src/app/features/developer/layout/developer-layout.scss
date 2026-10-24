@@ -17,6 +17,9 @@
 
 .user-main {
   flex: 1;
+  /* sin esto una imagen ancha estira toda la pagina (min-content) y
+     genera scroll horizontal en movil */
+  min-width: 0;
   margin-left: 72px;
   display: flex;
   flex-direction: column;

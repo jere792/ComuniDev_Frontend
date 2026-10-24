@@ -11,6 +11,8 @@
 
 .moderator-main {
   flex: 1;
+  /* evita que contenido ancho estire la pagina en movil */
+  min-width: 0;
   padding: var(--space-xl);
   background-color: var(--surface);
   overflow-y: auto;

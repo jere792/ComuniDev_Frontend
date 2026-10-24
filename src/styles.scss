@@ -215,6 +215,12 @@
   padding: 0;
 }
 
+/* ninguna imagen puede estirar la pagina mas alla del contenedor */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;

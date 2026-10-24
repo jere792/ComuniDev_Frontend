@@ -836,3 +836,9 @@
   color: var(--outline);
   font-size: 14px;
 }
+
+/* movil: urls o palabras largas no deben estirar las tarjetas */
+.content-text,
+.comment-text {
+  overflow-wrap: anywhere;
+}

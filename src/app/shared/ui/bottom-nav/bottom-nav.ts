@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { UserStore } from '@features/users/data-access/state/user.store';
 
@@ -21,15 +21,17 @@ export class BottomNav implements OnInit {
 
   private userStore = inject(UserStore);
 
-  /** Foto de perfil del usuario logueado (se muestra en el ítem de perfil). */
-  avatarUrl = '';
+  /** Foto de perfil del usuario logueado (se muestra en el ítem de perfil).
+   *  Es una señal: al resolverse la query asíncrona no dispara
+   *  ExpressionChangedAfterItHasBeenCheckedError (NG0100) en el @if. */
+  readonly avatarUrl = signal('');
 
   ngOnInit(): void {
     const userId = localStorage.getItem('userId');
     if (userId) {
       this.userStore.getById(userId).subscribe({
         next: (user) => {
-          this.avatarUrl = user?.fotoPerfilUrl ?? '';
+          this.avatarUrl.set(user?.fotoPerfilUrl ?? '');
         },
       });
     }

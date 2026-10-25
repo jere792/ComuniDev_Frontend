@@ -1,6 +1,6 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SocialStory, SocialStoryView } from '@features/recruiter/pages/inicio/domain/models/social-story.model';
+import { SocialStory, SocialStoryView, StoryComment } from '@features/recruiter/pages/inicio/domain/models/social-story.model';
 import { STORY_REPOSITORY, StoryRepository } from '@features/recruiter/pages/inicio/domain/ports/story.repository';
 
 @Injectable({ providedIn: 'root' })
@@ -65,6 +65,14 @@ export class StoryStore {
 
   getStoryViews(storyId: string): Observable<SocialStoryView[]> {
     return this.repository.getStoryViews(storyId);
+  }
+
+  getStoryComments(storyId: string): Observable<StoryComment[]> {
+    return this.repository.getStoryComments(storyId);
+  }
+
+  createStoryComment(storyId: string, autorId: string, texto: string): Observable<StoryComment> {
+    return this.repository.createStoryComment(storyId, autorId, texto);
   }
 
   deleteStory(id: string): Observable<boolean> {

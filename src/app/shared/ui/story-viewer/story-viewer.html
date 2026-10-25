@@ -173,10 +173,71 @@
         }
       </div>
 
+      <!-- Responder a la historia -->
+      <div class="viewer-reply" (click)="$event.stopPropagation()">
+        <button type="button" class="viewer-reply-open" (click)="abrirComentarios()">
+          <span class="material-symbols-outlined">chat_bubble_outline</span>
+        </button>
+        <input
+          class="viewer-reply-input"
+          type="text"
+          maxlength="500"
+          placeholder="Envía un comentario…"
+          [(ngModel)]="borradorComentario"
+          (keyup.enter)="enviarComentario()"
+          [disabled]="enviandoComentario()"
+        />
+        <button
+          type="button"
+          class="viewer-reply-send"
+          (click)="enviarComentario()"
+          [disabled]="!puedeComentar()"
+        >
+          <span class="material-symbols-outlined">{{ enviandoComentario() ? 'hourglass_top' : 'send' }}</span>
+        </button>
+      </div>
+
       <!-- Navigation zones -->
       <div class="nav-zone nav-prev" (click)="prevStory()"></div>
       <div class="nav-zone nav-next" (click)="nextStory()"></div>
     </div>
+
+    <!-- Comentarios de la historia -->
+    @if (mostrarComentarios()) {
+      <div class="views-panel" (click)="$event.stopPropagation()">
+        <div class="views-head">
+          <span class="material-symbols-outlined">chat_bubble_outline</span>
+          <strong>Comentarios</strong>
+          <span class="views-count">{{ comentarios().length }}</span>
+          <button type="button" class="views-close" (click)="cerrarComentarios()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        @if (cargandoComentarios()) {
+          <p class="views-empty">Cargando…</p>
+        } @else if (comentarios().length === 0) {
+          <p class="views-empty">Sé la primera persona en comentar</p>
+        } @else {
+          <ul class="views-list">
+            @for (c of comentarios(); track c.id) {
+              <li class="views-item-columna">
+                <div class="views-fila">
+                  @if (nombres().get(c.autorId)?.avatar) {
+                    <img [src]="nombres().get(c.autorId)!.avatar" alt="" class="views-avatar" />
+                  } @else {
+                    <span class="views-avatar views-initials">{{ getInitials(nombres().get(c.autorId)?.nombre ?? 'Usuario') }}</span>
+                  }
+                  <span class="views-name">{{ nombres().get(c.autorId)?.nombre ?? 'Usuario' }}</span>
+                  <span class="views-when">{{ c.creadoEn | date: 'dd MMM, HH:mm' }}</span>
+                </div>
+                <p class="views-texto">{{ c.texto }}</p>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    }
 
     <!-- Quién vio mi historia -->
     @if (mostrarVistas()) {
@@ -198,12 +259,12 @@
           <ul class="views-list">
             @for (v of vistas(); track v.id) {
               <li>
-                @if (nombresVistas().get(v.viewerId)?.avatar) {
-                  <img [src]="nombresVistas().get(v.viewerId)!.avatar" alt="" class="views-avatar" />
+                @if (nombres().get(v.viewerId)?.avatar) {
+                  <img [src]="nombres().get(v.viewerId)!.avatar" alt="" class="views-avatar" />
                 } @else {
-                  <span class="views-avatar views-initials">{{ getInitials(nombresVistas().get(v.viewerId)?.nombre ?? 'Usuario') }}</span>
+                  <span class="views-avatar views-initials">{{ getInitials(nombres().get(v.viewerId)?.nombre ?? 'Usuario') }}</span>
                 }
-                <span class="views-name">{{ nombresVistas().get(v.viewerId)?.nombre ?? 'Usuario' }}</span>
+                <span class="views-name">{{ nombres().get(v.viewerId)?.nombre ?? 'Usuario' }}</span>
                 <span class="views-when">{{ v.viewedAt | date: 'dd MMM, HH:mm' }}</span>
               </li>
             }

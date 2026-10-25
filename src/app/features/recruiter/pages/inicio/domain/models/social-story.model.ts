@@ -36,3 +36,12 @@ export interface SocialStoryView {
   viewerId: string;
   viewedAt?: string;
 }
+
+/** Comentario sobre una historia. */
+export interface StoryComment {
+  id: string;
+  storyId: string;
+  autorId: string;
+  texto: string;
+  creadoEn?: string;
+}

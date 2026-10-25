@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { SocialStory, SocialStoryView } from '@features/recruiter/pages/inicio/domain/models/social-story.model';
+import { SocialStory, SocialStoryView, StoryComment } from '@features/recruiter/pages/inicio/domain/models/social-story.model';
 import { StoryRepository } from '@features/recruiter/pages/inicio/domain/ports/story.repository';
 
 const GET_STORIES = gql`
@@ -151,6 +151,30 @@ const DELETE_STORY = gql`
   }
 `;
 
+const GET_STORY_COMMENTS = gql`
+  query GetStoryComments($storyId: String!) {
+    storyComments(storyId: $storyId) {
+      id
+      storyId
+      autorId
+      texto
+      creadoEn
+    }
+  }
+`;
+
+const CREATE_STORY_COMMENT = gql`
+  mutation CreateStoryComment($storyId: String!, $autorId: String!, $texto: String!) {
+    createStoryComment(storyId: $storyId, autorId: $autorId, texto: $texto) {
+      id
+      storyId
+      autorId
+      texto
+      creadoEn
+    }
+  }
+`;
+
 @Injectable({ providedIn: 'root' })
 export class StoryGraphqlService implements StoryRepository {
   private apollo = inject(Apollo);
@@ -199,6 +223,18 @@ export class StoryGraphqlService implements StoryRepository {
     return this.apollo
       .watchQuery<any>({ query: GET_STORY_VIEWS, variables: { storyId } })
       .valueChanges.pipe(map(result => result.data?.storyViews ?? []));
+  }
+
+  getStoryComments(storyId: string): Observable<StoryComment[]> {
+    return this.apollo
+      .watchQuery<any>({ query: GET_STORY_COMMENTS, variables: { storyId } })
+      .valueChanges.pipe(map(result => result.data?.storyComments ?? []));
+  }
+
+  createStoryComment(storyId: string, autorId: string, texto: string): Observable<StoryComment> {
+    return this.apollo
+      .mutate<any>({ mutation: CREATE_STORY_COMMENT, variables: { storyId, autorId, texto } })
+      .pipe(map(result => result.data?.createStoryComment));
   }
 
   deleteStory(id: string): Observable<boolean> {

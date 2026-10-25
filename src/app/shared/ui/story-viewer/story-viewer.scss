@@ -517,3 +517,91 @@
   color: var(--on-surface-variant, #777);
   text-align: center;
 }
+
+/* ---- Responder a la historia ---- */
+
+.viewer-reply {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* por encima de las zonas de navegación, para que el teclado no las active */
+  z-index: 6;
+}
+
+.viewer-reply-open,
+.viewer-reply-send {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ffffff3d;
+  border-radius: 999px;
+  background: #ffffff1f;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+
+  .material-symbols-outlined {
+    font-size: 17px;
+  }
+
+  &:hover {
+    background: #ffffff33;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+}
+
+.viewer-reply-input {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid #ffffff3d;
+  border-radius: 999px;
+  background: #00000059;
+  color: #fff;
+  font-size: 13px;
+  outline: none;
+
+  &::placeholder {
+    color: #ffffff8c;
+  }
+
+  &:focus {
+    border-color: var(--primary, #4c7dff);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+/* el texto del comentario va en su propia línea, debajo del avatar y el nombre */
+
+.views-list li.views-item-columna {
+  display: block;
+}
+
+.views-fila {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.views-texto {
+  margin: 4px 0 0 48px;
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  color: var(--on-surface, #2b2b2b);
+}

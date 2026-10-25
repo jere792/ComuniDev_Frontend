@@ -14,10 +14,11 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { SocialStory, SocialStoryView } from '@features/recruiter/pages/inicio/domain/models/social-story.model';
+import { SocialStory, SocialStoryView, StoryComment } from '@features/recruiter/pages/inicio/domain/models/social-story.model';
 import { StoryStore } from '@features/recruiter/pages/inicio/data-access/state/story.store';
 import { UserStore } from '@features/users/data-access/state/user.store';
 import { MusicaStore } from '@features/recruiter/pages/inicio/data-access/state/musica.store';
+import { FormsModule } from '@angular/forms';
 
 export interface StoryViewerUser {
   autorId: string;
@@ -29,7 +30,7 @@ export interface StoryViewerUser {
 @Component({
   selector: 'app-story-viewer',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, FormsModule],
   templateUrl: './story-viewer.html',
   styleUrl: './story-viewer.scss',
 })
@@ -43,11 +44,22 @@ export class StoryViewer implements OnChanges, OnDestroy {
   /** Quién está viendo; las vistas solo se registran y se listan en la historia propia. */
   readonly yo = localStorage.getItem('userId') ?? '';
 
-  /** Personas que vieron la historia propia, con nombre y avatar ya resueltos. */
+  /** Vistas de mi historia. */
   mostrarVistas = signal(false);
   cargandoVistas = signal(false);
   vistas = signal<SocialStoryView[]>([]);
-  nombresVistas = signal<Map<string, { nombre: string; avatar: string }>>(new Map());
+
+  /** Comentarios de la historia abierta. */
+  mostrarComentarios = signal(false);
+  cargandoComentarios = signal(false);
+  comentarios = signal<StoryComment[]>([]);
+  borradorComentario = '';
+  enviandoComentario = signal(false);
+  /** A qué historia pertenece la lista de comentarios cargada. */
+  private historiaComentarios = '';
+
+  /** Nombre y avatar de cada persona, compartidos por los paneles de vistas y comentarios. */
+  nombres = signal<Map<string, { nombre: string; avatar: string }>>(new Map());
   /** Cada historia se avisa como vista una sola vez por sesión. */
   private vistasAvisadas = new Set<string>();
 
@@ -156,7 +168,7 @@ export class StoryViewer implements OnChanges, OnDestroy {
       next: (vistas) => {
         this.vistas.set(vistas);
         this.cargandoVistas.set(false);
-        this.resolverNombres(vistas);
+        this.resolverNombresPorIds(vistas.map((v) => v.viewerId));
       },
       error: () => this.cargandoVistas.set(false),
     });
@@ -166,16 +178,58 @@ export class StoryViewer implements OnChanges, OnDestroy {
     this.mostrarVistas.set(false);
   }
 
-  /** Nombre y avatar de cada persona que vio la historia (una petición por id). */
-  private resolverNombres(vistas: SocialStoryView[]): void {
-    vistas.forEach((v) => {
-      if (!v.viewerId || this.nombresVistas().has(v.viewerId)) return;
-      this.userStore.getById(v.viewerId).subscribe({
+  // ─── Comentarios ───
+
+  abrirComentarios(): void {
+    const story = this.viewingUser()?.stories[this.viewingIndex()];
+    if (!story?.id) return;
+    this.historiaComentarios = story.id;
+    this.mostrarComentarios.set(true);
+    this.cargandoComentarios.set(true);
+    this.storyStore.getStoryComments(story.id).subscribe({
+      next: (comentarios) => {
+        this.comentarios.set(comentarios);
+        this.cargandoComentarios.set(false);
+        this.resolverNombresPorIds(comentarios.map((c) => c.autorId));
+      },
+      error: () => this.cargandoComentarios.set(false),
+    });
+  }
+
+  cerrarComentarios(): void {
+    this.mostrarComentarios.set(false);
+  }
+
+  puedeComentar(): boolean {
+    return !!this.yo && !!this.historiaComentarios && this.borradorComentario.trim().length > 0 && !this.enviandoComentario();
+  }
+
+  enviarComentario(): void {
+    const texto = this.borradorComentario.trim();
+    if (!texto || !this.historiaComentarios || !this.yo || this.enviandoComentario()) return;
+    this.enviandoComentario.set(true);
+    this.storyStore.createStoryComment(this.historiaComentarios, this.yo, texto).subscribe({
+      next: (comentario) => {
+        this.enviandoComentario.set(false);
+        if (!comentario) return;
+        this.borradorComentario = '';
+        this.comentarios.update((lista) => [...lista, comentario]);
+        this.resolverNombresPorIds([comentario.autorId]);
+      },
+      error: () => this.enviandoComentario.set(false),
+    });
+  }
+
+  /** Nombre y avatar de cada persona referenciada (una petición por id que aún no se conoce). */
+  private resolverNombresPorIds(ids: string[]): void {
+    ids.filter((id): id is string => !!id).forEach((id) => {
+      if (this.nombres().has(id)) return;
+      this.userStore.getById(id).subscribe({
         next: (u: any) => {
           if (!u) return;
-          this.nombresVistas.update((m) => {
+          this.nombres.update((m) => {
             const copia = new Map(m);
-            copia.set(v.viewerId, { nombre: u.nombre ?? 'Usuario', avatar: u.fotoPerfilUrl ?? '' });
+            copia.set(id, { nombre: u.nombre ?? 'Usuario', avatar: u.fotoPerfilUrl ?? '' });
             return copia;
           });
         },

@@ -1,6 +1,6 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SocialStory, SocialStoryView } from '@features/recruiter/pages/inicio/domain/models/social-story.model';
+import { SocialStory, SocialStoryView, StoryComment } from '@features/recruiter/pages/inicio/domain/models/social-story.model';
 
 export interface StoryRepository {
   getStories(userId: string): Observable<SocialStory[]>;
@@ -13,6 +13,8 @@ export interface StoryRepository {
   updateCategorias(storyId: string, categoriaIds: string[]): Observable<SocialStory | null>;
   viewStory(storyId: string, viewerId: string): Observable<SocialStoryView>;
   getStoryViews(storyId: string): Observable<SocialStoryView[]>;
+  getStoryComments(storyId: string): Observable<StoryComment[]>;
+  createStoryComment(storyId: string, autorId: string, texto: string): Observable<StoryComment>;
   deleteStory(id: string): Observable<boolean>;
 }
 

@@ -11,6 +11,18 @@ const GET_FEED = gql`
       id
       autorId
       tipo
+      vacanteId
+      vacante {
+        id
+        titulo
+        modalidad
+        ubicacion
+        tecnologias
+        estado
+        fechaLimite
+        postulacionesCount
+        company { nombre }
+      }
       contenido { texto imagenes videos archivos bloquesCodigo enlaces }
       etiquetas
       categoria
@@ -42,11 +54,39 @@ const GET_POSTS = gql`
 `;
 
 const CREATE_POST = gql`
-  mutation CreatePost($autorId: String!, $contenido: PostContenidoInput, $etiquetas: [String], $categoria: String, $visibilidad: String) {
-    createPost(autorId: $autorId, contenido: $contenido, etiquetas: $etiquetas, categoria: $categoria, visibilidad: $visibilidad) {
+  mutation CreatePost(
+    $autorId: String!
+    $contenido: PostContenidoInput
+    $etiquetas: [String]
+    $categoria: String
+    $visibilidad: String
+    $tipo: String
+    $vacanteId: String
+  ) {
+    createPost(
+      autorId: $autorId
+      contenido: $contenido
+      etiquetas: $etiquetas
+      categoria: $categoria
+      visibilidad: $visibilidad
+      tipo: $tipo
+      vacanteId: $vacanteId
+    ) {
       id
       autorId
       tipo
+      vacanteId
+      vacante {
+        id
+        titulo
+        modalidad
+        ubicacion
+        tecnologias
+        estado
+        fechaLimite
+        postulacionesCount
+        company { nombre }
+      }
       contenido { texto imagenes }
       etiquetas
       categoria
@@ -95,9 +135,20 @@ export class PostGraphqlService implements PostRepository {
       .valueChanges.pipe(map(result => result.data?.posts ?? []));
   }
 
-  createPost(autorId: string, contenido: { texto?: string; imagenes?: string[] }, etiquetas?: string[], categoria?: string, visibilidad?: string): Observable<SocialPost> {
+  createPost(
+    autorId: string,
+    contenido: { texto?: string; imagenes?: string[] },
+    etiquetas?: string[],
+    categoria?: string,
+    visibilidad?: string,
+    tipo?: string,
+    vacanteId?: string
+  ): Observable<SocialPost> {
     return this.apollo
-      .mutate<any>({ mutation: CREATE_POST, variables: { autorId, contenido, etiquetas, categoria, visibilidad } })
+      .mutate<any>({
+        mutation: CREATE_POST,
+        variables: { autorId, contenido, etiquetas, categoria, visibilidad, tipo, vacanteId }
+      })
       .pipe(map(result => result.data?.createPost));
   }
 

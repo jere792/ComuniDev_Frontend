@@ -39,9 +39,11 @@ export class PostStore {
     contenido: { texto?: string; imagenes?: string[] },
     etiquetas?: string[],
     categoria?: string,
-    visibilidad?: string
+    visibilidad?: string,
+    tipo?: string,
+    vacanteId?: string
   ): Observable<SocialPost> {
-    return this.repository.createPost(autorId, contenido, etiquetas, categoria, visibilidad);
+    return this.repository.createPost(autorId, contenido, etiquetas, categoria, visibilidad, tipo, vacanteId);
   }
 
   updatePost(id: string, data: any): Observable<SocialPost> {

@@ -35,13 +35,51 @@
             </button>
           </div>
         }
+
+        <!-- Oferta elegida para publicarla con su tarjeta -->
+        @if (composerVacante) {
+          <div class="vacancy-chip">
+            <span class="material-symbols-outlined">work</span>
+            <span class="chip-text">{{ composerVacante.titulo }}</span>
+            <button type="button" class="chip-remove" (click)="quitarVacante()" aria-label="Quitar vacante">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+        }
+
+        @if (showVacantePicker()) {
+          <div class="vacancy-picker">
+            @if (misVacantes().length === 0) {
+              <p class="picker-empty">No tienes vacantes activas. Créalas en Ofertas para destacarlas aquí.</p>
+            } @else {
+              @for (v of misVacantes(); track v.id) {
+                <button type="button" class="picker-item" (click)="elegirVacante(v)">
+                  <span class="picker-title">{{ v.titulo }}</span>
+                  <span class="picker-sub">
+                    {{ v.company?.nombre }}
+                    @if (v.ubicacion) { · {{ v.ubicacion }} }
+                  </span>
+                </button>
+              }
+            }
+          </div>
+        }
+
         <div class="composer-footer">
           <label class="attach-btn">
             <span class="material-symbols-outlined">image</span>
             <span>{{ uploadingImage ? 'Subiendo...' : 'Imagen' }}</span>
             <input type="file" accept="image/*" hidden (change)="onFileSelected($event)" [disabled]="uploadingImage" />
           </label>
-          <button class="btn-publish" (click)="publish()" [disabled]="!composerText.trim() && !composerImage">
+          <button type="button" class="attach-btn" [class.attach-btn-activo]="composerVacante" (click)="toggleVacantePicker()">
+            <span class="material-symbols-outlined">work</span>
+            <span>Vacante</span>
+          </button>
+          <button
+            class="btn-publish"
+            (click)="publish()"
+            [disabled]="!composerText.trim() && !composerImage && !composerVacante"
+          >
             Publicar
           </button>
         </div>
@@ -90,13 +128,51 @@
               </div>
             </div>
           } @else {
-            <p class="content-text">{{ vm.post.contenido?.texto }}</p>
+            @if (vm.post.contenido?.texto) {
+              <p class="content-text">{{ vm.post.contenido?.texto }}</p>
+            }
           }
         </div>
 
         @if (vm.post.contenido?.imagenes?.length && !vm.isEditing) {
           <div class="report-image">
             <img [src]="vm.post.contenido?.imagenes?.[0]" alt="Imagen de la publicación" />
+          </div>
+        }
+
+        <!-- Tarjeta de la oferta: solo cuando la publicación lleva su vacante -->
+        @if (!vm.isEditing && vm.post.tipo === 'VACANTE' && vm.post.vacante) {
+          <div class="vacancy-card">
+            <div class="vacancy-head">
+              <span class="vacancy-logo">{{ inicialesEmpresa(vm.post.vacante) }}</span>
+              <div class="vacancy-titles">
+                <span class="vacancy-title">{{ vm.post.vacante.titulo }}</span>
+                <span class="vacancy-sub">
+                  {{ vm.post.vacante.company?.nombre }}
+                  @if (vm.post.vacante.modalidad) { · {{ vm.post.vacante.modalidad }} }
+                  @if (vm.post.vacante.ubicacion) { · {{ vm.post.vacante.ubicacion }} }
+                </span>
+              </div>
+            </div>
+            @if (vm.post.vacante.tecnologias?.length) {
+              <div class="vacancy-tags">
+                @for (tec of vm.post.vacante.tecnologias; track tec) {
+                  <span class="vacancy-tag">{{ tec }}</span>
+                }
+              </div>
+            }
+            <div class="vacancy-foot">
+              <span class="vacancy-days">
+                <span class="material-symbols-outlined">event</span>
+                @if (diasRestantes(vm.post.vacante) > 0) {
+                  Vence en {{ diasRestantes(vm.post.vacante) }} días
+                } @else {
+                  Vencida
+                }
+              </span>
+              <span class="vacancy-apps">{{ vm.post.vacante.postulacionesCount ?? 0 }} postulaciones</span>
+              <button class="vacancy-apply" type="button" (click)="verOferta()">Ver oferta</button>
+            </div>
           </div>
         }
 

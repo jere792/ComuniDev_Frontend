@@ -10,7 +10,10 @@ export interface PostRepository {
     contenido: { texto?: string; imagenes?: string[] },
     etiquetas?: string[],
     categoria?: string,
-    visibilidad?: string
+    visibilidad?: string,
+    /** 'VACANTE' para destacar una oferta; viaja con vacanteId. */
+    tipo?: string,
+    vacanteId?: string
   ): Observable<SocialPost>;
   updatePost(id: string, data: any): Observable<SocialPost>;
   deletePost(id: string): Observable<boolean>;

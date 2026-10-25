@@ -842,3 +842,204 @@
 .comment-text {
   overflow-wrap: anywhere;
 }
+
+/* ─── Tarjeta de la oferta dentro de una publicación ─── */
+.vacancy-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin: 0 var(--space-lg) var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-container);
+
+  .vacancy-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .vacancy-logo {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    background: rgba(0, 36, 44, 0.08);
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .vacancy-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .vacancy-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--on-surface);
+  }
+
+  .vacancy-sub {
+    font-size: 13px;
+    color: var(--on-surface-variant);
+    overflow-wrap: anywhere;
+  }
+
+  .vacancy-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .vacancy-tag {
+    padding: 3px 10px;
+    border-radius: var(--radius-xl);
+    background: rgba(0, 36, 44, 0.06);
+    color: var(--on-surface-variant);
+    font-size: 12px;
+  }
+
+  .vacancy-foot {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+
+  .vacancy-days,
+  .vacancy-apps {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--on-surface-variant);
+  }
+
+  .vacancy-days .material-symbols-outlined {
+    font-size: 16px;
+  }
+
+  .vacancy-apply {
+    margin-left: auto;
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    border-radius: var(--radius-xl);
+    background: var(--primary);
+    color: var(--on-primary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.2s ease;
+
+    &:hover {
+      filter: brightness(1.15);
+    }
+  }
+}
+
+/* ─── Selector de vacante en el compositor ─── */
+.vacancy-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: var(--space-sm) var(--space-lg) 0;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-xl);
+  background: rgba(0, 36, 44, 0.06);
+  font-size: 14px;
+
+  .material-symbols-outlined {
+    font-size: 18px;
+    color: var(--primary);
+  }
+
+  .chip-text {
+    flex: 1;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .chip-remove {
+    display: flex;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--on-surface-variant);
+    cursor: pointer;
+  }
+}
+
+.vacancy-picker {
+  display: flex;
+  flex-direction: column;
+  max-height: 190px;
+  overflow-y: auto;
+  margin: var(--space-sm) var(--space-lg) 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+
+  .picker-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    border-bottom: 1px solid var(--border-subtle);
+    background: none;
+    text-align: left;
+    cursor: pointer;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: var(--surface-container);
+    }
+
+    .picker-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--on-surface);
+    }
+
+    .picker-sub {
+      font-size: 12px;
+      color: var(--on-surface-variant);
+    }
+  }
+
+  .picker-empty {
+    margin: 0;
+    padding: var(--space-md);
+    font-size: 13px;
+    color: var(--on-surface-variant);
+  }
+}
+
+/* el boton "Vacante" del pie usa la misma clase que la etiqueta de imagen */
+button.attach-btn {
+  border: none;
+  background: none;
+  font-family: inherit;
+
+  &.attach-btn-activo {
+    background: rgba(0, 36, 44, 0.1);
+    color: var(--primary);
+
+    .material-symbols-outlined {
+      color: var(--primary);
+    }
+  }
+}

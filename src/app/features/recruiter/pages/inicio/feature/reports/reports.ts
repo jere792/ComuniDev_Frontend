@@ -13,6 +13,9 @@ import { FeedSkeletonComponent } from '@shared/ui/feed-skeleton/feed-skeleton';
 import { ToastService } from '@core/services/toast.service';
 import { ImageEditorService } from '@core/services/image-editor.service';
 import { ConfirmModal } from '@shared/ui/confirm-modal/confirm-modal';
+import { VacancyGraphqlService } from '@features/recruiter/pages/offers/data-access/api/vacancy-graphql.service';
+import { OfferItem } from '@features/recruiter/pages/offers/domain/models/vacancy.model';
+import { VacanteEmbebida } from '@features/recruiter/pages/inicio/domain/models/social-post.model';
 
 interface CommentVM {
   comment: SocialComment;
@@ -63,11 +66,16 @@ export class ReportsComponent implements OnInit {
   private router = inject(Router);
   private toast = inject(ToastService);
   private imageEditor = inject(ImageEditorService);
+  private vacancyService = inject(VacancyGraphqlService);
 
   posts = signal<PostVM[]>([]);
   composerText = '';
   composerImage: string | null = null;
   uploadingImage = false;
+  /** Oferta elegida para publicarla en el feed con su tarjeta. */
+  composerVacante: { id: string; titulo: string; empresa: string; modalidad: string; ubicacion: string; tecnologias: string[] } | null = null;
+  showVacantePicker = signal(false);
+  misVacantes = signal<OfferItem[]>([]);
   loading = signal(true);
   showComposerModal = signal(false);
   showCommentsModal = signal(false);
@@ -105,6 +113,12 @@ export class ReportsComponent implements OnInit {
       this.loading.set(false);
       return;
     }
+
+    //solo las vacantes activas propias se pueden destacar en el feed
+    this.vacancyService.vacanciesByRecruiter(userId).subscribe({
+      next: (lista) => this.misVacantes.set(lista.filter(v => (v.estado ?? '').toUpperCase() === 'ACTIVA')),
+      error: () => this.misVacantes.set([])
+    });
 
     this.postService.getFeed(userId, 0, 20).subscribe({
       next: (data: SocialPost[]) => {
@@ -237,33 +251,80 @@ export class ReportsComponent implements OnInit {
     this.composerImage = null;
   }
 
+  /** Abre/cierra la lista de vacantes propias para destacarlas en la publicación. */
+  toggleVacantePicker(): void {
+    this.showVacantePicker.update(v => !v);
+  }
+
+  elegirVacante(v: OfferItem): void {
+    this.composerVacante = {
+      id: v.id,
+      titulo: v.titulo,
+      empresa: v.company?.nombre ?? '',
+      modalidad: v.modalidad ?? '',
+      ubicacion: v.ubicacion ?? '',
+      tecnologias: v.tecnologias ?? [],
+    };
+    this.showVacantePicker.set(false);
+  }
+
+  quitarVacante(): void {
+    this.composerVacante = null;
+  }
+
+  inicialesEmpresa(v: VacanteEmbebida): string {
+    const nombre = v.company?.nombre?.trim() || v.titulo?.trim() || '';
+    const iniciales = nombre.split(/\s+/).slice(0, 2).map(p => p.charAt(0).toUpperCase()).join('');
+    return iniciales || 'CV';
+  }
+
+  diasRestantes(v: VacanteEmbebida): number {
+    if (!v.fechaLimite) return 0;
+    const limite = new Date(v.fechaLimite).getTime();
+    if (Number.isNaN(limite)) return 0;
+    const dias = Math.ceil((limite - Date.now()) / 86400000);
+    return dias > 0 ? dias : 0;
+  }
+
+  /** La oferta publicada se administra desde la lista de Ofertas. */
+  verOferta(): void {
+    this.router.navigate(['/recruiter/offers']);
+  }
+
   publish(): void {
     const userId = this.getUserId();
     const text = this.composerText.trim();
-    if (!userId || (!text && !this.composerImage)) return;
+    const vacante = this.composerVacante;
+    //con la vacante elegida basta la tarjeta: no hace falta escribir texto
+    if (!userId || (!text && !this.composerImage && !vacante)) return;
 
     const contenido: any = { texto: text || undefined };
     if (this.composerImage) contenido.imagenes = [this.composerImage];
 
-    this.postService.createPost(userId, contenido).subscribe({
-      next: (created: SocialPost) => {
-        if (created) {
-          this.posts.update(list => [this.buildVm(created), ...list]);
-          this.loadAuthor(created.autorId);
-          this.composerText = '';
-          this.composerImage = null;
-          this.showComposerModal.set(false);
-          this.toast.success('Publicación creada');
-        }
-      },
-      error: () => this.toast.error('Error al crear publicación')
-    });
+    this.postService
+      .createPost(userId, contenido, undefined, undefined, undefined, vacante ? 'VACANTE' : undefined, vacante?.id)
+      .subscribe({
+        next: (created: SocialPost) => {
+          if (created) {
+            this.posts.update(list => [this.buildVm(created), ...list]);
+            this.loadAuthor(created.autorId);
+            this.composerText = '';
+            this.composerImage = null;
+            this.composerVacante = null;
+            this.showComposerModal.set(false);
+            this.toast.success(vacante ? 'Oferta publicada en el feed' : 'Publicación creada');
+          }
+        },
+        error: () => this.toast.error('Error al crear publicación')
+      });
   }
 
   closeComposerModal(): void {
     this.showComposerModal.set(false);
     this.composerText = '';
     this.composerImage = null;
+    this.composerVacante = null;
+    this.showVacantePicker.set(false);
   }
 
   // ─── Post Reacciones ───

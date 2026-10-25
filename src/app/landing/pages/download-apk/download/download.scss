@@ -111,3 +111,37 @@
     padding: 10px 20px;
   }
 }
+
+/* ---- v1.0.1: botón principal + enlace a la versión anterior ---- */
+
+.download-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-sm);
+}
+
+/* la novedad se distingue del resto de la tarjeta; la especificidad de abajo hace
+   falta porque .download-text .body-sm ya fija el color de todas las líneas */
+.download-text .download-novedad {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.download-anterior {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--primary);
+  }
+}
+
+@media (max-width: 600px) {
+  .download-actions {
+    align-items: center;
+  }
+}

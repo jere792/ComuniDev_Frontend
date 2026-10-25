@@ -9,6 +9,8 @@ export interface VacanteEmbebida {
   fechaLimite?: string | null;
   postulacionesCount?: number | null;
   company?: { nombre?: string | null } | null;
+  /** Quién publicó: la tarjeta lo usa cuando la oferta no tiene empresa. */
+  recruiter?: { nombre?: string | null } | null;
 }
 
 export interface SocialPost {

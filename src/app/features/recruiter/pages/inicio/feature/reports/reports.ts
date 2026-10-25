@@ -272,8 +272,21 @@ export class ReportsComponent implements OnInit {
     this.composerVacante = null;
   }
 
+  /** Quién figura en la tarjeta: la empresa si existe, si no el reclutador que publicó. */
+  empresaMostrada(v: VacanteEmbebida): string {
+    return v.company?.nombre?.trim() || v.recruiter?.nombre?.trim() || '';
+  }
+
+  /** «Empresa · modalidad · ubicación», sin separadores sueltos cuando falta algún dato. */
+  detalleVacante(v: VacanteEmbebida): string {
+    return [this.empresaMostrada(v), v.modalidad ?? '', v.ubicacion ?? '']
+      .map(parte => parte.trim())
+      .filter(Boolean)
+      .join(' · ');
+  }
+
   inicialesEmpresa(v: VacanteEmbebida): string {
-    const nombre = v.company?.nombre?.trim() || v.titulo?.trim() || '';
+    const nombre = this.empresaMostrada(v) || v.titulo?.trim() || '';
     const iniciales = nombre.split(/\s+/).slice(0, 2).map(p => p.charAt(0).toUpperCase()).join('');
     return iniciales || 'CV';
   }

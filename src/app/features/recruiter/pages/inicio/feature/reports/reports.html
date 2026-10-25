@@ -147,11 +147,7 @@
               <span class="vacancy-logo">{{ inicialesEmpresa(vm.post.vacante) }}</span>
               <div class="vacancy-titles">
                 <span class="vacancy-title">{{ vm.post.vacante.titulo }}</span>
-                <span class="vacancy-sub">
-                  {{ vm.post.vacante.company?.nombre }}
-                  @if (vm.post.vacante.modalidad) { · {{ vm.post.vacante.modalidad }} }
-                  @if (vm.post.vacante.ubicacion) { · {{ vm.post.vacante.ubicacion }} }
-                </span>
+                <span class="vacancy-sub">{{ detalleVacante(vm.post.vacante) }}</span>
               </div>
             </div>
             @if (vm.post.vacante.tecnologias?.length) {

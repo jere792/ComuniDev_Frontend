@@ -22,6 +22,7 @@ const GET_FEED = gql`
         fechaLimite
         postulacionesCount
         company { nombre }
+        recruiter { nombre }
       }
       contenido { texto imagenes videos archivos bloquesCodigo enlaces }
       etiquetas
@@ -86,6 +87,7 @@ const CREATE_POST = gql`
         fechaLimite
         postulacionesCount
         company { nombre }
+        recruiter { nombre }
       }
       contenido { texto imagenes }
       etiquetas

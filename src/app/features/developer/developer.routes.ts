@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { mensajesMatcher } from '@core/routing/messages.matcher';
 import { DeveloperMain } from '@features/developer/main';
 
 export const routes: Routes = [
@@ -28,9 +29,10 @@ export const routes: Routes = [
         loadComponent: () => import('@features/recruiter/pages/reels/feature/reels').then(m => m.RecruiterReels),
       },
       {
-        // ':id?' opcional: /developer/messages y /developer/messages/<userId>
-        // usan la misma entrada, asi el componente no se recrea al cambiar de chat
-        path: 'messages/:id?',
+        // matcher propio: /developer/messages y /developer/messages/<userId> usan la
+        // misma entrada (Angular no admite el "?" opcional en `path`), asi el
+        // componente no se recrea al cambiar de chat
+        matcher: mensajesMatcher,
         title: 'Mensajes',
         loadComponent: () => import('@features/shared/feature/messages/messages').then(m => m.Messages),
       },

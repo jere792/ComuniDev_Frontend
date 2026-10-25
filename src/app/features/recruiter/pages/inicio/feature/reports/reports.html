@@ -144,7 +144,13 @@
         @if (!vm.isEditing && vm.post.tipo === 'VACANTE' && vm.post.vacante) {
           <div class="vacancy-card">
             <div class="vacancy-head">
-              <span class="vacancy-logo">{{ inicialesEmpresa(vm.post.vacante) }}</span>
+              <span class="vacancy-logo">
+                @if (vm.post.vacante.company?.logoUrl) {
+                  <img [src]="vm.post.vacante.company?.logoUrl" [alt]="vm.post.vacante.company?.nombre ?? ''" />
+                } @else {
+                  {{ inicialesEmpresa(vm.post.vacante) }}
+                }
+              </span>
               <div class="vacancy-titles">
                 <span class="vacancy-title">{{ vm.post.vacante.titulo }}</span>
                 <span class="vacancy-sub">{{ detalleVacante(vm.post.vacante) }}</span>

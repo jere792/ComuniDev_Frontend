@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Login } from '@landing/pages/inicio/hero/login/login';
 import { TranslationPipe } from '@core/pipes/translation.pipe';
 import { AuthService } from '@core/services/auth.service';
+import { ToastService } from '@core/services/toast.service';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
@@ -15,6 +16,7 @@ import { environment } from '../../../../../environments/environment';
 export class Hero {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private toast = inject(ToastService);
 
   loginForm: FormGroup;
   loginError = '';
@@ -35,9 +37,12 @@ export class Hero {
         this.authService.navigateByRole(data.rolActivo);
       } catch (err: any) {
         //sin conexión (servidor apagado) no es lo mismo que credenciales incorrectas
-        this.loginError =
+        const mensaje =
           err?.error?.message ||
-          (err?.status === 0 ? 'No hay conexión con el servidor' : 'Credenciales invalidas');
+          (err?.status === 0 ? 'No hay conexión con el servidor' : 'Credenciales inválidas');
+        this.loginError = mensaje;
+        //el texto bajo el campo se pasa por alto fácil: el toast deja constancia del fallo
+        this.toast.error(mensaje);
       }
     }
   }

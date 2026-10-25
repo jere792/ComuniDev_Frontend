@@ -45,7 +45,16 @@
           }
           <span class="viewer-name">{{ vu.nombre }}</span>
         </div>
-        <span class="viewer-time">{{ vu.stories[viewingIndex()]?.createdAt | date: 'HH:mm' }}</span>
+        <div class="viewer-right">
+          <span class="viewer-time">{{ vu.stories[viewingIndex()]?.createdAt | date: 'HH:mm' }}</span>
+          <!-- Solo en mis historias: cuántas personas las vieron -->
+          @if (esHistoriaPropia()) {
+            <button class="viewer-views-btn" type="button" (click)="abrirVistas()">
+              <span class="material-symbols-outlined">visibility</span>
+              <span>{{ vu.stories[viewingIndex()]?.vistasCount ?? 0 }}</span>
+            </button>
+          }
+        </div>
       </div>
 
       <!-- Music bar (top, below user info) -->
@@ -168,5 +177,39 @@
       <div class="nav-zone nav-prev" (click)="prevStory()"></div>
       <div class="nav-zone nav-next" (click)="nextStory()"></div>
     </div>
+
+    <!-- Quién vio mi historia -->
+    @if (mostrarVistas()) {
+      <div class="views-panel" (click)="$event.stopPropagation()">
+        <div class="views-head">
+          <span class="material-symbols-outlined">visibility</span>
+          <strong>Vistas</strong>
+          <span class="views-count">{{ vistas().length }}</span>
+          <button type="button" class="views-close" (click)="cerrarVistas()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        @if (cargandoVistas()) {
+          <p class="views-empty">Cargando…</p>
+        } @else if (vistas().length === 0) {
+          <p class="views-empty">Todavía nadie vio tu historia</p>
+        } @else {
+          <ul class="views-list">
+            @for (v of vistas(); track v.id) {
+              <li>
+                @if (nombresVistas().get(v.viewerId)?.avatar) {
+                  <img [src]="nombresVistas().get(v.viewerId)!.avatar" alt="" class="views-avatar" />
+                } @else {
+                  <span class="views-avatar views-initials">{{ getInitials(nombresVistas().get(v.viewerId)?.nombre ?? 'Usuario') }}</span>
+                }
+                <span class="views-name">{{ nombresVistas().get(v.viewerId)?.nombre ?? 'Usuario' }}</span>
+                <span class="views-when">{{ v.viewedAt | date: 'dd MMM, HH:mm' }}</span>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    }
   </div>
 }

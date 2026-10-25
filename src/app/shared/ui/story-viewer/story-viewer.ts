@@ -14,7 +14,9 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { SocialStory } from '@features/recruiter/pages/inicio/domain/models/social-story.model';
+import { SocialStory, SocialStoryView } from '@features/recruiter/pages/inicio/domain/models/social-story.model';
+import { StoryStore } from '@features/recruiter/pages/inicio/data-access/state/story.store';
+import { UserStore } from '@features/users/data-access/state/user.store';
 import { MusicaStore } from '@features/recruiter/pages/inicio/data-access/state/musica.store';
 
 export interface StoryViewerUser {
@@ -35,6 +37,19 @@ export class StoryViewer implements OnChanges, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
   private musicaService = inject(MusicaStore);
+  private storyStore = inject(StoryStore);
+  private userStore = inject(UserStore);
+
+  /** Quién está viendo; las vistas solo se registran y se listan en la historia propia. */
+  readonly yo = localStorage.getItem('userId') ?? '';
+
+  /** Personas que vieron la historia propia, con nombre y avatar ya resueltos. */
+  mostrarVistas = signal(false);
+  cargandoVistas = signal(false);
+  vistas = signal<SocialStoryView[]>([]);
+  nombresVistas = signal<Map<string, { nombre: string; avatar: string }>>(new Map());
+  /** Cada historia se avisa como vista una sola vez por sesión. */
+  private vistasAvisadas = new Set<string>();
 
   @Input() open = false;
   @Input() users: StoryViewerUser[] = [];
@@ -77,6 +92,19 @@ export class StoryViewer implements OnChanges, OnDestroy {
         this.stopPreview();
       }
     });
+    //avisa al servidor cada vez que se muestra una historia (una sola vez por historia y sesión)
+    effect(() => {
+      const user = this.viewingUser();
+      const story = user?.stories[this.viewingIndex()];
+      if (!this.open || !user || !story?.id) return;
+      this.registrarVista(story.id, user.autorId);
+    });
+  }
+
+  private registrarVista(storyId: string, autorId: string): void {
+    if (!this.yo || autorId === this.yo || this.vistasAvisadas.has(storyId)) return;
+    this.vistasAvisadas.add(storyId);
+    this.storyStore.viewStory(storyId, this.yo).subscribe({ error: () => {} });
   }
 
   @HostListener('document:keydown.escape')
@@ -111,6 +139,49 @@ export class StoryViewer implements OnChanges, OnDestroy {
 
   closeViewer(): void {
     this.close.emit();
+  }
+
+  /** Solo en mis historias se puede ver quién las vio. */
+  esHistoriaPropia(): boolean {
+    const vu = this.viewingUser();
+    return !!vu && !!this.yo && vu.autorId === this.yo;
+  }
+
+  abrirVistas(): void {
+    const story = this.viewingUser()?.stories[this.viewingIndex()];
+    if (!story?.id) return;
+    this.mostrarVistas.set(true);
+    this.cargandoVistas.set(true);
+    this.storyStore.getStoryViews(story.id).subscribe({
+      next: (vistas) => {
+        this.vistas.set(vistas);
+        this.cargandoVistas.set(false);
+        this.resolverNombres(vistas);
+      },
+      error: () => this.cargandoVistas.set(false),
+    });
+  }
+
+  cerrarVistas(): void {
+    this.mostrarVistas.set(false);
+  }
+
+  /** Nombre y avatar de cada persona que vio la historia (una petición por id). */
+  private resolverNombres(vistas: SocialStoryView[]): void {
+    vistas.forEach((v) => {
+      if (!v.viewerId || this.nombresVistas().has(v.viewerId)) return;
+      this.userStore.getById(v.viewerId).subscribe({
+        next: (u: any) => {
+          if (!u) return;
+          this.nombresVistas.update((m) => {
+            const copia = new Map(m);
+            copia.set(v.viewerId, { nombre: u.nombre ?? 'Usuario', avatar: u.fotoPerfilUrl ?? '' });
+            return copia;
+          });
+        },
+        error: () => {},
+      });
+    });
   }
 
   private resetState(): void {

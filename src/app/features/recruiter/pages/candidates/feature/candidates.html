@@ -1,4 +1,5 @@
 <div class="candidates-container">
+  <!-- Encabezado de la sección -->
   <div class="candidates-header">
     <h1 class="page-title">Talento para tu equipo</h1>
     <p class="page-subtitle">Descubre y conecta con profesionales listos para unirse a tu proyecto.</p>
@@ -27,7 +28,7 @@
         [class.no-nav]="!blocksNavVisible()"
         [class.no-blocks]="currentBlocks().length === 0"
       >
-        <!-- Navegación de bloques -->
+        <!-- Navegación superior de bloques de información -->
         @if (blocksNavVisible()) {
           <div class="blocks-nav">
             <button
@@ -62,7 +63,7 @@
           </div>
         }
 
-        <!-- Columna izquierda: 2 bloques -->
+        <!-- Columna izquierda: Bloques informativos -->
         <div class="blocks-col blocks-col--left">
           @for (block of leftBlocks(); track block.key) {
             <app-candidate-block
@@ -74,7 +75,7 @@
           }
         </div>
 
-        <!-- Columna central: perfil (fijo al cambiar de flecha) -->
+        <!-- Columna central: Tarjeta principal del candidato -->
         <article class="profile-card">
           <div class="profile-header">
             <div class="profile-banner" [class.empty]="!dev.bannerUrl">
@@ -176,7 +177,7 @@
           </div>
         </article>
 
-        <!-- Columna derecha: 2 bloques -->
+        <!-- Columna derecha: Bloques informativos -->
         <div class="blocks-col blocks-col--right">
           @for (block of rightBlocks(); track block.key) {
             <app-candidate-block
@@ -189,11 +190,12 @@
         </div>
       </div>
 
+      <!-- Editor flotante de mensajes / propuestas -->
       @if (composerMode()) {
         <div class="composer">
           <textarea
-            rows="2"
-            [placeholder]="composerMode() === 'proposal' ? 'Escribe tu propuesta...' : 'Escribe un mensaje...'"
+            rows="3"
+            [placeholder]="composerMode() === 'proposal' ? 'Escribe tu propuesta formal...' : 'Escribe un mensaje...'"
             [(ngModel)]="composerText"
           ></textarea>
           <div class="composer-actions">

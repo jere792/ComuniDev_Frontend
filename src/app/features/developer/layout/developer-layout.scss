@@ -20,6 +20,9 @@
   /* sin esto una imagen ancha estira toda la pagina (min-content) y
      genera scroll horizontal en movil */
   min-width: 0;
+  /* la misma idea en vertical: sin esto la altura min-content estira el cuerpo
+     y el scroll se va a la pagina en lugar de quedarse en cada panel */
+  min-height: 0;
   margin-left: 72px;
   display: flex;
   flex-direction: column;
@@ -35,6 +38,9 @@
   flex-direction: column;
   flex: 1;
   min-width: 0;
+  /* que ocupe exactamente el alto disponible y no el de su contenido: asi una
+     pantalla de altura fija (mensajes) acota sus propios paneles con scroll */
+  min-height: 0;
   padding-block: var(--space-lg);
 }
 

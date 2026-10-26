@@ -36,7 +36,7 @@ export interface AuthState {
 export abstract class AuthRepository {
   abstract login(request: LoginRequest): Observable<LoginResponse>;
   abstract register(request: RegisterRequest): Observable<LoginResponse>;
-  abstract completeRole(userId: string, rol: string): Observable<LoginResponse>;
+  abstract completeRole(userId: string, rol: string, token: string): Observable<LoginResponse>;
 }
 
 export const AUTH_REPOSITORY = new InjectionToken<AuthRepository>('AuthRepository');

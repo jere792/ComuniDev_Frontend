@@ -1,6 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
 import { AuthStore } from '@features/auth/data-access/state/auth.store';
 
 @Component({
@@ -83,23 +82,22 @@ import { AuthStore } from '@features/auth/data-access/state/auth.store';
   `],
 })
 export class RoleSelectionComponent implements OnInit {
-  private route = inject(ActivatedRoute);
   store = inject(AuthStore);
 
   userId = '';
   token = '';
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      this.userId = params['userId'] || '';
-      this.token = params['token'] || '';
-      if (!this.userId || !this.token) {
-        this.store.logout();
-      }
-    });
+    // la sesión OAuth quedó guardada en el callback (sin pasar por la URL);
+    // sin ella no hay nada que completar y se vuelve al inicio
+    this.userId = localStorage.getItem('userId') || '';
+    this.token = localStorage.getItem('token') || '';
+    if (!this.userId || !this.token) {
+      this.store.logout();
+    }
   }
 
   selectRole(role: string): void {
-    this.store.completeRole(this.userId, role);
+    this.store.completeRole(this.userId, role, this.token);
   }
 }

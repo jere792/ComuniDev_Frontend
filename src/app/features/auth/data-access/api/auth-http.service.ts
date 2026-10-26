@@ -29,9 +29,9 @@ export class AuthHttpService implements AuthRepository {
       .pipe(map(res => res.data));
   }
 
-  completeRole(userId: string, rol: string): Observable<LoginResponse> {
+  completeRole(userId: string, rol: string, token: string): Observable<LoginResponse> {
     return this.http
-      .post<ApiResponse<LoginResponse>>(`${this.baseUrl}/auth/complete-role`, { userId, rol })
+      .post<ApiResponse<LoginResponse>>(`${this.baseUrl}/auth/complete-role`, { userId, rol, token })
       .pipe(map(res => res.data));
   }
 }

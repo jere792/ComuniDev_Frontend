@@ -44,10 +44,10 @@ export class AuthStore {
     });
   }
 
-  completeRole(userId: string, rol: string): void {
+  completeRole(userId: string, rol: string, token: string): void {
     this.loading.set(true);
     this.error.set(null);
-    this.repository.completeRole(userId, rol).subscribe({
+    this.repository.completeRole(userId, rol, token).subscribe({
       next: (data: LoginResponse) => {
         this.setSession(data);
         this.loading.set(false);
@@ -69,9 +69,15 @@ export class AuthStore {
     const email = params['email'];
 
     if (needsRole && userId && token) {
-      this.router.navigate(['/auth/role-selection'], {
-        queryParams: { userId, token, nombre, email },
-      });
+      // la sesión se guarda de una vez: la vista de selección de rol no lleva
+      // el token en la URL (evita que quede en el historial del navegador)
+      localStorage.removeItem('userPhoto');
+      localStorage.removeItem('userEmail');
+      localStorage.setItem('token', token);
+      localStorage.setItem('userId', userId);
+      if (nombre) localStorage.setItem('userName', nombre);
+      if (email) localStorage.setItem('userEmail', email);
+      this.router.navigate(['/auth/role-selection']);
       return;
     }
 

@@ -1,4 +1,45 @@
-# ComunidevFrontend
+# ComuniDev — Web (Angular)
+
+Frontend web de **ComuniDev**: red social profesional y bolsa de empleo para
+desarrolladores, reclutadores y empresas. Habla con el backend
+`ComuniDev_Backend` (Spring Boot) por **GraphQL** (pantallas) y **REST**
+(auth, upload, reportes, talento, música).
+
+## Cómo se corre
+
+```bash
+npm install
+npm start      # ng serve → http://localhost:4200
+npm run build  # build de producción (dist/)
+```
+
+En desarrollo el backend debe estar en `http://127.0.0.1:8080/api/v1`
+(p. ej. el contenedor Docker local de `ComuniDev_Backend`).
+
+## Configuración (environments)
+
+| Archivo | Cuándo se usa | `apiUrl` |
+|---|---|---|
+| `src/environments/environment.ts` | desarrollo (`ng serve`) | `http://127.0.0.1:8080/api/v1` |
+| `src/environments/environment.prod.ts` | producción (`npm run build`) | `https://comunidevbackend-production.up.railway.app/api/v1` |
+
+Despliegue: Cloudflare Pages (`https://comunidev.pages.dev`) ejecuta el build de
+producción contra Railway. Cambiar `environment.prod.ts` implica reconstruir y
+redeployar.
+
+## Estructura
+
+- `src/app/core` — servicios transversales (auth, upload, reportes, tema, idioma, toasts…).
+- `src/app/features` — pantallas por rol (`auth`, `developer`, `recruiter`, …) en cortes
+  `pages/` + `data-access/`, con `*-graphql.service.ts` para GraphQL y
+  `auth-http.service.ts` para REST.
+- `src/app/landing` y `src/app/shared` — portada y elementos compartidos.
+
+Más detalle de la arquitectura y del patrón de carpetas en [`doc/README.md`](doc/README.md).
+
+---
+
+# README original (Angular CLI)
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.5.
 

@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService, LoginData } from '@core/services/api.service';
+import { TERMINOS_VERSION } from '@shared/constants/terminos';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -44,7 +45,7 @@ export class AuthService {
         rol,
         telefono,
         //prueba de aceptación de términos: versión y fecha quedan en el usuario
-        terminosVersion: '2026-10',
+        terminosVersion: TERMINOS_VERSION,
         terminosAceptadosEn: new Date().toISOString(),
       }).subscribe({
         next: (data) => resolve(data),

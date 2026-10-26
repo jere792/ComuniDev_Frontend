@@ -180,6 +180,7 @@
     <div class="terminos-overlay" (click)="verTerminos.set(false)">
       <div class="terminos-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
         <h3 class="terminos-titulo">Términos y condiciones</h3>
+        <p class="terminos-version">{{ terminosLabel }}</p>
         <div class="terminos-texto">
           <p><strong>1. Uso de la plataforma</strong> — ComuniDev es una red profesional para desarrolladores, reclutadores y empresas. Al crear una cuenta te comprometes a usarla de forma lícita y respetuosa.</p>
           <p><strong>2. Cuenta y seguridad</strong> — Eres responsable de tus credenciales y de la actividad que ocurra en tu cuenta. Notifícanos ante cualquier acceso no autorizado.</p>

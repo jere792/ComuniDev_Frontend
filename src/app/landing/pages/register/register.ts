@@ -7,6 +7,7 @@ import { RevealDirective } from '@shared/directives/reveal/reveal.directive';
 import { AuthService } from '@core/services/auth.service';
 import { COMPANY_REPOSITORY } from '@features/recruiter/pages/company/domain/ports/company.repository';
 import { COUNTRIES, Country } from '@shared/constants/countries';
+import { TERMINOS_ACTUALIZACION, TERMINOS_VERSION } from '@shared/constants/terminos';
 
 @Component({
   selector: 'app-register',
@@ -36,6 +37,9 @@ export class Register {
   /** Términos y condiciones: el registro queda bloqueado hasta aceptarlos. */
   aceptaTerminos = signal(false);
   verTerminos = signal(false);
+
+  /** Versión del texto que muestra el diálogo; es la misma que queda guardada en el usuario. */
+  readonly terminosLabel = `Versión ${TERMINOS_VERSION} · Actualizado ${TERMINOS_ACTUALIZACION}`;
 
   /** Datos de empresa, solo cuando el rol es RECRUITER y declara tener una. */
   tieneEmpresa = signal(false);
@@ -127,7 +131,10 @@ export class Register {
       this.successMessage.set('Cuenta creada exitosamente. Ahora puedes iniciar sesion.');
       setTimeout(() => this.router.navigate(['/']), 2000);
     } catch (err: any) {
-      this.errorMessage.set(err?.error?.message || 'Error al crear la cuenta');
+      // si el backend devuelve errores por campo (validación), mostramos el primero
+      const campos = err?.error?.errors;
+      const detalle = campos && typeof campos === 'object' ? Object.values(campos)[0] : null;
+      this.errorMessage.set(detalle || err?.error?.message || 'Error al crear la cuenta');
     }
   }
 

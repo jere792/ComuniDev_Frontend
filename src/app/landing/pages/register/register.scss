@@ -378,9 +378,16 @@
 
 .terminos-titulo {
   margin: 0;
-  padding: 20px 24px 12px;
+  padding: 20px 24px 4px;
   font-size: 18px;
   color: var(--on-surface);
+}
+
+.terminos-version {
+  margin: 0;
+  padding: 0 24px 12px;
+  font-size: 13px;
+  color: var(--on-surface-variant);
 }
 
 .terminos-texto {

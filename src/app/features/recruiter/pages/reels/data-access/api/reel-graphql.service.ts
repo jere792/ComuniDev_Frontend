@@ -127,14 +127,14 @@ export class ReelGraphqlService implements ReelRepository {
   private apollo = inject(Apollo);
 
 
-  /** Ventana de 30 reels por defecto (feed y pestaña de perfil); el backend pagina. */
-  getReels(page = 0, size = 30): Observable<SocialReel[]> {
+  /** Ventana de 10 reels por defecto (feed y pestaña de perfil); el backend pagina. */
+  getReels(page = 0, size = 10): Observable<SocialReel[]> {
     return this.apollo
       .watchQuery<any>({ query: GET_REELS, variables: { page, size } })
       .valueChanges.pipe(map(result => result.data?.reels ?? []));
   }
 
-  getReelsByUser(userId: string, page = 0, size = 30): Observable<SocialReel[]> {
+  getReelsByUser(userId: string, page = 0, size = 10): Observable<SocialReel[]> {
     return this.apollo
       .watchQuery<any>({ query: GET_REELS_BY_USER, variables: { userId, page, size } })
       .valueChanges.pipe(map(result => result.data?.reelsByUser ?? []));

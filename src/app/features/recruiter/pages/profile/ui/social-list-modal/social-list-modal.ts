@@ -29,7 +29,7 @@ export class SocialListModal implements OnInit, OnChanges {
   readonly hayMas = signal(false);
   readonly cargandoMas = signal(false);
   private pagina = 0;
-  private static readonly TAMANO = 50;
+  private static readonly TAMANO = 25;
 
   private userStore = inject(UserStore);
   private followService = inject(FollowStore);

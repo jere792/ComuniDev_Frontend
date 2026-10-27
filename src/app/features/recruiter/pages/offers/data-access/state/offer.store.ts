@@ -22,7 +22,7 @@ export class OfferStore {
   readonly hayMas = signal(false);
   readonly cargandoMas = signal(false);
   private pagina = 0;
-  private static readonly TAMANO = 50;
+  private static readonly TAMANO = 20;
 
   load(recruiterId: string): void {
     this.loading.set(true);

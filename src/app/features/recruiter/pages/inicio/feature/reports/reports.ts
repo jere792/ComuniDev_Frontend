@@ -582,13 +582,17 @@ export class ReportsComponent implements OnInit {
           ));
         });
 
-        // autores y mis reacciones de esos comentarios, en 2 peticiones por post
-        this.posts()
-          .filter(v => porContenido.has(v.post.id) && v.comments.length > 0)
-          .forEach(v => {
-            this.cargarAutoresComentarios(v.comments.map(c => c.comment.autorId), v.post.id);
-            this.cargarMisReaccionesComentarios(v.comments.map(c => c.comment.id), v.post.id);
-          });
+        // autores y mis reacciones de TODOS esos comentarios en 2 peticiones globales
+        const conComentarios = this.posts()
+          .filter(v => porContenido.has(v.post.id) && v.comments.length > 0);
+        this.cargarAutoresComentariosDelFeed(conComentarios.map(v => ({
+          postId: v.post.id,
+          autorIds: v.comments.map(c => c.comment.autorId),
+        })));
+        this.cargarMisReaccionesComentariosDelFeed(conComentarios.map(v => ({
+          postId: v.post.id,
+          commentIds: v.comments.map(c => c.comment.id),
+        })));
       },
       // si el batch falla (backend sin actualizar), se hace como antes
       error: () => this.posts()
@@ -661,6 +665,51 @@ export class ReportsComponent implements OnInit {
           const tipo = tipoDe.get(c.comment.id);
           return tipo ? { ...c, myReaction: tipo } : c;
         });
+      },
+      error: () => {}
+    });
+  }
+
+  /** Autores de los comentarios de VARIOS posts en UNA sola peticion (carga del feed). */
+  private cargarAutoresComentariosDelFeed(filas: Array<{ postId: string; autorIds: string[] }>): void {
+    const todos = [...new Set(filas.flatMap(f => f.autorIds))].filter(id => !!id);
+    if (todos.length === 0) return;
+    const faltantes = todos.filter(id => !this.userCache.has(id));
+
+    const aplicar = () => filas.forEach(f => f.autorIds.forEach(id => {
+      const info = this.userCache.get(id);
+      if (info) this.aplicarAutorComentario(id, f.postId, info);
+    }));
+
+    if (faltantes.length === 0) {
+      aplicar();
+      return;
+    }
+
+    this.userStore.getByIds(faltantes).subscribe({
+      next: (usuarios: any[]) => {
+        usuarios.forEach(u => {
+          if (u?.id) this.userCache.set(u.id, { nombre: u.nombre ?? 'Usuario', avatar: u.fotoPerfilUrl ?? '' });
+        });
+        aplicar();
+      },
+      error: () => {}
+    });
+  }
+
+  /** Mis reacciones a los comentarios de VARIOS posts en UNA sola peticion. */
+  private cargarMisReaccionesComentariosDelFeed(filas: Array<{ postId: string; commentIds: string[] }>): void {
+    const userId = this.getUserId();
+    const todos = [...new Set(filas.flatMap(f => f.commentIds))];
+    if (!userId || todos.length === 0) return;
+
+    this.reactionService.getMyReactions(userId, 'COMMENT', todos).subscribe({
+      next: (reacciones) => {
+        const tipoDe = new Map(reacciones.map(r => [r.objetivoId, r.tipoReaccion as TipoReaccion]));
+        filas.forEach(f => this.updatePostComments(f.postId, c => {
+          const tipo = tipoDe.get(c.comment.id);
+          return tipo ? { ...c, myReaction: tipo } : c;
+        }));
       },
       error: () => {}
     });

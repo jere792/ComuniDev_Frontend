@@ -21,15 +21,6 @@
             <p class="file-name">{{ selectedFile.name }}</p>
           }
 
-          <label class="field-label">o pega una URL del video</label>
-          <input
-            type="url"
-            [(ngModel)]="reelVideoUrl"
-            placeholder="https://ejemplo.com/video.mp4"
-            class="field-input"
-            [disabled]="!!selectedFile"
-          />
-
           <label class="field-label">Descripción</label>
           <textarea
             [(ngModel)]="reelDescripcion"
@@ -50,7 +41,7 @@
             <button
               class="btn-create"
               (click)="createReel()"
-              [disabled]="(!reelVideoUrl.trim() && !selectedFile) || creating"
+              [disabled]="!selectedFile || creating"
             >
               @if (creating) {
                 {{ uploadProgress || 'Creando...' }}

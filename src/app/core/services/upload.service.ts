@@ -1,10 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface UploadedFile {
   url: string;
+  /** El backend nuevo ya devuelve https; el campo viejo era http (secure_url manda). */
+  secure_url?: string;
 }
 
 /**
@@ -21,6 +24,7 @@ export class UploadService {
   uploadFile(file: File): Observable<UploadedFile> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post<UploadedFile>(`${environment.apiUrl}/upload`, formData);
+    return this.http.post<UploadedFile>(`${environment.apiUrl}/upload`, formData)
+      .pipe(map(res => ({ url: res.secure_url ?? res.url })));
   }
 }

@@ -82,7 +82,6 @@ export class RecruiterReels implements OnInit {
 
   // Composer
   showComposer = signal(false);
-  reelVideoUrl = '';
   reelDescripcion = '';
   reelEtiquetas: string[] = [];
   creating = false;
@@ -223,38 +222,29 @@ export class RecruiterReels implements OnInit {
     }
 
     this.selectedFile = file;
-    // Si elige un archivo, la URL escrita a mano deja de mandar.
-    if (file) this.reelVideoUrl = '';
   }
 
   createReel(): void {
     const userId = this.getUserId();
-    if (!userId || (!this.reelVideoUrl.trim() && !this.selectedFile)) return;
+    if (!userId || !this.selectedFile) return;
 
     this.creating = true;
+    this.uploading = true;
+    this.uploadProgress = 'Subiendo video...';
 
-    // Con archivo, primero se sube al backend y con la URL resultante se crea
-    // el reel. Sin archivo se usa la URL escrita a mano.
-    if (this.selectedFile) {
-      this.uploading = true;
-      this.uploadProgress = 'Subiendo video...';
-
-      this.uploadService.uploadFile(this.selectedFile).subscribe({
-        next: (uploaded) => {
-          this.uploadProgress = 'Publicando...';
-          this.publishReel(userId, uploaded.url);
-        },
-        error: () => {
-          this.uploading = false;
-          this.creating = false;
-          this.uploadProgress = '';
-          this.toast.error('No se pudo subir el video');
-        }
-      });
-      return;
-    }
-
-    this.publishReel(userId, this.reelVideoUrl.trim());
+    // el video se sube al backend (Cloudinary) y con la url resultante se crea el reel
+    this.uploadService.uploadFile(this.selectedFile).subscribe({
+      next: (uploaded) => {
+        this.uploadProgress = 'Publicando...';
+        this.publishReel(userId, uploaded.url);
+      },
+      error: () => {
+        this.uploading = false;
+        this.creating = false;
+        this.uploadProgress = '';
+        this.toast.error('No se pudo subir el video');
+      }
+    });
   }
 
   private publishReel(userId: string, videoUrl: string): void {
@@ -268,7 +258,6 @@ export class RecruiterReels implements OnInit {
         if (created) {
           this.reels.update(list => [this.buildVm(created), ...list]);
           this.loadAuthor(created.autorId);
-          this.reelVideoUrl = '';
           this.reelDescripcion = '';
           this.reelEtiquetas = [];
           this.selectedFile = null;

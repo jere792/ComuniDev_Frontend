@@ -96,15 +96,24 @@
       <div class="report-card">
         <!-- Header -->
         <div class="report-header">
-          @if (vm.autorAvatar) {
-            <img [src]="vm.autorAvatar" [alt]="vm.autorNombre" class="user-avatar clickable" (click)="goToProfile(vm.post.autorId)" />
+          @if (!vm.autorNombre) {
+            <!-- el autor aun no llega: skeleton suave de perfil y nombre -->
+            <div class="user-avatar sk-perfil"></div>
+            <div class="user-info">
+              <div class="sk-nombre"></div>
+              <div class="sk-hora"></div>
+            </div>
           } @else {
-            <div class="user-avatar avatar-fallback clickable" (click)="goToProfile(vm.post.autorId)">{{ getInitials(vm.autorNombre || '?') }}</div>
+            @if (vm.autorAvatar) {
+              <img [src]="vm.autorAvatar" [alt]="vm.autorNombre" class="user-avatar clickable" (click)="goToProfile(vm.post.autorId)" />
+            } @else {
+              <div class="user-avatar avatar-fallback clickable" (click)="goToProfile(vm.post.autorId)">{{ getInitials(vm.autorNombre || '?') }}</div>
+            }
+            <div class="user-info clickable" (click)="goToProfile(vm.post.autorId)">
+              <span class="user-name">{{ vm.autorNombre || 'Usuario' }}</span>
+              <span class="post-time">{{ vm.post.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+            </div>
           }
-          <div class="user-info clickable" (click)="goToProfile(vm.post.autorId)">
-            <span class="user-name">{{ vm.autorNombre || 'Usuario' }}</span>
-            <span class="post-time">{{ vm.post.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
-          </div>
           @if (vm.post.autorId === getUserIdPublic()) {
             <div class="report-menu">
               <button class="menu-btn" (click)="startEdit(vm)">
@@ -257,14 +266,20 @@
 <!-- Recursive comment node (comments & nested replies) -->
 <ng-template #commentNode let-cvm let-postId="postId" let-level="level">
   <div class="comment" [class.nested]="level > 0">
-    @if (cvm.autorAvatar) {
+    @if (!cvm.autorNombre) {
+      <div class="comment-avatar sk-comentario" [class.small]="level > 0"></div>
+    } @else if (cvm.autorAvatar) {
       <img [src]="cvm.autorAvatar" class="comment-avatar clickable" (click)="goToProfile(cvm.comment.autorId)" />
     } @else {
       <div class="comment-avatar avatar-fallback clickable" [class.small]="level > 0" (click)="goToProfile(cvm.comment.autorId)">{{ getInitials(cvm.autorNombre || '?') }}</div>
     }
     <div class="comment-body">
       <div class="comment-bubble">
-        <span class="comment-name clickable" (click)="goToProfile(cvm.comment.autorId)">{{ cvm.autorNombre || 'Usuario' }}</span>
+        @if (!cvm.autorNombre) {
+          <div class="sk-nombre sm"></div>
+        } @else {
+          <span class="comment-name clickable" (click)="goToProfile(cvm.comment.autorId)">{{ cvm.autorNombre || 'Usuario' }}</span>
+        }
         <p class="comment-text">{{ cvm.comment.texto }}</p>
       </div>
       <div class="comment-actions">
@@ -295,7 +310,14 @@
         <span class="action-dot">·</span>
         <span class="comment-time">{{ cvm.comment.createdAt | date: 'dd/MM HH:mm' }}</span>
         @if ((cvm.comment.reaccionesCount ?? 0) > 0) {
-          <span class="comment-likes">👍 {{ cvm.comment.reaccionesCount }}</span>
+          <button
+            type="button"
+            class="comment-likes"
+            title="Ver quiénes reaccionaron"
+            (click)="verReaccionesComentario(cvm); $event.stopPropagation()"
+          >
+            👍 {{ cvm.comment.reaccionesCount }}
+          </button>
         }
       </div>
 

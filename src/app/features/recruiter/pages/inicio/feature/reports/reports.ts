@@ -124,7 +124,7 @@ export class ReportsComponent implements OnInit {
       next: (data: SocialPost[]) => {
         this.posts.set(data.map(p => this.buildVm(p)));
         this.loading.set(false);
-        data.forEach(p => this.loadAuthor(p.autorId));
+        this.cargarAutores(data.map(p => p.autorId));
         this.loadMyReactions(data);
         data.forEach(p => this.loadCommentCountSilently(p));
         this.posts().forEach(vm => this.loadComments(vm));
@@ -167,19 +167,27 @@ export class ReportsComponent implements OnInit {
     };
   }
 
-  private loadAuthor(autorId: string): void {
-    if (this.userCache.has(autorId)) {
-      this.applyAuthor(autorId, this.userCache.get(autorId)!);
+  /** Autores del feed en UNA sola peticion (aliases u0, u1...); el cache evita repetir. */
+  private cargarAutores(autorIds: string[]): void {
+    const pedidos = [...new Set(autorIds)].filter(id => !!id);
+    const faltantes = pedidos.filter(id => !this.userCache.has(id));
+
+    const aplicar = () => pedidos.forEach(id => {
+      const info = this.userCache.get(id);
+      if (info) this.applyAuthor(id, info);
+    });
+
+    if (faltantes.length === 0) {
+      aplicar();
       return;
     }
 
-    this.userStore.getById(autorId).subscribe({
-      next: (user: any) => {
-        if (user) {
-          const info = { nombre: user.nombre ?? 'Usuario', avatar: user.fotoPerfilUrl ?? '' };
-          this.userCache.set(autorId, info);
-          this.applyAuthor(autorId, info);
-        }
+    this.userStore.getByIds(faltantes).subscribe({
+      next: (usuarios: any[]) => {
+        usuarios.forEach(u => {
+          if (u?.id) this.userCache.set(u.id, { nombre: u.nombre ?? 'Usuario', avatar: u.fotoPerfilUrl ?? '' });
+        });
+        aplicar();
       },
       error: () => {}
     });
@@ -196,18 +204,18 @@ export class ReportsComponent implements OnInit {
 
   private loadMyReactions(feed: SocialPost[]): void {
     const userId = this.getUserId();
-    if (!userId) return;
+    if (!userId || feed.length === 0) return;
 
-    feed.forEach(post => {
-      this.reactionService.getMyReaction(userId, post.id, 'POST').subscribe({
-        next: (r: any) => {
-          if (r) {
-            this.posts.update(list => list.map(vm =>
-              vm.post.id === post.id ? { ...vm, myReaction: r.tipoReaccion } : vm
-            ));
-          }
-        }
-      });
+    // UNA sola peticion para todo el feed (antes: una por post)
+    this.reactionService.getMyReactions(userId, 'POST', feed.map(p => p.id)).subscribe({
+      next: (reacciones) => {
+        const tipoDe = new Map(reacciones.map(r => [r.objetivoId, r.tipoReaccion as TipoReaccion]));
+        this.posts.update(list => list.map(vm => {
+          const tipo = tipoDe.get(vm.post.id);
+          return tipo ? { ...vm, myReaction: tipo } : vm;
+        }));
+      },
+      error: () => {}
     });
   }
 
@@ -320,7 +328,7 @@ export class ReportsComponent implements OnInit {
         next: (created: SocialPost) => {
           if (created) {
             this.posts.update(list => [this.buildVm(created), ...list]);
-            this.loadAuthor(created.autorId);
+            this.cargarAutores([created.autorId]);
             this.composerText = '';
             this.composerImage = null;
             this.composerVacante = null;
@@ -435,11 +443,20 @@ export class ReportsComponent implements OnInit {
   readonly reaccionadores = signal<Array<{ id: string; nombre: string; avatar: string; tipo: TipoReaccion }>>([]);
 
   verReacciones(vm: PostVM): void {
+    this.abrirReacciones(vm.post.id, 'POST');
+  }
+
+  /** Lo mismo para comentarios y respuestas: quienes reaccionaron a ese comentario. */
+  verReaccionesComentario(cvm: CommentVM): void {
+    this.abrirReacciones(cvm.comment.id, 'COMMENT');
+  }
+
+  private abrirReacciones(targetId: string, targetType: string): void {
     this.reaccionesAbierta.set(true);
     this.reaccionadores.set([]);
     this.cargandoReacciones.set(true);
 
-    this.reactionService.getReactions(vm.post.id, 'POST').subscribe({
+    this.reactionService.getReactions(targetId, targetType).subscribe({
       next: (reacciones) => {
         const ids = [...new Set(reacciones.map(r => r.usuarioId).filter((id): id is string => Boolean(id)))];
         if (ids.length === 0) {
@@ -500,10 +517,9 @@ export class ReportsComponent implements OnInit {
           }
           return v;
         }));
-        comments.forEach(c => {
-          this.loadCommentAuthor(c.autorId, vm.post.id);
-          this.loadMyReactionForVm(vm.post.id, c.id);
-        });
+        // autores y mis reacciones de los comentarios en 2 peticiones (antes: 1 por comentario)
+        this.cargarAutoresComentarios(comments.map(c => c.autorId), vm.post.id);
+        this.cargarMisReaccionesComentarios(comments.map(c => c.id), vm.post.id);
       },
       error: (err) => console.error('Failed to load comments:', err)
     });
@@ -553,24 +569,53 @@ export class ReportsComponent implements OnInit {
   }
 
   private loadCommentAuthor(autorId: string, postId: string): void {
-    const apply = (info: { nombre: string; avatar: string }) => {
-      this.updatePostComments(postId, c =>
-        c.comment.autorId === autorId ? { ...c, autorNombre: info.nombre, autorAvatar: info.avatar } : c
-      );
-    };
+    this.cargarAutoresComentarios([autorId], postId);
+  }
 
-    if (this.userCache.has(autorId)) {
-      apply(this.userCache.get(autorId)!);
+  /** Autores de los comentarios de un post (o de un hilo) en UNA sola peticion. */
+  private cargarAutoresComentarios(autorIds: string[], postId: string): void {
+    const pedidos = [...new Set(autorIds)].filter(id => !!id);
+    const faltantes = pedidos.filter(id => !this.userCache.has(id));
+
+    const aplicar = () => pedidos.forEach(id => {
+      const info = this.userCache.get(id);
+      if (info) this.aplicarAutorComentario(id, postId, info);
+    });
+
+    if (faltantes.length === 0) {
+      aplicar();
       return;
     }
 
-    this.userStore.getById(autorId).subscribe({
-      next: (user: any) => {
-        if (user) {
-          const info = { nombre: user.nombre ?? 'Usuario', avatar: user.fotoPerfilUrl ?? '' };
-          this.userCache.set(autorId, info);
-          apply(info);
-        }
+    this.userStore.getByIds(faltantes).subscribe({
+      next: (usuarios: any[]) => {
+        usuarios.forEach(u => {
+          if (u?.id) this.userCache.set(u.id, { nombre: u.nombre ?? 'Usuario', avatar: u.fotoPerfilUrl ?? '' });
+        });
+        aplicar();
+      },
+      error: () => {}
+    });
+  }
+
+  private aplicarAutorComentario(autorId: string, postId: string, info: { nombre: string; avatar: string }): void {
+    this.updatePostComments(postId, c =>
+      c.comment.autorId === autorId ? { ...c, autorNombre: info.nombre, autorAvatar: info.avatar } : c
+    );
+  }
+
+  /** Mis reacciones a los comentarios de un post (incluye respuestas) en UNA peticion. */
+  private cargarMisReaccionesComentarios(commentIds: string[], postId: string): void {
+    const userId = this.getUserId();
+    if (!userId || commentIds.length === 0) return;
+
+    this.reactionService.getMyReactions(userId, 'COMMENT', commentIds).subscribe({
+      next: (reacciones) => {
+        const tipoDe = new Map(reacciones.map(r => [r.objetivoId, r.tipoReaccion as TipoReaccion]));
+        this.updatePostComments(postId, c => {
+          const tipo = tipoDe.get(c.comment.id);
+          return tipo ? { ...c, myReaction: tipo } : c;
+        });
       },
       error: () => {}
     });
@@ -717,10 +762,8 @@ export class ReportsComponent implements OnInit {
             ? { ...c, replies: vms, repliesLoaded: true, repliesCount: Math.max(c.repliesCount, vms.length) }
             : c
         );
-        replies.forEach(r => {
-          this.loadCommentAuthor(r.autorId, postId);
-          this.loadMyReactionForVm(postId, r.id);
-        });
+        this.cargarAutoresComentarios(replies.map(r => r.autorId), postId);
+        this.cargarMisReaccionesComentarios(replies.map(r => r.id), postId);
       },
       error: (err) => console.error('Failed to load replies:', err)
     });

@@ -1,3 +1,41 @@
+/* Skeleton de perfil/nombre mientras llega el autor del servidor */
+@keyframes feed-sk-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.sk-perfil {
+  background: var(--surface-container-high);
+  animation: feed-sk-pulse 1.4s ease-in-out infinite;
+}
+
+.sk-comentario {
+  background: var(--surface-container-high);
+  animation: feed-sk-pulse 1.4s ease-in-out infinite;
+}
+
+.sk-nombre {
+  width: 140px;
+  height: 13px;
+  border-radius: 7px;
+  background: var(--surface-container-high);
+  animation: feed-sk-pulse 1.4s ease-in-out infinite;
+
+  &.sm {
+    width: 90px;
+    height: 11px;
+  }
+}
+
+.sk-hora {
+  width: 90px;
+  height: 11px;
+  margin-top: 6px;
+  border-radius: 6px;
+  background: var(--surface-container-high);
+  animation: feed-sk-pulse 1.4s ease-in-out infinite;
+}
+
 /* Contador de reacciones: clic para ver quienes reaccionaron */
 .reaction-count-btn {
   padding: 4px 6px;
@@ -589,6 +627,16 @@
   margin-left: auto;
   font-size: 12px;
   color: var(--on-surface-variant);
+  /* ahora es un boton que abre la lista de quienes reaccionaron */
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-family: inherit;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--accent);
+  }
 }
 
 .like-icon {

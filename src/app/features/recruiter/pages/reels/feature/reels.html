@@ -70,6 +70,8 @@
           <video
             #videoEl
             [src]="reels()[currentIndex].reel.videoUrl"
+            [poster]="reels()[currentIndex].reel.portadaUrl || null"
+            preload="metadata"
             class="reel-video"
             autoplay
             loop

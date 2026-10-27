@@ -63,6 +63,11 @@ export class RecruiterReels implements OnInit {
 
   reels = signal<ReelVM[]>([]);
   currentIndex = 0;
+  /** Ventana del feed: paginas de 10; al acercarse al final se trae la siguiente sola. */
+  private pagina = 0;
+  private hayMas = false;
+  private cargandoPagina = false;
+  private static readonly TAMANO = 10;
   loading = signal(true);
   deleteConfirmOpen = signal(false);
   pendingDeleteId = signal<string | null>(null);
@@ -103,19 +108,41 @@ export class RecruiterReels implements OnInit {
     const me = this.getUserId();
     if (me) this.loadMyName(me);
 
-    this.reelService.getReels().subscribe({
+    this.cargarPagina(0);
+  }
+
+  /**
+   * Trae una ventana de reels (10). La pagina 0 reemplaza la lista; las demas
+   * se agregan al final. Al acercarse al ultimo reel del feed se pide la
+   * siguiente sola, sin boton: el pager sigue siendo infinito.
+   */
+  private cargarPagina(pagina: number): void {
+    if (this.cargandoPagina) return;
+    this.cargandoPagina = true;
+
+    this.reelService.getReels(pagina, RecruiterReels.TAMANO).subscribe({
       next: (data: SocialReel[]) => {
-        this.reels.set(data.map(r => this.buildVm(r)));
-        this.loading.set(false);
-        data.forEach(r => this.loadAuthor(r.autorId));
-        this.loadMyReactions(data);
-        this.loadSavedState(data);
-        // El reel que queda a la vista al entrar tambien cuenta como vista.
-        this.registrarVistaActual();
+        this.pagina = pagina;
+        this.hayMas = data.length >= RecruiterReels.TAMANO;
+        this.cargandoPagina = false;
+
+        if (pagina === 0) {
+          this.reels.set(data.map(r => this.buildVm(r)));
+          this.loading.set(false);
+          this.loadMyReactions(data);
+          this.loadSavedState(data);
+          // El reel que queda a la vista al entrar tambien cuenta como vista.
+          this.registrarVistaActual();
+        } else {
+          this.reels.update(list => [...list, ...data.map(r => this.buildVm(r))]);
+        }
+        // todos los autores de la pagina en una sola peticion (aliases)
+        this.cargarAutores(data.map(r => r.autorId));
       },
       error: () => {
+        this.cargandoPagina = false;
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -143,20 +170,33 @@ export class RecruiterReels implements OnInit {
     });
   }
 
-  private loadAuthor(autorId: string): void {
-    if (this.userCache.has(autorId)) {
-      this.applyAuthor(autorId, this.userCache.get(autorId)!);
+  /**
+   * Autores de varios reels en UNA sola consulta (aliases u0, u1...) con lo que
+   * falte en cache; antes era un user(id) por reel. Lo que ya esta en cache se
+   * aplica de una.
+   */
+  private cargarAutores(autorIds: string[]): void {
+    const pedidos = [...new Set(autorIds)].filter(id => !!id);
+    const faltantes = pedidos.filter(id => !this.userCache.has(id));
+
+    const aplicar = () => pedidos.forEach(id => {
+      const info = this.userCache.get(id);
+      if (info) this.applyAuthor(id, info);
+    });
+
+    if (faltantes.length === 0) {
+      aplicar();
       return;
     }
 
-    this.userStore.getById(autorId).subscribe({
-      next: (user: any) => {
-        if (user) {
-          const info = { nombre: user.nombre ?? 'Usuario', avatar: user.fotoPerfilUrl ?? '' };
-          this.userCache.set(autorId, info);
-          this.applyAuthor(autorId, info);
-        }
+    this.userStore.getByIds(faltantes).subscribe({
+      next: (usuarios: any[]) => {
+        usuarios.forEach(u => {
+          if (u?.id) this.userCache.set(u.id, { nombre: u.nombre ?? 'Usuario', avatar: u.fotoPerfilUrl ?? '' });
+        });
+        aplicar();
       },
+      // sin autores quedan los placeholders con "Usuario"
       error: () => {}
     });
   }
@@ -257,7 +297,7 @@ export class RecruiterReels implements OnInit {
       next: (created: SocialReel) => {
         if (created) {
           this.reels.update(list => [this.buildVm(created), ...list]);
-          this.loadAuthor(created.autorId);
+          this.cargarAutores([created.autorId]);
           this.reelDescripcion = '';
           this.reelEtiquetas = [];
           this.selectedFile = null;
@@ -380,6 +420,10 @@ export class RecruiterReels implements OnInit {
       this.currentTime = 0;
       this.duration = 0;
       this.registrarVistaActual();
+    }
+    // a dos del final (o ya al final) se trae la siguiente pagina: el feed sigue solo
+    if (this.currentIndex >= this.reels().length - 2 && this.hayMas) {
+      this.cargarPagina(this.pagina + 1);
     }
   }
 

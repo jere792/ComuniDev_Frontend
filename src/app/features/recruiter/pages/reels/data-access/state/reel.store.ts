@@ -26,8 +26,8 @@ export class ReelStore {
     });
   }
 
-  getReels(): Observable<SocialReel[]> {
-    return this.repository.getReels();
+  getReels(page?: number, size?: number): Observable<SocialReel[]> {
+    return this.repository.getReels(page, size);
   }
 
   getReelsByUser(userId: string): Observable<SocialReel[]> {

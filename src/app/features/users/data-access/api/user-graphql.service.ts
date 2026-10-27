@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { UploadService } from '@core/services/upload.service';
 import { User } from '@core/domain/models/user.model';
@@ -170,6 +170,21 @@ export class UserGraphqlService implements UserRepository {
     return this.apollo
       .watchQuery<any>({ query: GET_USERS, variables: { page: page ?? null, size: size ?? null } })
       .valueChanges.pipe(map(result => result.data?.users ?? []));
+  }
+
+  /** Varias personas en una sola peticion: una consulta con aliases u0, u1... */
+  getByIds(ids: string[]): Observable<User[]> {
+    const unicos = [...new Set(ids.filter(id => !!id))];
+    if (unicos.length === 0) return of([]);
+
+    const CAMPOS = 'id nombre nombreUsuario email fotoPerfilUrl bannerUrl bio roles rolActivo '
+      + 'estadoCuenta emailVerificado seguidoresCount siguiendoCount conexionesCount createdAt';
+    const aliases = unicos.map((id, i) => `u${i}: user(id: "${id}") { ${CAMPOS} }`).join('\n      ');
+    const consulta = gql`query GetUsersByIds { ${aliases} }`;
+
+    return this.apollo
+      .query<any>({ query: consulta, fetchPolicy: 'network-only' })
+      .pipe(map(result => Object.values(result.data ?? {}).filter(Boolean) as User[]));
   }
 
   getById(id: string): Observable<User | null> {

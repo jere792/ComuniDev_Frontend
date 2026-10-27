@@ -31,6 +31,11 @@ export class UserStore {
     return this.repository.getById(id);
   }
 
+  /** Varias personas en una sola peticion (aliases), p. ej. autores del feed de reels. */
+  getByIds(ids: string[]): Observable<User[]> {
+    return this.repository.getByIds(ids);
+  }
+
   update(id: string, data: Partial<User>): Observable<User> {
     return this.repository.update(id, data);
   }

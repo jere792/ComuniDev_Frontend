@@ -54,10 +54,4 @@ export class ApiService {
       .post<ApiResponse<any>>(`${this.baseUrl}/users`, payload)
       .pipe(map(res => res.data));
   }
-
-  completeRole(userId: string, rol: string): Observable<LoginData> {
-    return this.http
-      .post<ApiResponse<LoginData>>(`${this.baseUrl}/auth/complete-role`, { userId, rol })
-      .pipe(map(res => res.data));
-  }
 }

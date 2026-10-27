@@ -24,7 +24,12 @@ export class AuthService {
           localStorage.removeItem('userPhoto');
           localStorage.removeItem('userEmail');
           localStorage.setItem('token', data.token);
-          localStorage.setItem('role', data.rolActivo.toLowerCase());
+          if (data.rolActivo) {
+            localStorage.setItem('role', data.rolActivo.toLowerCase());
+          } else {
+            // cuenta OAuth que todavía no eligió rol (needsRole): falta completar la selección
+            localStorage.removeItem('role');
+          }
           localStorage.setItem('userId', data.id);
           localStorage.setItem('userName', data.nombre || data.nombreUsuario);
           localStorage.setItem('userUsername', data.nombreUsuario);
@@ -54,7 +59,12 @@ export class AuthService {
     });
   }
 
-  navigateByRole(role: string): void {
+  navigateByRole(role: string | null): void {
+    if (!role) {
+      // cuenta OAuth que todavía no eligió rol (needsRole): completar la selección
+      this.router.navigate(['/auth/role-selection']);
+      return;
+    }
     switch (role.toLowerCase()) {
       case 'admin':
         this.router.navigate(['/admin']);

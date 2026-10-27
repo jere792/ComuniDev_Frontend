@@ -114,16 +114,26 @@ export class AuthStore {
     localStorage.removeItem('userPhoto');
     localStorage.removeItem('userEmail');
     localStorage.setItem('token', data.token);
-    localStorage.setItem('role', data.rolActivo.toLowerCase());
+    if (data.rolActivo) {
+      localStorage.setItem('role', data.rolActivo.toLowerCase());
+    } else {
+      // cuenta OAuth que todavía no eligió rol (needsRole): falta completar la selección
+      localStorage.removeItem('role');
+    }
     localStorage.setItem('userId', data.id);
     localStorage.setItem('userName', data.nombre || data.nombreUsuario);
     localStorage.setItem('userUsername', data.nombreUsuario);
     localStorage.setItem('userEmail', data.email);
     this.user.set(data);
-    this.role.set(data.rolActivo.toLowerCase());
+    this.role.set(data.rolActivo ? data.rolActivo.toLowerCase() : null);
   }
 
-  private navigateByRole(role: string): void {
+  private navigateByRole(role: string | null): void {
+    if (!role) {
+      // cuenta OAuth que todavía no eligió rol (needsRole): completar la selección
+      this.router.navigate(['/auth/role-selection']);
+      return;
+    }
     switch (role.toLowerCase()) {
       case 'admin': this.router.navigate(['/admin']); break;
       case 'moderator': this.router.navigate(['/moderator']); break;

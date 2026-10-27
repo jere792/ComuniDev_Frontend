@@ -6,8 +6,8 @@ import { SocialReel } from '@features/recruiter/pages/reels/domain/models/social
 import { CreateReelRequest, ReelRepository, UpdateReelRequest } from '@features/recruiter/pages/reels/domain/ports/reel.repository';
 
 const GET_REELS = gql`
-  query GetReels {
-    reels {
+  query GetReels($page: Int, $size: Int) {
+    reels(page: $page, size: $size) {
       id
       autorId
       videoUrl
@@ -25,8 +25,8 @@ const GET_REELS = gql`
 `;
 
 const GET_REELS_BY_USER = gql`
-  query GetReelsByUser($userId: String!) {
-    reelsByUser(userId: $userId) {
+  query GetReelsByUser($userId: String!, $page: Int, $size: Int) {
+    reelsByUser(userId: $userId, page: $page, size: $size) {
       id
       autorId
       videoUrl
@@ -127,15 +127,16 @@ export class ReelGraphqlService implements ReelRepository {
   private apollo = inject(Apollo);
 
 
-  getReels(): Observable<SocialReel[]> {
+  /** Ventana de 30 reels por defecto (feed y pestaña de perfil); el backend pagina. */
+  getReels(page = 0, size = 30): Observable<SocialReel[]> {
     return this.apollo
-      .watchQuery<any>({ query: GET_REELS })
+      .watchQuery<any>({ query: GET_REELS, variables: { page, size } })
       .valueChanges.pipe(map(result => result.data?.reels ?? []));
   }
 
-  getReelsByUser(userId: string): Observable<SocialReel[]> {
+  getReelsByUser(userId: string, page = 0, size = 30): Observable<SocialReel[]> {
     return this.apollo
-      .watchQuery<any>({ query: GET_REELS_BY_USER, variables: { userId } })
+      .watchQuery<any>({ query: GET_REELS_BY_USER, variables: { userId, page, size } })
       .valueChanges.pipe(map(result => result.data?.reelsByUser ?? []));
   }
 

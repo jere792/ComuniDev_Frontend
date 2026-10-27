@@ -20,8 +20,8 @@ export interface UpdateReelRequest {
 }
 
 export interface ReelRepository {
-  getReels(): Observable<SocialReel[]>;
-  getReelsByUser(userId: string): Observable<SocialReel[]>;
+  getReels(page?: number, size?: number): Observable<SocialReel[]>;
+  getReelsByUser(userId: string, page?: number, size?: number): Observable<SocialReel[]>;
   /** Los reels guardados por esa persona (marcador), del mas reciente al mas viejo. */
   savedReels(userId: string): Observable<SocialReel[]>;
   isReelSaved(userId: string, reelId: string): Observable<boolean>;

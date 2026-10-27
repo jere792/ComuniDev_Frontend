@@ -28,6 +28,8 @@ export class DiscoverUsers implements OnInit {
   private static readonly TAMANO = 25;
   /** A quién sigo: una sola consulta y se compara en memoria (antes: 1 isFollowing por tarjeta). */
   private siguiendo = new Set<string>();
+  /** Respaldo: la lista de seguidos falló y hay que preguntar tarjeta por tarjeta. */
+  private consultarSeguimientoPorTarjeta = false;
 
   private userStore = inject(UserStore);
   private followService = inject(FollowStore);
@@ -54,8 +56,28 @@ export class DiscoverUsers implements OnInit {
         this.siguiendo = new Set(follows.map(f => f.seguidoId).filter((id): id is string => Boolean(id)));
         this.cargarPagina(0, false);
       },
-      // sin la lista de seguidos igual mostramos la gente
-      error: () => this.cargarPagina(0, false),
+      // si la lista de seguidos falla (p.ej. backend local desactualizado), no
+      // mentimos: se pregunta por cada tarjeta visible en vez de dejar todo en "Seguir"
+      error: () => {
+        this.consultarSeguimientoPorTarjeta = true;
+        this.cargarPagina(0, false);
+      },
+    });
+  }
+
+  /** Respaldo: isFollowing tarjeta por tarjeta (solo visible si falló la lista de seguidos). */
+  private marcarSeguimientoPorTarjeta(): void {
+    const yo = localStorage.getItem('userId');
+    if (!yo) return;
+    this.users().forEach((u, i) => {
+      if (!u.id) return;
+      this.followService.isFollowing(yo, u.id).subscribe({
+        next: (siguiendo) => {
+          this.users.update(list => list.map((item, j) =>
+            j === i ? { ...item, isFollowing: siguiendo } : item
+          ));
+        },
+      });
     });
   }
 
@@ -76,6 +98,7 @@ export class DiscoverUsers implements OnInit {
         this.users.update(lista => (acumular ? [...lista, ...enriquecidos] : enriquecidos));
         this.loading.set(false);
         this.cargandoMas.set(false);
+        if (this.consultarSeguimientoPorTarjeta) this.marcarSeguimientoPorTarjeta();
       },
       error: () => {
         this.loading.set(false);

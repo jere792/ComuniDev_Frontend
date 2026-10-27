@@ -77,6 +77,7 @@ export class FollowGraphqlService implements FollowRepository {
     return this.apollo.query({
       query: GET_FOLLOWERS,
       variables: { userId, page: page ?? null, size: size ?? null },
+      fetchPolicy: 'network-only',
     }).pipe(map((res: any) => res?.data?.followers ?? []));
   }
 
@@ -84,6 +85,8 @@ export class FollowGraphqlService implements FollowRepository {
     return this.apollo.query({
       query: GET_FOLLOWING,
       variables: { userId, page: page ?? null, size: size ?? null },
+      // siempre del servidor: sin esto, volver a Discover sin F5 mostraba la cache vieja
+      fetchPolicy: 'network-only',
     }).pipe(map((res: any) => res?.data?.following ?? []));
   }
 }

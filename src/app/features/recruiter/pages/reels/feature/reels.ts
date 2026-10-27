@@ -2,7 +2,6 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
 import { ReelStore } from '@features/recruiter/pages/reels/data-access/state/reel.store';
 import { ReactionStore } from '@features/shared/data-access/state/reaction.store';
 import { CommentStore } from '@features/shared/data-access/state/comment.store';

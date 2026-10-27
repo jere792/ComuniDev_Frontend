@@ -31,8 +31,14 @@ export class MessageStore {
       next: lista => {
         this.conversaciones.set(lista);
         this.cargandoConversaciones.set(false);
+        this.listaCargada = true;
+        this.resolverEsperaDeLista();
       },
-      error: () => this.cargandoConversaciones.set(false),
+      error: () => {
+        this.cargandoConversaciones.set(false);
+        this.listaCargada = true;
+        this.resolverEsperaDeLista();
+      },
     });
   }
 
@@ -120,6 +126,15 @@ export class MessageStore {
       return;
     }
 
+    // Viniendo de un perfil la lista de hilos todavia no llego: sin esta espera
+    // se creaba un hilo sintetico (id vacio) y el historial real nunca se cargaba
+    // ("se perdia" la conversacion anterior). Al llegar la lista se vuelve a buscar.
+    if (!this.listaCargada) {
+      this.alLlegarLista = () => this.abrirCon(userId, otroUserId);
+      if (!this.cargandoConversaciones()) this.cargarConversaciones(userId);
+      return;
+    }
+
     const nueva: MessageConversation = {
       id: '',
       participantes: [userId, otroUserId],
@@ -136,7 +151,19 @@ export class MessageStore {
     this.mensajes.set([]);
   }
 
+  /** La lista de hilos llego (o fallo): se ejecuta lo que estaba esperando abrirla. */
+  private resolverEsperaDeLista(): void {
+    const pendiente = this.alLlegarLista;
+    this.alLlegarLista = null;
+    pendiente?.();
+  }
+
+  /** Ya se pidió al menos una vez la lista de hilos. */
+  private listaCargada = false;
+  private alLlegarLista: (() => void) | null = null;
+
   cerrar(): void {
+    this.alLlegarLista = null;
     this.abierta.set(null);
     this.mensajes.set([]);
   }

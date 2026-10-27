@@ -22,6 +22,11 @@ export class UserStore {
     return this.repository.getAll();
   }
 
+  /** Página de usuarios (más recientes primero); la usa Discover. */
+  getPagina(page: number, size: number): Observable<User[]> {
+    return this.repository.getAll(page, size);
+  }
+
   getById(id: string): Observable<User | null> {
     return this.repository.getById(id);
   }

@@ -21,6 +21,13 @@ interface UserWithFollow extends User {
 export class DiscoverUsers implements OnInit {
   users = signal<UserWithFollow[]>([]);
   loading = signal(true);
+  /** Descubrir pagina de a 25; "Cargar más" trae la siguiente página. */
+  readonly hayMas = signal(false);
+  readonly cargandoMas = signal(false);
+  private pagina = 0;
+  private static readonly TAMANO = 25;
+  /** A quién sigo: una sola consulta y se compara en memoria (antes: 1 isFollowing por tarjeta). */
+  private siguiendo = new Set<string>();
 
   private userStore = inject(UserStore);
   private followService = inject(FollowStore);
@@ -32,27 +39,48 @@ export class DiscoverUsers implements OnInit {
     this.loadUsers();
   }
 
+  cargarMas(): void {
+    if (this.cargandoMas() || !this.hayMas()) return;
+    this.cargarPagina(++this.pagina, true);
+  }
+
   private loadUsers(): void {
     const currentUserId = localStorage.getItem('userId');
     if (!currentUserId) return;
+    this.pagina = 0;
 
-    this.userStore.getAll().subscribe({
-      next: (users: User[]) => {
-        const others = users.filter(u => u.id !== currentUserId);
-        const enriched = others.map(u => ({ ...u, isFollowing: false, followers: [] }));
-        this.users.set(enriched);
-        this.loading.set(false);
-        enriched.forEach((u, i) => {
-          this.followService.isFollowing(currentUserId, u.id!).subscribe({
-            next: (result) => {
-              this.users.update(list => list.map((item, j) =>
-                j === i ? { ...item, isFollowing: result } : item
-              ));
-            },
-          });
-        });
+    this.followService.getFollowing(currentUserId).subscribe({
+      next: (follows) => {
+        this.siguiendo = new Set(follows.map(f => f.seguidoId).filter((id): id is string => Boolean(id)));
+        this.cargarPagina(0, false);
       },
-      error: () => this.loading.set(false),
+      // sin la lista de seguidos igual mostramos la gente
+      error: () => this.cargarPagina(0, false),
+    });
+  }
+
+  private cargarPagina(pagina: number, acumular: boolean): void {
+    if (acumular) this.cargandoMas.set(true);
+    const yo = localStorage.getItem('userId');
+
+    this.userStore.getPagina(pagina, DiscoverUsers.TAMANO).subscribe({
+      next: (users: User[]) => {
+        const enriquecidos = users
+          .filter(u => u.id !== yo)
+          .map(u => ({
+            ...u,
+            isFollowing: this.siguiendo.has(u.id ?? ''),
+            followers: [],
+          }));
+        this.hayMas.set(users.length >= DiscoverUsers.TAMANO);
+        this.users.update(lista => (acumular ? [...lista, ...enriquecidos] : enriquecidos));
+        this.loading.set(false);
+        this.cargandoMas.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+        this.cargandoMas.set(false);
+      },
     });
   }
 

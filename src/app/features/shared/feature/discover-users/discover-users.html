@@ -13,6 +13,11 @@
     </div>
   } @else {
     <div class="users-grid">
+      @if (hayMas()) {
+        <button type="button" class="load-more" (click)="cargarMas()" [disabled]="cargandoMas()">
+          {{ cargandoMas() ? 'Cargando…' : 'Cargar más personas' }}
+        </button>
+      }
       @for (user of users(); track user.id) {
         <div class="user-card">
           <div class="card-banner" (click)="goToProfile(user.id!)">

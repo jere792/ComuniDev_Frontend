@@ -11,8 +11,8 @@ import {
 } from '@features/users/domain/ports/user.repository';
 
 const GET_USERS = gql`
-  query GetUsers {
-    users {
+  query GetUsers($page: Int, $size: Int) {
+    users(page: $page, size: $size) {
       id
       nombre
       nombreUsuario
@@ -165,9 +165,10 @@ export class UserGraphqlService implements UserRepository {
   private uploadService = inject(UploadService);
 
 
-  getAll(): Observable<User[]> {
+  /** Con size se pide una pagina; sin args el backend devuelve la lista completa. */
+  getAll(page?: number, size?: number): Observable<User[]> {
     return this.apollo
-      .watchQuery<any>({ query: GET_USERS })
+      .watchQuery<any>({ query: GET_USERS, variables: { page: page ?? null, size: size ?? null } })
       .valueChanges.pipe(map(result => result.data?.users ?? []));
   }
 

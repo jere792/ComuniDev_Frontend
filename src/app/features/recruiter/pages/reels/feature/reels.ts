@@ -53,6 +53,8 @@ interface ReelCommentVM {
 })
 export class RecruiterReels implements OnInit {
   private reelService = inject(ReelStore);
+  /** Mismo store (singleton) con el nombre con el que se leen sus caches de sesión. */
+  private reelStore = inject(ReelStore);
   private reactionService = inject(ReactionStore);
   private commentService = inject(CommentStore);
   private userStore = inject(UserStore);
@@ -95,7 +97,6 @@ export class RecruiterReels implements OnInit {
   uploading = false;
   uploadProgress = '';
 
-  private userCache = new Map<string, { nombre: string; avatar: string }>();
   /** Nombre y foto del usuario logueado, para firmar sus comentarios sin inventarlos. */
   private myName = 'Tú';
   private myAvatar = '';
@@ -117,6 +118,17 @@ export class RecruiterReels implements OnInit {
    * siguiente sola, sin boton: el pager sigue siendo infinito.
    */
   private cargarPagina(pagina: number): void {
+    // segunda visita: todo en memoria, CERO peticiones al servidor
+    if (pagina === 0 && this.reelStore.reelsCache().length > 0) {
+      this.reels.set(this.reelStore.reelsCache().map(r => this.buildVm(r)));
+      this.pagina = this.reelStore.paginaCache;
+      this.hayMas = this.reelStore.hayMasCache;
+      this.loading.set(false);
+      this.aplicarCaches();
+      this.registrarVistaActual();
+      return;
+    }
+
     if (this.cargandoPagina) return;
     this.cargandoPagina = true;
 
@@ -126,24 +138,45 @@ export class RecruiterReels implements OnInit {
         this.hayMas = data.length >= RecruiterReels.TAMANO;
         this.cargandoPagina = false;
 
+        // lo pedido queda en la memoria del store para las proximas visitas
         if (pagina === 0) {
-          this.reels.set(data.map(r => this.buildVm(r)));
+          this.reelStore.reelsCache.set(data);
+        } else {
+          this.reelStore.reelsCache.update(actual => [...actual, ...data]);
+        }
+        this.reelStore.paginaCache = this.pagina;
+        this.reelStore.hayMasCache = this.hayMas;
+
+        const vms = data.map(r => this.buildVm(r));
+        if (pagina === 0) {
+          this.reels.set(vms);
           this.loading.set(false);
-          this.loadMyReactions(data);
-          this.loadSavedState(data);
           // El reel que queda a la vista al entrar tambien cuenta como vista.
           this.registrarVistaActual();
         } else {
-          this.reels.update(list => [...list, ...data.map(r => this.buildVm(r))]);
+          this.reels.update(list => [...list, ...vms]);
         }
-        // todos los autores de la pagina en una sola peticion (aliases)
+        // de la pagina nueva: autores en 1 peticion, reacciones en 1 y guardados en 1
         this.cargarAutores(data.map(r => r.autorId));
+        this.loadMyReactions(data);
+        this.loadSavedState(data);
       },
       error: () => {
         this.cargandoPagina = false;
         this.loading.set(false);
       },
     });
+  }
+
+  /** Pinta desde la memoria lo que ya se pidio: reaccion, guardado, autor y vistas. */
+  private aplicarCaches(): void {
+    this.reels.update(list => list.map(vm => ({
+      ...vm,
+      myReaction: (this.reelStore.myReactionsCache.get(vm.reel.id) ?? null) as TipoReaccion | null,
+      saved: this.reelStore.guardadosCache.has(vm.reel.id),
+      vistaContada: this.reelStore.vistasCache.has(vm.reel.id),
+    })));
+    this.cargarAutores([...new Set(this.reels().map(vm => vm.reel.autorId))]);
   }
 
   private buildVm(reel: SocialReel): ReelVM {
@@ -177,10 +210,10 @@ export class RecruiterReels implements OnInit {
    */
   private cargarAutores(autorIds: string[]): void {
     const pedidos = [...new Set(autorIds)].filter(id => !!id);
-    const faltantes = pedidos.filter(id => !this.userCache.has(id));
+    const faltantes = pedidos.filter(id => !this.reelStore.autoresCache.has(id));
 
     const aplicar = () => pedidos.forEach(id => {
-      const info = this.userCache.get(id);
+      const info = this.reelStore.autoresCache.get(id);
       if (info) this.applyAuthor(id, info);
     });
 
@@ -192,7 +225,7 @@ export class RecruiterReels implements OnInit {
     this.userStore.getByIds(faltantes).subscribe({
       next: (usuarios: any[]) => {
         usuarios.forEach(u => {
-          if (u?.id) this.userCache.set(u.id, { nombre: u.nombre ?? 'Usuario', avatar: u.fotoPerfilUrl ?? '' });
+          if (u?.id) this.reelStore.autoresCache.set(u.id, { nombre: u.nombre ?? 'Usuario', avatar: u.fotoPerfilUrl ?? '' });
         });
         aplicar();
       },
@@ -212,18 +245,22 @@ export class RecruiterReels implements OnInit {
 
   private loadMyReactions(reels: SocialReel[]): void {
     const userId = this.getUserId();
-    if (!userId) return;
+    if (!userId || reels.length === 0) return;
 
-    reels.forEach(reel => {
-      this.reactionService.getMyReaction(userId, reel.id, 'REEL').subscribe({
-        next: (r: any) => {
-          if (r) {
-            this.reels.update(list => list.map(vm =>
-              vm.reel.id === reel.id ? { ...vm, myReaction: r.tipoReaccion } : vm
-            ));
+    // una sola peticion para todos los reels (antes: una por reel)
+    this.reactionService.getMyReactions(userId, 'REEL', reels.map(r => r.id)).subscribe({
+      next: (reacciones) => {
+        reacciones.forEach(r => {
+          if (r.tipoReaccion && r.objetivoId) {
+            this.reelStore.myReactionsCache.set(r.objetivoId, r.tipoReaccion);
           }
-        }
-      });
+        });
+        this.reels.update(list => list.map(vm => {
+          const tipo = this.reelStore.myReactionsCache.get(vm.reel.id);
+          return tipo ? { ...vm, myReaction: tipo as TipoReaccion } : vm;
+        }));
+      },
+      error: () => {}
     });
   }
 
@@ -231,15 +268,19 @@ export class RecruiterReels implements OnInit {
   private loadSavedState(reels: SocialReel[]): void {
     const userId = this.getUserId();
     if (!userId || reels.length === 0) return;
+    const visibles = reels.map(r => r.id);
 
-    forkJoin(reels.map(reel =>
-      this.reelService.isReelSaved(userId, reel.id)
-    )).subscribe({
-      next: (flags) => {
-        this.reels.update(list => list.map(vm => {
-          const index = reels.findIndex(r => r.id === vm.reel.id);
-          return index >= 0 ? { ...vm, saved: flags[index] } : vm;
-        }));
+    // una sola peticion: devuelve todos mis reels guardados (antes: una por reel)
+    this.reelService.savedReels(userId).subscribe({
+      next: (guardados) => {
+        const ids = new Set(guardados.map(g => g.id));
+        visibles.forEach(id => {
+          if (ids.has(id)) this.reelStore.guardadosCache.add(id);
+          else this.reelStore.guardadosCache.delete(id);
+        });
+        this.reels.update(list => list.map(vm =>
+          visibles.includes(vm.reel.id) ? { ...vm, saved: ids.has(vm.reel.id) } : vm
+        ));
       },
       error: () => {}
     });
@@ -296,6 +337,7 @@ export class RecruiterReels implements OnInit {
     }).subscribe({
       next: (created: SocialReel) => {
         if (created) {
+          this.reelStore.reelsCache.update(actual => [created, ...actual]);
           this.reels.update(list => [this.buildVm(created), ...list]);
           this.cargarAutores([created.autorId]);
           this.reelDescripcion = '';
@@ -439,8 +481,9 @@ export class RecruiterReels implements OnInit {
   /** Cuenta la vista del reel visible; una sola vez por reel y por sesión. */
   private registrarVistaActual(): void {
     const vm = this.reels()[this.currentIndex];
-    if (!vm || vm.vistaContada) return;
+    if (!vm || vm.vistaContada || this.reelStore.vistasCache.has(vm.reel.id)) return;
 
+    this.reelStore.vistasCache.add(vm.reel.id);
     this.reels.update(list => list.map(v =>
       v.reel.id === vm.reel.id ? { ...v, vistaContada: true } : v
     ));
@@ -457,6 +500,7 @@ export class RecruiterReels implements OnInit {
 
     if (vm.myReaction) {
       this.reactionService.unreact(userId, vm.reel.id, 'REEL').subscribe(() => {
+        this.reelStore.myReactionsCache.delete(vm.reel.id);
         this.reels.update(list => list.map(v =>
           v.reel.id === vm.reel.id
             ? {
@@ -472,6 +516,7 @@ export class RecruiterReels implements OnInit {
       });
     } else {
       this.reactionService.react(userId, vm.reel.id, 'REEL', 'LIKE').subscribe(() => {
+        this.reelStore.myReactionsCache.set(vm.reel.id, 'LIKE');
         this.reels.update(list => list.map(v =>
           v.reel.id === vm.reel.id
             ? {
@@ -495,6 +540,8 @@ export class RecruiterReels implements OnInit {
     const guardado = !vm.saved;
 
     // Optimista: se pinta al instante y si el backend falla se revierte.
+    if (guardado) this.reelStore.guardadosCache.add(vm.reel.id);
+    else this.reelStore.guardadosCache.delete(vm.reel.id);
     this.reels.update(list => list.map(v =>
       v.reel.id === vm.reel.id
         ? {
@@ -515,7 +562,9 @@ export class RecruiterReels implements OnInit {
     op.subscribe({
       next: () => {},
       error: () => {
-        // Revierte el cambio optimista.
+        // Revierte el cambio optimista (tambien en la memoria de sesion).
+        if (guardado) this.reelStore.guardadosCache.delete(vm.reel.id);
+        else this.reelStore.guardadosCache.add(vm.reel.id);
         this.reels.update(list => list.map(v =>
           v.reel.id === vm.reel.id
             ? {
@@ -778,6 +827,7 @@ export class RecruiterReels implements OnInit {
     this.reelService.deleteReel(reelId, userId).subscribe({
       next: (ok: boolean) => {
         if (ok) {
+          this.reelStore.reelsCache.update(actual => actual.filter(r => r.id !== reelId));
           this.reels.update(list => list.filter(r => r.reel.id !== reelId));
           if (this.currentIndex >= this.reels().length) {
             this.currentIndex = Math.max(0, this.reels().length - 1);

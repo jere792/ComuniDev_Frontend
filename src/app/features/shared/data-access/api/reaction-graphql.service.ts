@@ -31,6 +31,19 @@ const GET_MY_REACTION = gql`
   }
 `;
 
+const GET_MY_REACTIONS = gql`
+  query GetMyReactions($userId: String!, $targetType: String!, $targetIds: [String!]) {
+    myReactions(userId: $userId, targetType: $targetType, targetIds: $targetIds) {
+      id
+      usuarioId
+      objetivoId
+      tipoObjetivo
+      tipoReaccion
+      createdAt
+    }
+  }
+`;
+
 const REACT = gql`
   mutation React($usuarioId: String!, $objetivoId: String!, $tipoObjetivo: String!, $tipoReaccion: TipoReaccion!) {
     react(usuarioId: $usuarioId, objetivoId: $objetivoId, tipoObjetivo: $tipoObjetivo, tipoReaccion: $tipoReaccion) {
@@ -65,6 +78,13 @@ export class ReactionGraphqlService implements ReactionRepository {
     return this.apollo
       .watchQuery<any>({ query: GET_MY_REACTION, variables: { userId, targetId, targetType } })
       .valueChanges.pipe(map(result => result.data?.myReaction ?? null));
+  }
+
+  /** Una sola peticion para todas mis reacciones de un tipo (feed de reels, muro...). */
+  getMyReactions(userId: string, targetType: string, targetIds: string[]): Observable<SocialReaction[]> {
+    return this.apollo
+      .query<any>({ query: GET_MY_REACTIONS, variables: { userId, targetType, targetIds }, fetchPolicy: 'network-only' })
+      .pipe(map(result => result.data?.myReactions ?? []));
   }
 
   react(usuarioId: string, objetivoId: string, tipoObjetivo: string, tipoReaccion: TipoReaccion): Observable<SocialReaction> {

@@ -19,6 +19,10 @@ export class ReactionStore {
     return this.repository.getMyReaction(userId, targetId, targetType);
   }
 
+  getMyReactions(userId: string, targetType: string, targetIds: string[]): Observable<SocialReaction[]> {
+    return this.repository.getMyReactions(userId, targetType, targetIds);
+  }
+
   react(
     usuarioId: string,
     objetivoId: string,

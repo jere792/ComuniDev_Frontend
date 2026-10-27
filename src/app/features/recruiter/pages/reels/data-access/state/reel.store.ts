@@ -11,6 +11,18 @@ export class ReelStore {
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
 
+  /**
+   * Memoria de sesión: lo que ya se pidió al servidor. Si el usuario sale y
+   * vuelve a la pantalla, se pinta desde aquí con CERO peticiones.
+   */
+  readonly reelsCache = signal<SocialReel[]>([]);
+  readonly myReactionsCache = new Map<string, string>();
+  readonly guardadosCache = new Set<string>();
+  readonly autoresCache = new Map<string, { nombre: string; avatar: string }>();
+  readonly vistasCache = new Set<string>();
+  paginaCache = 0;
+  hayMasCache = false;
+
   loadReels(): void {
     this.loading.set(true);
     this.error.set(null);

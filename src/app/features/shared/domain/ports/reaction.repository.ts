@@ -5,6 +5,8 @@ import { SocialReaction, TipoReaccion } from '@features/shared/domain/models/soc
 export interface ReactionRepository {
   getReactions(targetId: string, targetType: string): Observable<SocialReaction[]>;
   getMyReaction(userId: string, targetId: string, targetType: string): Observable<SocialReaction | null>;
+  /** Mis reacciones de un tipo en una sola peticion (los ids del feed visible). */
+  getMyReactions(userId: string, targetType: string, targetIds: string[]): Observable<SocialReaction[]>;
   react(
     usuarioId: string,
     objetivoId: string,

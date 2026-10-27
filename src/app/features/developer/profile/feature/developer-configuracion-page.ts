@@ -163,6 +163,10 @@ export class DeveloperConfiguracionPage implements OnInit {
           this.enlacesForm.patchValue({
             sitioWeb: user.sitioWeb ?? '',
           } as never);
+          // Carga la visibilidad real del perfil (público/privado)
+          this.privacidadForm.patchValue({
+            perfilPublico: user.perfilPublico !== false,
+          } as never);
           if (user.ubicacion) {
             this.ubicacionForm.patchValue({
               pais: user.ubicacion.pais ?? 'Perú',
@@ -271,7 +275,7 @@ export class DeveloperConfiguracionPage implements OnInit {
         modalidades: this.profileData()?.disponibilidadLaboral?.modalidades ?? [],
         tiposContrato: this.profileData()?.disponibilidadLaboral?.tiposContrato ?? [],
       },
-      //si se cargó un CV, su URL pública viaja con el perfil
+      //si se cargó un CV, su URL pública viaja con el perfil; si se quitó, se envía vacío para limpiarlo
       ...(this.cvUrl()
         ? {
             cv: {
@@ -280,7 +284,7 @@ export class DeveloperConfiguracionPage implements OnInit {
               actualizadoEn: new Date().toISOString(),
             },
           }
-        : {}),
+        : { cv: {} }),
     };
 
     const profileId = this.profileId();
@@ -298,8 +302,14 @@ export class DeveloperConfiguracionPage implements OnInit {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
-    if (!file.name.toLowerCase().endsWith('.pdf')) {
+    if (!file.name.toLowerCase().endsWith('.pdf') || file.type !== 'application/pdf') {
       this.toast.error('El CV debe ser un archivo PDF');
+      input.value = '';
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      this.toast.error('El CV no puede superar los 5 MB');
+      input.value = '';
       return;
     }
     this.cvSubiendo.set(true);
@@ -315,6 +325,14 @@ export class DeveloperConfiguracionPage implements OnInit {
         this.toast.error('No se pudo subir el CV');
       },
     });
+  }
+
+  //quita el CV del formulario (y del perfil al guardar cambios)
+  removeCv(input?: HTMLInputElement): void {
+    this.cvUrl.set('');
+    this.cvNombre.set('');
+    if (input) input.value = '';
+    this.toast.info('CV quitado. Guarda los cambios para confirmar.');
   }
 
   saveEnlaces(): void {
@@ -456,6 +474,26 @@ export class DeveloperConfiguracionPage implements OnInit {
       })
     ).subscribe(result => {
       if (result) this.showSuccess();
+    });
+  }
+
+  /** Guarda la visibilidad del perfil (público/privado). */
+  savePrivacidad(): void {
+    const userId = this.getUserId();
+    if (!userId) return;
+
+    const esPublico = this.privacidadForm.value.perfilPublico !== false;
+    this.userStore.update(userId, { perfilPublico: esPublico }).pipe(
+      catchError(err => {
+        this.handleError(err);
+        return of(null);
+      })
+    ).subscribe(updated => {
+      if (!updated) return;
+      this.userData.set(updated);
+      this.toast.success(
+        esPublico ? 'Perfil público: cualquiera puede verlo' : 'Perfil privado: solo conexiones aceptadas'
+      );
     });
   }
 }

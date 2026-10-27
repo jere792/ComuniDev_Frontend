@@ -5,6 +5,7 @@ import { NOTIFICATION_REPOSITORY, NotificationRepository } from '@features/share
 import { AppNotification } from '@features/shared/domain/models/app-notification.model';
 import { ConnectionStore } from '@features/shared/data-access/state/connection.store';
 import { ConnectionRequest } from '@features/shared/domain/models/connection.model';
+import { UserStore } from '@features/users/data-access/state/user.store';
 
 @Component({
   selector: 'app-notification-bell',
@@ -18,9 +19,12 @@ export class NotificationBell implements OnInit {
   connectionRequests = signal<ConnectionRequest[]>([]);
   unreadCount = signal(0);
   isOpen = signal(false);
+  /** Nombre y foto de quien pide conexion, resueltos en lote. */
+  solicitantes = signal<Map<string, { nombre: string; foto: string }>>(new Map());
 
   private notifService = inject<NotificationRepository>(NOTIFICATION_REPOSITORY);
   private connService = inject(ConnectionStore);
+  private userStore = inject(UserStore);
   private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
@@ -54,8 +58,53 @@ export class NotificationBell implements OnInit {
 
   private loadConnectionRequests(userId: string): void {
     this.connService.getConnectionRequests(userId).subscribe({
-      next: (reqs) => this.connectionRequests.set(reqs),
+      next: (reqs) => {
+        this.connectionRequests.set(reqs);
+        this.cargarSolicitantes(reqs.map(r => r.solicitanteId));
+      },
     });
+  }
+
+  /** Nombre y foto de quien pide conexion en UNA sola peticion (aliases). */
+  private cargarSolicitantes(ids: string[]): void {
+    const faltantes = [...new Set(ids)].filter(id => id && !this.solicitantes().has(id));
+    if (faltantes.length === 0) return;
+
+    this.userStore.getByIds(faltantes).subscribe({
+      next: (usuarios: any[]) => {
+        this.solicitantes.update(mapa => {
+          const nuevo = new Map(mapa);
+          usuarios.forEach(u => {
+            if (u?.id) nuevo.set(u.id, { nombre: u.nombre || 'Alguien', foto: u.fotoPerfilUrl || '' });
+          });
+          return nuevo;
+        });
+      },
+      error: () => {},
+    });
+  }
+
+  nombreDeSolicitante(solicitanteId: string): string | null {
+    return this.solicitantes().get(solicitanteId)?.nombre ?? null;
+  }
+
+  fotoDeSolicitante(solicitanteId: string): string | null {
+    return this.solicitantes().get(solicitanteId)?.foto || null;
+  }
+
+  iniciales(nombre: string): string {
+    return nombre.split(/\s+/).map(p => p.charAt(0)).slice(0, 2).join('').toUpperCase();
+  }
+
+  /** Emoji del tipo de reaccion que trae la notificacion. */
+  emojiDe(notif: AppNotification): string {
+    switch (notif.detalle) {
+      case 'LIKE': return '👍';
+      case 'LOVE': return '❤️';
+      case 'CELEBRATE': return '🎉';
+      case 'SUPPORT': return '🤝';
+      default: return '';
+    }
   }
 
   togglePanel(): void {

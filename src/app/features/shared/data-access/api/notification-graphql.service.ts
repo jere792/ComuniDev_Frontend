@@ -10,9 +10,12 @@ const GET_NOTIFICATIONS = gql`
       id
       destinatarioId
       actorId
+      actorNombre
+      actorFoto
       tipo
       titulo
       mensaje
+      detalle
       referencia { tipo id }
       leida
       createdAt
@@ -32,9 +35,12 @@ const SUBSCRIBE_NOTIFICATIONS = gql`
       id
       destinatarioId
       actorId
+      actorNombre
+      actorFoto
       tipo
       titulo
       mensaje
+      detalle
       referencia { tipo id }
       leida
       createdAt

@@ -20,9 +20,21 @@
         <div class="section-label">Solicitudes de conexión</div>
         @for (req of connectionRequests(); track req.id) {
           <div class="notification-item request">
-            <span class="material-symbols-outlined notif-icon">person_add</span>
+            @if (fotoDeSolicitante(req.solicitanteId)) {
+              <img class="notif-avatar" [src]="fotoDeSolicitante(req.solicitanteId)" alt="" loading="lazy" />
+            } @else if (nombreDeSolicitante(req.solicitanteId); as nombre) {
+              <span class="notif-avatar initials">{{ iniciales(nombre) }}</span>
+            } @else {
+              <span class="material-symbols-outlined notif-icon">person_add</span>
+            }
             <div class="notif-content">
-              <span class="notif-text">Solicitud de conexión pendiente</span>
+              <span class="notif-text">
+                @if (nombreDeSolicitante(req.solicitanteId); as nombre) {
+                  {{ nombre }} te envió una solicitud de conexión
+                } @else {
+                  Solicitud de conexión pendiente
+                }
+              </span>
               <span class="notif-time">{{ getTimeAgo(req.createdAt) }}</span>
             </div>
             <div class="request-actions">
@@ -41,11 +53,22 @@
         <div class="section-label">Actividad</div>
         @for (notif of notifications(); track notif.id) {
           <div class="notification-item" [class.unread]="!notif.leida" (click)="markAsRead(notif.id)">
-            <span class="material-symbols-outlined notif-icon">{{ getNotificationIcon(notif.tipo) }}</span>
+            @if (notif.actorFoto) {
+              <img class="notif-avatar" [src]="notif.actorFoto" [alt]="notif.actorNombre" loading="lazy" />
+            } @else if (notif.actorNombre; as nombre) {
+              <span class="notif-avatar initials">{{ iniciales(nombre) }}</span>
+            } @else {
+              <span class="material-symbols-outlined notif-icon">{{ getNotificationIcon(notif.tipo) }}</span>
+            }
             <div class="notif-content">
               <span class="notif-text">{{ notif.titulo }}</span>
               @if (notif.mensaje) {
-                <span class="notif-sub">{{ notif.mensaje }}</span>
+                <span class="notif-sub">
+                  @if (notif.tipo === 'REACCION' && emojiDe(notif)) {
+                    <span class="notif-emoji">{{ emojiDe(notif) }}</span>
+                  }
+                  {{ notif.mensaje }}
+                </span>
               }
               <span class="notif-time">{{ getTimeAgo(notif.createdAt) }}</span>
             </div>

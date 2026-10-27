@@ -121,6 +121,29 @@
   }
 }
 
+/* Avatar del actor: foto (o iniciales) resuelta en el backend */
+.notif-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.notif-avatar.initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-container-high);
+  color: var(--on-surface-variant);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.notif-emoji {
+  margin-right: 4px;
+}
+
 .notif-icon {
   font-size: 22px;
   color: var(--primary);

@@ -183,13 +183,18 @@
           <div class="reacciones-wrapper">
             <button class="action-btn" [class.reacted]="vm.myReaction" (click)="toggleReactionsDropdown(vm); $event.stopPropagation()">
               <span class="reaction-emoji-btn">{{ getReactionEmoji(vm) }}</span>
-              <span class="action-text">
-                {{ getReactionLabel(vm) }}
-                @if ((vm.post.estadisticas?.reaccionesCount ?? 0) > 0) {
-                  ({{ vm.post.estadisticas?.reaccionesCount }})
-                }
-              </span>
+              <span class="action-text">{{ getReactionLabel(vm) }}</span>
             </button>
+            @if ((vm.post.estadisticas?.reaccionesCount ?? 0) > 0) {
+              <button
+                type="button"
+                class="reaction-count-btn"
+                title="Ver quiénes reaccionaron"
+                (click)="verReacciones(vm); $event.stopPropagation()"
+              >
+                ({{ vm.post.estadisticas?.reaccionesCount }})
+              </button>
+            }
 
             @if (vm.showReactionsDropdown) {
               <div class="reactions-dropdown">
@@ -359,6 +364,43 @@
             <span class="material-symbols-outlined">send</span>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (reaccionesAbierta()) {
+  <div class="reactores-overlay" (click)="cerrarReacciones()">
+    <div class="reactores-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="reactores-header">
+        <h3>Reacciones</h3>
+        <button type="button" class="reactores-close" (click)="cerrarReacciones()" aria-label="Cerrar">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="reactores-body">
+        @if (cargandoReacciones()) {
+          @for (fila of [1, 2, 3]; track fila) {
+            <div class="reactor-row">
+              <div class="skeleton-avatar"></div>
+              <div class="skeleton-linea"></div>
+            </div>
+          }
+        } @else {
+          @for (persona of reaccionadores(); track persona.id) {
+            <div class="reactor-row">
+              @if (persona.avatar) {
+                <img class="reactor-avatar" [src]="persona.avatar" [alt]="persona.nombre" loading="lazy" />
+              } @else {
+                <div class="reactor-avatar reactor-fallback">{{ persona.nombre.substring(0, 2) }}</div>
+              }
+              <span class="reactor-nombre">{{ persona.nombre }}</span>
+              <span class="reactor-tipo">{{ reactionConfig[persona.tipo].emoji }} {{ reactionConfig[persona.tipo].label }}</span>
+            </div>
+          } @empty {
+            <p class="reactores-vacio">Todavía no hay reacciones en esta publicación.</p>
+          }
+        }
       </div>
     </div>
   </div>

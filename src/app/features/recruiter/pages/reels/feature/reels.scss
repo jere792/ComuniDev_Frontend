@@ -5,6 +5,25 @@
   min-height: 0;
 }
 
+/* Skeleton del autor mientras llega del servidor (suave, sin parpadeos raros) */
+@keyframes autor-skeleton-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.skeleton-avatar {
+  background: rgba(255, 255, 255, 0.25);
+  animation: autor-skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton-nombre {
+  width: 140px;
+  height: 14px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.3);
+  animation: autor-skeleton-pulse 1.4s ease-in-out infinite;
+}
+
 .reels-container {
   width: 100%;
   flex: 1;

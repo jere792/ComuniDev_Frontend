@@ -101,12 +101,18 @@
 
         <div class="reel-info">
           <div class="reel-user">
-            @if (reels()[currentIndex].autorAvatar) {
-              <img [src]="reels()[currentIndex].autorAvatar" [alt]="reels()[currentIndex].autorNombre" class="user-avatar clickable" (click)="goToProfile(reels()[currentIndex].reel.autorId)" />
+            @if (!reels()[currentIndex].autorNombre) {
+              <!-- el autor aun no llego del servidor: skeleton suave en vez de "?" y "Usuario" -->
+              <div class="user-avatar skeleton-avatar"></div>
+              <div class="skeleton-nombre"></div>
             } @else {
-              <div class="user-avatar avatar-fallback clickable" (click)="goToProfile(reels()[currentIndex].reel.autorId)">{{ getInitials(reels()[currentIndex].autorNombre || '?') }}</div>
+              @if (reels()[currentIndex].autorAvatar) {
+                <img [src]="reels()[currentIndex].autorAvatar" [alt]="reels()[currentIndex].autorNombre" class="user-avatar clickable" (click)="goToProfile(reels()[currentIndex].reel.autorId)" />
+              } @else {
+                <div class="user-avatar avatar-fallback clickable" (click)="goToProfile(reels()[currentIndex].reel.autorId)">{{ getInitials(reels()[currentIndex].autorNombre || '?') }}</div>
+              }
+              <span class="user-name clickable" (click)="goToProfile(reels()[currentIndex].reel.autorId)">{{ reels()[currentIndex].autorNombre }}</span>
             }
-            <span class="user-name clickable" (click)="goToProfile(reels()[currentIndex].reel.autorId)">{{ reels()[currentIndex].autorNombre || 'Usuario' }}</span>
           </div>
           <p class="reel-description">{{ reels()[currentIndex].reel.descripcion }}</p>
           @if (reels()[currentIndex].reel.etiquetas?.length) {

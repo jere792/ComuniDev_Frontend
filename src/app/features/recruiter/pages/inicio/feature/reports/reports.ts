@@ -429,6 +429,49 @@ export class ReportsComponent implements OnInit {
     }
   }
 
+  /** Lista de quienes reaccionaron a un post: se abre con un clic en el contador. */
+  readonly reaccionesAbierta = signal(false);
+  readonly cargandoReacciones = signal(false);
+  readonly reaccionadores = signal<Array<{ id: string; nombre: string; avatar: string; tipo: TipoReaccion }>>([]);
+
+  verReacciones(vm: PostVM): void {
+    this.reaccionesAbierta.set(true);
+    this.reaccionadores.set([]);
+    this.cargandoReacciones.set(true);
+
+    this.reactionService.getReactions(vm.post.id, 'POST').subscribe({
+      next: (reacciones) => {
+        const ids = [...new Set(reacciones.map(r => r.usuarioId).filter((id): id is string => Boolean(id)))];
+        if (ids.length === 0) {
+          this.cargandoReacciones.set(false);
+          return;
+        }
+        const tipoDe = new Map(reacciones.map(r => [r.usuarioId, r.tipoReaccion as TipoReaccion]));
+
+        // todas las personas de la lista en UNA peticion (aliases u0, u1...)
+        this.userStore.getByIds(ids).subscribe({
+          next: (usuarios: any[]) => {
+            this.reaccionadores.set(usuarios
+              .filter(u => u?.id)
+              .map(u => ({
+                id: u.id,
+                nombre: u.nombre || 'Usuario',
+                avatar: u.fotoPerfilUrl || '',
+                tipo: tipoDe.get(u.id) ?? 'LIKE',
+              })));
+            this.cargandoReacciones.set(false);
+          },
+          error: () => this.cargandoReacciones.set(false),
+        });
+      },
+      error: () => this.cargandoReacciones.set(false),
+    });
+  }
+
+  cerrarReacciones(): void {
+    this.reaccionesAbierta.set(false);
+  }
+
   getReactionEmoji(vm: PostVM): string {
     return vm.myReaction ? this.reactionConfig[vm.myReaction].emoji : '😊';
   }

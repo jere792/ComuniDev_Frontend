@@ -38,6 +38,16 @@ export class CommentStore {
     return this.repository.countComments(contentId, contentType);
   }
 
+  /** Comentarios raiz de varios posts en una sola peticion. */
+  getCommentsBatch(contentIds: string[], contentType = 'POST'): Observable<SocialComment[]> {
+    return this.repository.getCommentsBatch(contentIds, contentType);
+  }
+
+  /** Contadores de comentarios de varios posts en una sola peticion. */
+  countCommentsBatch(contentIds: string[], contentType = 'POST'): Observable<Array<{ contentId: string; count: number }>> {
+    return this.repository.countCommentsBatch(contentIds, contentType);
+  }
+
   createComment(
     autorId: string,
     contenidoId: string,

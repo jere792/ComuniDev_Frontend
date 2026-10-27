@@ -126,8 +126,9 @@ export class ReportsComponent implements OnInit {
         this.loading.set(false);
         this.cargarAutores(data.map(p => p.autorId));
         this.loadMyReactions(data);
-        data.forEach(p => this.loadCommentCountSilently(p));
-        this.posts().forEach(vm => this.loadComments(vm));
+        // contadores y comentarios de TODOS los posts en 2 peticiones (antes: 20 + 20)
+        this.cargarConteosComentarios(data);
+        this.cargarTodosLosComentarios(data);
       },
       error: () => {
         this.loading.set(false);
@@ -549,6 +550,50 @@ export class ReportsComponent implements OnInit {
     this.commentService.countComments(post.id, 'POST').subscribe({
       next: (count: number) => this.setCommentCount(post.id, count),
       error: () => {}
+    });
+  }
+
+  /** Contadores de todos los posts en UNA peticion (antes: una por post). */
+  private cargarConteosComentarios(posts: SocialPost[]): void {
+    if (posts.length === 0) return;
+    this.commentService.countCommentsBatch(posts.map(p => p.id), 'POST').subscribe({
+      next: (contados) => contados.forEach(c => this.setCommentCount(c.contentId, c.count)),
+      // si el batch falla (backend sin actualizar), se hace como antes
+      error: () => posts.forEach(p => this.loadCommentCountSilently(p)),
+    });
+  }
+
+  /** Comentarios de todos los posts en UNA peticion (antes: una por post). */
+  private cargarTodosLosComentarios(posts: SocialPost[]): void {
+    if (posts.length === 0) return;
+
+    this.commentService.getCommentsBatch(posts.map(p => p.id), 'POST').subscribe({
+      next: (comentarios: SocialComment[]) => {
+        const porContenido = new Map<string, SocialComment[]>();
+        comentarios.forEach(c => {
+          const lista = porContenido.get(c.contenidoId) ?? [];
+          lista.push(c);
+          porContenido.set(c.contenidoId, lista);
+        });
+
+        porContenido.forEach((lista, postId) => {
+          this.posts.update(list => list.map(v =>
+            v.post.id === postId ? { ...v, comments: lista.map(c => this.buildCommentVm(c)) } : v
+          ));
+        });
+
+        // autores y mis reacciones de esos comentarios, en 2 peticiones por post
+        this.posts()
+          .filter(v => porContenido.has(v.post.id) && v.comments.length > 0)
+          .forEach(v => {
+            this.cargarAutoresComentarios(v.comments.map(c => c.comment.autorId), v.post.id);
+            this.cargarMisReaccionesComentarios(v.comments.map(c => c.comment.id), v.post.id);
+          });
+      },
+      // si el batch falla (backend sin actualizar), se hace como antes
+      error: () => this.posts()
+        .filter(v => posts.some(p => p.id === v.post.id))
+        .forEach(v => this.loadComments(v)),
     });
   }
 

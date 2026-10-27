@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { SocialComment } from '@features/shared/domain/models/social-comment.model';
 import { CommentRepository } from '@features/shared/domain/ports/comment.repository';
@@ -44,6 +44,33 @@ const GET_REPLIES = gql`
 const GET_COMMENT_COUNT = gql`
   query GetCommentCount($contentId: String!, $contentType: String!) {
     commentCount(contentId: $contentId, contentType: $contentType)
+  }
+`;
+
+const GET_COMMENTS_FOR_POSTS = gql`
+  query GetCommentsForPosts($contentIds: [String!]!, $contentType: String!) {
+    commentsForPosts(contentIds: $contentIds, contentType: $contentType) {
+      id
+      autorId
+      contenidoId
+      tipoContenido
+      parentCommentId
+      texto
+      imagenes
+      estadoModeracion
+      reaccionesCount
+      repliesCount
+      createdAt
+    }
+  }
+`;
+
+const GET_COMMENT_COUNTS = gql`
+  query GetCommentCounts($contentIds: [String!]!, $contentType: String!) {
+    commentCounts(contentIds: $contentIds, contentType: $contentType) {
+      contentId
+      count
+    }
   }
 `;
 
@@ -103,6 +130,22 @@ export class CommentGraphqlService implements CommentRepository {
     return this.apollo
       .query<any>({ query: GET_COMMENT_COUNT, variables: { contentId, contentType }, fetchPolicy: 'network-only' })
       .pipe(map(result => result.data?.commentCount ?? 0));
+  }
+
+  /** Comentarios raiz de varios posts en UNA peticion (antes: una por post). */
+  getCommentsBatch(contentIds: string[], contentType = 'POST'): Observable<SocialComment[]> {
+    if (contentIds.length === 0) return of([]);
+    return this.apollo
+      .query<any>({ query: GET_COMMENTS_FOR_POSTS, variables: { contentIds, contentType }, fetchPolicy: 'network-only' })
+      .pipe(map(result => result.data?.commentsForPosts ?? []));
+  }
+
+  /** Contadores de comentarios de varios posts en UNA peticion. */
+  countCommentsBatch(contentIds: string[], contentType = 'POST'): Observable<Array<{ contentId: string; count: number }>> {
+    if (contentIds.length === 0) return of([]);
+    return this.apollo
+      .query<any>({ query: GET_COMMENT_COUNTS, variables: { contentIds, contentType }, fetchPolicy: 'network-only' })
+      .pipe(map(result => result.data?.commentCounts ?? []));
   }
 
   createComment(autorId: string, contenidoId: string, texto: string, tipoContenido = 'POST', parentCommentId?: string): Observable<SocialComment> {

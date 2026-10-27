@@ -2,6 +2,7 @@ import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserStore } from '@features/users/data-access/state/user.store';
 import { FollowStore } from '@features/shared/data-access/state/follow.store';
+import { ToastService } from '@core/services/toast.service';
 
 @Component({
   selector: 'app-shared-right-panel',
@@ -20,6 +21,7 @@ export class SharedRightPanel implements OnInit {
   private userStore = inject(UserStore);
   private followService = inject(FollowStore);
   private router = inject(Router);
+  private toast = inject(ToastService);
 
   ngOnInit(): void {
     this.loadSuggestions();
@@ -91,7 +93,12 @@ export class SharedRightPanel implements OnInit {
       });
     } else {
       this.followService.follow(currentUserId, suggestion.id).subscribe({
-        next: () => {
+        next: (resultado) => {
+          if (!resultado) {
+            // perfil privado: queda solicitud enviada
+            this.toast.success('Solicitud de seguimiento enviada');
+            return;
+          }
           this.suggestions.update(list => list.map(s =>
             s.id === suggestion.id ? { ...s, isFollowing: true } : s
           ));

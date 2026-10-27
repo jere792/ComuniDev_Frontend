@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { map, Observable } from 'rxjs';
 import { FollowEdge } from '@features/shared/domain/models/follow.model';
-import { FollowRepository } from '@features/shared/domain/ports/follow.repository';
+import { FollowRepository, FollowRequest } from '@features/shared/domain/ports/follow.repository';
 
 const FOLLOW = gql`
   mutation Follow($seguidorId: String!, $tipoSeguido: String!, $seguidoId: String!) {
@@ -47,6 +47,30 @@ const GET_FOLLOWING = gql`
   }
 `;
 
+const GET_FOLLOW_REQUESTS = gql`
+  query FollowRequests($userId: String!) {
+    followRequests(userId: $userId) {
+      id
+      seguidorId
+      seguidoId
+      estado
+      createdAt
+    }
+  }
+`;
+
+const ACCEPT_FOLLOW_REQUEST = gql`
+  mutation AcceptFollowRequest($requestId: ID!) {
+    acceptFollowRequest(requestId: $requestId)
+  }
+`;
+
+const REJECT_FOLLOW_REQUEST = gql`
+  mutation RejectFollowRequest($requestId: ID!) {
+    rejectFollowRequest(requestId: $requestId)
+  }
+`;
+
 @Injectable({ providedIn: 'root' })
 export class FollowGraphqlService implements FollowRepository {
   private apollo = inject(Apollo);
@@ -88,5 +112,28 @@ export class FollowGraphqlService implements FollowRepository {
       // siempre del servidor: sin esto, volver a Discover sin F5 mostraba la cache vieja
       fetchPolicy: 'network-only',
     }).pipe(map((res: any) => res?.data?.following ?? []));
+  }
+
+  /** Solicitudes de seguir pendientes (perfil privado) de un usuario. */
+  getFollowRequests(userId: string): Observable<FollowRequest[]> {
+    return this.apollo.query<any>({
+      query: GET_FOLLOW_REQUESTS,
+      variables: { userId },
+      fetchPolicy: 'network-only',
+    }).pipe(map((res) => res?.data?.followRequests ?? []));
+  }
+
+  acceptFollowRequest(requestId: string): Observable<boolean> {
+    return this.apollo.mutate<any>({
+      mutation: ACCEPT_FOLLOW_REQUEST,
+      variables: { requestId },
+    }).pipe(map((res) => res?.data?.acceptFollowRequest === true));
+  }
+
+  rejectFollowRequest(requestId: string): Observable<boolean> {
+    return this.apollo.mutate<any>({
+      mutation: REJECT_FOLLOW_REQUEST,
+      variables: { requestId },
+    }).pipe(map((res) => res?.data?.rejectFollowRequest === true));
   }
 }

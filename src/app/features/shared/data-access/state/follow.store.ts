@@ -1,7 +1,7 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { FollowEdge } from '@features/shared/domain/models/follow.model';
-import { FOLLOW_REPOSITORY, FollowRepository } from '@features/shared/domain/ports/follow.repository';
+import { FOLLOW_REPOSITORY, FollowRepository, FollowRequest } from '@features/shared/domain/ports/follow.repository';
 
 @Injectable({ providedIn: 'root' })
 export class FollowStore {
@@ -60,6 +60,19 @@ export class FollowStore {
 
   getFollowing(userId: string, page?: number, size?: number): Observable<FollowEdge[]> {
     return this.repository.getFollowing(userId, page, size);
+  }
+
+  /** Solicitudes de seguir pendientes (perfil privado) de un usuario. */
+  getFollowRequests(userId: string): Observable<FollowRequest[]> {
+    return this.repository.getFollowRequests(userId);
+  }
+
+  acceptFollowRequest(requestId: string): Observable<boolean> {
+    return this.repository.acceptFollowRequest(requestId);
+  }
+
+  rejectFollowRequest(requestId: string): Observable<boolean> {
+    return this.repository.rejectFollowRequest(requestId);
   }
 
   clear(): void {

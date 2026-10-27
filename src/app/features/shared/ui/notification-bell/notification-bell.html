@@ -1,8 +1,8 @@
 <div class="bell-container">
   <button class="icon-btn" (click)="togglePanel()" title="Notificaciones">
     <span class="material-symbols-outlined">notifications</span>
-    @if (unreadCount() > 0 || connectionRequests().length > 0) {
-      <span class="notification-dot">{{ unreadCount() + connectionRequests().length }}</span>
+    @if (unreadCount() > 0 || connectionRequests().length > 0 || solicitudesSeguir().length > 0) {
+      <span class="notification-dot">{{ unreadCount() + connectionRequests().length + solicitudesSeguir().length }}</span>
     }
   </button>
 
@@ -42,6 +42,39 @@
                 <span class="material-symbols-outlined">check</span>
               </button>
               <button class="reject-btn" (click)="rejectRequest(req.id)">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+          </div>
+        }
+      }
+
+      @if (solicitudesSeguir().length) {
+        <div class="section-label">Solicitudes para seguirte</div>
+        @for (sol of solicitudesSeguir(); track sol.id) {
+          <div class="notification-item request">
+            @if (fotoDeSolicitante(sol.seguidorId)) {
+              <img class="notif-avatar" [src]="fotoDeSolicitante(sol.seguidorId)" alt="" loading="lazy" />
+            } @else if (nombreDeSolicitante(sol.seguidorId); as nombre) {
+              <span class="notif-avatar initials">{{ iniciales(nombre) }}</span>
+            } @else {
+              <span class="material-symbols-outlined notif-icon">group_add</span>
+            }
+            <div class="notif-content">
+              <span class="notif-text">
+                @if (nombreDeSolicitante(sol.seguidorId); as nombre) {
+                  {{ nombre }} quiere seguirte
+                } @else {
+                  Solicitud para seguirte
+                }
+              </span>
+              <span class="notif-time">{{ getTimeAgo(sol.createdAt) }}</span>
+            </div>
+            <div class="request-actions">
+              <button class="accept-btn" (click)="aceptarSeguimiento(sol.id)" aria-label="Aceptar">
+                <span class="material-symbols-outlined">check</span>
+              </button>
+              <button class="reject-btn" (click)="rechazarSeguimiento(sol.id)" aria-label="Rechazar">
                 <span class="material-symbols-outlined">close</span>
               </button>
             </div>

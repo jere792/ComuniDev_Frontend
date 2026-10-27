@@ -5,6 +5,8 @@ import { NOTIFICATION_REPOSITORY, NotificationRepository } from '@features/share
 import { AppNotification } from '@features/shared/domain/models/app-notification.model';
 import { ConnectionStore } from '@features/shared/data-access/state/connection.store';
 import { ConnectionRequest } from '@features/shared/domain/models/connection.model';
+import { FollowStore } from '@features/shared/data-access/state/follow.store';
+import { FollowRequest } from '@features/shared/domain/ports/follow.repository';
 import { UserStore } from '@features/users/data-access/state/user.store';
 
 @Component({
@@ -17,6 +19,8 @@ import { UserStore } from '@features/users/data-access/state/user.store';
 export class NotificationBell implements OnInit {
   notifications = signal<AppNotification[]>([]);
   connectionRequests = signal<ConnectionRequest[]>([]);
+  /** Solicitudes de seguir de perfiles privados (estilo Instagram). */
+  solicitudesSeguir = signal<FollowRequest[]>([]);
   unreadCount = signal(0);
   isOpen = signal(false);
   /** Nombre y foto de quien pide conexion, resueltos en lote. */
@@ -24,6 +28,7 @@ export class NotificationBell implements OnInit {
 
   private notifService = inject<NotificationRepository>(NOTIFICATION_REPOSITORY);
   private connService = inject(ConnectionStore);
+  private followService = inject(FollowStore);
   private userStore = inject(UserStore);
   private destroyRef = inject(DestroyRef);
 
@@ -32,6 +37,7 @@ export class NotificationBell implements OnInit {
     if (userId) {
       this.loadNotifications(userId);
       this.loadConnectionRequests(userId);
+      this.loadFollowRequests(userId);
       this.notifService
         .subscribeToNotifications(userId)
         .pipe(takeUntilDestroyed(this.destroyRef))
@@ -43,8 +49,33 @@ export class NotificationBell implements OnInit {
           if (notif.tipo === 'SOLICITUD_CONEXION') {
             this.loadConnectionRequests(userId);
           }
+          if (notif.tipo === 'SOLICITUD_SEGUIR') {
+            this.loadFollowRequests(userId);
+          }
         });
     }
+  }
+
+  /** Solicitudes de seguir pendientes (perfil privado), con sus autores en lote. */
+  private loadFollowRequests(userId: string): void {
+    this.followService.getFollowRequests(userId).subscribe({
+      next: (solicitudes) => {
+        this.solicitudesSeguir.set(solicitudes);
+        this.cargarSolicitantes(solicitudes.map(s => s.seguidorId));
+      },
+    });
+  }
+
+  aceptarSeguimiento(requestId: string): void {
+    this.followService.acceptFollowRequest(requestId).subscribe({
+      next: () => this.solicitudesSeguir.update(lista => lista.filter(s => s.id !== requestId)),
+    });
+  }
+
+  rechazarSeguimiento(requestId: string): void {
+    this.followService.rejectFollowRequest(requestId).subscribe({
+      next: () => this.solicitudesSeguir.update(lista => lista.filter(s => s.id !== requestId)),
+    });
   }
 
   private loadNotifications(userId: string): void {
@@ -162,13 +193,17 @@ export class NotificationBell implements OnInit {
       case 'SOLICITUD_CONEXION': return 'person_add';
       case 'CONEXION_ACEPTADA': return 'check_circle';
       case 'SOLICITUD_RECHAZADA': return 'person_cancel';
+      case 'SOLICITUD_SEGUIR': return 'group_add';
+      case 'SEGUIMIENTO_ACEPTADO': return 'check_circle';
+      case 'SEGUIMIENTO_RECHAZADO': return 'person_cancel';
       case 'COMENTARIO': return 'comment';
       case 'REACCION': return 'favorite';
       default: return 'notifications';
     }
   }
 
-  getTimeAgo(dateStr: string): string {
+  getTimeAgo(dateStr?: string): string {
+    if (!dateStr) return '';
     const date = new Date(dateStr);
     const now = new Date();
     const diff = now.getTime() - date.getTime();

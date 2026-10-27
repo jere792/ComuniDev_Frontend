@@ -205,7 +205,14 @@ export class RecruiterCandidates implements OnInit {
     if (!dev || !recruiterId) return;
 
     this.followStore.follow(recruiterId, dev.id).subscribe({
-      next: () => this.toast.success(`Ahora sigues a ${dev.nombre}`),
+      next: (resultado) => {
+        if (!resultado) {
+          // perfil privado: queda solicitud enviada
+          this.toast.success('Solicitud de seguimiento enviada');
+          return;
+        }
+        this.toast.success(`Ahora sigues a ${dev.nombre}`);
+      },
       error: () => this.toast.error('No se pudo seguir al candidato'),
     });
   }

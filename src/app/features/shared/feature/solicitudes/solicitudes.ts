@@ -4,6 +4,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ConnectionStore } from '@features/shared/data-access/state/connection.store';
 import { ConnectionRequest } from '@features/shared/domain/models/connection.model';
+import { FollowStore } from '@features/shared/data-access/state/follow.store';
+import { FollowRequest } from '@features/shared/domain/ports/follow.repository';
 import { UserStore } from '@features/users/data-access/state/user.store';
 import { User } from '@core/domain/models/user.model';
 import { ToastService } from '@core/services/toast.service';
@@ -24,9 +26,11 @@ export class Solicitudes implements OnInit {
   pendingRequests = signal<RequestWithUser[]>([]);
   sentRequests = signal<RequestWithUser[]>([]);
   connections = signal<any[]>([]);
+  /** Solicitudes de seguir de perfiles privados (esta pestaña nueva). */
+  solicitudesSeguir = signal<FollowRequest[]>([]);
   usersMap = signal<Map<string, User>>(new Map());
   loading = signal(true);
-  activeTab = signal<'recibidas' | 'enviadas' | 'conexiones'>('recibidas');
+  activeTab = signal<'recibidas' | 'enviadas' | 'conexiones' | 'seguir'>('recibidas');
   confirmOpen = signal(false);
   confirmTitle = signal('');
   confirmMessage = signal('');
@@ -34,6 +38,7 @@ export class Solicitudes implements OnInit {
   pendingId = signal<string | null>(null);
 
   private connService = inject(ConnectionStore);
+  private followService = inject(FollowStore);
   private userStore = inject(UserStore);
   private router = inject(Router);
   private location = inject(Location);
@@ -80,6 +85,11 @@ export class Solicitudes implements OnInit {
         this.loadUsers(peerIds);
       },
     });
+
+    // solicitudes de seguir (perfiles privados); los usuarios ya se cargan con getAll
+    this.followService.getFollowRequests(userId).subscribe({
+      next: (solicitudes) => this.solicitudesSeguir.set(solicitudes),
+    });
   }
 
   private loadUsers(_userIds: string[]): void {
@@ -113,6 +123,26 @@ export class Solicitudes implements OnInit {
     this.connService.rejectConnection(requestId, userId ?? undefined).subscribe({
       next: () => {
         this.pendingRequests.update(reqs => reqs.filter(r => r.id !== requestId));
+        this.toast.success('Solicitud rechazada');
+      },
+      error: () => this.toast.error('Error al rechazar solicitud'),
+    });
+  }
+
+  aceptarSeguir(requestId: string): void {
+    this.followService.acceptFollowRequest(requestId).subscribe({
+      next: () => {
+        this.solicitudesSeguir.update(lista => lista.filter(s => s.id !== requestId));
+        this.toast.success('Solicitud aceptada');
+      },
+      error: () => this.toast.error('Error al aceptar solicitud'),
+    });
+  }
+
+  rechazarSeguir(requestId: string): void {
+    this.followService.rejectFollowRequest(requestId).subscribe({
+      next: () => {
+        this.solicitudesSeguir.update(lista => lista.filter(s => s.id !== requestId));
         this.toast.success('Solicitud rechazada');
       },
       error: () => this.toast.error('Error al rechazar solicitud'),
@@ -169,7 +199,7 @@ export class Solicitudes implements OnInit {
     this.pendingId.set(null);
   }
 
-  setTab(tab: 'recibidas' | 'enviadas' | 'conexiones'): void {
+  setTab(tab: 'recibidas' | 'enviadas' | 'conexiones' | 'seguir'): void {
     this.activeTab.set(tab);
   }
 
@@ -203,7 +233,8 @@ export class Solicitudes implements OnInit {
     return conn.usuarioMenorId === userId ? conn.usuarioMayorId : conn.usuarioMenorId;
   }
 
-  getTimeAgo(dateStr: string): string {
+  getTimeAgo(dateStr?: string): string {
+    if (!dateStr) return '';
     const date = new Date(dateStr);
     const now = new Date();
     const diff = now.getTime() - date.getTime();

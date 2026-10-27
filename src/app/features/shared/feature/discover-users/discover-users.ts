@@ -123,7 +123,12 @@ export class DiscoverUsers implements OnInit {
       });
     } else {
       this.followService.follow(currentUserId, user.id).subscribe({
-        next: () => {
+        next: (resultado) => {
+          if (!resultado) {
+            // perfil privado: quedo solicitud enviada, todavia no se siguen
+            this.toast.success('Solicitud de seguimiento enviada');
+            return;
+          }
           this.users.update(list => list.map(u =>
             u.id === user.id ? { ...u, isFollowing: true } : u
           ));

@@ -22,6 +22,12 @@
     <button class="tab" [class.active]="activeTab() === 'conexiones'" (click)="setTab('conexiones')">
       Conexiones
     </button>
+    <button class="tab" [class.active]="activeTab() === 'seguir'" (click)="setTab('seguir')">
+      Para seguir
+      @if (solicitudesSeguir().length > 0) {
+        <span class="tab-badge">{{ solicitudesSeguir().length }}</span>
+      }
+    </button>
   </div>
 
   @if (loading()) {
@@ -130,6 +136,41 @@
       <div class="empty-state">
         <span class="material-symbols-outlined">people</span>
         <span>No tienes conexiones aún</span>
+      </div>
+    }
+  }
+
+  <!-- Solicitudes para seguirte (perfil privado, estilo Instagram) -->
+  @if (activeTab() === 'seguir' && !loading()) {
+    @for (sol of solicitudesSeguir(); track sol.id) {
+      <div class="request-card">
+        <div class="request-avatar clickable" (click)="goToProfile(sol.seguidorId)">
+          @if (getUser(sol.seguidorId)?.fotoPerfilUrl) {
+            <img [src]="getUser(sol.seguidorId)!.fotoPerfilUrl" [alt]="getUser(sol.seguidorId)!.nombre" />
+          } @else {
+            <div class="avatar-fallback">{{ getInitials(getUser(sol.seguidorId)?.nombre || '?') }}</div>
+          }
+        </div>
+        <div class="request-info">
+          <span class="request-name clickable" (click)="goToProfile(sol.seguidorId)">
+            {{ getUser(sol.seguidorId)?.nombre || 'Usuario' }}
+          </span>
+          <span class="request-time">{{ getTimeAgo(sol.createdAt) }}</span>
+        </div>
+        <div class="request-actions">
+          <button class="btn-accept" (click)="aceptarSeguir(sol.id)">
+            <span class="material-symbols-outlined">check</span>
+            Aceptar
+          </button>
+          <button class="btn-reject" (click)="rechazarSeguir(sol.id)">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-state">
+        <span class="material-symbols-outlined">group_add</span>
+        <span>No tienes solicitudes para seguirte</span>
       </div>
     }
   }

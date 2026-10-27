@@ -28,8 +28,8 @@ const IS_FOLLOWING = gql`
 `;
 
 const GET_FOLLOWERS = gql`
-  query Followers($userId: String!) {
-    followers(userId: $userId) {
+  query Followers($userId: String!, $page: Int, $size: Int) {
+    followers(userId: $userId, page: $page, size: $size) {
       id
       seguidorId
       createdAt
@@ -38,8 +38,8 @@ const GET_FOLLOWERS = gql`
 `;
 
 const GET_FOLLOWING = gql`
-  query Following($userId: String!) {
-    following(userId: $userId) {
+  query Following($userId: String!, $page: Int, $size: Int) {
+    following(userId: $userId, page: $page, size: $size) {
       id
       seguidoId
       createdAt
@@ -72,17 +72,18 @@ export class FollowGraphqlService implements FollowRepository {
     }).pipe(map((res: any) => res?.data?.isFollowing ?? false));
   }
 
-  getFollowers(userId: string): Observable<FollowEdge[]> {
+  /** Con size se pide una pagina (50 por defecto en la UI); page arranca en 0. */
+  getFollowers(userId: string, page?: number, size?: number): Observable<FollowEdge[]> {
     return this.apollo.query({
       query: GET_FOLLOWERS,
-      variables: { userId },
+      variables: { userId, page: page ?? null, size: size ?? null },
     }).pipe(map((res: any) => res?.data?.followers ?? []));
   }
 
-  getFollowing(userId: string): Observable<FollowEdge[]> {
+  getFollowing(userId: string, page?: number, size?: number): Observable<FollowEdge[]> {
     return this.apollo.query({
       query: GET_FOLLOWING,
-      variables: { userId },
+      variables: { userId, page: page ?? null, size: size ?? null },
     }).pipe(map((res: any) => res?.data?.following ?? []));
   }
 }

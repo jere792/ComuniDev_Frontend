@@ -6,8 +6,9 @@ export interface FollowRepository {
   follow(seguidorId: string, seguidoId: string): Observable<FollowEdge | null>;
   unfollow(seguidorId: string, seguidoId: string): Observable<boolean>;
   isFollowing(followerId: string, followedId: string): Observable<boolean>;
-  getFollowers(userId: string): Observable<FollowEdge[]>;
-  getFollowing(userId: string): Observable<FollowEdge[]>;
+  /** Con size se pide una pagina (los mas recientes primero); page arranca en 0. */
+  getFollowers(userId: string, page?: number, size?: number): Observable<FollowEdge[]>;
+  getFollowing(userId: string, page?: number, size?: number): Observable<FollowEdge[]>;
 }
 
 export const FOLLOW_REPOSITORY = new InjectionToken<FollowRepository>('FollowRepository');

@@ -26,6 +26,11 @@
             Cargando...
           </div>
         } @else {
+          @if (hayMas()) {
+            <button type="button" class="load-more" (click)="cargarMas()" [disabled]="cargandoMas()">
+              {{ cargandoMas() ? 'Cargando…' : 'Cargar más' }}
+            </button>
+          }
           @for (user of filteredUsers(); track user.id) {
             <div class="user-row" (click)="goToProfile(user.id)">
               @if (user.fotoPerfilUrl) {

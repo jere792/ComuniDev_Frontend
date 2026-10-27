@@ -6,8 +6,8 @@ import { SocialComment } from '@features/shared/domain/models/social-comment.mod
 import { CommentRepository } from '@features/shared/domain/ports/comment.repository';
 
 const GET_COMMENTS = gql`
-  query GetComments($contentId: String!, $contentType: String!) {
-    comments(contentId: $contentId, contentType: $contentType) {
+  query GetComments($contentId: String!, $contentType: String!, $limit: Int) {
+    comments(contentId: $contentId, contentType: $contentType, limit: $limit) {
       id
       autorId
       contenidoId
@@ -24,8 +24,8 @@ const GET_COMMENTS = gql`
 `;
 
 const GET_REPLIES = gql`
-  query GetReplies($parentCommentId: String!) {
-    commentReplies(parentCommentId: $parentCommentId) {
+  query GetReplies($parentCommentId: String!, $limit: Int) {
+    commentReplies(parentCommentId: $parentCommentId, limit: $limit) {
       id
       autorId
       contenidoId
@@ -86,15 +86,16 @@ export class CommentGraphqlService implements CommentRepository {
   private apollo = inject(Apollo);
 
 
-  getComments(contentId: string, contentType = 'POST'): Observable<SocialComment[]> {
+  /** Ventana de comentarios (100 por defecto); el backend pagina con before/limit. */
+  getComments(contentId: string, contentType = 'POST', limit = 100): Observable<SocialComment[]> {
     return this.apollo
-      .watchQuery<any>({ query: GET_COMMENTS, variables: { contentId, contentType } })
+      .watchQuery<any>({ query: GET_COMMENTS, variables: { contentId, contentType, limit } })
       .valueChanges.pipe(map(result => result.data?.comments ?? []));
   }
 
-  getReplies(parentCommentId: string): Observable<SocialComment[]> {
+  getReplies(parentCommentId: string, limit = 100): Observable<SocialComment[]> {
     return this.apollo
-      .watchQuery<any>({ query: GET_REPLIES, variables: { parentCommentId } })
+      .watchQuery<any>({ query: GET_REPLIES, variables: { parentCommentId, limit } })
       .valueChanges.pipe(map(result => result.data?.commentReplies ?? []));
   }
 

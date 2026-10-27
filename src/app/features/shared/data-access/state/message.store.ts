@@ -14,6 +14,12 @@ export class MessageStore {
   readonly cargandoSolicitudes = signal(false);
   readonly cargandoMensajes = signal(false);
   readonly enviando = signal(false);
+  /** Todavia hay mensajes mas viejos que no se cargaron del servidor. */
+  readonly hayMasMensajes = signal(false);
+  readonly cargandoMasMensajes = signal(false);
+
+  /** Ventana que se pide al servidor al abrir un hilo y por cada "cargar mas". */
+  private static readonly TAMANO_VENTANA = 30;
 
   /** Quien está usando la pantalla; el backend no lo dice porque no hay JWT. */
   private userId: string | null = null;
@@ -71,11 +77,13 @@ export class MessageStore {
     this.userId = userId;
     this.abierta.set(conversation);
     this.mensajes.set([]);
+    this.hayMasMensajes.set(false);
     this.cargandoMensajes.set(true);
 
-    this.repository.messages(userId, conversation.id).subscribe({
+    this.repository.messages(userId, conversation.id, MessageStore.TAMANO_VENTANA).subscribe({
       next: lista => {
         this.mensajes.set(lista);
+        this.hayMasMensajes.set(lista.length >= MessageStore.TAMANO_VENTANA);
         this.cargandoMensajes.set(false);
       },
       error: () => this.cargandoMensajes.set(false),
@@ -84,6 +92,24 @@ export class MessageStore {
     if (conversation.mensajesNoLeidos) {
       this.marcarLeido(userId, conversation.id);
     }
+  }
+
+  /** Trae la ventana anterior (hacia atras en el tiempo) y la prepende al hilo. */
+  cargarMasMensajes(): void {
+    const conversation = this.abierta();
+    const userId = this.userId;
+    const masViejo = this.mensajes()[0]?.createdAt;
+    if (!conversation?.id || !userId || !masViejo || this.cargandoMasMensajes()) return;
+
+    this.cargandoMasMensajes.set(true);
+    this.repository.messages(userId, conversation.id, MessageStore.TAMANO_VENTANA, masViejo).subscribe({
+      next: lista => {
+        this.mensajes.update(actual => sinDuplicados([...lista, ...actual]));
+        this.hayMasMensajes.set(lista.length >= MessageStore.TAMANO_VENTANA);
+        this.cargandoMasMensajes.set(false);
+      },
+      error: () => this.cargandoMasMensajes.set(false),
+    });
   }
 
   /** Abre un hilo que todavía no está en la lista, para escribirle a alguien nuevo. */

@@ -1,3 +1,19 @@
+.load-more {
+  margin: 8px auto 4px;
+  padding: 6px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--on-surface-variant);
+  font-size: 13px;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
+
 .modal-overlay {
   position: fixed;
   inset: 0;

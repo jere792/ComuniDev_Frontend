@@ -25,6 +25,11 @@ export class SocialListModal implements OnInit, OnChanges {
   loading = signal(true);
   users = signal<User[]>([]);
   search = signal('');
+  /** Paginado: la primera pagina trae TAMANO y "cargar mas" sigue por page+1. */
+  readonly hayMas = signal(false);
+  readonly cargandoMas = signal(false);
+  private pagina = 0;
+  private static readonly TAMANO = 50;
 
   private userStore = inject(UserStore);
   private followService = inject(FollowStore);
@@ -78,19 +83,23 @@ export class SocialListModal implements OnInit, OnChanges {
     if (!this.userId) return;
     this.loading.set(true);
     this.users.set([]);
+    this.pagina = 0;
+    this.hayMas.set(false);
 
     if (this.type === 'followers') {
-      this.followService.getFollowers(this.userId).subscribe({
+      this.followService.getFollowers(this.userId, 0, SocialListModal.TAMANO).subscribe({
         next: (follows) => {
           const ids = follows.map(f => f.seguidorId).filter((id): id is string => Boolean(id));
+          this.hayMas.set(ids.length >= SocialListModal.TAMANO);
           this.resolveUsers(ids);
         },
         error: () => this.loading.set(false),
       });
     } else if (this.type === 'following') {
-      this.followService.getFollowing(this.userId).subscribe({
+      this.followService.getFollowing(this.userId, 0, SocialListModal.TAMANO).subscribe({
         next: (follows) => {
           const ids = follows.map(f => f.seguidoId).filter((id): id is string => Boolean(id));
+          this.hayMas.set(ids.length >= SocialListModal.TAMANO);
           this.resolveUsers(ids);
         },
         error: () => this.loading.set(false),
@@ -108,19 +117,52 @@ export class SocialListModal implements OnInit, OnChanges {
     }
   }
 
-  private resolveUsers(ids: string[]): void {
+  /** Trae la siguiente pagina y la agrega a la lista ya visible. */
+  cargarMas(): void {
+    if (!this.userId || this.cargandoMas() || !this.hayMas()) return;
+    if (this.type === 'connections') {
+      this.hayMas.set(false);
+      return;
+    }
+    this.pagina += 1;
+    this.cargandoMas.set(true);
+    const siguiente = this.type === 'followers'
+      ? this.followService.getFollowers(this.userId, this.pagina, SocialListModal.TAMANO)
+      : this.followService.getFollowing(this.userId, this.pagina, SocialListModal.TAMANO);
+    siguiente.subscribe({
+      next: (follows) => {
+        const ids = (this.type === 'followers'
+          ? follows.map(f => f.seguidorId)
+          : follows.map(f => f.seguidoId))
+          .filter((id): id is string => Boolean(id));
+        this.hayMas.set(ids.length >= SocialListModal.TAMANO);
+        this.resolveUsers(ids, true);
+      },
+      error: () => this.cargandoMas.set(false),
+    });
+  }
+
+  private resolveUsers(ids: string[], acumular = false): void {
     if (ids.length === 0) {
-      this.users.set([]);
+      if (!acumular) this.users.set([]);
       this.loading.set(false);
+      this.cargandoMas.set(false);
       return;
     }
     this.userStore.getAll().subscribe({
       next: (all: User[]) => {
         const idSet = new Set(ids);
-        this.users.set(all.filter(u => u.id && idSet.has(u.id)));
+        const encontrados = all.filter(u => u.id && idSet.has(u.id));
+        this.users.update(actual => acumular
+          ? [...actual, ...encontrados.filter(u => !actual.some(a => a.id === u.id))]
+          : encontrados);
         this.loading.set(false);
+        this.cargandoMas.set(false);
       },
-      error: () => this.loading.set(false),
+      error: () => {
+        this.loading.set(false);
+        this.cargandoMas.set(false);
+      },
     });
   }
 

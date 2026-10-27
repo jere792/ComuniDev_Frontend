@@ -18,20 +18,43 @@ export class OfferStore {
   readonly loading = signal(false);
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
+  /** Paginado de "Mis Ofertas": pagina 0 con 50 y mas al llegar al final. */
+  readonly hayMas = signal(false);
+  readonly cargandoMas = signal(false);
+  private pagina = 0;
+  private static readonly TAMANO = 50;
 
   load(recruiterId: string): void {
     this.loading.set(true);
     this.error.set(null);
+    this.pagina = 0;
+    this.hayMas.set(false);
 
-    this.repository.vacanciesByRecruiter(recruiterId).subscribe({
+    this.repository.vacanciesByRecruiter(recruiterId, 0, OfferStore.TAMANO).subscribe({
       next: offers => {
         this.offers.set(offers);
+        this.hayMas.set(offers.length >= OfferStore.TAMANO);
         this.loading.set(false);
       },
       error: () => {
         this.error.set('Error al cargar las ofertas');
         this.loading.set(false);
       },
+    });
+  }
+
+  /** Trae la siguiente pagina de ofertas y la agrega a la lista. */
+  cargarMas(recruiterId: string): void {
+    if (this.cargandoMas() || !this.hayMas()) return;
+    this.pagina += 1;
+    this.cargandoMas.set(true);
+    this.repository.vacanciesByRecruiter(recruiterId, this.pagina, OfferStore.TAMANO).subscribe({
+      next: ofertas => {
+        this.hayMas.set(ofertas.length >= OfferStore.TAMANO);
+        this.offers.update(actual => [...actual, ...ofertas]);
+        this.cargandoMas.set(false);
+      },
+      error: () => this.cargandoMas.set(false),
     });
   }
 

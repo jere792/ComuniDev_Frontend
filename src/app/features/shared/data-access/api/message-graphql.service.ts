@@ -39,8 +39,8 @@ const MESSAGE_REQUESTS = gql`
 `;
 
 const MESSAGES = gql`
-  query Messages($userId: String!, $conversationId: String!) {
-    messages(userId: $userId, conversationId: $conversationId) {
+  query Messages($userId: String!, $conversationId: String!, $before: String, $limit: Int) {
+    messages(userId: $userId, conversationId: $conversationId, before: $before, limit: $limit) {
       id
       conversationId
       emisorId
@@ -119,11 +119,12 @@ export class MessageGraphqlService implements MessageRepository {
       .pipe(map(result => (result.data?.messageRequests ?? []).map(normalizeConversation)));
   }
 
-  messages(userId: string, conversationId: string): Observable<Message[]> {
+  /** Con limit se pide una ventana de los mensajes mas recientes; before (fecha ISO del mas viejo) carga mas hacia atras. */
+  messages(userId: string, conversationId: string, limit?: number, before?: string): Observable<Message[]> {
     return this.apollo
       .query<{ messages: Array<Record<string, unknown>> | null }>({
         query: MESSAGES,
-        variables: { userId, conversationId },
+        variables: { userId, conversationId, before: before ?? null, limit: limit ?? null },
         fetchPolicy: 'network-only',
       })
       .pipe(map(result => (result.data?.messages ?? []).map(normalizeMessage)));

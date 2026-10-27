@@ -26,6 +26,14 @@ export class RecruiterOffers implements OnInit {
   readonly offers = this.store.offers;
   readonly loading = this.store.loading;
   readonly error = this.store.error;
+  readonly hayMas = this.store.hayMas;
+  readonly cargandoMas = this.store.cargandoMas;
+
+  /** Trae la siguiente pagina de ofertas. */
+  cargarMas(): void {
+    const recruiterId = this.getRecruiterId();
+    if (recruiterId) this.store.cargarMas(recruiterId);
+  }
 
   /** En móvil se llega a Candidatos desde aquí (el footer no incluye esa ruta). */
   irACandidatos(): void {

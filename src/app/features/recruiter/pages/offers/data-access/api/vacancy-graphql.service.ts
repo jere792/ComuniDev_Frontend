@@ -11,8 +11,8 @@ import { VacancyRepository } from '@features/recruiter/pages/offers/domain/ports
 import { COMPANY_REPOSITORY } from '@features/recruiter/pages/company/domain/ports/company.repository';
 
 const VACANCIES_BY_RECRUITER = gql`
-  query VacanciesByRecruiter($recruiterId: String!) {
-    vacanciesByRecruiter(recruiterId: $recruiterId) {
+  query VacanciesByRecruiter($recruiterId: String!, $page: Int, $size: Int) {
+    vacanciesByRecruiter(recruiterId: $recruiterId, page: $page, size: $size) {
       id
       companyId
       recruiterId
@@ -162,12 +162,13 @@ export class VacancyGraphqlService implements VacancyRepository {
   /** El selector de empresa vive en el módulo company; aquí solo se lee. */
   private readonly companyRepository = inject(COMPANY_REPOSITORY);
 
-  vacanciesByRecruiter(recruiterId: string): Observable<OfferItem[]> {
+  /** Con size se pide una pagina (50 por defecto en la UI); page arranca en 0. */
+  vacanciesByRecruiter(recruiterId: string, page?: number, size?: number): Observable<OfferItem[]> {
     return this.withCompany(
       this.apollo
         .query<{ vacanciesByRecruiter: Array<Record<string, unknown>> | null }>({
           query: VACANCIES_BY_RECRUITER,
-          variables: { recruiterId },
+          variables: { recruiterId, page: page ?? null, size: size ?? null },
           fetchPolicy: 'network-only',
         })
         .pipe(map(result => result.data?.vacanciesByRecruiter ?? [])),

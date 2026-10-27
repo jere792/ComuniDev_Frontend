@@ -129,6 +129,11 @@
         } @else if (mensajes().length === 0) {
           <p class="empty-chat">Envía el primer mensaje</p>
         } @else {
+          @if (hayMasMensajes()) {
+            <button type="button" class="load-more-btn" (click)="cargarMasMensajes()" [disabled]="cargandoMasMensajes()">
+              {{ cargandoMasMensajes() ? 'Cargando…' : 'Cargar mensajes anteriores' }}
+            </button>
+          }
           @for (message of mensajes(); track message.id) {
             <div class="bubble" [class.mine]="esMio(message.emisorId)">
               <p class="bubble-text">{{ message.texto }}</p>

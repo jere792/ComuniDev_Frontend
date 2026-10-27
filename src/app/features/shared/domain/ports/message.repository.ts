@@ -6,7 +6,8 @@ export interface MessageRepository {
   conversations(userId: string): Observable<MessageConversation[]>;
   /** Hilos de alguien a quien esta persona no sigue todavia: quedan ocultos hasta aceptar. */
   messageRequests(userId: string): Observable<MessageConversation[]>;
-  messages(userId: string, conversationId: string): Observable<Message[]>;
+  /** Con limit se pide una ventana (los mas recientes); before carga mas hacia atras. */
+  messages(userId: string, conversationId: string, limit?: number, before?: string): Observable<Message[]>;
   sendMessage(emisorId: string, receptorId: string, texto: string): Observable<Message | null>;
   markConversationRead(userId: string, conversationId: string): Observable<boolean>;
   /** Pasa una solicitud a conversacion normal para quien la recibio. */

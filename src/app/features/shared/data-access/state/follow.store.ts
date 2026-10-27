@@ -54,12 +54,12 @@ export class FollowStore {
     });
   }
 
-  getFollowers(userId: string): Observable<FollowEdge[]> {
-    return this.repository.getFollowers(userId);
+  getFollowers(userId: string, page?: number, size?: number): Observable<FollowEdge[]> {
+    return this.repository.getFollowers(userId, page, size);
   }
 
-  getFollowing(userId: string): Observable<FollowEdge[]> {
-    return this.repository.getFollowing(userId);
+  getFollowing(userId: string, page?: number, size?: number): Observable<FollowEdge[]> {
+    return this.repository.getFollowing(userId, page, size);
   }
 
   clear(): void {

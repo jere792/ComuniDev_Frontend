@@ -21,6 +21,11 @@
     </div>
   } @else {
     <div class="offers-list">
+      @if (hayMas()) {
+        <button type="button" class="load-more" (click)="cargarMas()" [disabled]="cargandoMas()">
+          {{ cargandoMas() ? 'Cargando…' : 'Cargar más ofertas' }}
+        </button>
+      }
       @for (offer of offers(); track offer.id) {
         <div class="offer-card">
           <div class="offer-status" [class]="estadoClass(offer)">{{ estadoLabel(offer) }}</div>

@@ -292,6 +292,22 @@
   padding: var(--space-lg);
 }
 
+.load-more-btn {
+  align-self: center;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
+
 .bubble {
   max-width: 72%;
   display: flex;

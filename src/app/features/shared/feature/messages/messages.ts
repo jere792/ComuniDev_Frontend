@@ -31,6 +31,8 @@ export class Messages implements OnInit, AfterViewChecked {
   readonly cargandoSolicitudes = this.store.cargandoSolicitudes;
   readonly cargandoMensajes = this.store.cargandoMensajes;
   readonly enviando = this.store.enviando;
+  readonly hayMasMensajes = this.store.hayMasMensajes;
+  readonly cargandoMasMensajes = this.store.cargandoMasMensajes;
 
   /** Como Instagram: la pestaña principal y la de solicitudes pendientes. */
   readonly pestana = signal<'conversaciones' | 'solicitudes'>('conversaciones');
@@ -82,6 +84,11 @@ export class Messages implements OnInit, AfterViewChecked {
 
   cambiarPestana(pestana: 'conversaciones' | 'solicitudes'): void {
     this.pestana.set(pestana);
+  }
+
+  /** Trae los mensajes mas viejos del hilo abierto (paginado hacia atras). */
+  cargarMasMensajes(): void {
+    this.store.cargarMasMensajes();
   }
 
   aceptarSolicitud(conversation: MessageConversation): void {

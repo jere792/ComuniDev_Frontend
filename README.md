@@ -85,6 +85,13 @@ To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use th
 ng test
 ```
 
+## Quality and load testing (planned)
+
+Besides unit tests (Vitest), the project will add:
+
+- **SonarQube / SonarCloud** – static code quality analysis (bugs, code smells, duplicated code) with a CI quality gate.
+- **k6** – API load and performance testing (feed, login, GraphQL); it complements the unit tests, it does not replace them.
+
 ## Running end-to-end tests
 
 For end-to-end (e2e) testing, run:

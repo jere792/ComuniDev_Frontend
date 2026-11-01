@@ -970,6 +970,59 @@
   border-top: 1px solid var(--border-subtle);
 }
 
+/* Personas etiquetadas: selector del compositor/edición y menciones del feed */
+.etiquetar-bloque {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding: var(--space-sm) var(--space-lg);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.etiquetar-titulo {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+}
+
+.etiquetar-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
+.mention-chip {
+  padding: 4px var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: transparent;
+  color: var(--on-surface-variant);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover { background: var(--surface-container); }
+
+  &.activa {
+    background: color-mix(in srgb, #7fd4ff 22%, transparent);
+    border-color: #7fd4ff;
+    color: #2a6f8f;
+  }
+}
+
+.post-mentions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  margin-top: var(--space-2xs);
+}
+
+.mention {
+  font-size: 13px;
+  font-weight: 500;
+  color: #2a8bb3;
+}
+
 .attach-btn {
   display: flex;
   align-items: center;

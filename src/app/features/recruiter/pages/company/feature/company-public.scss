@@ -212,6 +212,34 @@
   color: var(--on-surface-variant);
 }
 
+.vacancy-actions {
+  display: flex;
+  margin-top: var(--space-md);
+}
+
+.vacancy-share {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--on-surface);
+  transition: all 0.2s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  .material-symbols-outlined {
+    font-size: 18px;
+  }
+}
+
 .empty-note {
   margin: 0;
   font-size: 14px;

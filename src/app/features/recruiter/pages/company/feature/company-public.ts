@@ -11,6 +11,8 @@ import {
   VACANCY_REPOSITORY,
   VacancyRepository,
 } from '@features/recruiter/pages/offers/domain/ports/vacancy.repository';
+import { PostStore } from '@features/recruiter/pages/inicio/data-access/state/post.store';
+import { ToastService } from '@core/services/toast.service';
 import {
   CONTRATO_LABELS,
   MODALIDAD_LABELS,
@@ -31,6 +33,8 @@ export class CompanyPublic implements OnInit {
   private readonly location = inject(Location);
   private readonly companyRepository = inject<CompanyRepository>(COMPANY_REPOSITORY);
   private readonly vacancyRepository = inject<VacancyRepository>(VACANCY_REPOSITORY);
+  private readonly postStore = inject(PostStore);
+  private readonly toast = inject(ToastService);
 
   readonly company = signal<Company | null>(null);
   readonly vacancies = signal<OfferItem[]>([]);
@@ -95,6 +99,41 @@ export class CompanyPublic implements OnInit {
 
   modalidadLabel(offer: OfferItem): string {
     return MODALIDAD_LABELS[offer.modalidad ?? ''] ?? offer.modalidad ?? '';
+  }
+
+  /** true si hay sesión iniciada: sin usuario no se puede publicar en el feed. */
+  haySesion(): boolean {
+    return !!localStorage.getItem('userId');
+  }
+
+  /** Comparte la vacante en el feed como publicación con su tarjeta (tipo VACANTE). */
+  compartirEnFeed(offer: OfferItem): void {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      this.toast.error('Inicia sesión para compartir en el feed');
+      return;
+    }
+
+    this.postStore
+      .createPost(
+        userId,
+        { texto: `Les comparto esta oferta: ${offer.titulo}` },
+        undefined,
+        undefined,
+        undefined,
+        'VACANTE',
+        offer.id
+      )
+      .subscribe({
+        next: () => {
+          this.toast.success('Oferta publicada en el feed');
+          // cada rol tiene su propio feed: se abre el del usuario para que vea la publicación
+          const rol = (localStorage.getItem('role') || 'developer').toLowerCase();
+          const esReclutador = rol.includes('reclut') || rol.includes('recruit');
+          this.router.navigate([esReclutador ? '/recruiter/inicio' : '/developer/inicio']);
+        },
+        error: () => this.toast.error('No se pudo publicar en el feed'),
+      });
   }
 
   private loadVacancies(companyId: string): void {

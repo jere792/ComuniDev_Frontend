@@ -155,8 +155,8 @@ export class RecruiterReels implements OnInit {
         } else {
           this.reels.update(list => [...list, ...vms]);
         }
-        // de la pagina nueva: autores en 1 peticion, reacciones en 1 y guardados en 1
-        this.cargarAutores(data.map(r => r.autorId));
+        // de la pagina nueva: autores y etiquetados en 1 peticion, reacciones en 1 y guardados en 1
+        this.cargarAutores(data.flatMap(r => [r.autorId, ...(r.etiquetados ?? [])]));
         this.loadMyReactions(data);
         this.loadSavedState(data);
       },
@@ -175,7 +175,7 @@ export class RecruiterReels implements OnInit {
       saved: this.reelStore.guardadosCache.has(vm.reel.id),
       vistaContada: this.reelStore.vistasCache.has(vm.reel.id),
     })));
-    this.cargarAutores([...new Set(this.reels().map(vm => vm.reel.autorId))]);
+    this.cargarAutores([...new Set(this.reels().flatMap(vm => [vm.reel.autorId, ...(vm.reel.etiquetados ?? [])]))]);
   }
 
   private buildVm(reel: SocialReel): ReelVM {
@@ -240,6 +240,11 @@ export class RecruiterReels implements OnInit {
       }
       return vm;
     }));
+  }
+
+  /** Nombre de una persona etiquetado en el reel, desde la misma cache de usuarios que los autores. */
+  nombreEtiquetado(id: string): string {
+    return this.reelStore.autoresCache.get(id)?.nombre ?? '…';
   }
 
   private loadMyReactions(reels: SocialReel[]): void {
@@ -338,7 +343,7 @@ export class RecruiterReels implements OnInit {
         if (created) {
           this.reelStore.reelsCache.update(actual => [created, ...actual]);
           this.reels.update(list => [this.buildVm(created), ...list]);
-          this.cargarAutores([created.autorId]);
+          this.cargarAutores([created.autorId, ...(created.etiquetados ?? [])]);
           this.reelDescripcion = '';
           this.reelEtiquetas = [];
           this.selectedFile = null;

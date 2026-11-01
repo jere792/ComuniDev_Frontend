@@ -16,6 +16,8 @@ import { ConfirmModal } from '@shared/ui/confirm-modal/confirm-modal';
 import { VacancyGraphqlService } from '@features/recruiter/pages/offers/data-access/api/vacancy-graphql.service';
 import { OfferItem } from '@features/recruiter/pages/offers/domain/models/vacancy.model';
 import { VacanteEmbebida } from '@features/recruiter/pages/inicio/domain/models/social-post.model';
+import { ConnectionStore } from '@features/shared/data-access/state/connection.store';
+import { Connection } from '@features/shared/domain/models/connection.model';
 
 interface CommentVM {
   comment: SocialComment;
@@ -42,6 +44,8 @@ interface PostVM {
   newComment: string;
   isEditing: boolean;
   editText: string;
+  /** Personas etiquetadas que se están editando en la publicación. */
+  editEtiquetados: string[];
   showReactionsDropdown: boolean;
 }
 
@@ -67,6 +71,7 @@ export class ReportsComponent implements OnInit {
   private toast = inject(ToastService);
   private imageEditor = inject(ImageEditorService);
   private vacancyService = inject(VacancyGraphqlService);
+  private connectionStore = inject(ConnectionStore);
 
   posts = signal<PostVM[]>([]);
   composerText = '';
@@ -76,6 +81,9 @@ export class ReportsComponent implements OnInit {
   composerVacante: { id: string; titulo: string; empresa: string; modalidad: string; ubicacion: string; tecnologias: string[] } | null = null;
   showVacantePicker = signal(false);
   misVacantes = signal<OfferItem[]>([]);
+  /** Personas a las que se puede etiquetar: conexiones aceptadas del usuario. */
+  contactos = this.connectionStore.connections;
+  composerEtiquetados: string[] = [];
   loading = signal(true);
   showComposerModal = signal(false);
   showCommentsModal = signal(false);
@@ -98,6 +106,8 @@ export class ReportsComponent implements OnInit {
   reactionConfig = REACTION_CONFIG;
 
   private userCache = new Map<string, { nombre: string; avatar: string }>();
+  /** Nombres ya resueltos (id -> nombre) para las menciones; el mapa es señal para que la vista se actualice. */
+  private nombresUsuarios = signal<Record<string, string>>({});
 
   private getUserId(): string | null {
     return localStorage.getItem('userId');
@@ -120,11 +130,21 @@ export class ReportsComponent implements OnInit {
       error: () => this.misVacantes.set([])
     });
 
+    //conexiones (y sus nombres) para poder etiquetar personas en una publicación
+    this.connectionStore.getConnections(userId).subscribe({
+      next: (conexiones) => {
+        this.connectionStore.connections.set(conexiones);
+        this.cargarAutores(conexiones.map(c => c.usuarioMenorId === userId ? c.usuarioMayorId : c.usuarioMenorId));
+      },
+      error: () => this.connectionStore.connections.set([])
+    });
+
     this.postService.getFeed(userId, 0, 20).subscribe({
       next: (data: SocialPost[]) => {
         this.posts.set(data.map(p => this.buildVm(p)));
         this.loading.set(false);
-        this.cargarAutores(data.map(p => p.autorId));
+        //también se piden los nombres de las personas etiquetadas en cada publicación
+        this.cargarAutores([...data.map(p => p.autorId), ...data.flatMap(p => p.etiquetados ?? [])]);
         this.loadMyReactions(data);
         // contadores y comentarios de TODOS los posts en 2 peticiones (antes: 20 + 20)
         this.cargarConteosComentarios(data);
@@ -148,6 +168,7 @@ export class ReportsComponent implements OnInit {
       newComment: '',
       isEditing: false,
       editText: '',
+      editEtiquetados: [...(post.etiquetados ?? [])],
       showReactionsDropdown: false,
     };
   }
@@ -173,10 +194,17 @@ export class ReportsComponent implements OnInit {
     const pedidos = [...new Set(autorIds)].filter(id => !!id);
     const faltantes = pedidos.filter(id => !this.userCache.has(id));
 
-    const aplicar = () => pedidos.forEach(id => {
-      const info = this.userCache.get(id);
-      if (info) this.applyAuthor(id, info);
-    });
+    const aplicar = () => {
+      const nombres: Record<string, string> = {};
+      pedidos.forEach(id => {
+        const info = this.userCache.get(id);
+        if (info) {
+          nombres[id] = info.nombre;
+          this.applyAuthor(id, info);
+        }
+      });
+      this.nombresUsuarios.update(previos => ({ ...previos, ...nombres }));
+    };
 
     if (faltantes.length === 0) {
       aplicar();
@@ -324,15 +352,25 @@ export class ReportsComponent implements OnInit {
     if (this.composerImage) contenido.imagenes = [this.composerImage];
 
     this.postService
-      .createPost(userId, contenido, undefined, undefined, undefined, vacante ? 'VACANTE' : undefined, vacante?.id)
+      .createPost(
+        userId,
+        contenido,
+        undefined,
+        undefined,
+        undefined,
+        vacante ? 'VACANTE' : undefined,
+        vacante?.id,
+        this.composerEtiquetados
+      )
       .subscribe({
         next: (created: SocialPost) => {
           if (created) {
             this.posts.update(list => [this.buildVm(created), ...list]);
-            this.cargarAutores([created.autorId]);
+            this.cargarAutores([created.autorId, ...(created.etiquetados ?? [])]);
             this.composerText = '';
             this.composerImage = null;
             this.composerVacante = null;
+            this.composerEtiquetados = [];
             this.showComposerModal.set(false);
             this.toast.success(vacante ? 'Oferta publicada en el feed' : 'Publicación creada');
           }
@@ -346,7 +384,36 @@ export class ReportsComponent implements OnInit {
     this.composerText = '';
     this.composerImage = null;
     this.composerVacante = null;
+    this.composerEtiquetados = [];
     this.showVacantePicker.set(false);
+  }
+
+  // ─── Etiquetados ───
+
+  /** Nombre con el que se muestra una mención en el feed. */
+  nombreEtiquetado(id: string): string {
+    return this.nombresUsuarios()[id] ?? '';
+  }
+
+  /** Id de la otra persona en una conexión (la conexión guarda las dos partes). */
+  otroDeConexion(conn: Connection): string {
+    const yo = this.getUserId() ?? '';
+    return conn.usuarioMenorId === yo ? conn.usuarioMayorId : conn.usuarioMenorId;
+  }
+
+  /** Marca o desmarca a alguien en el compositor (máximo 10, igual que el servidor). */
+  toggleEtiquetadoEnComposer(id: string): void {
+    this.composerEtiquetados = this.alternarEtiquetado(this.composerEtiquetados, id);
+  }
+
+  /** Marca o desmarca a alguien al editar una publicación. */
+  toggleEtiquetadoEnEdicion(vm: PostVM, id: string): void {
+    vm.editEtiquetados = this.alternarEtiquetado(vm.editEtiquetados, id);
+  }
+
+  private alternarEtiquetado(lista: string[], id: string): string[] {
+    if (lista.includes(id)) return lista.filter(otro => otro !== id);
+    return lista.length >= 10 ? lista : [...lista, id];
   }
 
   // ─── Post Reacciones ───
@@ -905,17 +972,26 @@ export class ReportsComponent implements OnInit {
   startEdit(vm: PostVM): void {
     vm.isEditing = true;
     vm.editText = vm.post.contenido?.texto ?? '';
+    vm.editEtiquetados = [...(vm.post.etiquetados ?? [])];
   }
 
   saveEdit(vm: PostVM): void {
-    this.postService.updatePost(vm.post.id, { contenido: { texto: vm.editText.trim() } }).subscribe({
+    this.postService.updatePost(vm.post.id, {
+      contenido: { texto: vm.editText.trim() },
+      etiquetados: vm.editEtiquetados
+    }).subscribe({
       next: (updated: any) => {
         if (updated) {
           this.posts.update(list => list.map(v => v.post.id === vm.post.id ? {
             ...v,
             isEditing: false,
-            post: { ...v.post, contenido: { ...v.post.contenido, texto: vm.editText.trim() } }
+            post: {
+              ...v.post,
+              contenido: { ...v.post.contenido, texto: vm.editText.trim() },
+              etiquetados: [...vm.editEtiquetados]
+            }
           } : v));
+          this.cargarAutores(vm.editEtiquetados);
           this.toast.success('Publicación actualizada');
         }
       },

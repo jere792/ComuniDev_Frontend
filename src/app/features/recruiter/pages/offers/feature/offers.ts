@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { PostStore } from '@features/recruiter/pages/inicio/data-access/state/post.store';
 import { OfferStore } from '@features/recruiter/pages/offers/data-access/state/offer.store';
 import { OfferItem } from '@features/recruiter/pages/offers/domain/models/vacancy.model';
 import { ToastService } from '@core/services/toast.service';
@@ -20,6 +21,7 @@ import {
 })
 export class RecruiterOffers implements OnInit {
   private readonly store = inject(OfferStore);
+  private readonly postStore = inject(PostStore);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
 
@@ -68,6 +70,31 @@ export class RecruiterOffers implements OnInit {
       next: () => this.toast.success(next === 'CERRADA' ? 'Oferta cerrada' : 'Oferta reactivada'),
       error: () => this.toast.error('No se pudo cambiar el estado'),
     });
+  }
+
+  /** Comparte la oferta en el feed como publicación con su tarjeta (tipo VACANTE). */
+  compartirEnFeed(offer: OfferItem): void {
+    const recruiterId = this.getRecruiterId();
+    if (!recruiterId) return;
+
+    this.postStore
+      .createPost(
+        recruiterId,
+        { texto: `Estamos contratando: ${offer.titulo}` },
+        undefined,
+        undefined,
+        undefined,
+        'VACANTE',
+        offer.id
+      )
+      .subscribe({
+        next: () => {
+          this.toast.success('Oferta publicada en el feed');
+          // el feed se recarga al entrar, así que se muestra la publicación recién creada
+          this.router.navigate(['/recruiter/inicio']);
+        },
+        error: () => this.toast.error('No se pudo publicar en el feed'),
+      });
   }
 
   // -------------------------------------------------------------- formato

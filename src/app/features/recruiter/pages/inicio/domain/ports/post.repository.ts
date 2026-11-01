@@ -13,7 +13,9 @@ export interface PostRepository {
     visibilidad?: string,
     /** 'VACANTE' para destacar una oferta; viaja con vacanteId. */
     tipo?: string,
-    vacanteId?: string
+    vacanteId?: string,
+    /** Personas etiquetadas (ids): solo conexiones o gente a la que se sigue. */
+    etiquetados?: string[]
   ): Observable<SocialPost>;
   updatePost(id: string, data: any): Observable<SocialPost>;
   deletePost(id: string): Observable<boolean>;

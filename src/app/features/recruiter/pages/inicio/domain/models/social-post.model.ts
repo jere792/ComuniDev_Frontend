@@ -14,14 +14,15 @@ export interface VacanteEmbebida {
 }
 
 export interface SocialPost {
-  id: string;
-  autorId: string;
+  id: string;  autorId: string;
   tipo: string;
   /** Vacante dentro de la publicación; solo existe cuando tipo === 'VACANTE'. */
   vacanteId?: string | null;
   vacante?: VacanteEmbebida | null;
   contenido?: { texto?: string; imagenes?: string[] };
   etiquetas?: string[];
+  /** Personas etiquetadas en la publicación (ids de usuario). */
+  etiquetados?: string[];
   categoria?: string;
   visibilidad?: string;
   estadoModeracion?: string;

@@ -14,6 +14,7 @@ const GET_REELS = gql`
       portadaUrl
       descripcion
       etiquetas
+      etiquetados
       musica { titulo artista }
       duracionSegundos
       visibilidad
@@ -33,6 +34,7 @@ const GET_REELS_BY_USER = gql`
       portadaUrl
       descripcion
       etiquetas
+      etiquetados
       musica { titulo artista }
       duracionSegundos
       visibilidad
@@ -52,6 +54,7 @@ const CREATE_REEL = gql`
       portadaUrl
       descripcion
       etiquetas
+      etiquetados
       musica { titulo artista }
       duracionSegundos
       visibilidad
@@ -68,6 +71,7 @@ const UPDATE_REEL = gql`
       id
       descripcion
       etiquetas
+      etiquetados
       visibilidad
     }
   }
@@ -88,6 +92,7 @@ const GET_SAVED_REELS = gql`
       portadaUrl
       descripcion
       etiquetas
+      etiquetados
       musica { titulo artista }
       duracionSegundos
       visibilidad

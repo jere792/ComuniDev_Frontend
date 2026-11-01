@@ -98,6 +98,10 @@
           </div>
 
           <div class="offer-actions">
+            <button class="btn btn-outline" (click)="compartirEnFeed(offer)">
+              <span class="material-symbols-outlined">share</span>
+              Compartir en el feed
+            </button>
             <button class="btn btn-outline" (click)="toggleEstado(offer)">
               {{ offer.estado === 'ACTIVA' ? 'Cerrar oferta' : 'Reabrir oferta' }}
             </button>

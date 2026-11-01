@@ -145,6 +145,15 @@
                   }
                 </div>
               }
+
+              @if (haySesion()) {
+                <div class="vacancy-actions">
+                  <button class="vacancy-share" type="button" (click)="compartirEnFeed(offer)">
+                    <span class="material-symbols-outlined">share</span>
+                    Compartir en el feed
+                  </button>
+                </div>
+              }
             </div>
           }
         </div>

@@ -770,6 +770,20 @@
   flex-wrap: wrap;
 }
 
+.reel-mentions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.mention {
+  font-size: 13px;
+  /* celeste fijo: como .tag, se dibuja sobre el degradado oscuro del video */
+  color: #7fd4ff;
+  font-weight: 600;
+}
+
 .tag {
   font-size: 12px;
   /* blanco fijo: el tag se dibuja sobre el degradado oscuro del video,

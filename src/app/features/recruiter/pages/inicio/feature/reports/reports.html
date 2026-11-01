@@ -65,6 +65,25 @@
           </div>
         }
 
+        <!-- A quién se etiqueta en la publicación: solo conexiones, igual que el servidor -->
+        @if (contactos().length > 0) {
+          <div class="etiquetar-bloque">
+            <span class="etiquetar-titulo">Etiquetar amigos ({{ composerEtiquetados.length }}/10)</span>
+            <div class="etiquetar-chips">
+              @for (c of contactos(); track c.id) {
+                <button
+                  type="button"
+                  class="mention-chip"
+                  [class.activa]="composerEtiquetados.includes(otroDeConexion(c))"
+                  (click)="toggleEtiquetadoEnComposer(otroDeConexion(c))"
+                >
+                  {{ nombreEtiquetado(otroDeConexion(c)) || 'Usuario' }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+
         <div class="composer-footer">
           <label class="attach-btn">
             <span class="material-symbols-outlined">image</span>
@@ -131,6 +150,20 @@
           @if (vm.isEditing) {
             <div class="edit-mode">
               <textarea [(ngModel)]="vm.editText" class="edit-textarea" rows="3"></textarea>
+              @if (contactos().length > 0) {
+                <div class="etiquetar-chips">
+                  @for (c of contactos(); track c.id) {
+                    <button
+                      type="button"
+                      class="mention-chip"
+                      [class.activa]="vm.editEtiquetados.includes(otroDeConexion(c))"
+                      (click)="toggleEtiquetadoEnEdicion(vm, otroDeConexion(c))"
+                    >
+                      {{ nombreEtiquetado(otroDeConexion(c)) || 'Usuario' }}
+                    </button>
+                  }
+                </div>
+              }
               <div class="edit-actions">
                 <button class="btn btn-outline" (click)="cancelEdit(vm)">Cancelar</button>
                 <button class="btn btn-primary" (click)="saveEdit(vm)">Guardar</button>
@@ -139,6 +172,16 @@
           } @else {
             @if (vm.post.contenido?.texto) {
               <p class="content-text">{{ vm.post.contenido?.texto }}</p>
+            }
+            <!-- Personas etiquetadas, como mención -->
+            @if (vm.post.etiquetados?.length) {
+              <div class="post-mentions">
+                @for (id of vm.post.etiquetados; track id) {
+                  @if (nombreEtiquetado(id)) {
+                    <span class="mention">@{{ nombreEtiquetado(id) }}</span>
+                  }
+                }
+              </div>
             }
           }
         </div>

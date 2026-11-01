@@ -115,6 +115,13 @@
             }
           </div>
           <p class="reel-description">{{ reels()[currentIndex].reel.descripcion }}</p>
+          @if (reels()[currentIndex].reel.etiquetados?.length) {
+            <div class="reel-mentions">
+              @for (id of reels()[currentIndex].reel.etiquetados; track id) {
+                <span class="mention">@{{ nombreEtiquetado(id) }}</span>
+              }
+            </div>
+          }
           @if (reels()[currentIndex].reel.etiquetas?.length) {
             <div class="reel-tags">
               @for (tag of reels()[currentIndex].reel.etiquetas; track tag) {

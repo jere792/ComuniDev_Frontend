@@ -26,6 +26,7 @@ const GET_FEED = gql`
       }
       contenido { texto imagenes videos archivos bloquesCodigo enlaces }
       etiquetas
+      etiquetados
       categoria
       visibilidad
       estadoModeracion
@@ -44,6 +45,7 @@ const GET_POSTS = gql`
       tipo
       contenido { texto imagenes videos archivos bloquesCodigo enlaces }
       etiquetas
+      etiquetados
       categoria
       visibilidad
       estadoModeracion
@@ -59,6 +61,7 @@ const CREATE_POST = gql`
     $autorId: String!
     $contenido: PostContenidoInput
     $etiquetas: [String]
+    $etiquetados: [String]
     $categoria: String
     $visibilidad: String
     $tipo: String
@@ -68,6 +71,7 @@ const CREATE_POST = gql`
       autorId: $autorId
       contenido: $contenido
       etiquetas: $etiquetas
+      etiquetados: $etiquetados
       categoria: $categoria
       visibilidad: $visibilidad
       tipo: $tipo
@@ -101,12 +105,13 @@ const CREATE_POST = gql`
 `;
 
 const UPDATE_POST = gql`
-  mutation UpdatePost($id: ID!, $contenido: PostContenidoInput, $etiquetas: [String], $categoria: String, $visibilidad: String) {
-    updatePost(id: $id, contenido: $contenido, etiquetas: $etiquetas, categoria: $categoria, visibilidad: $visibilidad) {
+  mutation UpdatePost($id: ID!, $contenido: PostContenidoInput, $etiquetas: [String], $etiquetados: [String], $categoria: String, $visibilidad: String) {
+    updatePost(id: $id, contenido: $contenido, etiquetas: $etiquetas, etiquetados: $etiquetados, categoria: $categoria, visibilidad: $visibilidad) {
       id
       autorId
       contenido { texto imagenes }
       etiquetas
+      etiquetados
       categoria
       visibilidad
       updatedAt
@@ -144,12 +149,13 @@ export class PostGraphqlService implements PostRepository {
     categoria?: string,
     visibilidad?: string,
     tipo?: string,
-    vacanteId?: string
+    vacanteId?: string,
+    etiquetados?: string[]
   ): Observable<SocialPost> {
     return this.apollo
       .mutate<any>({
         mutation: CREATE_POST,
-        variables: { autorId, contenido, etiquetas, categoria, visibilidad, tipo, vacanteId }
+        variables: { autorId, contenido, etiquetas, etiquetados, categoria, visibilidad, tipo, vacanteId }
       })
       .pipe(map(result => result.data?.createPost));
   }

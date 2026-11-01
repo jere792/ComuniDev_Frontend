@@ -49,6 +49,20 @@ interface PostVM {
   showReactionsDropdown: boolean;
 }
 
+/** Persona sugerida en el desplegable que aparece al escribir "@". */
+interface PersonaMencion {
+  id: string;
+  nombre: string;
+  usuario: string;
+  avatar: string;
+  iniciales: string;
+}
+
+/** Mención que se está escribiendo: "@" + lo tecleado, al final del texto hasta el cursor. */
+const MENCION_AL_FINAL = /(^|\s)@([\p{L}\p{N}._-]*)$/u;
+/** Mención ya escrita en el texto, para pintarla como enlace. */
+const MENCION_EN_TEXTO = /@[\p{L}\p{N}._-]+/gu;
+
 const REACTION_CONFIG: Record<TipoReaccion, { icon: string; label: string; color: string; emoji: string }> = {
   LIKE: { icon: 'thumb_up', label: 'Me gusta', color: '#1877F2', emoji: '👍' },
   LOVE: { icon: 'favorite', label: 'Me encanta', color: '#F33E58', emoji: '❤️' },
@@ -84,6 +98,11 @@ export class ReportsComponent implements OnInit {
   /** Personas a las que se puede etiquetar: conexiones aceptadas del usuario. */
   contactos = this.connectionStore.connections;
   composerEtiquetados: string[] = [];
+  /** Desplegable de menciones abierto: el compositor o la publicación que se está editando. */
+  mencionAbierta: 'composer' | PostVM | null = null;
+  /** Lo que se lleva escrito después del "@" y dónde quedó el cursor para reemplazarlo. */
+  mencionConsulta = '';
+  private mencionCaret = 0;
   loading = signal(true);
   showComposerModal = signal(false);
   showCommentsModal = signal(false);
@@ -105,9 +124,9 @@ export class ReportsComponent implements OnInit {
   reactionTypes: TipoReaccion[] = ['LIKE', 'LOVE', 'CELEBRATE', 'SUPPORT'];
   reactionConfig = REACTION_CONFIG;
 
-  private userCache = new Map<string, { nombre: string; avatar: string }>();
-  /** Nombres ya resueltos (id -> nombre) para las menciones; el mapa es señal para que la vista se actualice. */
-  private nombresUsuarios = signal<Record<string, string>>({});
+  private userCache = new Map<string, { nombre: string; usuario: string; avatar: string }>();
+  /** Personas ya resueltas (id -> datos) para el desplegable de menciones; es señal para que la vista se actualice. */
+  private personasCache = signal<Record<string, { nombre: string; usuario: string; avatar: string }>>({});
 
   private getUserId(): string | null {
     return localStorage.getItem('userId');
@@ -195,15 +214,15 @@ export class ReportsComponent implements OnInit {
     const faltantes = pedidos.filter(id => !this.userCache.has(id));
 
     const aplicar = () => {
-      const nombres: Record<string, string> = {};
+      const personas: Record<string, { nombre: string; usuario: string; avatar: string }> = {};
       pedidos.forEach(id => {
         const info = this.userCache.get(id);
         if (info) {
-          nombres[id] = info.nombre;
+          personas[id] = info;
           this.applyAuthor(id, info);
         }
       });
-      this.nombresUsuarios.update(previos => ({ ...previos, ...nombres }));
+      this.personasCache.update(previas => ({ ...previas, ...personas }));
     };
 
     if (faltantes.length === 0) {
@@ -214,7 +233,13 @@ export class ReportsComponent implements OnInit {
     this.userStore.getByIds(faltantes).subscribe({
       next: (usuarios: any[]) => {
         usuarios.forEach(u => {
-          if (u?.id) this.userCache.set(u.id, { nombre: u.nombre ?? 'Usuario', avatar: u.fotoPerfilUrl ?? '' });
+          if (u?.id) {
+            this.userCache.set(u.id, {
+              nombre: u.nombre ?? 'Usuario',
+              usuario: u.nombreUsuario ?? '',
+              avatar: u.fotoPerfilUrl ?? ''
+            });
+          }
         });
         aplicar();
       },
@@ -222,7 +247,7 @@ export class ReportsComponent implements OnInit {
     });
   }
 
-  private applyAuthor(autorId: string, info: { nombre: string; avatar: string }): void {
+  private applyAuthor(autorId: string, info: { nombre: string; usuario: string; avatar: string }): void {
     this.posts.update(list => list.map(vm => {
       if (vm.post.autorId === autorId) {
         return { ...vm, autorNombre: info.nombre, autorAvatar: info.avatar };
@@ -388,12 +413,7 @@ export class ReportsComponent implements OnInit {
     this.showVacantePicker.set(false);
   }
 
-  // ─── Etiquetados ───
-
-  /** Nombre con el que se muestra una mención en el feed. */
-  nombreEtiquetado(id: string): string {
-    return this.nombresUsuarios()[id] ?? '';
-  }
+  // ─── Menciones (@usuario) ───
 
   /** Id de la otra persona en una conexión (la conexión guarda las dos partes). */
   otroDeConexion(conn: Connection): string {
@@ -401,19 +421,116 @@ export class ReportsComponent implements OnInit {
     return conn.usuarioMenorId === yo ? conn.usuarioMayorId : conn.usuarioMenorId;
   }
 
-  /** Marca o desmarca a alguien en el compositor (máximo 10, igual que el servidor). */
-  toggleEtiquetadoEnComposer(id: string): void {
-    this.composerEtiquetados = this.alternarEtiquetado(this.composerEtiquetados, id);
+  /** Detecta un "@" al escribir y abre el desplegable con las conexiones que coinciden. */
+  onComposerInput(event: Event): void {
+    const campo = event.target as HTMLTextAreaElement;
+    this.composerText = campo.value;
+    this.detectarMencion(campo.value, campo.selectionStart, 'composer');
   }
 
-  /** Marca o desmarca a alguien al editar una publicación. */
-  toggleEtiquetadoEnEdicion(vm: PostVM, id: string): void {
-    vm.editEtiquetados = this.alternarEtiquetado(vm.editEtiquetados, id);
+  onEditInput(vm: PostVM, event: Event): void {
+    const campo = event.target as HTMLTextAreaElement;
+    vm.editText = campo.value;
+    this.detectarMencion(campo.value, campo.selectionStart, vm);
   }
 
-  private alternarEtiquetado(lista: string[], id: string): string[] {
-    if (lista.includes(id)) return lista.filter(otro => otro !== id);
-    return lista.length >= 10 ? lista : [...lista, id];
+  /** Conexiones sugeridas para la mención que se está escribiendo. */
+  sugerenciasMencion(): PersonaMencion[] {
+    if (!this.mencionAbierta) return [];
+    const consulta = this.sinAcentos(this.mencionConsulta);
+    const etiquetados = this.mencionAbierta === 'composer'
+      ? this.composerEtiquetados
+      : this.mencionAbierta.editEtiquetados;
+    const cache = this.personasCache();
+    return this.contactos()
+      .map(c => this.otroDeConexion(c))
+      .filter(id => !etiquetados.includes(id))
+      .map(id => {
+        const datos = cache[id];
+        const nombre = datos?.nombre ?? 'Usuario';
+        const usuario = datos?.usuario || this.usuarioDe(nombre);
+        return { id, nombre, usuario, avatar: datos?.avatar ?? '', iniciales: this.iniciales(nombre) };
+      })
+      .filter(p => !consulta || this.sinAcentos(p.nombre).includes(consulta) || this.sinAcentos(p.usuario).includes(consulta))
+      .slice(0, 8);
+  }
+
+  /** Escribe "@usuario" en el texto y guarda el id para que le llegue la notificación. */
+  elegirMencion(persona: PersonaMencion): void {
+    const destino = this.mencionAbierta;
+    if (!destino) return;
+    const texto = destino === 'composer' ? this.composerText : destino.editText;
+    const antes = texto
+      .slice(0, this.mencionCaret)
+      .replace(MENCION_AL_FINAL, (_todo: string, espacio: string) => `${espacio}@${persona.usuario} `);
+    const nuevo = `${antes}${texto.slice(this.mencionCaret)}`;
+    const etiquetados = destino === 'composer' ? this.composerEtiquetados : destino.editEtiquetados;
+
+    if (destino === 'composer') this.composerText = nuevo;
+    else destino.editText = nuevo;
+    if (!etiquetados.includes(persona.id) && etiquetados.length < 10) {
+      if (destino === 'composer') this.composerEtiquetados = [...etiquetados, persona.id];
+      else destino.editEtiquetados = [...etiquetados, persona.id];
+    }
+    this.cerrarMenciones();
+  }
+
+  cerrarMenciones(): void {
+    this.mencionAbierta = null;
+    this.mencionConsulta = '';
+  }
+
+  /** Parte el texto para pintar las menciones en azul, como en Instagram. */
+  trozosTexto(texto: string): { texto: string; mencion: boolean }[] {
+    const trozos: { texto: string; mencion: boolean }[] = [];
+    let ultimo = 0;
+    for (const m of texto.matchAll(MENCION_EN_TEXTO)) {
+      const inicio = m.index ?? 0;
+      if (inicio > ultimo) trozos.push({ texto: texto.slice(ultimo, inicio), mencion: false });
+      trozos.push({ texto: m[0], mencion: true });
+      ultimo = inicio + m[0].length;
+    }
+    if (ultimo < texto.length) trozos.push({ texto: texto.slice(ultimo), mencion: false });
+    return trozos;
+  }
+
+  private detectarMencion(texto: string, caret: number, destino: 'composer' | PostVM): void {
+    //si se borra la mención del texto, deja de estar etiquetada
+    this.purgarEtiquetados(texto, destino);
+    const coincidencia = MENCION_AL_FINAL.exec(texto.slice(0, caret));
+    if (!coincidencia) {
+      this.cerrarMenciones();
+      return;
+    }
+    this.mencionAbierta = destino;
+    this.mencionConsulta = coincidencia[2];
+    this.mencionCaret = caret;
+  }
+
+  /** Quita las etiquetas cuyo "@usuario" ya no está en el texto. */
+  private purgarEtiquetados(texto: string, destino: 'composer' | PostVM): void {
+    const etiquetados = destino === 'composer' ? this.composerEtiquetados : destino.editEtiquetados;
+    const vigentes = etiquetados.filter(id => {
+      const datos = this.personasCache()[id];
+      const usuario = datos?.usuario || this.usuarioDe(datos?.nombre ?? '');
+      return !!usuario && texto.includes(`@${usuario}`);
+    });
+    if (vigentes.length === etiquetados.length) return;
+    if (destino === 'composer') this.composerEtiquetados = vigentes;
+    else destino.editEtiquetados = vigentes;
+  }
+
+  /** "@" + usuario (sin espacios) que se escribe en la mención. */
+  private usuarioDe(nombre: string): string {
+    return nombre.replace(/\s+/g, '').toLowerCase();
+  }
+
+  private iniciales(nombre: string): string {
+    return nombre.split(/\s+/).filter(Boolean).slice(0, 2).map(parte => parte[0]).join('').toUpperCase();
+  }
+
+  private sinAcentos(texto: string): string {
+    return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   }
 
   // ─── Post Reacciones ───
@@ -706,7 +823,13 @@ export class ReportsComponent implements OnInit {
     this.userStore.getByIds(faltantes).subscribe({
       next: (usuarios: any[]) => {
         usuarios.forEach(u => {
-          if (u?.id) this.userCache.set(u.id, { nombre: u.nombre ?? 'Usuario', avatar: u.fotoPerfilUrl ?? '' });
+          if (u?.id) {
+            this.userCache.set(u.id, {
+              nombre: u.nombre ?? 'Usuario',
+              usuario: u.nombreUsuario ?? '',
+              avatar: u.fotoPerfilUrl ?? ''
+            });
+          }
         });
         aplicar();
       },
@@ -756,7 +879,13 @@ export class ReportsComponent implements OnInit {
     this.userStore.getByIds(faltantes).subscribe({
       next: (usuarios: any[]) => {
         usuarios.forEach(u => {
-          if (u?.id) this.userCache.set(u.id, { nombre: u.nombre ?? 'Usuario', avatar: u.fotoPerfilUrl ?? '' });
+          if (u?.id) {
+            this.userCache.set(u.id, {
+              nombre: u.nombre ?? 'Usuario',
+              usuario: u.nombreUsuario ?? '',
+              avatar: u.fotoPerfilUrl ?? ''
+            });
+          }
         });
         aplicar();
       },

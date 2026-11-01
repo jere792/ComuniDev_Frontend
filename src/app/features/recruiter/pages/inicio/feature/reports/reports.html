@@ -20,13 +20,33 @@
             <span class="material-symbols-outlined">close</span>
           </button>
         </div>
-        <textarea
-          class="composer-textarea"
-          [(ngModel)]="composerText"
-          placeholder="¿Qué quieres compartir con la comunidad?"
-          rows="4"
-          autofocus
-        ></textarea>
+        <div class="composer-input">
+          <textarea
+            class="composer-textarea"
+            [(ngModel)]="composerText"
+            (input)="onComposerInput($event)"
+            placeholder="¿Qué quieres compartir con la comunidad? Escribe @ para etiquetar a alguien"
+            rows="4"
+            autofocus
+          ></textarea>
+          @if (mencionAbierta === 'composer' && sugerenciasMencion().length > 0) {
+            <div class="mencion-lista">
+              @for (persona of sugerenciasMencion(); track persona.id) {
+                <button type="button" class="mencion-item" (click)="elegirMencion(persona)">
+                  @if (persona.avatar) {
+                    <img [src]="persona.avatar" alt="" class="mencion-avatar" />
+                  } @else {
+                    <span class="mencion-avatar mencion-iniciales">{{ persona.iniciales }}</span>
+                  }
+                  <span class="mencion-datos">
+                    <span class="mencion-nombre">{{ persona.nombre }}</span>
+                    <span class="mencion-usuario">&#64;{{ persona.usuario }}</span>
+                  </span>
+                </button>
+              }
+            </div>
+          }
+        </div>
         @if (composerImage) {
           <div class="composer-image-preview">
             <img [src]="composerImage" alt="Vista previa" />
@@ -65,23 +85,9 @@
           </div>
         }
 
-        <!-- A quién se etiqueta en la publicación: solo conexiones, igual que el servidor -->
-        @if (contactos().length > 0) {
-          <div class="etiquetar-bloque">
-            <span class="etiquetar-titulo">Etiquetar amigos ({{ composerEtiquetados.length }}/10)</span>
-            <div class="etiquetar-chips">
-              @for (c of contactos(); track c.id) {
-                <button
-                  type="button"
-                  class="mention-chip"
-                  [class.activa]="composerEtiquetados.includes(otroDeConexion(c))"
-                  (click)="toggleEtiquetadoEnComposer(otroDeConexion(c))"
-                >
-                  {{ nombreEtiquetado(otroDeConexion(c)) || 'Usuario' }}
-                </button>
-              }
-            </div>
-          </div>
+        <!-- A quién se etiqueta: se escribe "@" en el texto y se elige del desplegable -->
+        @if (mencionAbierta === 'composer' && sugerenciasMencion().length === 0 && mencionConsulta.length > 0) {
+          <div class="mencion-vacio">No hay conexiones que coincidan con &#64;{{ mencionConsulta }}</div>
         }
 
         <div class="composer-footer">
@@ -149,21 +155,32 @@
         <div class="report-content">
           @if (vm.isEditing) {
             <div class="edit-mode">
-              <textarea [(ngModel)]="vm.editText" class="edit-textarea" rows="3"></textarea>
-              @if (contactos().length > 0) {
-                <div class="etiquetar-chips">
-                  @for (c of contactos(); track c.id) {
-                    <button
-                      type="button"
-                      class="mention-chip"
-                      [class.activa]="vm.editEtiquetados.includes(otroDeConexion(c))"
-                      (click)="toggleEtiquetadoEnEdicion(vm, otroDeConexion(c))"
-                    >
-                      {{ nombreEtiquetado(otroDeConexion(c)) || 'Usuario' }}
-                    </button>
-                  }
-                </div>
-              }
+              <div class="composer-input">
+                <textarea
+                  [(ngModel)]="vm.editText"
+                  (input)="onEditInput(vm, $event)"
+                  class="edit-textarea"
+                  placeholder="Escribe @ para etiquetar a alguien"
+                  rows="3"
+                ></textarea>
+                @if (mencionAbierta === vm && sugerenciasMencion().length > 0) {
+                  <div class="mencion-lista">
+                    @for (persona of sugerenciasMencion(); track persona.id) {
+                      <button type="button" class="mencion-item" (click)="elegirMencion(persona)">
+                        @if (persona.avatar) {
+                          <img [src]="persona.avatar" alt="" class="mencion-avatar" />
+                        } @else {
+                          <span class="mencion-avatar mencion-iniciales">{{ persona.iniciales }}</span>
+                        }
+                        <span class="mencion-datos">
+                          <span class="mencion-nombre">{{ persona.nombre }}</span>
+                          <span class="mencion-usuario">&#64;{{ persona.usuario }}</span>
+                        </span>
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
               <div class="edit-actions">
                 <button class="btn btn-outline" (click)="cancelEdit(vm)">Cancelar</button>
                 <button class="btn btn-primary" (click)="saveEdit(vm)">Guardar</button>
@@ -171,17 +188,15 @@
             </div>
           } @else {
             @if (vm.post.contenido?.texto) {
-              <p class="content-text">{{ vm.post.contenido?.texto }}</p>
-            }
-            <!-- Personas etiquetadas, como mención -->
-            @if (vm.post.etiquetados?.length) {
-              <div class="post-mentions">
-                @for (id of vm.post.etiquetados; track id) {
-                  @if (nombreEtiquetado(id)) {
-                    <span class="mention">@{{ nombreEtiquetado(id) }}</span>
+              <p class="content-text">
+                @for (trozo of trozosTexto(vm.post.contenido?.texto ?? ''); track $index) {
+                  @if (trozo.mencion) {
+                    <span class="mention">{{ trozo.texto }}</span>
+                  } @else {
+                    <span>{{ trozo.texto }}</span>
                   }
                 }
-              </div>
+              </p>
             }
           }
         </div>

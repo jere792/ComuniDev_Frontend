@@ -15,6 +15,8 @@ import { UploadService } from '@core/services/upload.service';
 import { TagInputComponent } from '@shared/ui/tag-input/tag-input';
 import { ConfirmModal } from '@shared/ui/confirm-modal/confirm-modal';
 import { ReportModal, ReportPayload } from '@shared/ui/report-modal/report-modal';
+import { ConnectionStore } from '@features/shared/data-access/state/connection.store';
+import { Connection } from '@features/shared/domain/models/connection.model';
 
 interface ReelVM {
   reel: SocialReel;
@@ -44,6 +46,21 @@ interface ReelCommentVM {
   showReplyInput: boolean;
 }
 
+/** Persona sugerida en el desplegable de menciones al escribir "@". */
+interface PersonaMencion {
+  id: string;
+  nombre: string;
+  usuario: string;
+  avatar: string;
+  iniciales: string;
+}
+
+/** Mención que se está escribiendo: el "@" con lo que se lleva escrito hasta el cursor. */
+const MENCION_AL_FINAL = /(^|\s)@([\p{L}\p{N}._-]*)$/u;
+
+/** Mención ya escrita en el texto, para pintarla en azul. */
+const MENCION_EN_TEXTO = /@[\p{L}\p{N}._-]+/gu;
+
 @Component({
   selector: 'app-recruiter-reels',
   imports: [FormsModule, DatePipe, ConfirmModal, ReportModal, TagInputComponent],
@@ -58,6 +75,7 @@ export class RecruiterReels implements OnInit {
   private commentService = inject(CommentStore);
   private userStore = inject(UserStore);
   private uploadService = inject(UploadService);
+  private connectionStore = inject(ConnectionStore);
   private router = inject(Router);
   private toast = inject(ToastService);
   private reportService = inject(ReportService);
@@ -96,6 +114,17 @@ export class RecruiterReels implements OnInit {
   uploading = false;
   uploadProgress = '';
 
+  /** Personas a las que se puede etiquetar: conexiones aceptadas del usuario. */
+  contactos = this.connectionStore.connections;
+  /** Ids de las personas mencionadas con @usuario en la descripción del reel que se está creando. */
+  composerEtiquetados: string[] = [];
+  /** Desplegable de menciones abierto mientras se escribe "@" en la descripción. */
+  mencionAbierta = false;
+  mencionConsulta = '';
+  private mencionCaret = 0;
+  /** id -> datos de las conexiones, para el desplegable de menciones. */
+  private personas = signal<Record<string, { nombre: string; usuario: string; avatar: string }>>({});
+
   /** Nombre y foto del usuario logueado, para firmar sus comentarios sin inventarlos. */
   private myName = 'Tú';
   private myAvatar = '';
@@ -107,6 +136,17 @@ export class RecruiterReels implements OnInit {
   ngOnInit(): void {
     const me = this.getUserId();
     if (me) this.loadMyName(me);
+
+    //conexiones (y sus nombres) para poder etiquetar personas con "@" en el reel
+    if (me) {
+      this.connectionStore.getConnections(me).subscribe({
+        next: (conexiones) => {
+          this.connectionStore.connections.set(conexiones);
+          this.cargarAutores(conexiones.map(c => this.otroDeConexion(c)));
+        },
+        error: () => this.connectionStore.connections.set([])
+      });
+    }
 
     this.cargarPagina(0);
   }
@@ -223,9 +263,16 @@ export class RecruiterReels implements OnInit {
 
     this.userStore.getByIds(faltantes).subscribe({
       next: (usuarios: any[]) => {
+        const resueltos: Record<string, { nombre: string; usuario: string; avatar: string }> = {};
         usuarios.forEach(u => {
-          if (u?.id) this.reelStore.autoresCache.set(u.id, { nombre: u.nombre ?? 'Usuario', avatar: u.fotoPerfilUrl ?? '' });
+          if (u?.id) {
+            const nombre = u.nombre ?? 'Usuario';
+            const avatar = u.fotoPerfilUrl ?? '';
+            this.reelStore.autoresCache.set(u.id, { nombre, avatar });
+            resueltos[u.id] = { nombre, usuario: u.usuario ?? '', avatar };
+          }
         });
+        this.personas.update(mapa => ({ ...mapa, ...resueltos }));
         aplicar();
       },
       // sin autores quedan los placeholders con "Usuario"
@@ -242,9 +289,98 @@ export class RecruiterReels implements OnInit {
     }));
   }
 
-  /** Nombre de una persona etiquetado en el reel, desde la misma cache de usuarios que los autores. */
-  nombreEtiquetado(id: string): string {
-    return this.reelStore.autoresCache.get(id)?.nombre ?? '…';
+  /** Detecta un "@" al escribir la descripción y abre el desplegable con las conexiones que coinciden. */
+  onDescripcionInput(event: Event): void {
+    const campo = event.target as HTMLTextAreaElement;
+    this.reelDescripcion = campo.value;
+    //si se borra la mención del texto, deja de estar etiquetada
+    this.purgarEtiquetados(campo.value);
+    const coincidencia = MENCION_AL_FINAL.exec(campo.value.slice(0, campo.selectionStart));
+    if (!coincidencia) {
+      this.cerrarMenciones();
+      return;
+    }
+    this.mencionAbierta = true;
+    this.mencionConsulta = coincidencia[2];
+    this.mencionCaret = campo.selectionStart;
+  }
+
+  /** Conexiones sugeridas para la mención que se está escribiendo. */
+  sugerenciasMencion(): PersonaMencion[] {
+    if (!this.mencionAbierta) return [];
+    const consulta = this.sinAcentos(this.mencionConsulta);
+    const cache = this.personas();
+    return this.contactos()
+      .map(c => this.otroDeConexion(c))
+      .filter(id => !this.composerEtiquetados.includes(id))
+      .map(id => {
+        const datos = cache[id];
+        const autor = this.reelStore.autoresCache.get(id);
+        const nombre = datos?.nombre ?? autor?.nombre ?? 'Usuario';
+        const usuario = datos?.usuario || this.usuarioDe(nombre);
+        return { id, nombre, usuario, avatar: datos?.avatar ?? autor?.avatar ?? '', iniciales: this.iniciales(nombre) };
+      })
+      .filter(p => !consulta || this.sinAcentos(p.nombre).includes(consulta) || this.sinAcentos(p.usuario).includes(consulta))
+      .slice(0, 8);
+  }
+
+  /** Escribe "@usuario" en la descripción y guarda el id para que le llegue la notificación. */
+  elegirMencion(persona: PersonaMencion): void {
+    const antes = this.reelDescripcion
+      .slice(0, this.mencionCaret)
+      .replace(MENCION_AL_FINAL, (_todo: string, espacio: string) => `${espacio}@${persona.usuario} `);
+    this.reelDescripcion = `${antes}${this.reelDescripcion.slice(this.mencionCaret)}`;
+    if (!this.composerEtiquetados.includes(persona.id) && this.composerEtiquetados.length < 10) {
+      this.composerEtiquetados = [...this.composerEtiquetados, persona.id];
+    }
+    this.cerrarMenciones();
+  }
+
+  cerrarMenciones(): void {
+    this.mencionAbierta = false;
+    this.mencionConsulta = '';
+  }
+
+  /** Parte la descripción para pintar las menciones en azul, como en el feed. */
+  trozosTexto(texto: string): { texto: string; mencion: boolean }[] {
+    const trozos: { texto: string; mencion: boolean }[] = [];
+    let ultimo = 0;
+    for (const m of texto.matchAll(MENCION_EN_TEXTO)) {
+      const inicio = m.index ?? 0;
+      if (inicio > ultimo) trozos.push({ texto: texto.slice(ultimo, inicio), mencion: false });
+      trozos.push({ texto: m[0], mencion: true });
+      ultimo = inicio + m[0].length;
+    }
+    if (ultimo < texto.length) trozos.push({ texto: texto.slice(ultimo), mencion: false });
+    return trozos;
+  }
+
+  /** Quita las etiquetas cuyo "@usuario" ya no está en el texto. */
+  private purgarEtiquetados(texto: string): void {
+    const vigentes = this.composerEtiquetados.filter(id => {
+      const datos = this.personas()[id];
+      const usuario = datos?.usuario || this.usuarioDe(datos?.nombre ?? '');
+      return !!usuario && texto.includes(`@${usuario}`);
+    });
+    if (vigentes.length !== this.composerEtiquetados.length) this.composerEtiquetados = vigentes;
+  }
+
+  private otroDeConexion(conn: Connection): string {
+    const yo = this.getUserId() ?? '';
+    return conn.usuarioMenorId === yo ? conn.usuarioMayorId : conn.usuarioMenorId;
+  }
+
+  /** "@" + usuario (sin espacios) que se escribe en la mención. */
+  private usuarioDe(nombre: string): string {
+    return nombre.replace(/\s+/g, '').toLowerCase();
+  }
+
+  private iniciales(nombre: string): string {
+    return nombre.split(/\s+/).filter(Boolean).slice(0, 2).map(parte => parte[0]).join('').toUpperCase();
+  }
+
+  private sinAcentos(texto: string): string {
+    return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   }
 
   private loadMyReactions(reels: SocialReel[]): void {
@@ -338,6 +474,7 @@ export class RecruiterReels implements OnInit {
       videoUrl,
       descripcion: this.reelDescripcion.trim() || undefined,
       etiquetas: this.reelEtiquetas.length > 0 ? this.reelEtiquetas : undefined,
+      etiquetados: this.composerEtiquetados.length > 0 ? this.composerEtiquetados : undefined,
     }).subscribe({
       next: (created: SocialReel) => {
         if (created) {
@@ -346,6 +483,8 @@ export class RecruiterReels implements OnInit {
           this.cargarAutores([created.autorId, ...(created.etiquetados ?? [])]);
           this.reelDescripcion = '';
           this.reelEtiquetas = [];
+          this.composerEtiquetados = [];
+          this.cerrarMenciones();
           this.selectedFile = null;
           this.uploading = false;
           this.uploadProgress = '';

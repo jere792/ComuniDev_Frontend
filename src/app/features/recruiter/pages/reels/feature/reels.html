@@ -23,11 +23,32 @@
 
           <label class="field-label">Descripción</label>
           <textarea
-            [(ngModel)]="reelDescripcion"
-            placeholder="¿De qué trata este reel?"
+            [ngModel]="reelDescripcion"
+            (input)="onDescripcionInput($event)"
+            placeholder="¿De qué trata este reel? Escribe @ para etiquetar a alguien"
             rows="3"
             class="field-textarea"
           ></textarea>
+          @if (mencionAbierta && sugerenciasMencion().length > 0) {
+            <div class="mencion-lista">
+              @for (persona of sugerenciasMencion(); track persona.id) {
+                <button type="button" class="mencion-item" (click)="elegirMencion(persona)">
+                  @if (persona.avatar) {
+                    <img [src]="persona.avatar" alt="" class="mencion-avatar" />
+                  } @else {
+                    <span class="mencion-avatar mencion-iniciales">{{ persona.iniciales }}</span>
+                  }
+                  <span class="mencion-datos">
+                    <span class="mencion-nombre">{{ persona.nombre }}</span>
+                    <span class="mencion-usuario">&#64;{{ persona.usuario }}</span>
+                  </span>
+                </button>
+              }
+            </div>
+          }
+          @if (mencionAbierta && sugerenciasMencion().length === 0 && mencionConsulta.length > 0) {
+            <div class="mencion-vacio">No hay conexiones que coincidan con &#64;{{ mencionConsulta }}</div>
+          }
 
           <app-tag-input
             titulo="Etiquetas"
@@ -114,14 +135,7 @@
               <span class="user-name clickable" (click)="goToProfile(reels()[currentIndex].reel.autorId)">{{ reels()[currentIndex].autorNombre }}</span>
             }
           </div>
-          <p class="reel-description">{{ reels()[currentIndex].reel.descripcion }}</p>
-          @if (reels()[currentIndex].reel.etiquetados?.length) {
-            <div class="reel-mentions">
-              @for (id of reels()[currentIndex].reel.etiquetados; track id) {
-                <span class="mention">@{{ nombreEtiquetado(id) }}</span>
-              }
-            </div>
-          }
+          <p class="reel-description">@for (trozo of trozosTexto(reels()[currentIndex].reel.descripcion ?? ''); track $index) {<span [class.mention]="trozo.mencion">{{ trozo.texto }}</span>}</p>
           @if (reels()[currentIndex].reel.etiquetas?.length) {
             <div class="reel-tags">
               @for (tag of reels()[currentIndex].reel.etiquetas; track tag) {

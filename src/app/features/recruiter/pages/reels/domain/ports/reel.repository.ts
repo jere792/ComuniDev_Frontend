@@ -8,6 +8,8 @@ export interface CreateReelRequest {
   portadaUrl?: string;
   descripcion?: string;
   etiquetas?: string[];
+  /** Personas mencionadas con @usuario en la descripcion (ids); maximo 10, solo conexiones o seguidos. */
+  etiquetados?: string[];
   musica?: { titulo?: string; artista?: string };
   duracionSegundos?: number;
   visibilidad?: string;
@@ -16,6 +18,7 @@ export interface CreateReelRequest {
 export interface UpdateReelRequest {
   descripcion?: string;
   etiquetas?: string[];
+  etiquetados?: string[];
   visibilidad?: string;
 }
 

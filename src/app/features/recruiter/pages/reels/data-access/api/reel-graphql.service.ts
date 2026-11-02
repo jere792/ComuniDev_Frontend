@@ -46,8 +46,8 @@ const GET_REELS_BY_USER = gql`
 `;
 
 const CREATE_REEL = gql`
-  mutation CreateReel($autorId: String!, $videoUrl: String!, $portadaUrl: String, $descripcion: String, $etiquetas: [String], $musica: ReelMusicaInput, $duracionSegundos: Int, $visibilidad: String) {
-    createReel(autorId: $autorId, videoUrl: $videoUrl, portadaUrl: $portadaUrl, descripcion: $descripcion, etiquetas: $etiquetas, musica: $musica, duracionSegundos: $duracionSegundos, visibilidad: $visibilidad) {
+  mutation CreateReel($autorId: String!, $videoUrl: String!, $portadaUrl: String, $descripcion: String, $etiquetas: [String], $etiquetados: [String], $musica: ReelMusicaInput, $duracionSegundos: Int, $visibilidad: String) {
+    createReel(autorId: $autorId, videoUrl: $videoUrl, portadaUrl: $portadaUrl, descripcion: $descripcion, etiquetas: $etiquetas, etiquetados: $etiquetados, musica: $musica, duracionSegundos: $duracionSegundos, visibilidad: $visibilidad) {
       id
       autorId
       videoUrl
@@ -66,8 +66,8 @@ const CREATE_REEL = gql`
 `;
 
 const UPDATE_REEL = gql`
-  mutation UpdateReel($id: ID!, $autorId: String!, $descripcion: String, $etiquetas: [String], $visibilidad: String) {
-    updateReel(id: $id, autorId: $autorId, descripcion: $descripcion, etiquetas: $etiquetas, visibilidad: $visibilidad) {
+  mutation UpdateReel($id: ID!, $autorId: String!, $descripcion: String, $etiquetas: [String], $etiquetados: [String], $visibilidad: String) {
+    updateReel(id: $id, autorId: $autorId, descripcion: $descripcion, etiquetas: $etiquetas, etiquetados: $etiquetados, visibilidad: $visibilidad) {
       id
       descripcion
       etiquetas

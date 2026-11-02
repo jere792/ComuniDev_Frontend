@@ -214,7 +214,33 @@
 
 .vacancy-actions {
   display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
   margin-top: var(--space-md);
+}
+
+/* Acceso al detalle de la vacante para postularse (solo developer). */
+.vacancy-apply {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  color: var(--on-primary);
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  .material-symbols-outlined {
+    font-size: 18px;
+  }
 }
 
 .vacancy-share {

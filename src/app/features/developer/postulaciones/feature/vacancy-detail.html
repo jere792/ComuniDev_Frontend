@@ -1,0 +1,224 @@
+<div class="vacancy-detail-container">
+  <div class="detail-header">
+    <button class="back-btn" type="button" (click)="goBack()" aria-label="Volver">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <h1>Detalle de la vacante</h1>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <span class="material-symbols-outlined spinning">progress_activity</span>
+      Cargando vacante...
+    </div>
+  } @else if (error() || !vacancy()) {
+    <div class="state-box">
+      <span class="material-symbols-outlined">error</span>
+      <p>{{ error() ?? 'No se encontró la vacante' }}</p>
+      <button class="btn btn-outline" type="button" (click)="goBack()">Volver</button>
+    </div>
+  } @else {
+    <article class="detail-card">
+      <div class="detail-head">
+        <div class="detail-company">
+          @if (vacancy()?.company?.logoUrl; as logo) {
+            <img class="company-logo" [src]="logo" [alt]="empresaNombre()" />
+          } @else {
+            <span class="company-logo company-logo-fallback">{{ empresaIniciales() }}</span>
+          }
+          <div class="company-text">
+            <span class="company-name">{{ empresaNombre() }}</span>
+            @if (vacancy()?.company?.sector; as sector) {
+              <span class="company-sector">{{ sector }}</span>
+            }
+          </div>
+        </div>
+        <span class="estado-vacancy" [ngClass]="estadoVacancyClase()">{{ estadoVacancyLabel() }}</span>
+      </div>
+
+      <h2 class="detail-title">{{ vacancy()?.titulo }}</h2>
+
+      <div class="meta-row">
+        @if (modalidadLabel(); as modalidad) {
+          <span class="meta-item">
+            <span class="material-symbols-outlined">home_work</span>
+            {{ modalidad }}
+          </span>
+        }
+        @if (contratoLabel(); as contrato) {
+          <span class="meta-item">
+            <span class="material-symbols-outlined">schedule</span>
+            {{ contrato }}
+          </span>
+        }
+        @if (vacancy()?.ubicacion; as ubicacion) {
+          <span class="meta-item">
+            <span class="material-symbols-outlined">location_on</span>
+            {{ ubicacion }}
+          </span>
+        }
+        @if (salario(); as salarioTexto) {
+          <span class="meta-item">
+            <span class="material-symbols-outlined">payments</span>
+            {{ salarioTexto }}
+          </span>
+        }
+        @if (vacancy()?.nivelExperiencia; as nivel) {
+          <span class="meta-item">
+            <span class="material-symbols-outlined">workspace_premium</span>
+            {{ nivel }}
+          </span>
+        }
+        @if (publicada(); as cuando) {
+          <span class="meta-item">
+            <span class="material-symbols-outlined">event</span>
+            Publicada {{ cuando }}
+          </span>
+        }
+        @if (vence(); as vencimiento) {
+          <span class="meta-item" [class.vencida]="vencida()">
+            <span class="material-symbols-outlined">event_busy</span>
+            @if (vencida()) {
+              Venció {{ vencimiento }}
+            } @else {
+              Cierra {{ vencimiento }}
+            }
+          </span>
+        }
+      </div>
+
+      @if (vacancy()?.tecnologias?.length) {
+        <div class="tech-chips">
+          @for (tec of vacancy()!.tecnologias; track tec) {
+            <span class="tech-chip">{{ tec }}</span>
+          }
+        </div>
+      }
+
+      <div class="detail-stats">
+        <div class="stat">
+          <span class="material-symbols-outlined">person</span>
+          <span class="stat-value">{{ vacancy()?.postulacionesCount ?? 0 }}</span>
+          <span class="stat-label">postulaciones</span>
+        </div>
+        @if (vacancy()?.vacantesDisponibles; as disponibles) {
+          <div class="stat">
+            <span class="material-symbols-outlined">group_add</span>
+            <span class="stat-value">{{ disponibles }}</span>
+            <span class="stat-label">vacantes</span>
+          </div>
+        }
+      </div>
+
+      @if (vacancy()?.descripcion; as descripcion) {
+        <section class="detail-section">
+          <h3 class="section-title">Descripción</h3>
+          <p class="section-text">{{ descripcion }}</p>
+        </section>
+      }
+
+      @if (vacancy()?.responsabilidades?.length) {
+        <section class="detail-section">
+          <h3 class="section-title">Responsabilidades</h3>
+          <ul class="section-list">
+            @for (item of vacancy()!.responsabilidades; track item) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </section>
+      }
+
+      @if (vacancy()?.requisitos?.length) {
+        <section class="detail-section">
+          <h3 class="section-title">Requisitos</h3>
+          <ul class="section-list">
+            @for (item of vacancy()!.requisitos; track item) {
+              <li>{{ item }}</li>
+            }
+          </ul>
+        </section>
+      }
+    </article>
+
+    @if (esDeveloper) {
+      <section class="apply-card">
+        <div class="apply-info">
+          <span class="material-symbols-outlined">how_to_reg</span>
+          <div class="apply-text">
+            @if (postulado()) {
+              <strong>Postulado ✓</strong>
+              <span class="apply-sub">
+                Tu postulación está
+                <span class="estado-pill" [ngClass]="estadoAplicacionClase(miPostulacion()!.estado)">
+                  {{ estadoAplicacionLabel(miPostulacion()!.estado) }}
+                </span>
+              </span>
+              @if (miPostulacion()!.cartaPresentacion; as carta) {
+                <p class="apply-carta">«{{ carta }}»</p>
+              }
+            } @else if (retirada()) {
+              <strong>Postulación retirada</strong>
+              <span class="apply-sub">Ya no postulaste a esta vacante.</span>
+            } @else {
+              <strong>¿Te interesa esta oferta?</strong>
+              <span class="apply-sub">
+                @if (puedePostular()) {
+                  Postúlate con una carta de presentación opcional.
+                } @else if (vacancy()?.estado !== 'ACTIVA') {
+                  Esta vacante no está recibiendo postulaciones.
+                } @else if (vencida()) {
+                  Esta vacante venció y ya no recibe postulaciones.
+                } @else {
+                  Ya postulaste a esta vacante.
+                }
+              </span>
+            }
+          </div>
+        </div>
+
+        <div class="apply-actions">
+          @if (postulado()) {
+            <button class="btn btn-outline btn-danger" type="button" (click)="pedirRetiro()">
+              <span class="material-symbols-outlined">person_remove</span>
+              Retirar postulación
+            </button>
+          } @else if (!retirada()) {
+            <button
+              class="btn btn-primary"
+              type="button"
+              (click)="abrirModal()"
+              [disabled]="!puedePostular()"
+            >
+              <span class="material-symbols-outlined">send</span>
+              Postularme
+            </button>
+          }
+          <a class="btn btn-outline" routerLink="/developer/postulaciones">
+            <span class="material-symbols-outlined">list_alt</span>
+            Mis postulaciones
+          </a>
+        </div>
+      </section>
+    }
+  }
+
+  <app-apply-modal
+    [open]="applyOpen()"
+    [titulo]="vacancy()?.titulo ?? ''"
+    [sending]="sending()"
+    (confirm)="postularme($event)"
+    (cancel)="cerrarModal()"
+  />
+
+  <app-confirm-modal
+    [open]="withdrawOpen()"
+    title="Retirar postulación"
+    message="¿Seguro que quieres retirar tu postulación a esta vacante? Esta acción no se puede deshacer."
+    confirmText="Retirar"
+    cancelText="Cancelar"
+    variant="danger"
+    icon="person_remove"
+    (confirm)="retirarPostulacion()"
+    (cancel)="withdrawOpen.set(false)"
+  />
+</div>

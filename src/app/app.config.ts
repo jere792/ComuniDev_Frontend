@@ -51,6 +51,10 @@ import { COMPANY_REPOSITORY } from '@features/recruiter/pages/company/domain/por
 import { CompanyGraphqlService } from '@features/recruiter/pages/company/data-access/api/company-graphql.service';
 import { MESSAGE_REPOSITORY } from '@features/shared/domain/ports/message.repository';
 import { MessageGraphqlService } from '@features/shared/data-access/api/message-graphql.service';
+import { APPLICATION_REPOSITORY } from '@features/developer/postulaciones/domain/ports/application.repository';
+import { ApplicationGraphqlService } from '@features/developer/postulaciones/data-access/api/application-graphql.service';
+import { VACANCY_DETAIL_REPOSITORY } from '@features/developer/postulaciones/domain/ports/vacancy-detail.repository';
+import { VacancyDetailGraphqlService } from '@features/developer/postulaciones/data-access/api/vacancy-detail-graphql.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -74,6 +78,8 @@ export const appConfig: ApplicationConfig = {
     { provide: VACANCY_REPOSITORY, useClass: VacancyGraphqlService },
     { provide: COMPANY_REPOSITORY, useClass: CompanyGraphqlService },
     { provide: MESSAGE_REPOSITORY, useClass: MessageGraphqlService },
+    { provide: APPLICATION_REPOSITORY, useClass: ApplicationGraphqlService },
+    { provide: VACANCY_DETAIL_REPOSITORY, useClass: VacancyDetailGraphqlService },
     provideRouter(routes, withInMemoryScrolling({
       scrollPositionRestoration: 'top',
     })),

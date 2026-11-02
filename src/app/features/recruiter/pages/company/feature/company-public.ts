@@ -106,6 +106,17 @@ export class CompanyPublic implements OnInit {
     return !!localStorage.getItem('userId');
   }
 
+  /** Solo el developer ve el acceso a postularse (HU-43). */
+  esDeveloper(): boolean {
+    const rol = (localStorage.getItem('role') || '').toLowerCase();
+    return rol.includes('develop') || rol.includes('desarroll');
+  }
+
+  /** El developer abre el detalle de la vacante, donde está el botón "Postularme". */
+  verOferta(offer: OfferItem): void {
+    if (this.esDeveloper()) this.router.navigate(['/developer/vacantes', offer.id]);
+  }
+
   /** Comparte la vacante en el feed como publicación con su tarjeta (tipo VACANTE). */
   compartirEnFeed(offer: OfferItem): void {
     const userId = localStorage.getItem('userId');

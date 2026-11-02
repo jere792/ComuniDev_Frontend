@@ -240,7 +240,7 @@
                 }
               </span>
               <span class="vacancy-apps">{{ vm.post.vacante.postulacionesCount ?? 0 }} postulaciones</span>
-              <button class="vacancy-apply" type="button" (click)="verOferta()">Ver oferta</button>
+              <button class="vacancy-apply" type="button" (click)="verOferta(vm.post.vacante)">Ver oferta</button>
             </div>
           </div>
         }

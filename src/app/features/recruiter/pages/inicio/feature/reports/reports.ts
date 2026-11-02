@@ -367,8 +367,17 @@ export class ReportsComponent implements OnInit {
     return dias > 0 ? dias : 0;
   }
 
-  /** La oferta publicada se administra desde la lista de Ofertas. */
-  verOferta(): void {
+  /**
+   * El reclutador administra su oferta desde "Mis Ofertas"; el developer la
+   * abre en su detalle, donde puede postularse con carta de presentación.
+   */
+  verOferta(vacante?: VacanteEmbebida | null): void {
+    const rol = (localStorage.getItem('role') || '').toLowerCase();
+    const esDeveloper = rol.includes('develop') || rol.includes('desarroll');
+    if (esDeveloper && vacante?.id) {
+      this.router.navigate(['/developer/vacantes', vacante.id]);
+      return;
+    }
     this.router.navigate(['/recruiter/offers']);
   }
 

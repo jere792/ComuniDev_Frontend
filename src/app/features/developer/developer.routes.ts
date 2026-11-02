@@ -12,6 +12,7 @@ export const routes: Routes = [
         { label: 'Reels', route: '/developer/reels', icon: 'smart_display' },
         { label: 'Mensajes', route: '/developer/messages', icon: 'chat' },
         { label: 'Solicitudes', route: '/developer/solicitudes', icon: 'person_add' },
+        { label: 'Postulaciones', route: '/developer/postulaciones', icon: 'work' },
         { label: 'Perfil', route: '/developer/profile', icon: 'person' },
       ],
     },
@@ -40,6 +41,18 @@ export const routes: Routes = [
         path: 'solicitudes',
         title: 'Solicitudes',
         loadComponent: () => import('@features/shared/feature/solicitudes/solicitudes').then(m => m.Solicitudes),
+      },
+      {
+        path: 'postulaciones',
+        title: 'Mis postulaciones',
+        loadComponent: () =>
+          import('@features/developer/postulaciones/feature/mis-postulaciones').then(m => m.MisPostulaciones),
+      },
+      {
+        path: 'vacantes/:id',
+        title: 'Vacante',
+        loadComponent: () =>
+          import('@features/developer/postulaciones/feature/vacancy-detail').then(m => m.VacancyDetailPage),
       },
       {
         path: 'discover',

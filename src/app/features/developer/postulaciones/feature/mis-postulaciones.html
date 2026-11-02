@@ -1,0 +1,86 @@
+<div class="postulaciones-container">
+  <div class="postulaciones-header">
+    <button class="back-btn" type="button" (click)="goBack()" aria-label="Volver">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <h1>Mis postulaciones</h1>
+    <span class="header-count" aria-hidden="true">{{ applications().length }}</span>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <span class="material-symbols-outlined spinning">progress_activity</span>
+      Cargando tus postulaciones...
+    </div>
+  } @else if (error()) {
+    <div class="state-box">
+      <span class="material-symbols-outlined">error</span>
+      <p>{{ error() }}</p>
+    </div>
+  } @else {
+    <div class="postulaciones-list">
+      @for (app of applications(); track app.id) {
+        <article class="application-card">
+          <div class="app-main">
+            @if (app.vacancy?.company?.logoUrl; as logo) {
+              <img class="app-logo" [src]="logo" [alt]="empresa(app)" />
+            } @else {
+              <span class="app-logo app-logo-fallback">{{ empresa(app).charAt(0) }}</span>
+            }
+            <div class="app-info">
+              <span class="app-title">{{ titulo(app) }}</span>
+              <span class="app-company">{{ empresa(app) }}</span>
+              <span class="app-date">
+                @if (app.createdAt; as fecha) {
+                  Postulada el {{ fecha | date: 'dd/MM/yyyy' }}
+                } @else {
+                  Postulación registrada
+                }
+              </span>
+            </div>
+          </div>
+
+          <div class="app-side">
+            <span class="estado-pill" [ngClass]="estadoClass(app.estado)">
+              {{ estadoLabel(app.estado) }}
+            </span>
+            <div class="app-actions">
+              <button class="btn btn-outline" type="button" (click)="verVacante(app)">
+                <span class="material-symbols-outlined">visibility</span>
+                Ver vacante
+              </button>
+              @if (activa(app.estado)) {
+                <button
+                  class="btn btn-outline btn-danger"
+                  type="button"
+                  (click)="pedirRetiro(app)"
+                >
+                  <span class="material-symbols-outlined">person_remove</span>
+                  Retirar
+                </button>
+              }
+            </div>
+          </div>
+        </article>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">work_off</span>
+          <span>Todavía no postulaste a ninguna vacante</span>
+          <a class="btn btn-primary" routerLink="/developer/inicio">Explorar el feed</a>
+        </div>
+      }
+    </div>
+  }
+
+  <app-confirm-modal
+    [open]="withdrawOpen()"
+    title="Retirar postulación"
+    message="¿Seguro que quieres retirar tu postulación? El reclutador dejará de verla en su lista."
+    confirmText="Retirar"
+    cancelText="Cancelar"
+    variant="danger"
+    icon="person_remove"
+    (confirm)="retirarPostulacion()"
+    (cancel)="cerrarConfirm()"
+  />
+</div>

@@ -1,0 +1,41 @@
+@if (open) {
+  <div class="apply-overlay" (click)="onOverlayClick($event)">
+    <div
+      class="apply-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="apply-modal-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="apply-head">
+        <span class="material-symbols-outlined">draft</span>
+        <div class="apply-head-text">
+          <h3 id="apply-modal-title" class="apply-title">Postularme a la oferta</h3>
+          <p class="apply-subtitle">{{ titulo }}</p>
+        </div>
+      </div>
+
+      <label class="apply-label" for="carta-presentacion">
+        Carta de presentación <span class="apply-optional">(opcional)</span>
+      </label>
+      <textarea
+        id="carta-presentacion"
+        class="apply-textarea"
+        rows="6"
+        [(ngModel)]="carta"
+        [disabled]="sending"
+        placeholder="Cuéntale al reclutador por qué encajas en esta vacante…"
+      ></textarea>
+      <p class="apply-hint">Se envía junto a tu postulación; puedes dejarla vacía.</p>
+
+      <div class="apply-actions">
+        <button type="button" class="btn btn-cancel" (click)="close()" [disabled]="sending">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-confirm" (click)="submit()" [disabled]="sending">
+          {{ sending ? 'Enviando…' : 'Postularme' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -148,6 +148,12 @@
 
               @if (haySesion()) {
                 <div class="vacancy-actions">
+                  @if (esDeveloper()) {
+                    <button class="vacancy-apply" type="button" (click)="verOferta(offer)">
+                      <span class="material-symbols-outlined">send</span>
+                      Postularme
+                    </button>
+                  }
                   <button class="vacancy-share" type="button" (click)="compartirEnFeed(offer)">
                     <span class="material-symbols-outlined">share</span>
                     Compartir en el feed

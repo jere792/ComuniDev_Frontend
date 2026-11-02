@@ -215,11 +215,24 @@
       background: rgba(107, 114, 128, 0.1);
       color: #6b7280;
     }
+
+    &.badge-banned {
+      background: rgba(186, 26, 26, 0.12);
+      color: #ba1a1a;
+    }
+  }
+
+  .status-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
   }
 
   .actions {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
 
     .action-btn {
       width: 32px;
@@ -237,6 +250,14 @@
 
       &.delete:hover {
         background: #fee2e2;
+      }
+
+      &.ban:hover {
+        background: #fee2e2;
+      }
+
+      &.unban:hover {
+        background: #d1fae5;
       }
     }
   }

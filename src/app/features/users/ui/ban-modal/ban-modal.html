@@ -1,0 +1,83 @@
+@if (open) {
+  <div class="ban-overlay" (click)="onOverlayClick($event)">
+    <div
+      class="ban-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ban-modal-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="ban-head">
+        <span class="material-symbols-outlined ban-icon">block</span>
+        <div class="ban-head-text">
+          <h3 id="ban-modal-title" class="ban-title">Suspender cuenta</h3>
+          @if (userName) {
+            <p class="ban-subtitle">{{ userName }}</p>
+          }
+        </div>
+        <button type="button" class="ban-close" (click)="close()" [disabled]="sending" aria-label="Cerrar">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <fieldset class="ban-fieldset" [disabled]="sending">
+        <legend class="ban-label">Tipo de suspensión</legend>
+        <div class="ban-tipo-options">
+          <label class="ban-tipo" [class.selected]="tipo === 'TEMPORAL'">
+            <input type="radio" name="ban-tipo" value="TEMPORAL" [(ngModel)]="tipo" />
+            <span class="ban-tipo-text">
+              <strong>Temporal</strong>
+              <small>La cuenta se reactiva solo, sin intervención.</small>
+            </span>
+          </label>
+          <label class="ban-tipo" [class.selected]="tipo === 'PERMANENTE'">
+            <input type="radio" name="ban-tipo" value="PERMANENTE" [(ngModel)]="tipo" />
+            <span class="ban-tipo-text">
+              <strong>Permanente</strong>
+              <small>Queda suspendida hasta que un admin la reactive.</small>
+            </span>
+          </label>
+        </div>
+      </fieldset>
+
+      @if (esTemporal) {
+        <div class="ban-field">
+          <label class="ban-label" for="ban-duracion">Duración (días)</label>
+          <input
+            id="ban-duracion"
+            class="ban-input"
+            type="number"
+            min="1"
+            max="3650"
+            [(ngModel)]="duracionDias"
+            [disabled]="sending"
+          />
+        </div>
+      }
+
+      <div class="ban-field">
+        <label class="ban-label" for="ban-razon">
+          Motivo <span class="ban-required">(obligatorio)</span>
+        </label>
+        <textarea
+          id="ban-razon"
+          class="ban-textarea"
+          rows="3"
+          maxlength="300"
+          [(ngModel)]="razon"
+          [disabled]="sending"
+          placeholder="Explica al usuario por qué se suspende su cuenta…"
+        ></textarea>
+      </div>
+
+      <div class="ban-actions">
+        <button type="button" class="btn btn-cancel" (click)="close()" [disabled]="sending">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-confirm" (click)="submit()" [disabled]="sending || !puedeConfirmar">
+          {{ sending ? 'Suspendiendo…' : 'Suspender' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

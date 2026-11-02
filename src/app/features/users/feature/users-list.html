@@ -60,15 +60,39 @@
               </span>
             </td>
             <td>
-              <span class="badge" [class]="getStatusBadgeClass(user.estadoCuenta)">
-                {{ user.estadoCuenta }}
-              </span>
+              <div class="status-cell">
+                <span class="badge" [class]="getStatusBadgeClass(user.estadoCuenta)">
+                  {{ user.estadoCuenta }}
+                </span>
+                @if (estaBaneado(user)) {
+                  <span class="badge badge-banned" title="Suspensión activa aplicada desde este panel">
+                    Suspendido
+                  </span>
+                }
+              </div>
             </td>
             <td>{{ user.createdAt }}</td>
             <td>
               <div class="actions">
                 <button class="action-btn view" title="Ver perfil">👁️</button>
                 <button class="action-btn edit" title="Editar">✏️</button>
+                @if (estaBaneado(user)) {
+                  <button
+                    class="action-btn unban"
+                    title="Desbanear (reactivar cuenta)"
+                    (click)="askUnban(user)"
+                  >
+                    🔓
+                  </button>
+                } @else {
+                  <button
+                    class="action-btn ban"
+                    title="Banear (suspender cuenta)"
+                    (click)="askBan(user)"
+                  >
+                    🚫
+                  </button>
+                }
                 <button class="action-btn delete" title="Eliminar" (click)="askDeleteUser(user.id)">🗑️</button>
               </div>
             </td>
@@ -89,4 +113,24 @@
   icon="delete"
   (confirm)="onConfirmDelete()"
   (cancel)="onCancelDelete()"
+/>
+
+<app-ban-modal
+  [open]="banOpen()"
+  [userName]="pendingBanUser()?.nombre ?? ''"
+  [sending]="banSending()"
+  (confirm)="onConfirmBan($event)"
+  (cancel)="onCancelBan()"
+/>
+
+<app-confirm-modal
+  [open]="unbanOpen()"
+  title="Desbanear usuario"
+  [message]="'¿Reactivar la cuenta de ' + (pendingUnbanUser()?.nombre ?? '') + '? Volverá a poder iniciar sesión.'"
+  confirmText="Reactivar"
+  cancelText="Cancelar"
+  variant="success"
+  icon="lock_open"
+  (confirm)="onConfirmUnban()"
+  (cancel)="onCancelUnban()"
 />

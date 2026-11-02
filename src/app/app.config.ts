@@ -59,6 +59,8 @@ import { POINTS_REPOSITORY } from '@features/developer/gamificacion/domain/ports
 import { PointsGraphqlService } from '@features/developer/gamificacion/data-access/api/points-graphql.service';
 import { REPORT_REPOSITORY } from '@features/moderator/feature/reports/domain/ports/report.repository';
 import { ReportHttpService } from '@features/moderator/feature/reports/data-access/api/report-http.service';
+import { USER_MODERATION_REPOSITORY } from '@features/users/domain/ports/user-moderation.repository';
+import { UserModerationHttpService } from '@features/users/data-access/api/user-moderation-http.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -86,6 +88,7 @@ export const appConfig: ApplicationConfig = {
     { provide: VACANCY_DETAIL_REPOSITORY, useClass: VacancyDetailGraphqlService },
     { provide: POINTS_REPOSITORY, useClass: PointsGraphqlService },
     { provide: REPORT_REPOSITORY, useClass: ReportHttpService },
+    { provide: USER_MODERATION_REPOSITORY, useClass: UserModerationHttpService },
     provideRouter(routes, withInMemoryScrolling({
       scrollPositionRestoration: 'top',
     })),

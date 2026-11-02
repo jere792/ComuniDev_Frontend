@@ -4,11 +4,19 @@ import { User } from '@core/domain/models/user.model';
 import { UserStore } from '@features/users/data-access/state/user.store';
 import { ToastService } from '@core/services/toast.service';
 import { ConfirmModal } from '@shared/ui/confirm-modal/confirm-modal';
+import { BanModal, BanPayload } from '@features/users/ui/ban-modal/ban-modal';
+import { TipoBan } from '@features/users/domain/ports/user-moderation.repository';
+
+/** Lee el mensaje de error que devuelve el backend en su `ApiResponse`. */
+function mensajeError(err: unknown): string | null {
+  const body = (err as { error?: { message?: string } } | null)?.error;
+  return typeof body?.message === 'string' && body.message.trim() ? body.message : null;
+}
 
 @Component({
   selector: 'app-users-list-page',
   standalone: true,
-  imports: [CommonModule, ConfirmModal],
+  imports: [CommonModule, ConfirmModal, BanModal],
   templateUrl: './users-list.html',
   styleUrl: './users-list.scss',
 })
@@ -19,6 +27,15 @@ export class UsersListPage implements OnInit {
   searchTerm = signal('');
   confirmOpen = signal(false);
   pendingUserId = signal<string | null>(null);
+
+  // ---------------------------------------------------- banear / desbanear
+  banOpen = signal(false);
+  banSending = signal(false);
+  pendingBanUser = signal<User | null>(null);
+
+  unbanOpen = signal(false);
+  unbanSending = signal(false);
+  pendingUnbanUser = signal<User | null>(null);
 
   private toast = inject(ToastService);
 
@@ -76,6 +93,99 @@ export class UsersListPage implements OnInit {
   onCancelDelete(): void {
     this.confirmOpen.set(false);
     this.pendingUserId.set(null);
+  }
+
+  // -------------------------------------------------------- banear / desbanear
+
+  estaBaneado(user: User): boolean {
+    return this.store.estaBaneado(user.id);
+  }
+
+  askBan(user: User): void {
+    this.pendingBanUser.set(user);
+    this.banOpen.set(true);
+  }
+
+  onCancelBan(): void {
+    this.banOpen.set(false);
+    this.pendingBanUser.set(null);
+  }
+
+  onConfirmBan(payload: BanPayload): void {
+    const user = this.pendingBanUser();
+    if (!user) return;
+
+    const moderadorId = localStorage.getItem('userId');
+    if (!moderadorId) {
+      this.onCancelBan();
+      this.toast.error('No se encontró tu usuario en sesión');
+      return;
+    }
+
+    this.banSending.set(true);
+    this.store
+      .ban(user.id, {
+        moderadorId,
+        tipo: payload.tipo as TipoBan,
+        razon: payload.razon,
+        duracionDias: payload.duracionDias,
+      })
+      .subscribe({
+        next: (info) => {
+          this.banSending.set(false);
+          this.onCancelBan();
+          if (info?.baneado) {
+            this.toast.success(
+              payload.tipo === 'TEMPORAL'
+                ? `Cuenta suspendida por ${payload.duracionDias} días`
+                : 'Cuenta suspendida permanentemente',
+            );
+          } else {
+            this.toast.error('No se pudo suspender la cuenta');
+          }
+        },
+        error: (err) => {
+          this.banSending.set(false);
+          this.onCancelBan();
+          this.toast.error(mensajeError(err) ?? 'No se pudo suspender la cuenta');
+        },
+      });
+  }
+
+  askUnban(user: User): void {
+    this.pendingUnbanUser.set(user);
+    this.unbanOpen.set(true);
+  }
+
+  onCancelUnban(): void {
+    this.unbanOpen.set(false);
+    this.pendingUnbanUser.set(null);
+  }
+
+  onConfirmUnban(): void {
+    const user = this.pendingUnbanUser();
+    if (!user) return;
+
+    const moderadorId = localStorage.getItem('userId');
+    if (!moderadorId) {
+      this.onCancelUnban();
+      this.toast.error('No se encontró tu usuario en sesión');
+      return;
+    }
+
+    this.unbanSending.set(true);
+    this.store.unban(user.id, { moderadorId }).subscribe({
+      next: () => {
+        this.unbanSending.set(false);
+        this.onCancelUnban();
+        this.toast.success('Cuenta reactivada correctamente');
+      },
+      error: (err) => {
+        this.unbanSending.set(false);
+        this.onCancelUnban();
+        this.toast.error(mensajeError(err) ?? 'No se pudo reactivar la cuenta');
+      },
+    });
   }
 
   getRoleBadgeClass(role: string): string {

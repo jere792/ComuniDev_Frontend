@@ -1,0 +1,251 @@
+.ban-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  background: #00000099;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ban-modal {
+  width: 480px;
+  max-width: 92vw;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 24px 80px #00000066;
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  animation: ban-in 0.2s ease;
+}
+
+@keyframes ban-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.ban-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.ban-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background: rgba(186, 26, 26, 0.12);
+  color: var(--error);
+  flex-shrink: 0;
+}
+
+.ban-head-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.ban-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--on-surface);
+  margin: 0;
+}
+
+.ban-subtitle {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--on-surface-variant);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ban-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover:not(:disabled) {
+    background: var(--surface-container);
+  }
+}
+
+.ban-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.ban-label {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-surface);
+  padding: 0;
+}
+
+.ban-required {
+  font-weight: 400;
+  color: var(--on-surface-variant);
+}
+
+.ban-tipo-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+.ban-tipo {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+
+  input[type='radio'] {
+    accent-color: var(--error);
+    margin-top: 2px;
+    cursor: pointer;
+  }
+
+  &:hover {
+    background: var(--surface-container);
+  }
+
+  &.selected {
+    border-color: var(--error);
+    background: rgba(186, 26, 26, 0.06);
+  }
+}
+
+.ban-tipo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  strong {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--on-surface);
+  }
+
+  small {
+    font-family: var(--font-body);
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--on-surface-variant);
+  }
+}
+
+.ban-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.ban-input,
+.ban-textarea {
+  width: 100%;
+  padding: var(--space-sm);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  background: var(--surface-container-low);
+  color: var(--on-surface);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 20px;
+
+  &:focus {
+    outline: none;
+    border-color: var(--error);
+  }
+
+  &::placeholder {
+    color: var(--on-surface-variant);
+  }
+}
+
+.ban-textarea {
+  resize: vertical;
+  min-height: 76px;
+}
+
+.ban-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.btn-cancel {
+  background: var(--surface-container);
+  color: var(--on-surface-variant);
+  border: 1px solid var(--outline-variant);
+
+  &:hover:not(:disabled) {
+    background: var(--surface-container-high);
+    opacity: 1;
+  }
+}
+
+.btn-confirm {
+  background: var(--error);
+  color: var(--on-error);
+}

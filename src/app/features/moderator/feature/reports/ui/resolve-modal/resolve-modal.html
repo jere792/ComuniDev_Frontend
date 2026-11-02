@@ -1,0 +1,49 @@
+@if (open) {
+  <div class="resolve-overlay" (click)="onOverlayClick($event)">
+    <div
+      class="resolve-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="resolve-modal-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="resolve-head">
+        <span class="material-symbols-outlined resolve-icon">{{ icono }}</span>
+        <div class="resolve-head-text">
+          <h3 id="resolve-modal-title" class="resolve-title">{{ titulo }}</h3>
+          @if (motivo) {
+            <p class="resolve-subtitle">Motivo: {{ motivo }}</p>
+          }
+        </div>
+      </div>
+
+      <p class="resolve-message">{{ mensaje }}</p>
+
+      @if (pideNotas) {
+        <label class="resolve-label" for="resolve-notas">
+          Notas del moderador <span class="resolve-optional">(opcional)</span>
+        </label>
+        <textarea
+          id="resolve-notas"
+          class="resolve-textarea"
+          rows="3"
+          maxlength="300"
+          [ngModel]="notas"
+          (ngModelChange)="notas = $event"
+          [disabled]="sending"
+          placeholder="Agrega observaciones sobre la decisión…"
+        ></textarea>
+        <p class="resolve-hint">Se guardarán en el historial del reporte y se informarán al autor.</p>
+      }
+
+      <div class="resolve-actions">
+        <button type="button" class="btn btn-cancel" (click)="close()" [disabled]="sending">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-confirm" (click)="submit()" [disabled]="sending">
+          {{ sending ? 'Aplicando…' : confirmLabel }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

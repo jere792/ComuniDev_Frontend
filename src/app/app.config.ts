@@ -57,6 +57,8 @@ import { VACANCY_DETAIL_REPOSITORY } from '@features/developer/postulaciones/dom
 import { VacancyDetailGraphqlService } from '@features/developer/postulaciones/data-access/api/vacancy-detail-graphql.service';
 import { POINTS_REPOSITORY } from '@features/developer/gamificacion/domain/ports/points.repository';
 import { PointsGraphqlService } from '@features/developer/gamificacion/data-access/api/points-graphql.service';
+import { REPORT_REPOSITORY } from '@features/moderator/feature/reports/domain/ports/report.repository';
+import { ReportHttpService } from '@features/moderator/feature/reports/data-access/api/report-http.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -83,6 +85,7 @@ export const appConfig: ApplicationConfig = {
     { provide: APPLICATION_REPOSITORY, useClass: ApplicationGraphqlService },
     { provide: VACANCY_DETAIL_REPOSITORY, useClass: VacancyDetailGraphqlService },
     { provide: POINTS_REPOSITORY, useClass: PointsGraphqlService },
+    { provide: REPORT_REPOSITORY, useClass: ReportHttpService },
     provideRouter(routes, withInMemoryScrolling({
       scrollPositionRestoration: 'top',
     })),

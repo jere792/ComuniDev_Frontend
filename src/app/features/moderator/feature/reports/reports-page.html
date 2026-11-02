@@ -1,0 +1,224 @@
+<div class="reports-header">
+  <h1>Reportes</h1>
+  <p class="subtitle">Cola de moderación de contenido y usuarios</p>
+</div>
+
+<div class="reports-toolbar">
+  <div class="filter-tabs" role="tablist" aria-label="Filtrar reportes por estado">
+    <button
+      type="button"
+      role="tab"
+      class="filter-tab"
+      [class.active]="estado() === 'PENDIENTE'"
+      [attr.aria-selected]="estado() === 'PENDIENTE'"
+      (click)="cambiarEstado('PENDIENTE')"
+    >
+      <span class="material-symbols-outlined">flag</span>
+      Pendientes
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="filter-tab"
+      [class.active]="estado() === 'RESUELTO'"
+      [attr.aria-selected]="estado() === 'RESUELTO'"
+      (click)="cambiarEstado('RESUELTO')"
+    >
+      <span class="material-symbols-outlined">task_alt</span>
+      Resueltos
+    </button>
+  </div>
+  <div class="stats-summary">
+    <span class="count">{{ reports().length }} reportes</span>
+  </div>
+</div>
+
+@if (error()) {
+  <div class="error-message">{{ error() }}</div>
+}
+
+@if (loading()) {
+  <div class="loading-state">Cargando reportes…</div>
+}
+
+@if (!loading() && !error() && reports().length === 0) {
+  <div class="empty-state">
+    <span class="material-symbols-outlined empty-icon">verified</span>
+    <p>
+      @if (estado() === 'PENDIENTE') {
+        No hay reportes pendientes. ¡La cola está limpia!
+      } @else {
+        Todavía no hay reportes resueltos.
+      }
+    </p>
+  </div>
+}
+
+@if (!loading() && reports().length > 0) {
+  <div class="reports-table-container">
+    <table class="reports-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Reportó</th>
+          <th>Contenido</th>
+          <th>Motivo</th>
+          @if (estado() === 'PENDIENTE') {
+            <th>Acciones</th>
+          } @else {
+            <th>Resolución</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (reporte of reports(); track reporte.id) {
+          <tr>
+            <td class="cell-fecha">
+              <span class="fecha-principal">{{ fecha(reporte.createdAt) }}</span>
+              @if (estado() === 'RESUELTO') {
+                <span class="fecha-secundaria">resuelto {{ fechaResolucion(reporte) }}</span>
+              }
+            </td>
+
+            <td>
+              <a
+                class="id-link"
+                [routerLink]="['/moderator/u', reporte.reporterId]"
+                [title]="reporte.reporterId"
+              >
+                {{ corto(reporte.reporterId) }}
+              </a>
+            </td>
+
+            <td>
+              <div class="contenido-head">
+                <span
+                  class="tipo-badge"
+                  [ngClass]="tipoClase(reporte.targetType)"
+                >
+                  {{ tipoLabel(reporte.targetType) }}
+                </span>
+                @if (esUsuario(reporte)) {
+                  <a
+                    class="id-link"
+                    [routerLink]="['/moderator/u', reporte.targetId]"
+                    [title]="reporte.targetId"
+                  >
+                    {{ corto(reporte.targetId) }}
+                  </a>
+                } @else {
+                  <code class="target-id" [title]="reporte.targetId">{{ corto(reporte.targetId) }}</code>
+                }
+              </div>
+
+              <button
+                type="button"
+                class="link-btn"
+                [disabled]="previewLoading() === clave(reporte)"
+                (click)="verPreview(reporte)"
+              >
+                @if (previewAbierto() === clave(reporte)) {
+                  Ocultar vista previa
+                } @else if (previewLoading() === clave(reporte)) {
+                  Cargando…
+                } @else if (esTipoContenido(reporte.targetType)) {
+                  Ver contenido
+                } @else {
+                  Ver usuario
+                }
+              </button>
+
+              @if (previewAbierto() === clave(reporte)) {
+                <div class="preview">
+                  @if (previewLoading() === clave(reporte)) {
+                    <p class="preview-loading">Cargando vista previa…</p>
+                  } @else if (previewSinContenido(reporte)) {
+                    <p class="preview-vacio">Contenido no disponible (puede haber sido eliminado).</p>
+                  } @else if (previewTexto(reporte)) {
+                    <p class="preview-texto">{{ previewTexto(reporte) }}</p>
+                    @if (previewAutor(reporte); as autor) {
+                      <a class="preview-link" [routerLink]="['/moderator/u', autor]">
+                        Ver perfil del autor
+                      </a>
+                    }
+                  } @else {
+                    <p class="preview-vacio">Sin texto para mostrar.</p>
+                  }
+                </div>
+              }
+            </td>
+
+            <td class="cell-motivo">{{ reporte.motivo || 'Sin motivo indicado' }}</td>
+
+            @if (estado() === 'PENDIENTE') {
+              <td>
+                <div class="row-actions">
+                  <button
+                    type="button"
+                    class="action-btn reject"
+                    title="Rechazar reporte (no toca el contenido)"
+                    (click)="pedirRechazo(reporte)"
+                  >
+                    <span class="material-symbols-outlined">block</span>
+                    <span class="action-label">Rechazar</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn hide"
+                    title="Ocultar el contenido reportado"
+                    (click)="pedirAccion(reporte, 'OCULTAR')"
+                  >
+                    <span class="material-symbols-outlined">visibility_off</span>
+                    <span class="action-label">Ocultar</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn sanction"
+                    title="Ocultar el contenido y sancionar al autor"
+                    (click)="pedirAccion(reporte, 'SANCIONAR')"
+                  >
+                    <span class="material-symbols-outlined">gavel</span>
+                    <span class="action-label">Sancionar</span>
+                  </button>
+                </div>
+              </td>
+            } @else {
+              <td class="cell-resolucion">
+                <span class="accion-badge" [ngClass]="'accion-' + (reporte.accionResolucion || '').toLowerCase()">
+                  {{ accionDe(reporte) }}
+                </span>
+                <span class="resolucion-detalle">
+                  por <a class="id-link" [routerLink]="['/moderator/u', reporte.moderadorId]">{{ corto(reporte.moderadorId) }}</a>
+                </span>
+                @if (reporte.notas) {
+                  <span class="resolucion-notas" [title]="reporte.notas">{{ reporte.notas }}</span>
+                }
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+
+<app-confirm-modal
+  [open]="confirmarRechazarOpen()"
+  title="Rechazar reporte"
+  message="El reporte se cerrará sin acción sobre el contenido reportado. ¿Continuar?"
+  confirmText="Rechazar"
+  cancelText="Cancelar"
+  variant="warning"
+  icon="flag"
+  (confirm)="confirmarRechazo()"
+  (cancel)="cerrarModales()"
+/>
+
+<app-report-resolve-modal
+  [open]="resolverOpen()"
+  [accion]="accionModal()"
+  [motivo]="reporteActivo()?.motivo ?? ''"
+  [sending]="sending()"
+  (confirm)="confirmarAccion($event)"
+  (cancel)="cerrarModales()"
+/>

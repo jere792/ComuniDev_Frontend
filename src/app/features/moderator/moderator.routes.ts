@@ -15,6 +15,9 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', loadComponent: () => import('@features/moderator/feature/dashboard/moderator-dashboard').then(m => m.ModeratorDashboard) },
+      { path: 'reports', loadComponent: () => import('@features/moderator/feature/reports/reports-page').then(m => m.ReportsPage) },
+      // "Revisiones" es el historial de reportes ya resueltos (mismo panel con RESUELTO)
+      { path: 'reviews', loadComponent: () => import('@features/moderator/feature/reports/reports-page').then(m => m.ReportsPage), data: { estadoInicial: 'RESUELTO' } },
       { path: 'discover', loadComponent: () => import('@features/shared/feature/discover-users/discover-users').then(m => m.DiscoverUsers) },
       { path: 'u/:userId', loadComponent: () => import('@features/public/feature/public-profile').then(m => m.PublicProfile) },
     ],

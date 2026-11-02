@@ -1,12 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService, LoginData } from '@core/services/api.service';
+import { TokenRefreshService } from '@core/services/token-refresh.service';
 import { TERMINOS_VERSION } from '@shared/constants/terminos';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private router = inject(Router);
   private api = inject(ApiService);
+  private session = inject(TokenRefreshService);
 
 
   isAuthenticated(): boolean {
@@ -23,7 +25,8 @@ export class AuthService {
         next: (data) => {
           localStorage.removeItem('userPhoto');
           localStorage.removeItem('userEmail');
-          localStorage.setItem('token', data.token);
+          // access JWT (15 min) + refresh JWT (7 días) para renovar la sesión
+          this.session.saveTokens(data.token, data.refreshToken);
           if (data.rolActivo) {
             localStorage.setItem('role', data.rolActivo.toLowerCase());
           } else {
@@ -83,13 +86,9 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('userUsername');
-    localStorage.removeItem('userPhoto');
-    localStorage.removeItem('userEmail');
+    // best-effort: el backend no invalida tokens, solo borra del lado cliente
+    this.session.logoutRemote();
+    this.session.clearSession();
     this.router.navigate(['/']);
   }
 }

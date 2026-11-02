@@ -7,10 +7,13 @@ import { HttpLink } from 'apollo-angular/http';
 import { inject } from '@angular/core';
 import { InMemoryCache, ApolloLink, split } from '@apollo/client/core';
 import { setContext } from '@apollo/client/link/context';
+import { ErrorLink } from '@apollo/client/link/error';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
 import { isSubscriptionOperation } from '@apollo/client/utilities';
+import { from, switchMap, throwError } from 'rxjs';
 import { environment } from '../environments/environment';
+import { TokenRefreshService } from '@core/services/token-refresh.service';
 
 import { routes } from './app.routes';
 import { AUTH_REPOSITORY } from '@features/auth/domain/ports/auth.repository';
@@ -95,6 +98,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideApollo(() => {
       const httpLink = inject(HttpLink);
+      const session = inject(TokenRefreshService);
 
       const auth = setContext((_, { headers }) => {
         const token = localStorage.getItem('token');
@@ -106,12 +110,38 @@ export const appConfig: ApplicationConfig = {
         };
       });
 
-      const http = ApolloLink.from([auth, httpLink.create({ uri: `${environment.apiUrl}/graphql` })]);
+      // Apollo no pasa por el interceptor de HttpClient: el 401 se atiende aquí.
+      // Va ANTES de `auth` para que el reintento vuelva a leer el token ya
+      // renovado; un solo reintento por operación (authRetried).
+      const authRetry = new ErrorLink(({ error, operation, forward }) => {
+        if (!isUnauthorized(error)) return;
+        if (operation.getContext()['authRetried']) return;
+
+        return from(session.refresh()).pipe(
+          switchMap((newToken) => {
+            if (!newToken) return throwError(() => error);
+            const headers = operation.getContext()['headers'] ?? {};
+            operation.setContext({
+              authRetried: true,
+              headers: { ...headers, Authorization: `Bearer ${newToken}` },
+            });
+            return forward(operation);
+          }),
+        );
+      });
+
+      const http = ApolloLink.from([
+        authRetry,
+        auth,
+        httpLink.create({ uri: `${environment.apiUrl}/graphql` }),
+      ]);
 
       const wsUrl = `${environment.apiUrl.replace(/^http/, 'ws')}/graphql`;
       const ws = new GraphQLWsLink(
         createClient({
           url: wsUrl,
+          // Se invoca en cada intento de conexión: al reconectar toma el
+          // access token que quedó guardado tras un refresh.
           connectionParams: () => {
             const token = localStorage.getItem('token');
             return token ? { Authorization: `Bearer ${token}` } : {};
@@ -132,3 +162,25 @@ export const appConfig: ApplicationConfig = {
     }),
   ]
 };
+
+/**
+ * ¿El error es un 401 del filtro JWT? Cubre el `ServerError` de Apollo
+ * (status HTTP distinto de 200) y el cuerpo `{"message":"Token invalido o
+ * expirado"}` si llegara como error GraphQL.
+ */
+function isUnauthorized(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const err = error as {
+    statusCode?: number;
+    status?: number;
+    message?: string;
+    errors?: Array<{ message?: string }>;
+  };
+  if (err.statusCode === 401 || err.status === 401) return true;
+
+  const mensajes = [
+    err.message,
+    ...(Array.isArray(err.errors) ? err.errors.map((e) => e?.message) : []),
+  ];
+  return mensajes.some((m) => !!m && /token invalido o expirado/i.test(m));
+}

@@ -1,11 +1,13 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AUTH_REPOSITORY, AuthRepository, LoginRequest, RegisterRequest, LoginResponse } from '@features/auth/domain/ports/auth.repository';
+import { TokenRefreshService } from '@core/services/token-refresh.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthStore {
   private repository = inject<AuthRepository>(AUTH_REPOSITORY);
   private router = inject(Router);
+  private session = inject(TokenRefreshService);
 
   readonly user = signal<LoginResponse | null>(null);
   readonly loading = signal(false);
@@ -62,6 +64,7 @@ export class AuthStore {
 
   handleOAuthCallback(params: Record<string, string>): void {
     const token = params['token'];
+    const refreshToken = params['refreshToken'];
     const role = params['role'];
     const needsRole = params['needsRole'] === 'true';
     const userId = params['id'];
@@ -73,7 +76,7 @@ export class AuthStore {
       // el token en la URL (evita que quede en el historial del navegador)
       localStorage.removeItem('userPhoto');
       localStorage.removeItem('userEmail');
-      localStorage.setItem('token', token);
+      this.session.saveTokens(token, refreshToken);
       localStorage.setItem('userId', userId);
       if (nombre) localStorage.setItem('userName', nombre);
       if (email) localStorage.setItem('userEmail', email);
@@ -85,7 +88,7 @@ export class AuthStore {
       const normalizedRole = role.toLowerCase();
       localStorage.removeItem('userPhoto');
       localStorage.removeItem('userEmail');
-      localStorage.setItem('token', token);
+      this.session.saveTokens(token, refreshToken);
       localStorage.setItem('role', normalizedRole);
       if (userId) localStorage.setItem('userId', userId);
       if (nombre) localStorage.setItem('userName', nombre);
@@ -98,13 +101,9 @@ export class AuthStore {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userUsername');
-    localStorage.removeItem('userPhoto');
+    // best-effort: el backend no invalida tokens, solo borra del lado cliente
+    this.session.logoutRemote();
+    this.session.clearSession();
     this.user.set(null);
     this.role.set(null);
     this.router.navigate(['/']);
@@ -113,7 +112,8 @@ export class AuthStore {
   private setSession(data: LoginResponse): void {
     localStorage.removeItem('userPhoto');
     localStorage.removeItem('userEmail');
-    localStorage.setItem('token', data.token);
+    // access JWT (15 min) + refresh JWT (7 días) para renovar la sesión
+    this.session.saveTokens(data.token, data.refreshToken);
     if (data.rolActivo) {
       localStorage.setItem('role', data.rolActivo.toLowerCase());
     } else {

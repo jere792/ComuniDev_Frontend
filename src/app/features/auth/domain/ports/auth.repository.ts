@@ -24,6 +24,8 @@ export interface LoginResponse {
   rolActivo: string;
   estadoCuenta: string;
   token: string;
+  /** Refresh JWT (7 días): se renueva en POST /auth/refresh. */
+  refreshToken?: string;
 }
 
 export interface AuthState {

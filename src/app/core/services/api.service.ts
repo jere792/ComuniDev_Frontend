@@ -35,6 +35,8 @@ export interface LoginData {
   rolActivo: string;
   estadoCuenta: string;
   token: string;
+  /** Refresh JWT (7 días): se renueva en POST /auth/refresh. */
+  refreshToken?: string;
 }
 
 @Injectable({ providedIn: 'root' })

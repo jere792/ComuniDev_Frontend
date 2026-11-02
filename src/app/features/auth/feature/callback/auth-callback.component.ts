@@ -27,8 +27,14 @@ export class AuthCallbackComponent implements OnInit {
   private authStore = inject(AuthStore);
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      this.authStore.handleOAuthCallback(params);
-    });
+    // Una sola lectura: al procesar la sesión se limpia la URL para que los
+    // tokens no queden en el historial del navegador.
+    const params = { ...this.route.snapshot.queryParams };
+    if (Object.keys(params).length > 0) {
+      window.history.replaceState(window.history.state, '', window.location.pathname);
+    }
+    // El store guarda access + refresh token (viene en ?token=...&refreshToken=...)
+    // y redirige según el rol de la cuenta.
+    this.authStore.handleOAuthCallback(params);
   }
 }

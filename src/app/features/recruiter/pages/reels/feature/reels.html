@@ -241,7 +241,7 @@
 
             <div class="comment-body">
               <span class="comment-name clickable" (click)="goToProfile(c.comment.autorId)">{{ c.autorNombre || 'Usuario' }}</span>
-              <p class="comment-text">{{ c.comment.texto }}</p>
+              <p class="comment-text">@for (trozo of trozosTexto(c.comment.texto); track $index) {<span [class.mention]="trozo.mencion">{{ trozo.texto }}</span>}</p>
 
               <div class="comment-meta">
                 <span class="comment-time">{{ c.comment.createdAt | date: 'dd/MM HH:mm' }}</span>
@@ -266,7 +266,7 @@
                       }
                       <div class="comment-body">
                         <span class="comment-name clickable" (click)="goToProfile(r.comment.autorId)">{{ r.autorNombre || 'Usuario' }}</span>
-                        <p class="comment-text">{{ r.comment.texto }}</p>
+                        <p class="comment-text">@for (trozo of trozosTexto(r.comment.texto); track $index) {<span [class.mention]="trozo.mencion">{{ trozo.texto }}</span>}</p>
                         <div class="comment-meta">
                           <span class="comment-time">{{ r.comment.createdAt | date: 'dd/MM HH:mm' }}</span>
                           <button class="comment-action" (click)="openReport(r)">Reportar</button>
@@ -286,11 +286,29 @@
               }
 
               @if (c.showReplyInput) {
+                @if (mencionComentario === c && sugerenciasMencionComentario().length > 0) {
+                  <div class="mencion-lista">
+                    @for (persona of sugerenciasMencionComentario(); track persona.id) {
+                      <button type="button" class="mencion-item" (click)="elegirMencionComentario(persona)">
+                        @if (persona.avatar) {
+                          <img [src]="persona.avatar" alt="" class="mencion-avatar" />
+                        } @else {
+                          <span class="mencion-avatar mencion-iniciales">{{ persona.iniciales }}</span>
+                        }
+                        <span class="mencion-datos">
+                          <span class="mencion-nombre">{{ persona.nombre }}</span>
+                          <span class="mencion-usuario">&#64;{{ persona.usuario }}</span>
+                        </span>
+                      </button>
+                    }
+                  </div>
+                }
                 <div class="comment-input reply-input">
                   <input
                     type="text"
                     placeholder="Escribe una respuesta..."
                     [(ngModel)]="c.replyText"
+                    (input)="onComentarioInput(c.replyText, $any($event.target), c)"
                     (keyup.enter)="addReply(c, reels()[currentIndex].reel.id)"
                   />
                   <button class="send-btn" (click)="addReply(c, reels()[currentIndex].reel.id)">
@@ -314,11 +332,29 @@
         }
       </div>
 
+      @if (mencionComentario === 'nuevo' && sugerenciasMencionComentario().length > 0) {
+        <div class="mencion-lista">
+          @for (persona of sugerenciasMencionComentario(); track persona.id) {
+            <button type="button" class="mencion-item" (click)="elegirMencionComentario(persona)">
+              @if (persona.avatar) {
+                <img [src]="persona.avatar" alt="" class="mencion-avatar" />
+              } @else {
+                <span class="mencion-avatar mencion-iniciales">{{ persona.iniciales }}</span>
+              }
+              <span class="mencion-datos">
+                <span class="mencion-nombre">{{ persona.nombre }}</span>
+                <span class="mencion-usuario">&#64;{{ persona.usuario }}</span>
+              </span>
+            </button>
+          }
+        </div>
+      }
       <div class="comment-input">
         <input
           type="text"
           placeholder="Escribe un comentario..."
           [(ngModel)]="reels()[currentIndex].newComment"
+          (input)="onComentarioInput(reels()[currentIndex].newComment, $any($event.target), 'nuevo')"
           (keyup.enter)="addComment(reels()[currentIndex])"
         />
         <button class="send-btn" (click)="addComment(reels()[currentIndex])">

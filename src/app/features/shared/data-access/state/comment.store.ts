@@ -53,9 +53,10 @@ export class CommentStore {
     contenidoId: string,
     texto: string,
     tipoContenido = 'POST',
-    parentCommentId?: string
+    parentCommentId?: string,
+    etiquetados: string[] = []
   ): Observable<SocialComment> {
-    return this.repository.createComment(autorId, contenidoId, texto, tipoContenido, parentCommentId);
+    return this.repository.createComment(autorId, contenidoId, texto, tipoContenido, parentCommentId, etiquetados);
   }
 
   updateComment(id: string, texto?: string, imagenes?: string[]): Observable<SocialComment> {

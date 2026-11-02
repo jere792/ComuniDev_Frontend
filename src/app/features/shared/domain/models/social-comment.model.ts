@@ -6,6 +6,7 @@ export interface SocialComment {
   parentCommentId?: string;
   texto: string;
   imagenes?: string[];
+  etiquetados?: string[];
   estadoModeracion?: string;
   reaccionesCount?: number;
   repliesCount?: number;

@@ -303,11 +303,29 @@
               </button>
             }
 
+            @if (mencionComentario?.clave === 'post:' + vm.post.id && sugerenciasMencionComentario().length > 0) {
+              <div class="mencion-lista">
+                @for (persona of sugerenciasMencionComentario(); track persona.id) {
+                  <button type="button" class="mencion-item" (click)="elegirMencionComentario(persona)">
+                    @if (persona.avatar) {
+                      <img [src]="persona.avatar" alt="" class="mencion-avatar" />
+                    } @else {
+                      <span class="mencion-avatar mencion-iniciales">{{ persona.iniciales }}</span>
+                    }
+                    <span class="mencion-datos">
+                      <span class="mencion-nombre">{{ persona.nombre }}</span>
+                      <span class="mencion-usuario">&#64;{{ persona.usuario }}</span>
+                    </span>
+                  </button>
+                }
+              </div>
+            }
             <div class="add-comment">
               <input
                 type="text"
                 placeholder="Escribe un comentario..."
                 [(ngModel)]="vm.newComment"
+                (input)="onComentarioInput(vm.newComment, $any($event.target), 'post:' + vm.post.id, vm.post.id)"
                 (keyup.enter)="addComment(vm)"
               />
               <button class="send-btn" [disabled]="!vm.newComment.trim()" (click)="addComment(vm)">
@@ -338,7 +356,7 @@
         } @else {
           <span class="comment-name clickable" (click)="goToProfile(cvm.comment.autorId)">{{ cvm.autorNombre || 'Usuario' }}</span>
         }
-        <p class="comment-text">{{ cvm.comment.texto }}</p>
+        <p class="comment-text">@for (trozo of trozosTexto(cvm.comment.texto); track $index) {<span [class.mention]="trozo.mencion">{{ trozo.texto }}</span>}</p>
       </div>
       <div class="comment-actions">
         <div class="comment-reaction-wrapper">
@@ -398,11 +416,29 @@
       }
 
       @if (cvm.showReplyInput) {
+        @if (mencionComentario?.clave === 'respuesta:' + cvm.comment.id && sugerenciasMencionComentario().length > 0) {
+          <div class="mencion-lista">
+            @for (persona of sugerenciasMencionComentario(); track persona.id) {
+              <button type="button" class="mencion-item" (click)="elegirMencionComentario(persona)">
+                @if (persona.avatar) {
+                  <img [src]="persona.avatar" alt="" class="mencion-avatar" />
+                } @else {
+                  <span class="mencion-avatar mencion-iniciales">{{ persona.iniciales }}</span>
+                }
+                <span class="mencion-datos">
+                  <span class="mencion-nombre">{{ persona.nombre }}</span>
+                  <span class="mencion-usuario">&#64;{{ persona.usuario }}</span>
+                </span>
+              </button>
+            }
+          </div>
+        }
         <div class="reply-input">
           <input
             type="text"
             placeholder="Escribe una respuesta..."
             [(ngModel)]="cvm.replyText"
+            (input)="onComentarioInput(cvm.replyText, $any($event.target), 'respuesta:' + cvm.comment.id, postId, cvm)"
             (keyup.enter)="addReply(cvm, postId)"
           />
           <button class="send-btn" [disabled]="!cvm.replyText.trim()" (click)="addReply(cvm, postId)">
@@ -433,11 +469,29 @@
         }
       </div>
       <div class="modal-footer">
+        @if (mencionComentario?.clave === 'modal' && sugerenciasMencionComentario().length > 0) {
+          <div class="mencion-lista">
+            @for (persona of sugerenciasMencionComentario(); track persona.id) {
+              <button type="button" class="mencion-item" (click)="elegirMencionComentario(persona)">
+                @if (persona.avatar) {
+                  <img [src]="persona.avatar" alt="" class="mencion-avatar" />
+                } @else {
+                  <span class="mencion-avatar mencion-iniciales">{{ persona.iniciales }}</span>
+                }
+                <span class="mencion-datos">
+                  <span class="mencion-nombre">{{ persona.nombre }}</span>
+                  <span class="mencion-usuario">&#64;{{ persona.usuario }}</span>
+                </span>
+              </button>
+            }
+          </div>
+        }
         <div class="add-comment">
           <input
             type="text"
             placeholder="Escribe un comentario..."
             [(ngModel)]="modalNewComment"
+            (input)="onComentarioInput(modalNewComment, $any($event.target), 'modal', modalPostId())"
             (keyup.enter)="addCommentToPost(modalPostId(), modalNewComment)"
           />
           <button class="send-btn" [disabled]="!modalNewComment.trim()" (click)="addCommentToPost(modalPostId(), modalNewComment)">

@@ -15,7 +15,8 @@ export interface CommentRepository {
     contenidoId: string,
     texto: string,
     tipoContenido?: string,
-    parentCommentId?: string
+    parentCommentId?: string,
+    etiquetados?: string[]
   ): Observable<SocialComment>;
   updateComment(id: string, texto?: string, imagenes?: string[]): Observable<SocialComment>;
   deleteComment(id: string): Observable<boolean>;

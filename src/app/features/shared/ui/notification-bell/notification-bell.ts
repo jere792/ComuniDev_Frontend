@@ -199,6 +199,7 @@ export class NotificationBell implements OnInit {
       case 'COMENTARIO': return 'comment';
       case 'REACCION': return 'favorite';
       case 'ETIQUETADO_EN_REEL': return 'alternate_email';
+      case 'ETIQUETADO_EN_COMENTARIO': return 'alternate_email';
       default: return 'notifications';
     }
   }

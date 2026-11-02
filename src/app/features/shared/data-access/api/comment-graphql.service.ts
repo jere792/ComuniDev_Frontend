@@ -75,8 +75,8 @@ const GET_COMMENT_COUNTS = gql`
 `;
 
 const CREATE_COMMENT = gql`
-  mutation CreateComment($autorId: String!, $contenidoId: String!, $tipoContenido: String!, $parentCommentId: String, $texto: String!, $imagenes: [String]) {
-    createComment(autorId: $autorId, contenidoId: $contenidoId, tipoContenido: $tipoContenido, parentCommentId: $parentCommentId, texto: $texto, imagenes: $imagenes) {
+  mutation CreateComment($autorId: String!, $contenidoId: String!, $tipoContenido: String!, $parentCommentId: String, $texto: String!, $imagenes: [String], $etiquetados: [String]) {
+    createComment(autorId: $autorId, contenidoId: $contenidoId, tipoContenido: $tipoContenido, parentCommentId: $parentCommentId, texto: $texto, imagenes: $imagenes, etiquetados: $etiquetados) {
       id
       autorId
       contenidoId
@@ -84,6 +84,7 @@ const CREATE_COMMENT = gql`
       parentCommentId
       texto
       imagenes
+      etiquetados
       estadoModeracion
       reaccionesCount
       repliesCount
@@ -148,9 +149,9 @@ export class CommentGraphqlService implements CommentRepository {
       .pipe(map(result => result.data?.commentCounts ?? []));
   }
 
-  createComment(autorId: string, contenidoId: string, texto: string, tipoContenido = 'POST', parentCommentId?: string): Observable<SocialComment> {
+  createComment(autorId: string, contenidoId: string, texto: string, tipoContenido = 'POST', parentCommentId?: string, etiquetados: string[] = []): Observable<SocialComment> {
     return this.apollo
-      .mutate<any>({ mutation: CREATE_COMMENT, variables: { autorId, contenidoId, tipoContenido, parentCommentId, texto } })
+      .mutate<any>({ mutation: CREATE_COMMENT, variables: { autorId, contenidoId, tipoContenido, parentCommentId, texto, etiquetados } })
       .pipe(map(result => result.data?.createComment));
   }
 

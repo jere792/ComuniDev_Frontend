@@ -103,6 +103,12 @@ export class ReportsComponent implements OnInit {
   /** Lo que se lleva escrito después del "@" y dónde quedó el cursor para reemplazarlo. */
   mencionConsulta = '';
   private mencionCaret = 0;
+  /** Comentario donde se escribe una mención: 'post:<id>' del compositor, 'modal' o 'respuesta:<id>'. */
+  mencionComentario: { clave: string; postId: string; cvm?: CommentVM } | null = null;
+  mencionComentarioConsulta = '';
+  private mencionComentarioCaret = 0;
+  /** Ids mencionados en el comentario que se está escribiendo. */
+  private comentarioEtiquetados: string[] = [];
   loading = signal(true);
   showComposerModal = signal(false);
   showCommentsModal = signal(false);
@@ -437,21 +443,32 @@ export class ReportsComponent implements OnInit {
   /** Conexiones sugeridas para la mención que se está escribiendo. */
   sugerenciasMencion(): PersonaMencion[] {
     if (!this.mencionAbierta) return [];
-    const consulta = this.sinAcentos(this.mencionConsulta);
     const etiquetados = this.mencionAbierta === 'composer'
       ? this.composerEtiquetados
       : this.mencionAbierta.editEtiquetados;
+    return this.personasSugeridas(this.mencionConsulta, etiquetados);
+  }
+
+  /** Conexiones sugeridas al mencionar dentro de un comentario o una respuesta. */
+  sugerenciasMencionComentario(): PersonaMencion[] {
+    if (!this.mencionComentario) return [];
+    return this.personasSugeridas(this.mencionComentarioConsulta, this.comentarioEtiquetados);
+  }
+
+  /** Conexiones que coinciden con lo escrito tras el "@", sin las ya mencionadas. */
+  private personasSugeridas(consulta: string, excluir: string[]): PersonaMencion[] {
+    const limpia = this.sinAcentos(consulta);
     const cache = this.personasCache();
     return this.contactos()
       .map(c => this.otroDeConexion(c))
-      .filter(id => !etiquetados.includes(id))
+      .filter(id => !excluir.includes(id))
       .map(id => {
         const datos = cache[id];
         const nombre = datos?.nombre ?? 'Usuario';
         const usuario = datos?.usuario || this.usuarioDe(nombre);
         return { id, nombre, usuario, avatar: datos?.avatar ?? '', iniciales: this.iniciales(nombre) };
       })
-      .filter(p => !consulta || this.sinAcentos(p.nombre).includes(consulta) || this.sinAcentos(p.usuario).includes(consulta))
+      .filter(p => !limpia || this.sinAcentos(p.nombre).includes(limpia) || this.sinAcentos(p.usuario).includes(limpia))
       .slice(0, 8);
   }
 
@@ -518,6 +535,63 @@ export class ReportsComponent implements OnInit {
     if (vigentes.length === etiquetados.length) return;
     if (destino === 'composer') this.composerEtiquetados = vigentes;
     else destino.editEtiquetados = vigentes;
+  }
+
+  /** Detecta un "@" al escribir un comentario del feed o una respuesta. */
+  onComentarioInput(texto: string, campo: HTMLInputElement, clave: string, postId: string, cvm?: CommentVM): void {
+    //si se borra la mención del texto, deja de estar etiquetada
+    this.comentarioEtiquetados = this.etiquetadosVigentesComentario(texto);
+    const posicion = campo.selectionStart ?? 0;
+    const coincidencia = MENCION_AL_FINAL.exec(texto.slice(0, posicion));
+    if (!coincidencia) {
+      this.cerrarMencionesComentario();
+      return;
+    }
+    this.mencionComentario = { clave, postId, cvm };
+    this.mencionComentarioConsulta = coincidencia[2];
+    this.mencionComentarioCaret = posicion;
+  }
+
+  /** Escribe "@usuario" en el comentario y guarda el id para que le llegue la notificación. */
+  elegirMencionComentario(persona: PersonaMencion): void {
+    const destino = this.mencionComentario;
+    if (!destino) return;
+    const texto = destino.cvm
+      ? destino.cvm.replyText
+      : destino.clave === 'modal'
+        ? this.modalNewComment
+        : (this.posts().find(v => v.post.id === destino.postId)?.newComment ?? '');
+    const antes = texto
+      .slice(0, this.mencionComentarioCaret)
+      .replace(MENCION_AL_FINAL, (_todo: string, espacio: string) => `${espacio}@${persona.usuario} `);
+    const nuevo = `${antes}${texto.slice(this.mencionComentarioCaret)}`;
+    if (destino.cvm) destino.cvm.replyText = nuevo;
+    else if (destino.clave === 'modal') this.modalNewComment = nuevo;
+    else this.posts.update(list => list.map(v => (v.post.id === destino.postId ? { ...v, newComment: nuevo } : v)));
+    if (!this.comentarioEtiquetados.includes(persona.id) && this.comentarioEtiquetados.length < 10) {
+      this.comentarioEtiquetados = [...this.comentarioEtiquetados, persona.id];
+    }
+    this.cerrarMencionesComentario();
+  }
+
+  cerrarMencionesComentario(): void {
+    this.mencionComentario = null;
+    this.mencionComentarioConsulta = '';
+  }
+
+  /** Ids cuyo "@usuario" sigue escrito en el comentario. */
+  private etiquetadosVigentesComentario(texto: string): string[] {
+    return this.comentarioEtiquetados.filter(id => {
+      const datos = this.personasCache()[id];
+      const usuario = datos?.usuario || this.usuarioDe(datos?.nombre ?? '');
+      return !!usuario && texto.includes(`@${usuario}`);
+    });
+  }
+
+  /** Olvida las menciones al enviar el comentario. */
+  private limpiarMencionesComentario(): void {
+    this.comentarioEtiquetados = [];
+    this.cerrarMencionesComentario();
   }
 
   /** "@" + usuario (sin espacios) que se escribe en la mención. */
@@ -948,9 +1022,10 @@ export class ReportsComponent implements OnInit {
     const value = text.trim();
     if (!userId || !value) return;
 
-    this.commentService.createComment(userId, postId, value, 'POST').subscribe({
+    this.commentService.createComment(userId, postId, value, 'POST', undefined, this.etiquetadosVigentesComentario(value)).subscribe({
       next: (created: SocialComment) => {
         if (!created) return;
+        this.limpiarMencionesComentario();
 
         const newVm = this.buildCommentVm(created);
         const cached = this.userCache.get(userId);
@@ -1066,9 +1141,10 @@ export class ReportsComponent implements OnInit {
 
     const wasLoaded = commentVm.repliesLoaded;
 
-    this.commentService.createComment(userId, postId, text, 'POST', commentVm.comment.id).subscribe({
+    this.commentService.createComment(userId, postId, text, 'POST', commentVm.comment.id, this.etiquetadosVigentesComentario(text)).subscribe({
       next: (created: SocialComment) => {
         if (!created) return;
+        this.limpiarMencionesComentario();
 
         const newReply = this.buildCommentVm(created);
         const cached = this.userCache.get(userId);

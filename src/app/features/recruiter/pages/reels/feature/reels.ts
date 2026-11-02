@@ -93,6 +93,14 @@ export class RecruiterReels implements OnInit {
   /** Comentario que se está reportando (null = modal cerrado). */
   reportTarget: ReelCommentVM | null = null;
 
+  // Menciones dentro de los comentarios del reel (el nuevo o una respuesta)
+  /** Desplegable abierto: 'nuevo', el comentario al que se responde, o null si está cerrado. */
+  mencionComentario: 'nuevo' | ReelCommentVM | null = null;
+  mencionComentarioConsulta = '';
+  private mencionComentarioCaret = 0;
+  /** Ids mencionados en el comentario que se está escribiendo. */
+  private comentarioEtiquetados: string[] = [];
+
   // Reproducción del video (barra de progreso estilo TikTok)
   currentTime = 0;
   duration = 0;
@@ -308,11 +316,22 @@ export class RecruiterReels implements OnInit {
   /** Conexiones sugeridas para la mención que se está escribiendo. */
   sugerenciasMencion(): PersonaMencion[] {
     if (!this.mencionAbierta) return [];
-    const consulta = this.sinAcentos(this.mencionConsulta);
+    return this.personasSugeridas(this.mencionConsulta, this.composerEtiquetados);
+  }
+
+  /** Conexiones sugeridas al mencionar dentro de un comentario del reel. */
+  sugerenciasMencionComentario(): PersonaMencion[] {
+    if (this.mencionComentario === null) return [];
+    return this.personasSugeridas(this.mencionComentarioConsulta, this.comentarioEtiquetados);
+  }
+
+  /** Conexiones que coinciden con lo escrito tras el "@", sin las ya mencionadas. */
+  private personasSugeridas(consulta: string, excluir: string[]): PersonaMencion[] {
+    const limpia = this.sinAcentos(consulta);
     const cache = this.personas();
     return this.contactos()
       .map(c => this.otroDeConexion(c))
-      .filter(id => !this.composerEtiquetados.includes(id))
+      .filter(id => !excluir.includes(id))
       .map(id => {
         const datos = cache[id];
         const autor = this.reelStore.autoresCache.get(id);
@@ -320,7 +339,7 @@ export class RecruiterReels implements OnInit {
         const usuario = datos?.usuario || this.usuarioDe(nombre);
         return { id, nombre, usuario, avatar: datos?.avatar ?? autor?.avatar ?? '', iniciales: this.iniciales(nombre) };
       })
-      .filter(p => !consulta || this.sinAcentos(p.nombre).includes(consulta) || this.sinAcentos(p.usuario).includes(consulta))
+      .filter(p => !limpia || this.sinAcentos(p.nombre).includes(limpia) || this.sinAcentos(p.usuario).includes(limpia))
       .slice(0, 8);
   }
 
@@ -339,6 +358,66 @@ export class RecruiterReels implements OnInit {
   cerrarMenciones(): void {
     this.mencionAbierta = false;
     this.mencionConsulta = '';
+  }
+
+  /** Detecta un "@" al escribir un comentario del reel (el nuevo o una respuesta). */
+  onComentarioInput(texto: string, campo: HTMLInputElement, destino: 'nuevo' | ReelCommentVM): void {
+    //si se borra la mención del texto, deja de estar etiquetada
+    this.comentarioEtiquetados = this.etiquetadosVigentesComentario(texto);
+    const clave = campo.selectionStart ?? 0;
+    const coincidencia = MENCION_AL_FINAL.exec(texto.slice(0, clave));
+    if (!coincidencia) {
+      this.cerrarMencionesComentario();
+      return;
+    }
+    this.mencionComentario = destino;
+    this.mencionComentarioConsulta = coincidencia[2];
+    this.mencionComentarioCaret = clave;
+  }
+
+  /** Escribe "@usuario" en el comentario y guarda el id para que le llegue la notificación. */
+  elegirMencionComentario(persona: PersonaMencion): void {
+    const destino = this.mencionComentario;
+    if (destino === null) return;
+    const texto = destino === 'nuevo'
+      ? (this.reels()[this.currentIndex]?.newComment ?? '')
+      : destino.replyText;
+    const antes = texto
+      .slice(0, this.mencionComentarioCaret)
+      .replace(MENCION_AL_FINAL, (_todo: string, espacio: string) => `${espacio}@${persona.usuario} `);
+    const nuevo = `${antes}${texto.slice(this.mencionComentarioCaret)}`;
+    if (destino === 'nuevo') {
+      const actual = this.reels()[this.currentIndex];
+      if (actual) {
+        this.reels.update(list => list.map(v => (v.reel.id === actual.reel.id ? { ...v, newComment: nuevo } : v)));
+      }
+    } else {
+      destino.replyText = nuevo;
+    }
+    if (!this.comentarioEtiquetados.includes(persona.id) && this.comentarioEtiquetados.length < 10) {
+      this.comentarioEtiquetados = [...this.comentarioEtiquetados, persona.id];
+    }
+    this.cerrarMencionesComentario();
+  }
+
+  cerrarMencionesComentario(): void {
+    this.mencionComentario = null;
+    this.mencionComentarioConsulta = '';
+  }
+
+  /** Ids cuyo "@usuario" sigue escrito en el comentario. */
+  private etiquetadosVigentesComentario(texto: string): string[] {
+    return this.comentarioEtiquetados.filter(id => {
+      const datos = this.personas()[id];
+      const usuario = datos?.usuario || this.usuarioDe(datos?.nombre ?? '');
+      return !!usuario && texto.includes(`@${usuario}`);
+    });
+  }
+
+  /** Olvida las menciones al enviar el comentario. */
+  private limpiarMencionesComentario(): void {
+    this.comentarioEtiquetados = [];
+    this.cerrarMencionesComentario();
   }
 
   /** Parte la descripción para pintar las menciones en azul, como en el feed. */
@@ -865,9 +944,10 @@ export class RecruiterReels implements OnInit {
     const text = vm.replyText.trim();
     if (!userId || !text) return;
 
-    this.commentService.createComment(userId, reelId, text, 'REEL', vm.comment.id).subscribe({
+    this.commentService.createComment(userId, reelId, text, 'REEL', vm.comment.id, this.etiquetadosVigentesComentario(text)).subscribe({
       next: (created: SocialComment) => {
         if (!created) return;
+        this.limpiarMencionesComentario();
         const nuevo = this.buildCommentVm(created);
         nuevo.autorNombre = this.myName;
         nuevo.autorAvatar = this.myAvatar;
@@ -929,9 +1009,10 @@ export class RecruiterReels implements OnInit {
     const text = vm.newComment.trim();
     if (!userId || !text) return;
 
-    this.commentService.createComment(userId, vm.reel.id, text, 'REEL').subscribe({
+    this.commentService.createComment(userId, vm.reel.id, text, 'REEL', undefined, this.etiquetadosVigentesComentario(text)).subscribe({
       next: (created: SocialComment) => {
         if (created) {
+          this.limpiarMencionesComentario();
           this.reels.update(list => list.map(v =>
             v.reel.id === vm.reel.id
               ? {

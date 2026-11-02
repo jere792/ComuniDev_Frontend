@@ -1,0 +1,110 @@
+:host {
+  display: block;
+}
+
+.badges-card {
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.badges-skeleton {
+  color: var(--on-surface-variant);
+  font-size: 14px;
+  text-align: center;
+}
+
+.badges-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.badges-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--on-surface);
+  margin: 0;
+
+  .material-symbols-outlined {
+    font-size: 20px;
+    color: var(--primary);
+  }
+}
+
+.badges-count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  background: var(--surface-container);
+  color: var(--on-surface-variant);
+}
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-sm);
+}
+
+.badge-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  padding: var(--space-sm);
+  border-radius: var(--radius-lg);
+  background: var(--surface-container-low);
+  border: 1px solid var(--border-subtle);
+  filter: grayscale(1);
+  opacity: 0.65;
+  transition: filter 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+
+  &.unlocked {
+    filter: none;
+    opacity: 1;
+    background: var(--surface-container-lowest);
+    border-color: rgba(0, 36, 44, 0.16);
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.badge-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.badge-name {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.badge-desc {
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--on-surface-variant);
+}
+
+.badge-lock {
+  color: var(--on-surface-variant);
+
+  .material-symbols-outlined {
+    font-size: 16px;
+  }
+}

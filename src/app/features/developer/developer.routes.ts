@@ -13,6 +13,7 @@ export const routes: Routes = [
         { label: 'Mensajes', route: '/developer/messages', icon: 'chat' },
         { label: 'Solicitudes', route: '/developer/solicitudes', icon: 'person_add' },
         { label: 'Postulaciones', route: '/developer/postulaciones', icon: 'work' },
+        { label: 'Ranking', route: '/developer/ranking', icon: 'leaderboard' },
         { label: 'Perfil', route: '/developer/profile', icon: 'person' },
       ],
     },
@@ -53,6 +54,12 @@ export const routes: Routes = [
         title: 'Vacante',
         loadComponent: () =>
           import('@features/developer/postulaciones/feature/vacancy-detail').then(m => m.VacancyDetailPage),
+      },
+      {
+        path: 'ranking',
+        title: 'Ranking',
+        loadComponent: () =>
+          import('@features/developer/gamificacion/feature/ranking/ranking').then(m => m.DeveloperRanking),
       },
       {
         path: 'discover',

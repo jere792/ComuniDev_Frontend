@@ -10,6 +10,9 @@ import { ImageEditorService } from '@core/services/image-editor.service';
 import { DeveloperProfileCard } from '@features/developer/profile/ui/profile-card/developer-profile-card';
 import { DeveloperContactInfo } from '@features/developer/profile/ui/contact-info/developer-contact-info';
 import { DeveloperStackCard } from '@features/developer/profile/ui/stack-card/developer-stack-card';
+import { PointsStore } from '@features/developer/gamificacion/data-access/state/points.store';
+import { PointsCard } from '@features/developer/gamificacion/ui/points-card/points-card';
+import { BadgesGrid } from '@features/developer/gamificacion/ui/badges-grid/badges-grid';
 import { SidebarCard } from '@features/recruiter/pages/profile/ui/sidebar-card/sidebar-card';
 import { SocialListModal, SocialListType } from '@features/recruiter/pages/profile/ui/social-list-modal/social-list-modal';
 import { TagInputComponent } from '@shared/ui/tag-input/tag-input';
@@ -24,6 +27,8 @@ import { TagInputComponent } from '@shared/ui/tag-input/tag-input';
     DeveloperProfileCard,
     DeveloperContactInfo,
     DeveloperStackCard,
+    PointsCard,
+    BadgesGrid,
     SidebarCard,
     SocialListModal,
     TagInputComponent,
@@ -35,6 +40,7 @@ export class DeveloperProfilePage implements OnInit {
   private fb = inject(FormBuilder);
   private store = inject(DeveloperProfileStore);
   private userStore = inject(UserStore);
+  private pointsStore = inject(PointsStore);
 
   user = signal<User | null>(null);
   isEditingBasic = signal(false);
@@ -95,6 +101,9 @@ export class DeveloperProfilePage implements OnInit {
 
   ngOnInit(): void {
     this.loadUser();
+    // puntos, nivel, rango e insignias del usuario logueado (tarjetas del perfil)
+    const userId = localStorage.getItem('userId');
+    if (userId) this.pointsStore.loadProfile(userId);
   }
 
   loadUser(): void {

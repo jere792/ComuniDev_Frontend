@@ -1,0 +1,39 @@
+@if (badges().length) {
+  <section class="badges-card">
+    <header class="badges-head">
+      <h3 class="badges-title">
+        <span class="material-symbols-outlined">military_tech</span>
+        Insignias
+      </h3>
+      <span class="badges-count">{{ desbloqueadas() }}/{{ badges().length }}</span>
+    </header>
+
+    <div class="badges-grid">
+      @for (badge of badges(); track badge.codigo) {
+        <div
+          class="badge-item"
+          [class.unlocked]="badge.desbloqueada"
+          [attr.title]="badge.descripcion || badge.nombre"
+        >
+          <span class="badge-icon" aria-hidden="true">
+            @if (badge.icono; as icono) {
+              {{ icono }}
+            } @else {
+              🏅
+            }
+          </span>
+          <span class="badge-name">{{ badge.nombre }}</span>
+          @if (badge.desbloqueada) {
+            <span class="badge-desc">{{ badge.descripcion }}</span>
+          } @else {
+            <span class="badge-lock" aria-hidden="true">
+              <span class="material-symbols-outlined">lock</span>
+            </span>
+          }
+        </div>
+      }
+    </div>
+  </section>
+} @else if (loading()) {
+  <section class="badges-card badges-skeleton">Cargando insignias…</section>
+}

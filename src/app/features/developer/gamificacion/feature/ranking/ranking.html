@@ -1,0 +1,61 @@
+<div class="ranking-container">
+  <div class="ranking-header">
+    <h1>Ranking</h1>
+    <p class="ranking-subtitle">Los usuarios con más puntos de la comunidad</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <span class="material-symbols-outlined spinning">progress_activity</span>
+      Cargando ranking...
+    </div>
+  } @else if (error()) {
+    <div class="state-box">
+      <span class="material-symbols-outlined">error</span>
+      <p>{{ error() }}</p>
+    </div>
+  } @else {
+    <div class="ranking-list">
+      @for (row of ranking(); track row.posicion) {
+        <button
+          class="ranking-card"
+          type="button"
+          [class.top]="row.posicion <= 3"
+          [class.is-me]="esYo(row)"
+          (click)="abrirPerfil(row)"
+        >
+          <span class="position" [class.medal]="row.posicion <= 3">{{ medalla(row.posicion) }}</span>
+
+          @if (row.fotoPerfilUrl; as foto) {
+            <img class="avatar" [src]="foto" [alt]="row.nombre ?? 'Usuario'" />
+          } @else {
+            <span class="avatar avatar-fallback">{{ iniciales(row.nombre) }}</span>
+          }
+
+          <span class="user-text">
+            <span class="user-name">{{ row.nombre || 'Usuario' }}</span>
+            <span class="user-handle">@{{ row.nombreUsuario || 'usuario' }}</span>
+          </span>
+
+          <span class="user-stats">
+            <span class="rango-pill" [style.--rango-color]="rangoColor(row.puntos.rango)">
+              {{ rangoEmoji(row.puntos.rango) }}
+              {{ rangoNombre(row.puntos.rango) }}
+            </span>
+            <span class="nivel">Nivel {{ row.puntos.nivel }}</span>
+          </span>
+
+          <span class="points">
+            <strong>{{ row.puntos.puntosTotales | number }}</strong>
+            <span class="points-label">puntos</span>
+          </span>
+        </button>
+      } @empty {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">leaderboard</span>
+          <span>Todavía no hay puntos en el ranking</span>
+        </div>
+      }
+    </div>
+  }
+</div>

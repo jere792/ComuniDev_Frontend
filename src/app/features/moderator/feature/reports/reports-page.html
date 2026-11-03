@@ -111,22 +111,24 @@
                 }
               </div>
 
-              <button
-                type="button"
-                class="link-btn"
-                [disabled]="previewLoading() === clave(reporte)"
-                (click)="verPreview(reporte)"
-              >
-                @if (previewAbierto() === clave(reporte)) {
-                  Ocultar vista previa
-                } @else if (previewLoading() === clave(reporte)) {
-                  Cargando…
-                } @else if (esTipoContenido(reporte.targetType)) {
-                  Ver contenido
-                } @else {
-                  Ver usuario
-                }
-              </button>
+              @if (!esSoporte(reporte.targetType)) {
+                <button
+                  type="button"
+                  class="link-btn"
+                  [disabled]="previewLoading() === clave(reporte)"
+                  (click)="verPreview(reporte)"
+                >
+                  @if (previewAbierto() === clave(reporte)) {
+                    Ocultar vista previa
+                  } @else if (previewLoading() === clave(reporte)) {
+                    Cargando…
+                  } @else if (esTipoContenido(reporte.targetType)) {
+                    Ver contenido
+                  } @else {
+                    Ver usuario
+                  }
+                </button>
+              }
 
               @if (previewAbierto() === clave(reporte)) {
                 <div class="preview">
@@ -162,24 +164,26 @@
                     <span class="material-symbols-outlined">block</span>
                     <span class="action-label">Rechazar</span>
                   </button>
-                  <button
-                    type="button"
-                    class="action-btn hide"
-                    title="Ocultar el contenido reportado"
-                    (click)="pedirAccion(reporte, 'OCULTAR')"
-                  >
-                    <span class="material-symbols-outlined">visibility_off</span>
-                    <span class="action-label">Ocultar</span>
-                  </button>
-                  <button
-                    type="button"
-                    class="action-btn sanction"
-                    title="Ocultar el contenido y sancionar al autor"
-                    (click)="pedirAccion(reporte, 'SANCIONAR')"
-                  >
-                    <span class="material-symbols-outlined">gavel</span>
-                    <span class="action-label">Sancionar</span>
-                  </button>
+                  @if (!esSoporte(reporte.targetType)) {
+                    <button
+                      type="button"
+                      class="action-btn hide"
+                      title="Ocultar el contenido reportado"
+                      (click)="pedirAccion(reporte, 'OCULTAR')"
+                    >
+                      <span class="material-symbols-outlined">visibility_off</span>
+                      <span class="action-label">Ocultar</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="action-btn sanction"
+                      title="Ocultar el contenido y sancionar al autor"
+                      (click)="pedirAccion(reporte, 'SANCIONAR')"
+                    >
+                      <span class="material-symbols-outlined">gavel</span>
+                      <span class="action-label">Sancionar</span>
+                    </button>
+                  }
                 </div>
               </td>
             } @else {

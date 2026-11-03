@@ -209,6 +209,11 @@ export class ReportsPage implements OnInit {
     return (reporte.targetType ?? '').trim().toUpperCase() === 'USER';
   }
 
+  /** Reporte de problema hacia soporte: sin contenido ni usuario que previsualizar. */
+  esSoporte(targetType: string): boolean {
+    return (targetType ?? '').trim().toUpperCase() === 'SUPPORT';
+  }
+
   accionDe(reporte: Reporte): string {
     return accionLabel(reporte.accionResolucion);
   }

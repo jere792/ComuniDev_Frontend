@@ -41,6 +41,7 @@ export const TARGET_LABELS: Record<string, string> = {
   REEL: 'Reel',
   COMMENT: 'Comentario',
   USER: 'Usuario',
+  SUPPORT: 'Soporte',
 };
 
 export const ACCION_LABELS: Record<string, string> = {

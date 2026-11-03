@@ -15,15 +15,19 @@ import { BottomNav } from '@shared/ui/bottom-nav/bottom-nav';
 export class DeveloperLayout implements OnInit {
   private route = inject(ActivatedRoute);
 
+  /** Links del header de escritorio: sin "Perfil" (ya vive en el sidebar). */
   headerLinks: HeaderLink[] = [];
+  /** Links completos para el bottom-nav movil (ahi si incluye Perfil). */
+  navLinks: HeaderLink[] = [];
 
   ngOnInit(): void {
     const data = this.route.snapshot.data;
     const links = data['sidebarLinks'] || [];
-    this.headerLinks = links.map((l: { label: string; route: string; icon?: string }) => ({
+    this.navLinks = links.map((l: { label: string; route: string; icon?: string }) => ({
       label: l.label,
       route: l.route,
       icon: l.icon,
     }));
+    this.headerLinks = this.navLinks.filter((l) => !l.route.includes('/profile'));
   }
 }

@@ -115,6 +115,30 @@
   gap: var(--space-sm);
 }
 
+.icon-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--on-surface);
+  }
+
+  .material-symbols-outlined {
+    font-size: 22px;
+  }
+}
+
 /* en movil el header queda solo con el logotipo y las notificaciones */
 @media (max-width: 768px) {
   .user-header {

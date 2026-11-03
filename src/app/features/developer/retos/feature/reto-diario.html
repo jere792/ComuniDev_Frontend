@@ -1,0 +1,216 @@
+<div class="reto-container">
+  <div class="reto-header">
+    <button class="back-btn" type="button" (click)="vuelve()" aria-label="Volver">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <div class="header-text">
+      <h1>Reto diario</h1>
+      <p class="header-subtitle">Un ejercicio técnico al día · {{ fechaHoy }}</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <span class="material-symbols-outlined spinning">progress_activity</span>
+      Cargando el reto del día...
+    </div>
+  } @else if (error()) {
+    <div class="state-box">
+      <span class="material-symbols-outlined">error</span>
+      <p>{{ error() }}</p>
+      <button class="btn btn-outline" type="button" (click)="reiniciar()">Reintentar</button>
+    </div>
+  } @else if (challenge(); as reto) {
+    <!-- Enunciado -->
+    <article class="reto-card">
+      <div class="reto-top">
+        <span class="tipo-chip">{{ reto.tipo === 'TEORICO' ? '📝 Teórico' : '💻 Código' }}</span>
+        @if (reto.lenguaje; as lenguaje) {
+          <span class="lenguaje-chip">{{ lenguaje }}</span>
+        }
+        @if (reto.dificultad; as dificultad) {
+          <span class="dificultad-chip">{{ dificultadLabel(dificultad) }}</span>
+        }
+        @if (respondido()) {
+          <span class="respondido-chip">Respondido hoy — vuelve mañana 🗓️</span>
+        }
+      </div>
+
+      <h2 class="reto-titulo">{{ reto.titulo }}</h2>
+      <p class="reto-enunciado">{{ reto.enunciado }}</p>
+
+      @if (reto.etiquetas?.length) {
+        <div class="reto-tags">
+          @for (tag of reto.etiquetas!; track tag) {
+            <span class="tag">{{ tag }}</span>
+          }
+        </div>
+      }
+
+      <!-- ─── Formulario (aún no respondió) ─── -->
+      @if (!respondido()) {
+        @if (esTeorico()) {
+          <section class="opciones" role="radiogroup" aria-label="Opciones de respuesta">
+            @for (opcion of reto.opciones!; track opcion; let i = $index) {
+              <button
+                class="opcion"
+                type="button"
+                role="radio"
+                [attr.aria-checked]="seleccion() === i"
+                [class.activa]="seleccion() === i"
+                (click)="elegirOpcion(i)"
+              >
+                <span class="opcion-letra">{{ letraOpcion(i) }}</span>
+                <span class="opcion-texto">{{ opcion }}</span>
+              </button>
+            }
+          </section>
+
+          <div class="acciones">
+            <button
+              class="btn btn-primary"
+              type="button"
+              (click)="responder()"
+              [disabled]="seleccion() == null || submitting()"
+            >
+              <span class="material-symbols-outlined">check_circle</span>
+              {{ submitting() ? 'Enviando…' : 'Responder' }}
+            </button>
+          </div>
+        } @else {
+          <section class="editor">
+            <div class="editor-bar">
+              <span class="editor-dot"></span>
+              <span class="editor-dot"></span>
+              <span class="editor-dot"></span>
+              <span class="editor-lang">{{ reto.lenguaje || 'CODIGO' }}</span>
+            </div>
+            <textarea
+              class="editor-textarea"
+              spellcheck="false"
+              placeholder="// Escribe aquí tu solución…"
+              [value]="codigo() || reto.codigoInicial || ''"
+              (input)="escribirCodigo($event)"
+            ></textarea>
+          </section>
+
+          <div class="acciones">
+            <button
+              class="btn btn-primary"
+              type="button"
+              (click)="responder()"
+              [disabled]="!codigo().trim() || submitting()"
+            >
+              <span class="material-symbols-outlined">send</span>
+              {{ submitting() ? 'Enviando…' : 'Enviar solución' }}
+            </button>
+          </div>
+        }
+      }
+
+      <!-- ─── Resultado ─── -->
+      @if (submitting()) {
+        <div class="validando">
+          <span class="material-symbols-outlined spinning">progress_activity</span>
+          Validando tu respuesta...
+        </div>
+      } @else if (submission(); as resultado) {
+        <section class="resultado" [ngClass]="estadoMeta(resultado.estado).clase">
+          <div class="resultado-head">
+            <span class="resultado-emoji">{{ estadoMeta(resultado.estado).emoji }}</span>
+            <div class="resultado-texto">
+              <strong>{{ estadoMeta(resultado.estado).label }}</strong>
+              @if (resultado.puntosOtorgados != null) {
+                <span class="puntos">+{{ resultado.puntosOtorgados }} puntos</span>
+              }
+            </div>
+          </div>
+
+          @if (resultado.feedback; as feedback) {
+            <p class="feedback">{{ feedback }}</p>
+          }
+
+          @if (resultado.codigo; as codigoEnviado) {
+            <div class="respuesta-enviada">
+              <span class="respuesta-label">Tu solución</span>
+              <pre class="respuesta-codigo"><code>{{ codigoEnviado }}</code></pre>
+            </div>
+          } @else if (resultado.respuesta != null) {
+            <p class="respuesta-label">
+              Tu respuesta: opción {{ letraOpcion(resultado.respuesta) }}
+              @if (reto.opciones?.[resultado.respuesta]; as texto) {
+                — «{{ texto }}»
+              }
+            </p>
+          }
+
+          @if (opcionCorrecta() != null && esTeorico()) {
+            <p class="respuesta-correcta">
+              Respuesta correcta: opción {{ letraOpcion(opcionCorrecta()!) }}
+              @if (reto.opciones?.[opcionCorrecta()!]; as texto) {
+                — «{{ texto }}»
+              }
+            </p>
+          }
+        </section>
+
+        <!-- Solución de referencia (colapsable) -->
+        @if (solucionVisible() || explicacionVisible()) {
+          <div class="solucion">
+            <button class="solucion-toggle" type="button" (click)="toggleSolucion()" [attr.aria-expanded]="solucionAbierta()">
+              <span class="material-symbols-outlined">{{ solucionAbierta() ? 'expand_less' : 'expand_more' }}</span>
+              Solución de referencia
+            </button>
+            @if (solucionAbierta()) {
+              <div class="solucion-body">
+                @if (solucionVisible(); as solucion) {
+                  <span class="solucion-label">Solución</span>
+                  <pre class="solucion-codigo"><code>{{ solucion }}</code></pre>
+                }
+                @if (explicacionVisible(); as explicacion) {
+                  <span class="solucion-label">Explicación</span>
+                  <p class="solucion-explicacion">{{ explicacion }}</p>
+                }
+              </div>
+            }
+          </div>
+        }
+      }
+    </article>
+  }
+
+  <!-- ─── Histórico ─── -->
+  @if (history().length) {
+    <section class="historico">
+      <button class="historico-toggle" type="button" (click)="toggleHistorico()" [attr.aria-expanded]="mostrarHistorico()">
+        <span class="material-symbols-outlined">{{ mostrarHistorico() ? 'expand_less' : 'expand_more' }}</span>
+        Histórico de retos ({{ history().length }})
+      </button>
+      @if (mostrarHistorico()) {
+        <div class="historico-lista">
+          @for (item of history(); track item.id) {
+            <article class="historico-card">
+              <div class="historico-main">
+                <span class="historico-emoji">{{ estadoMeta(item.estado).emoji }}</span>
+                <div class="historico-texto">
+                  <strong>{{ tituloDe(item) }}</strong>
+                  @if (fechaDe(item); as fecha) {
+                    <span class="historico-fecha">{{ fecha | date: 'dd/MM/yyyy' }}</span>
+                  }
+                </div>
+              </div>
+              <div class="historico-side">
+                <span class="estado-chip" [ngClass]="estadoMeta(item.estado).clase">
+                  {{ estadoMeta(item.estado).label }}
+                </span>
+                @if (item.puntosOtorgados != null) {
+                  <span class="historico-puntos">+{{ item.puntosOtorgados }}</span>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  }
+</div>

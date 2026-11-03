@@ -14,6 +14,7 @@ export const routes: Routes = [
         { label: 'Solicitudes', route: '/developer/solicitudes', icon: 'person_add' },
         { label: 'Postulaciones', route: '/developer/postulaciones', icon: 'work' },
         { label: 'EcoDev', route: '/developer/ecodev', icon: 'eco' },
+        { label: 'Retos', route: '/developer/retos', icon: 'sports_score' },
         { label: 'Ranking', route: '/developer/ranking', icon: 'leaderboard' },
         { label: 'Perfil', route: '/developer/profile', icon: 'person' },
       ],
@@ -77,6 +78,11 @@ export const routes: Routes = [
         path: 'ecodev/:id',
         title: 'Anuncio EcoDev',
         loadComponent: () => import('@features/developer/ecodev/feature/ecodev-detail').then(m => m.EcodevDetail),
+      },
+      {
+        path: 'retos',
+        title: 'Retos diarios',
+        loadComponent: () => import('@features/developer/retos/feature/reto-diario').then(m => m.RetoDiario),
       },
       {
         path: 'discover',

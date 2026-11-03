@@ -31,27 +31,17 @@
             <strong>{{ impacto.reciclajes }}</strong>
             <span>reciclajes</span>
           </div>
-          <div class="impacto-card">
-            <span class="material-symbols-outlined impacto-icono">build</span>
-            <strong>{{ impacto.reparaciones }}</strong>
-            <span>reparaciones</span>
-          </div>
-          <div class="impacto-card">
-            <span class="material-symbols-outlined impacto-icono">autorenew</span>
-            <strong>{{ impacto.reutilizaciones }}</strong>
-            <span>reutilizaciones</span>
-          </div>
-          <div class="impacto-card">
-            <span class="material-symbols-outlined impacto-icono">campaign</span>
-            <strong>{{ impacto.campanas }}</strong>
-            <span>campañas</span>
-          </div>
           <div class="impacto-card impacto-total">
             <span class="material-symbols-outlined impacto-icono">devices</span>
             <strong>{{ impacto.equiposTotal }}</strong>
             <span>equipos salvados</span>
           </div>
         </div>
+        <p class="impacto-extra">
+          <span><span class="material-symbols-outlined">build</span> {{ impacto.reparaciones }} reparaciones</span>
+          <span><span class="material-symbols-outlined">autorenew</span> {{ impacto.reutilizaciones }} reutilizaciones</span>
+          <span><span class="material-symbols-outlined">campaign</span> {{ impacto.campanas }} campañas</span>
+        </p>
       </section>
     }
 

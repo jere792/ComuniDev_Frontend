@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -32,6 +32,13 @@ export class EcodevList implements OnInit {
   readonly store = inject(EcodevStore);
   private readonly router = inject(Router);
   private readonly miUserId = localStorage.getItem('userId') ?? '';
+
+  /** Pestaña activa: anuncios por defecto (operaciones y puntos no se pierden abajo). */
+  readonly tab = signal<'anuncios' | 'operaciones' | 'puntos'>('anuncios');
+
+  setTab(tab: 'anuncios' | 'operaciones' | 'puntos'): void {
+    this.tab.set(tab);
+  }
 
   readonly categorias = Object.entries(CATEGORIAS_EQUIPO);
   readonly tipos = Object.entries({

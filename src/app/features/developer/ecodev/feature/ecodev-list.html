@@ -55,7 +55,30 @@
       </section>
     }
 
+    <!-- ─── Pestañas: Anuncios puede crecer mucho; operaciones y puntos viven aparte ─── -->
+    <nav class="ecodev-tabs" role="tablist" aria-label="Secciones EcoDev">
+      <button type="button" class="tab" [class.active]="tab() === 'anuncios'" (click)="setTab('anuncios')" role="tab">
+        <span class="material-symbols-outlined">sell</span>
+        Anuncios
+      </button>
+      <button type="button" class="tab" [class.active]="tab() === 'operaciones'" (click)="setTab('operaciones')" role="tab">
+        <span class="material-symbols-outlined">handshake</span>
+        Mis operaciones
+        @if (store.misOperaciones().length) {
+          <span class="tab-count">{{ store.misOperaciones().length }}</span>
+        }
+      </button>
+      <button type="button" class="tab" [class.active]="tab() === 'puntos'" (click)="setTab('puntos')" role="tab">
+        <span class="material-symbols-outlined">recycling</span>
+        Puntos de reciclaje
+        @if (store.recyclingPoints().length) {
+          <span class="tab-count">{{ store.recyclingPoints().length }}</span>
+        }
+      </button>
+    </nav>
+
   <!-- ─── Anuncios ─── -->
+  @if (tab() === 'anuncios') {
   <section class="anuncios-section" aria-label="Anuncios">
     <div class="section-head">
       <h2 class="section-title">Anuncios</h2>
@@ -179,8 +202,10 @@
       }
     }
   </section>
+  }
 
   <!-- ─── Mis operaciones ─── -->
+  @if (tab() === 'operaciones') {
   <section class="operaciones-section" aria-label="Mis operaciones">
     <h2 class="section-title">Mis operaciones</h2>
     @if (store.operacionesLoading()) {
@@ -223,8 +248,10 @@
       </div>
     }
   </section>
+  }
 
   <!-- ─── Puntos de reciclaje ─── -->
+  @if (tab() === 'puntos') {
   <section class="puntos-section" aria-label="Puntos de reciclaje">
     <h2 class="section-title">Puntos de reciclaje verificados</h2>
     @if (store.puntosLoading()) {
@@ -280,6 +307,7 @@
       </div>
     }
   </section>
+  }
   </div>
   <app-shared-right-panel />
 </div>

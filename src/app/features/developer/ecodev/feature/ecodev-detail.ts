@@ -24,6 +24,11 @@ import {
 export class EcodevDetail implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+
+  /** Base de rutas EcoDev segun el rol activo (/developer o /recruiter). */
+  get baseEcoDev(): string {
+    return this.router.url.startsWith('/recruiter') ? '/recruiter/ecodev' : '/developer/ecodev';
+  }
   private readonly location = inject(Location);
   private readonly toast = inject(ToastService);
   readonly store = inject(EcodevStore);
@@ -180,7 +185,7 @@ export class EcodevDetail implements OnInit {
     if (window.history.length > 1) {
       this.location.back();
     } else {
-      this.router.navigate(['/developer/ecodev']);
+      this.router.navigate([this.baseEcoDev]);
     }
   }
 }

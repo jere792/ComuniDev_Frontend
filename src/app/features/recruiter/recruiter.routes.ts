@@ -14,6 +14,7 @@ export const routes: Routes = [
         { label: 'Reels', route: '/recruiter/reels', icon: 'smart_display' },
         { label: 'Candidatos', route: '/recruiter/candidates', icon: 'people' },
         { label: 'Ofertas', route: '/recruiter/offers', icon: 'work' },
+        { label: 'EcoDev', route: '/recruiter/ecodev', icon: 'eco' },
         { label: 'Mensajes', route: '/recruiter/messages', icon: 'chat' },
         { label: 'Perfil', route: '/recruiter/profile', icon: 'person' },
       ],
@@ -25,6 +26,11 @@ export const routes: Routes = [
       { path: 'candidates', loadComponent: () => import('@features/recruiter/pages/candidates/feature/candidates').then(m => m.RecruiterCandidates) },
       { path: 'offers', loadComponent: () => import('@features/recruiter/pages/offers/feature/offers').then(m => m.RecruiterOffers) },
       { path: 'offers/new', loadComponent: () => import('@features/recruiter/pages/offers/feature/offers-new').then(m => m.RecruiterOffersNew) },
+      // EcoDev es compartido entre developer y recruiter: se reutiliza el mismo
+      // slice y los componentes resuelven su base con `baseEcoDev`.
+      { path: 'ecodev', loadComponent: () => import('@features/developer/ecodev/feature/ecodev-list').then(m => m.EcodevList) },
+      { path: 'ecodev/nuevo', loadComponent: () => import('@features/developer/ecodev/feature/ecodev-nuevo').then(m => m.EcodevNuevo) },
+      { path: 'ecodev/:id', loadComponent: () => import('@features/developer/ecodev/feature/ecodev-detail').then(m => m.EcodevDetail) },
       // matcher propio: /recruiter/messages y /recruiter/messages/<userId> usan la
       // misma entrada (Angular no admite el "?" opcional en `path`), asi el
       // componente no se recrea al cambiar de chat

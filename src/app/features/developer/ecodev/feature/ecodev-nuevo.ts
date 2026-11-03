@@ -39,6 +39,11 @@ export class EcodevNuevo implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly upload = inject(UploadService);
   private readonly router = inject(Router);
+
+  /** Base de rutas EcoDev segun el rol activo (/developer o /recruiter). */
+  get baseEcoDev(): string {
+    return this.router.url.startsWith('/recruiter') ? '/recruiter/ecodev' : '/developer/ecodev';
+  }
   private readonly location = inject(Location);
 
   readonly tipos = Object.entries({
@@ -93,7 +98,7 @@ export class EcodevNuevo implements OnInit {
         this.saving.set(false);
         if (post) {
           this.toast.success('Anuncio publicado');
-          this.router.navigate(['/developer/ecodev']);
+          this.router.navigate([this.baseEcoDev]);
         } else {
           this.toast.error('No se pudo publicar el anuncio');
         }
@@ -160,7 +165,7 @@ export class EcodevNuevo implements OnInit {
     if (window.history.length > 1) {
       this.location.back();
     } else {
-      this.router.navigate(['/developer/ecodev']);
+      this.router.navigate([this.baseEcoDev]);
     }
   }
 

@@ -73,7 +73,12 @@ export class EcodevList implements OnInit {
   }
 
   abrirDetalle(post: EcotechPost): void {
-    this.router.navigate(['/developer/ecodev', post.id]);
+    this.router.navigate([this.baseEcoDev, post.id]);
+  }
+
+  /** Base de rutas EcoDev segun el rol activo (/developer o /recruiter): el modulo es compartido. */
+  get baseEcoDev(): string {
+    return this.router.url.startsWith('/recruiter') ? '/recruiter/ecodev' : '/developer/ecodev';
   }
 
   portada(post: EcotechPost): string | null {
@@ -85,7 +90,7 @@ export class EcodevList implements OnInit {
   }
 
   verAnuncio(postId: string): void {
-    this.router.navigate(['/developer/ecodev', postId]);
+    this.router.navigate([this.baseEcoDev, postId]);
   }
 
   puntoMaps(punto: RecyclingPoint): string | null {

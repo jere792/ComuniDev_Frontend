@@ -48,7 +48,8 @@
 
       <div class="detail-head">
         <span class="tipo-chip" [style.--tipo-color]="tipoMeta(post()!.tipo).color">
-          {{ tipoMeta(post()!.tipo).emoji }} {{ tipoMeta(post()!.tipo).label }}
+          <span class="material-symbols-outlined chip-icon">{{ tipoMeta(post()!.tipo).icon }}</span>
+          {{ tipoMeta(post()!.tipo).label }}
         </span>
         @if (post()!.estado !== 'ACTIVA') {
           <span class="estado-anuncio">{{ post()!.estado === 'CERRADA' ? 'Cerrada' : post()!.estado }}</span>
@@ -134,7 +135,8 @@
           <div class="operacion-texto">
             <strong>Estado de tu operación</strong>
             <span class="tx-estado" [ngClass]="txEstadoMeta(tx.estado).clase">
-              {{ txEstadoMeta(tx.estado).emoji }} {{ txEstadoMeta(tx.estado).label }}
+              <span class="material-symbols-outlined chip-icon">{{ txEstadoMeta(tx.estado).icon }}</span>
+              {{ txEstadoMeta(tx.estado).label }}
             </span>
             @if (tx.estado === 'PENDIENTE_CONFIRMACION' || tx.estado === 'EN_DISPUTA') {
               <span class="operacion-hint">

@@ -1,58 +1,59 @@
-<div class="ecodev-container">
-  <div class="ecodev-header">
-    <div class="header-text">
-      <h1>EcoDev</h1>
-      <p class="header-subtitle">Donación, intercambio y reparación de equipo electrónico (ODS 12)</p>
-    </div>
-    <a class="btn btn-primary" [routerLink]="baseEcoDev + '/nuevo'">
-      <span class="material-symbols-outlined">add_circle</span>
-      Publicar anuncio
-    </a>
-  </div>
-
-  <!-- ─── Impacto ─── -->
-  @if (store.impacto(); as impacto) {
-    <section class="impacto-section" aria-label="Tu impacto">
-      <h2 class="section-title">Tu impacto</h2>
-      <div class="impacto-grid">
-        <div class="impacto-card">
-          <span class="impacto-emoji">🎁</span>
-          <strong>{{ impacto.donaciones }}</strong>
-          <span>donaciones</span>
-        </div>
-        <div class="impacto-card">
-          <span class="impacto-emoji">🔄</span>
-          <strong>{{ impacto.intercambios }}</strong>
-          <span>intercambios</span>
-        </div>
-        <div class="impacto-card">
-          <span class="impacto-emoji">🗑️</span>
-          <strong>{{ impacto.reciclajes }}</strong>
-          <span>reciclajes</span>
-        </div>
-        <div class="impacto-card">
-          <span class="impacto-emoji">🔧</span>
-          <strong>{{ impacto.reparaciones }}</strong>
-          <span>reparaciones</span>
-        </div>
-        <div class="impacto-card">
-          <span class="impacto-emoji">♻️</span>
-          <strong>{{ impacto.reutilizaciones }}</strong>
-          <span>reutilizaciones</span>
-        </div>
-        <div class="impacto-card">
-          <span class="impacto-emoji">📢</span>
-          <strong>{{ impacto.campanas }}</strong>
-          <span>campañas</span>
-        </div>
-        <div class="impacto-card impacto-total">
-          <span class="impacto-emoji">💻</span>
-          <strong>{{ impacto.equiposTotal }}</strong>
-          <span>equipos salvados</span>
-        </div>
+<div class="ecodev-layout">
+  <div class="ecodev-container">
+    <div class="ecodev-header">
+      <div class="header-text">
+        <h1>EcoDev</h1>
+        <p class="header-subtitle">Donación, intercambio y reparación de equipo electrónico (ODS 12)</p>
       </div>
-    </section>
-  }
+      <a class="btn btn-primary" [routerLink]="baseEcoDev + '/nuevo'">
+        <span class="material-symbols-outlined">add_circle</span>
+        Publicar anuncio
+      </a>
+    </div>
+
+    <!-- ─── Impacto ─── -->
+    @if (store.impacto(); as impacto) {
+      <section class="impacto-section" aria-label="Tu impacto">
+        <h2 class="section-title">Tu impacto</h2>
+        <div class="impacto-grid">
+          <div class="impacto-card">
+            <span class="material-symbols-outlined impacto-icono">redeem</span>
+            <strong>{{ impacto.donaciones }}</strong>
+            <span>donaciones</span>
+          </div>
+          <div class="impacto-card">
+            <span class="material-symbols-outlined impacto-icono">swap_horiz</span>
+            <strong>{{ impacto.intercambios }}</strong>
+            <span>intercambios</span>
+          </div>
+          <div class="impacto-card">
+            <span class="material-symbols-outlined impacto-icono">recycling</span>
+            <strong>{{ impacto.reciclajes }}</strong>
+            <span>reciclajes</span>
+          </div>
+          <div class="impacto-card">
+            <span class="material-symbols-outlined impacto-icono">build</span>
+            <strong>{{ impacto.reparaciones }}</strong>
+            <span>reparaciones</span>
+          </div>
+          <div class="impacto-card">
+            <span class="material-symbols-outlined impacto-icono">autorenew</span>
+            <strong>{{ impacto.reutilizaciones }}</strong>
+            <span>reutilizaciones</span>
+          </div>
+          <div class="impacto-card">
+            <span class="material-symbols-outlined impacto-icono">campaign</span>
+            <strong>{{ impacto.campanas }}</strong>
+            <span>campañas</span>
+          </div>
+          <div class="impacto-card impacto-total">
+            <span class="material-symbols-outlined impacto-icono">devices</span>
+            <strong>{{ impacto.equiposTotal }}</strong>
+            <span>equipos salvados</span>
+          </div>
+        </div>
+      </section>
+    }
 
   <!-- ─── Anuncios ─── -->
   <section class="anuncios-section" aria-label="Anuncios">
@@ -92,27 +93,41 @@
         <button class="btn btn-outline" type="button" (click)="store.loadPosts()">Reintentar</button>
       </div>
     } @else {
-      <div class="anuncios-grid">
+      <div class="anuncios-list">
         @for (post of store.posts(); track post.id) {
           <article class="anuncio-card" (click)="abrirDetalle(post)" role="button" tabindex="0"
             (keydown.enter)="abrirDetalle(post)">
-            @if (portada(post); as foto) {
-              <img class="anuncio-foto" [src]="foto" [alt]="post.titulo" />
-            } @else {
-              <div class="anuncio-foto anuncio-foto-fallback">
-                <span class="material-symbols-outlined">devices</span>
+            <header class="anuncio-head">
+              <div class="anuncio-avatar">
+                <span class="material-symbols-outlined">eco</span>
               </div>
-            }
+              <div class="anuncio-autor">
+                <span class="anuncio-autor-nombre">Anuncio EcoDev</span>
+                <span class="anuncio-fecha">{{ fecha(post.createdAt) }}</span>
+              </div>
+              <span class="tipo-chip" [style.--tipo-color]="tipoMeta(post.tipo).color">
+                <span class="material-symbols-outlined chip-icon">{{ tipoMeta(post.tipo).icon }}</span>
+                {{ tipoMeta(post.tipo).label }}
+              </span>
+            </header>
+
             <div class="anuncio-body">
-              <div class="anuncio-top">
-                <span class="tipo-chip" [style.--tipo-color]="tipoMeta(post.tipo).color">
-                  {{ tipoMeta(post.tipo).emoji }} {{ tipoMeta(post.tipo).label }}
-                </span>
-                @if (post.estado !== 'ACTIVA') {
-                  <span class="estado-anuncio">{{ post.estado === 'CERRADA' ? 'Cerrada' : post.estado }}</span>
-                }
-              </div>
+              @if (post.estado !== 'ACTIVA') {
+                <span class="estado-anuncio">{{ post.estado === 'CERRADA' ? 'Cerrada' : post.estado }}</span>
+              }
               <h3 class="anuncio-titulo">{{ post.titulo }}</h3>
+              @if (post.descripcion) {
+                <p class="anuncio-desc">{{ post.descripcion }}</p>
+              }
+
+              @if (portada(post); as foto) {
+                <img class="anuncio-foto" [src]="foto" [alt]="post.titulo" loading="lazy" />
+              } @else {
+                <div class="anuncio-foto anuncio-foto-fallback">
+                  <span class="material-symbols-outlined">devices</span>
+                </div>
+              }
+
               <div class="anuncio-meta">
                 <span class="meta-chip">{{ condicionLabel(post.condicion) }}</span>
                 <span class="meta-chip">{{ categoriaLabel(post.categoriaEquipo) }}</span>
@@ -138,6 +153,10 @@
                 @if (esMia(post)) {
                   <span class="mia-chip">Tu anuncio</span>
                 }
+                <span class="ver-detalle">
+                  Ver detalles
+                  <span class="material-symbols-outlined">chevron_right</span>
+                </span>
               </div>
             </div>
           </article>
@@ -180,7 +199,8 @@
           <article class="operacion-card">
             <div class="operacion-main">
               <span class="tipo-chip" [style.--tipo-color]="tipoMeta(tx.tipo).color">
-                {{ tipoMeta(tx.tipo).emoji }} {{ tipoMeta(tx.tipo).label }}
+                <span class="material-symbols-outlined chip-icon">{{ tipoMeta(tx.tipo).icon }}</span>
+                {{ tipoMeta(tx.tipo).label }}
               </span>
               <div class="operacion-texto">
                 <button class="operacion-titulo" type="button" (click)="verAnuncio(tx.ecotechPostId)">
@@ -195,7 +215,8 @@
               </div>
             </div>
             <span class="tx-estado" [ngClass]="txEstadoMeta(tx.estado).clase">
-              {{ txEstadoMeta(tx.estado).emoji }} {{ txEstadoMeta(tx.estado).label }}
+              <span class="material-symbols-outlined chip-icon">{{ txEstadoMeta(tx.estado).icon }}</span>
+              {{ txEstadoMeta(tx.estado).label }}
             </span>
           </article>
         }
@@ -259,4 +280,6 @@
       </div>
     }
   </section>
+  </div>
+  <app-shared-right-panel />
 </div>

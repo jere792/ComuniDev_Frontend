@@ -110,15 +110,15 @@ export interface EcotechTransactionsFiltro {
   size?: number;
 }
 
-/** Emoji, etiqueta en español y color de cada tipo de anuncio. */
-export const TIPO_META: Record<string, { label: string; emoji: string; color: string }> = {
-  DONACION: { label: 'Donación', emoji: '🎁', color: '#15803d' },
-  INTERCAMBIO: { label: 'Intercambio', emoji: '🔄', color: '#0b6cb0' },
-  REPARACION: { label: 'Reparación', emoji: '🔧', color: '#a16207' },
-  REUTILIZACION: { label: 'Reutilización', emoji: '♻️', color: '#00695c' },
-  RECICLAJE: { label: 'Reciclaje', emoji: '🗑️', color: '#6d4cd1' },
-  CAMPANA: { label: 'Campaña', emoji: '📢', color: '#b45309' },
-  CONSEJO_GREEN_IT: { label: 'Consejo green IT', emoji: '💡', color: '#0f766e' },
+/** Icono Material, etiqueta en español y color de cada tipo de anuncio. */
+export const TIPO_META: Record<string, { label: string; icon: string; color: string }> = {
+  DONACION: { label: 'Donación', icon: 'redeem', color: '#15803d' },
+  INTERCAMBIO: { label: 'Intercambio', icon: 'swap_horiz', color: '#0b6cb0' },
+  REPARACION: { label: 'Reparación', icon: 'build', color: '#a16207' },
+  REUTILIZACION: { label: 'Reutilización', icon: 'autorenew', color: '#00695c' },
+  RECICLAJE: { label: 'Reciclaje', icon: 'recycling', color: '#6d4cd1' },
+  CAMPANA: { label: 'Campaña', icon: 'campaign', color: '#b45309' },
+  CONSEJO_GREEN_IT: { label: 'Consejo green IT', icon: 'lightbulb', color: '#0f766e' },
 };
 
 export const CATEGORIAS_EQUIPO: Record<string, string> = {
@@ -141,17 +141,17 @@ export const CONDICIONES: Record<string, string> = {
   NO_FUNCIONAL: 'No funcional',
 };
 
-/** Estado de una transacción con su símbolo y su clase CSS. */
-export const TX_ESTADO_META: Record<string, { label: string; emoji: string; clase: string }> = {
-  PENDIENTE_CONFIRMACION: { label: 'Pendiente de confirmación', emoji: '⏳', clase: 'tx-pendiente' },
-  COMPLETADA: { label: 'Completada', emoji: '✅', clase: 'tx-completada' },
-  CANCELADA: { label: 'Cancelada', emoji: '✗', clase: 'tx-cancelada' },
-  RECHAZADA: { label: 'Rechazada', emoji: '✗', clase: 'tx-cancelada' },
-  EN_DISPUTA: { label: 'En disputa', emoji: '⚠️', clase: 'tx-pendiente' },
+/** Estado de una transacción con su icono Material y su clase CSS. */
+export const TX_ESTADO_META: Record<string, { label: string; icon: string; clase: string }> = {
+  PENDIENTE_CONFIRMACION: { label: 'Pendiente de confirmación', icon: 'hourglass_top', clase: 'tx-pendiente' },
+  COMPLETADA: { label: 'Completada', icon: 'check_circle', clase: 'tx-completada' },
+  CANCELADA: { label: 'Cancelada', icon: 'cancel', clase: 'tx-cancelada' },
+  RECHAZADA: { label: 'Rechazada', icon: 'cancel', clase: 'tx-cancelada' },
+  EN_DISPUTA: { label: 'En disputa', icon: 'warning', clase: 'tx-pendiente' },
 };
 
-export function tipoMeta(tipo?: string | null): { label: string; emoji: string; color: string } {
-  return TIPO_META[(tipo ?? '').toUpperCase()] ?? { label: tipo ?? 'Anuncio', emoji: '🌐', color: '#0f766e' };
+export function tipoMeta(tipo?: string | null): { label: string; icon: string; color: string } {
+  return TIPO_META[(tipo ?? '').toUpperCase()] ?? { label: tipo ?? 'Anuncio', icon: 'eco', color: '#0f766e' };
 }
 
 export function categoriaLabel(categoria?: string | null): string {
@@ -164,8 +164,8 @@ export function condicionLabel(condicion?: string | null): string {
   return CONDICIONES[value] ?? condicion ?? '';
 }
 
-export function txEstadoMeta(estado?: string | null): { label: string; emoji: string; clase: string } {
-  return TX_ESTADO_META[(estado ?? '').toUpperCase()] ?? { label: estado ?? '', emoji: '•', clase: '' };
+export function txEstadoMeta(estado?: string | null): { label: string; icon: string; clase: string } {
+  return TX_ESTADO_META[(estado ?? '').toUpperCase()] ?? { label: estado ?? '', icon: 'circle', clase: '' };
 }
 
 /** "Ciudad · Distrito" o lo que haya, sin coma final suelta. */

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { EcodevStore } from '@features/developer/ecodev/data-access/state/ecodev.store';
+import { SharedRightPanel } from '@features/shared/ui/right-panel/right-panel';
 import {
   CATEGORIAS_EQUIPO,
   EcotechPost,
@@ -23,7 +24,7 @@ import {
 @Component({
   selector: 'app-ecodev-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, SharedRightPanel],
   templateUrl: './ecodev-list.html',
   styleUrl: './ecodev-list.scss',
 })
@@ -83,6 +84,14 @@ export class EcodevList implements OnInit {
 
   portada(post: EcotechPost): string | null {
     return post.imagenes?.length ? post.imagenes[0] : null;
+  }
+
+  /** Fecha corta del anuncio (estilo feed). */
+  fecha(valor: string | null): string {
+    if (!valor) return '';
+    const fecha = new Date(valor);
+    if (isNaN(fecha.getTime())) return '';
+    return new Intl.DateTimeFormat('es-PE', { day: '2-digit', month: 'short', year: 'numeric' }).format(fecha);
   }
 
   tituloDe(postId: string): string {

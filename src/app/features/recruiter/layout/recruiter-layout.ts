@@ -15,11 +15,17 @@ import { BottomNav } from '@shared/ui/bottom-nav/bottom-nav';
 export class RecruiterLayout implements OnInit {
   private route = inject(ActivatedRoute);
 
+  /** Links del header de escritorio: sin Mensajes (icono a la derecha) ni Perfil (sidebar). */
   headerLinks: HeaderLink[] = [];
+  /** Links completos para el bottom-nav movil. */
+  navLinks: HeaderLink[] = [];
 
   ngOnInit(): void {
     const data = this.route.snapshot.data;
     const sidebarLinks = data['sidebarLinks'] || [];
-    this.headerLinks = sidebarLinks.map((l: any) => ({ label: l.label, route: l.route, icon: l.icon }));
+    this.navLinks = sidebarLinks.map((l: any) => ({ label: l.label, route: l.route, icon: l.icon }));
+    this.headerLinks = this.navLinks.filter(
+      (l) => !l.route.includes('/profile') && !l.route.includes('/messages'),
+    );
   }
 }

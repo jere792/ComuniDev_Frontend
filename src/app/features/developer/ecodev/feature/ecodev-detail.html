@@ -1,0 +1,224 @@
+<div class="ecodev-detail-container">
+  <div class="detail-header">
+    <button class="back-btn" type="button" (click)="vuelve()" aria-label="Volver">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <h1>Anuncio EcoDev</h1>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <span class="material-symbols-outlined spinning">progress_activity</span>
+      Cargando anuncio...
+    </div>
+  } @else if (error() || !post()) {
+    <div class="state-box">
+      <span class="material-symbols-outlined">error</span>
+      <p>{{ error() ?? 'No se encontró el anuncio' }}</p>
+      <button class="btn btn-outline" type="button" (click)="vuelve()">Volver</button>
+    </div>
+  } @else {
+    <article class="detail-card">
+      <!-- Fotos -->
+      @if (post()!.imagenes.length) {
+        <div class="galeria">
+          @if (fotoActual(); as foto) {
+            <img class="foto-principal" [src]="foto" [alt]="post()!.titulo" />
+          }
+          @if (post()!.imagenes!.length > 1) {
+            <div class="miniaturas">
+              @for (imagen of post()!.imagenes!; track imagen; let i = $index) {
+                <button
+                  class="miniatura"
+                  type="button"
+                  [class.activa]="i === fotoActiva()"
+                  (click)="seleccionarFoto(i)"
+                >
+                  <img [src]="imagen" [alt]="'Foto ' + (i + 1)" />
+                </button>
+              }
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="galeria galeria-vacia">
+          <span class="material-symbols-outlined">devices</span>
+        </div>
+      }
+
+      <div class="detail-head">
+        <span class="tipo-chip" [style.--tipo-color]="tipoMeta(post()!.tipo).color">
+          {{ tipoMeta(post()!.tipo).emoji }} {{ tipoMeta(post()!.tipo).label }}
+        </span>
+        @if (post()!.estado !== 'ACTIVA') {
+          <span class="estado-anuncio">{{ post()!.estado === 'CERRADA' ? 'Cerrada' : post()!.estado }}</span>
+        }
+      </div>
+
+      <h2 class="detail-title">{{ post()!.titulo }}</h2>
+
+      <div class="meta-row">
+        <span class="meta-item">
+          <span class="material-symbols-outlined">category</span>
+          {{ categoriaLabel(post()!.categoriaEquipo) }}
+        </span>
+        <span class="meta-item">
+          <span class="material-symbols-outlined">build</span>
+          {{ condicionLabel(post()!.condicion) }}
+        </span>
+        @if (ubicacionDe(post()!); as ubicacion) {
+          <span class="meta-item">
+            <span class="material-symbols-outlined">location_on</span>
+            {{ ubicacion }}
+          </span>
+        }
+        <span class="meta-item">
+          <span class="material-symbols-outlined">favorite</span>
+          {{ post()!.interesadosCount }} interesados
+        </span>
+        @if (post()!.createdAt; as fecha) {
+          <span class="meta-item">
+            <span class="material-symbols-outlined">event</span>
+            Publicado {{ fecha | date: 'dd/MM/yyyy' }}
+          </span>
+        }
+      </div>
+
+      <!-- Advertencia de seguridad -->
+      @if (post()!.advertenciaSeguridad; as advertencia) {
+        <div class="alerta-seguridad" role="alert">
+          <span class="material-symbols-outlined">warning</span>
+          <div>
+            <strong>Advertencia de seguridad</strong>
+            <p>{{ advertencia }}</p>
+          </div>
+        </div>
+      }
+
+      @if (post()!.descripcion; as descripcion) {
+        <section class="detail-section">
+          <h3 class="section-title">Descripción</h3>
+          <p class="section-text">{{ descripcion }}</p>
+        </section>
+      }
+
+      @if (post()!.etiquetas.length) {
+        <div class="tags">
+          @for (tag of post()!.etiquetas; track tag) {
+            <span class="tag">{{ tag }}</span>
+          }
+        </div>
+      }
+
+      <!-- Ubicación con link a Google Maps -->
+      <section class="detail-section">
+        <h3 class="section-title">Ubicación aproximada</h3>
+        @if (mapsLink(); as maps) {
+          <p class="section-text">{{ ubicacionLarga() }}</p>
+          <a class="maps-link" [href]="maps" target="_blank" rel="noopener">
+            <span class="material-symbols-outlined">map</span>
+            Ver en Google Maps
+          </a>
+        } @else {
+          <p class="section-text">{{ ubicacionLarga() }}</p>
+          <p class="section-hint">Este anuncio no tiene coordenadas para abrir en el mapa.</p>
+        }
+      </section>
+    </article>
+
+    <!-- Estado de tu operación sobre este anuncio -->
+    @if (transaccion(); as tx) {
+      <section class="operacion-card">
+        <div class="operacion-info">
+          <span class="material-symbols-outlined">handshake</span>
+          <div class="operacion-texto">
+            <strong>Estado de tu operación</strong>
+            <span class="tx-estado" [ngClass]="txEstadoMeta(tx.estado).clase">
+              {{ txEstadoMeta(tx.estado).emoji }} {{ txEstadoMeta(tx.estado).label }}
+            </span>
+            @if (tx.estado === 'PENDIENTE_CONFIRMACION' || tx.estado === 'EN_DISPUTA') {
+              <span class="operacion-hint">
+                Confirmación de ti:
+                {{ (tx.emisorId === miUserId ? tx.confirmadoPorEmisor : tx.confirmadoPorReceptor) ? 'sí' : 'no' }},
+                de la otra parte:
+                {{ (tx.emisorId === miUserId ? tx.confirmadoPorReceptor : tx.confirmadoPorEmisor) ? 'sí' : 'no' }}.
+                Con las dos, la entrega queda completada.
+              </span>
+            }
+          </div>
+        </div>
+        @if (tx.estado === 'PENDIENTE_CONFIRMACION') {
+          <div class="operacion-actions">
+            <button class="btn btn-primary" type="button" (click)="confirmarEntrega()" [disabled]="enviando()">
+              <span class="material-symbols-outlined">task_alt</span>
+              Confirmar entrega
+            </button>
+            <button class="btn btn-outline btn-danger" type="button" (click)="pedirCancelacion()" [disabled]="enviando()">
+              <span class="material-symbols-outlined">cancel</span>
+              Cancelar
+            </button>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- Acciones -->
+    <section class="acciones-card">
+      <div class="acciones-info">
+        <span class="material-symbols-outlined">eco</span>
+        <div class="acciones-texto">
+          @if (esMia()) {
+            <strong>Este es tu anuncio</strong>
+            <span class="acciones-sub">Los interesados te escribirán por el chat para coordinar.</span>
+          } @else if (!activo()) {
+            <strong>Anuncio cerrado</strong>
+            <span class="acciones-sub">Ya no recibe nuevos interesados ni operaciones.</span>
+          } @else if (conTransaccion()) {
+            <strong>Operación en curso</strong>
+            <span class="acciones-sub">Ya iniciaste una operación sobre este anuncio: confirma o cancela arriba.</span>
+          } @else {
+            <strong>¿Te interesa este equipo?</strong>
+            <span class="acciones-sub">Marca tu interés o inicia la operación de entrega con el autor.</span>
+          }
+        </div>
+      </div>
+
+      <div class="acciones-buttons">
+        <button
+          class="btn btn-outline"
+          type="button"
+          (click)="marcarInteres()"
+          [disabled]="esMia() || !activo() || enviando()"
+        >
+          <span class="material-symbols-outlined">favorite</span>
+          Me interesa
+        </button>
+        <button
+          class="btn btn-primary"
+          type="button"
+          (click)="coordinar()"
+          [disabled]="esMia() || !activo() || conTransaccion() || enviando()"
+        >
+          <span class="material-symbols-outlined">handshake</span>
+          Coordinar operación
+        </button>
+        <a class="btn btn-outline" routerLink="/developer/ecodev">
+          <span class="material-symbols-outlined">list</span>
+          Ver todos los anuncios
+        </a>
+      </div>
+    </section>
+  }
+
+  <app-confirm-modal
+    [open]="cancelOpen()"
+    title="Cancelar operación"
+    message="¿Seguro que quieres cancelar esta operación? El autor del anuncio será avisado."
+    confirmText="Cancelar operación"
+    cancelText="Volver"
+    variant="danger"
+    icon="cancel"
+    (confirm)="cancelarOperacion()"
+    (cancel)="cancelOpen.set(false)"
+  />
+</div>

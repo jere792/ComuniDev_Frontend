@@ -1,0 +1,262 @@
+<div class="ecodev-container">
+  <div class="ecodev-header">
+    <div class="header-text">
+      <h1>EcoDev</h1>
+      <p class="header-subtitle">Donación, intercambio y reparación de equipo electrónico (ODS 12)</p>
+    </div>
+    <a class="btn btn-primary" routerLink="/developer/ecodev/nuevo">
+      <span class="material-symbols-outlined">add_circle</span>
+      Publicar anuncio
+    </a>
+  </div>
+
+  <!-- ─── Impacto ─── -->
+  @if (store.impacto(); as impacto) {
+    <section class="impacto-section" aria-label="Tu impacto">
+      <h2 class="section-title">Tu impacto</h2>
+      <div class="impacto-grid">
+        <div class="impacto-card">
+          <span class="impacto-emoji">🎁</span>
+          <strong>{{ impacto.donaciones }}</strong>
+          <span>donaciones</span>
+        </div>
+        <div class="impacto-card">
+          <span class="impacto-emoji">🔄</span>
+          <strong>{{ impacto.intercambios }}</strong>
+          <span>intercambios</span>
+        </div>
+        <div class="impacto-card">
+          <span class="impacto-emoji">🗑️</span>
+          <strong>{{ impacto.reciclajes }}</strong>
+          <span>reciclajes</span>
+        </div>
+        <div class="impacto-card">
+          <span class="impacto-emoji">🔧</span>
+          <strong>{{ impacto.reparaciones }}</strong>
+          <span>reparaciones</span>
+        </div>
+        <div class="impacto-card">
+          <span class="impacto-emoji">♻️</span>
+          <strong>{{ impacto.reutilizaciones }}</strong>
+          <span>reutilizaciones</span>
+        </div>
+        <div class="impacto-card">
+          <span class="impacto-emoji">📢</span>
+          <strong>{{ impacto.campanas }}</strong>
+          <span>campañas</span>
+        </div>
+        <div class="impacto-card impacto-total">
+          <span class="impacto-emoji">💻</span>
+          <strong>{{ impacto.equiposTotal }}</strong>
+          <span>equipos salvados</span>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- ─── Anuncios ─── -->
+  <section class="anuncios-section" aria-label="Anuncios">
+    <div class="section-head">
+      <h2 class="section-title">Anuncios</h2>
+      <div class="filtros">
+        <label class="filtro">
+          <span>Tipo</span>
+          <select class="input" [value]="store.filtroTipo()" (change)="cambiarTipo($event)">
+            <option value="">Todos</option>
+            @for (tipo of tipos; track tipo[0]) {
+              <option [value]="tipo[0]">{{ tipo[1] }}</option>
+            }
+          </select>
+        </label>
+        <label class="filtro">
+          <span>Equipo</span>
+          <select class="input" [value]="store.filtroCategoria()" (change)="cambiarCategoria($event)">
+            <option value="">Todos</option>
+            @for (cat of categorias; track cat[0]) {
+              <option [value]="cat[0]">{{ cat[1] }}</option>
+            }
+          </select>
+        </label>
+      </div>
+    </div>
+
+    @if (store.loading()) {
+      <div class="loading-state">
+        <span class="material-symbols-outlined spinning">progress_activity</span>
+        Cargando anuncios...
+      </div>
+    } @else if (store.error()) {
+      <div class="state-box">
+        <span class="material-symbols-outlined">error</span>
+        <p>{{ store.error() }}</p>
+        <button class="btn btn-outline" type="button" (click)="store.loadPosts()">Reintentar</button>
+      </div>
+    } @else {
+      <div class="anuncios-grid">
+        @for (post of store.posts(); track post.id) {
+          <article class="anuncio-card" (click)="abrirDetalle(post)" role="button" tabindex="0"
+            (keydown.enter)="abrirDetalle(post)">
+            @if (portada(post); as foto) {
+              <img class="anuncio-foto" [src]="foto" [alt]="post.titulo" />
+            } @else {
+              <div class="anuncio-foto anuncio-foto-fallback">
+                <span class="material-symbols-outlined">devices</span>
+              </div>
+            }
+            <div class="anuncio-body">
+              <div class="anuncio-top">
+                <span class="tipo-chip" [style.--tipo-color]="tipoMeta(post.tipo).color">
+                  {{ tipoMeta(post.tipo).emoji }} {{ tipoMeta(post.tipo).label }}
+                </span>
+                @if (post.estado !== 'ACTIVA') {
+                  <span class="estado-anuncio">{{ post.estado === 'CERRADA' ? 'Cerrada' : post.estado }}</span>
+                }
+              </div>
+              <h3 class="anuncio-titulo">{{ post.titulo }}</h3>
+              <div class="anuncio-meta">
+                <span class="meta-chip">{{ condicionLabel(post.condicion) }}</span>
+                <span class="meta-chip">{{ categoriaLabel(post.categoriaEquipo) }}</span>
+                @if (ubicacionDe(post); as ubicacion) {
+                  <span class="meta-item">
+                    <span class="material-symbols-outlined">location_on</span>
+                    {{ ubicacion }}
+                  </span>
+                }
+              </div>
+              @if (post.etiquetas.length) {
+                <div class="anuncio-tags">
+                  @for (tag of post.etiquetas; track tag) {
+                    <span class="tag">{{ tag }}</span>
+                  }
+                </div>
+              }
+              <div class="anuncio-footer">
+                <span class="interesados">
+                  <span class="material-symbols-outlined">favorite</span>
+                  {{ post.interesadosCount }} interesados
+                </span>
+                @if (esMia(post)) {
+                  <span class="mia-chip">Tu anuncio</span>
+                }
+              </div>
+            </div>
+          </article>
+        } @empty {
+          <div class="empty-state">
+            <span class="material-symbols-outlined">recycling</span>
+            <span>No hay anuncios con esos filtros</span>
+            <a class="btn btn-outline" routerLink="/developer/ecodev/nuevo">Publicar el primero</a>
+          </div>
+        }
+      </div>
+
+      @if (store.hasMore()) {
+        <div class="cargar-mas">
+          <button class="btn btn-outline" type="button" (click)="cargarMas()" [disabled]="store.loadingMore()">
+            <span class="material-symbols-outlined">expand_more</span>
+            {{ store.loadingMore() ? 'Cargando…' : 'Cargar más' }}
+          </button>
+        </div>
+      }
+    }
+  </section>
+
+  <!-- ─── Mis operaciones ─── -->
+  <section class="operaciones-section" aria-label="Mis operaciones">
+    <h2 class="section-title">Mis operaciones</h2>
+    @if (store.operacionesLoading()) {
+      <div class="loading-state">
+        <span class="material-symbols-outlined spinning">progress_activity</span>
+        Cargando tus operaciones...
+      </div>
+    } @else if (store.misOperaciones().length === 0) {
+      <div class="empty-inline">
+        <span class="material-symbols-outlined">handshake</span>
+        <span>Todavía no tienes operaciones coordinadas</span>
+      </div>
+    } @else {
+      <div class="operaciones-list">
+        @for (tx of store.misOperaciones(); track tx.id) {
+          <article class="operacion-card">
+            <div class="operacion-main">
+              <span class="tipo-chip" [style.--tipo-color]="tipoMeta(tx.tipo).color">
+                {{ tipoMeta(tx.tipo).emoji }} {{ tipoMeta(tx.tipo).label }}
+              </span>
+              <div class="operacion-texto">
+                <button class="operacion-titulo" type="button" (click)="verAnuncio(tx.ecotechPostId)">
+                  {{ tituloDe(tx.ecotechPostId) }}
+                </button>
+                <span class="operacion-sub">
+                  {{ tx.cantidadEquipos }} {{ tx.cantidadEquipos === 1 ? 'equipo' : 'equipos' }}
+                  @if (soyEmisor(tx)) {
+                    · tú fuiste el interesado
+                  }
+                </span>
+              </div>
+            </div>
+            <span class="tx-estado" [ngClass]="txEstadoMeta(tx.estado).clase">
+              {{ txEstadoMeta(tx.estado).emoji }} {{ txEstadoMeta(tx.estado).label }}
+            </span>
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- ─── Puntos de reciclaje ─── -->
+  <section class="puntos-section" aria-label="Puntos de reciclaje">
+    <h2 class="section-title">Puntos de reciclaje verificados</h2>
+    @if (store.puntosLoading()) {
+      <div class="loading-state">
+        <span class="material-symbols-outlined spinning">progress_activity</span>
+        Cargando puntos de reciclaje...
+      </div>
+    } @else if (store.recyclingPoints().length === 0) {
+      <div class="empty-inline">
+        <span class="material-symbols-outlined">location_searching</span>
+        <span>Todavía no hay puntos verificados</span>
+      </div>
+    } @else {
+      <div class="puntos-grid">
+        @for (punto of store.recyclingPoints(); track punto.id) {
+          <article class="punto-card">
+            <div class="punto-head">
+              <span class="material-symbols-outlined punto-icono">recycling</span>
+              <div class="punto-titulo">
+                <h3>{{ punto.nombre }}</h3>
+                @if (punto.organizacion; as org) {
+                  <span class="punto-org">{{ org }}</span>
+                }
+              </div>
+            </div>
+            @if (direccionDe(punto); as direccion) {
+              <p class="punto-dato">
+                <span class="material-symbols-outlined">location_on</span>
+                {{ direccion }}
+              </p>
+            }
+            @if (punto.horario; as horario) {
+              <p class="punto-dato">
+                <span class="material-symbols-outlined">schedule</span>
+                {{ horario }}
+              </p>
+            }
+            @if (punto.materialesAceptados.length) {
+              <div class="punto-tags">
+                @for (material of punto.materialesAceptados; track material) {
+                  <span class="tag">{{ material }}</span>
+                }
+              </div>
+            }
+            @if (puntoMaps(punto); as maps) {
+              <a class="punto-link" [href]="maps" target="_blank" rel="noopener">
+                <span class="material-symbols-outlined">map</span>
+                Ver en Google Maps
+              </a>
+            }
+          </article>
+        }
+      </div>
+    }
+  </section>
+</div>

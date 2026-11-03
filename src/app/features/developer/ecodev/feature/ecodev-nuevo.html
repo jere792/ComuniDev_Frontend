@@ -1,0 +1,173 @@
+<div class="ecodev-nuevo-container">
+  <div class="page-header">
+    <button class="back-btn" type="button" (click)="goBack()" aria-label="Volver">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <div class="header-text">
+      <h1>Nuevo anuncio EcoDev</h1>
+      <p class="header-subtitle">Donación, intercambio, reparación o reciclaje de equipo electrónico</p>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <!-- Tipo y título -->
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label" for="tipo">Tipo *</label>
+        <select id="tipo" class="input" [(ngModel)]="form.tipo">
+          <option value="">Selecciona un tipo</option>
+          @for (tipo of tipos; track tipo[0]) {
+            <option [value]="tipo[0]">{{ tipo[1] }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-field form-field-grow">
+        <label class="form-label" for="titulo">Título *</label>
+        <input
+          id="titulo"
+          class="input"
+          type="text"
+          maxlength="120"
+          placeholder="Ej. Laptop funcional para donar"
+          [(ngModel)]="form.titulo"
+        />
+      </div>
+    </div>
+
+    <!-- Descripción -->
+    <div class="form-field">
+      <label class="form-label" for="descripcion">Descripción</label>
+      <textarea
+        id="descripcion"
+        class="input"
+        rows="4"
+        maxlength="2000"
+        placeholder="Estado del equipo, motivo, qué incluye…"
+        [(ngModel)]="form.descripcion"
+      ></textarea>
+    </div>
+
+    <!-- Categoría y condición -->
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label" for="categoria">Categoría del equipo *</label>
+        <select id="categoria" class="input" [(ngModel)]="form.categoriaEquipo">
+          <option value="">Selecciona una categoría</option>
+          @for (cat of categorias; track cat[0]) {
+            <option [value]="cat[0]">{{ cat[1] }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="condicion">Condición *</label>
+        <select id="condicion" class="input" [(ngModel)]="form.condicion">
+          <option value="">Selecciona la condición</option>
+          @for (cond of condiciones; track cond[0]) {
+            <option [value]="cond[0]">{{ cond[1] }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Imágenes -->
+    <div class="form-field">
+      <label class="form-label">Imágenes</label>
+      <div class="imagenes-grid">
+        @for (url of imagenes(); track url) {
+          <div class="imagen-preview">
+            <img [src]="url" alt="Imagen del anuncio" />
+            <button type="button" class="imagen-quitar" (click)="quitarImagen(url)" title="Quitar imagen">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+        }
+        <label class="imagen-add" [class.disabled]="subiendo()">
+          <span class="material-symbols-outlined">add_photo_alternate</span>
+          @if (subiendo()) {
+            <span>Subiendo…</span>
+          } @else {
+            <span>Agregar imágenes</span>
+          }
+          <input
+            class="imagen-input"
+            type="file"
+            accept="image/*"
+            multiple
+            (change)="onImagenesSelected($event)"
+            [disabled]="subiendo()"
+          />
+        </label>
+      </div>
+      <p class="form-hint">Se suben a la nube (Cloudinary). Máximo 5 MB por imagen.</p>
+    </div>
+
+    <!-- Ubicación -->
+    <div class="form-section-label">Ubicación (opcional)</div>
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label" for="ciudad">Ciudad</label>
+        <input id="ciudad" class="input" type="text" placeholder="Ej. Lima" [(ngModel)]="form.ciudad" />
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="distrito">Distrito</label>
+        <input id="distrito" class="input" type="text" placeholder="Ej. Miraflores" [(ngModel)]="form.distrito" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label" for="lat">Latitud</label>
+        <input id="lat" class="input" type="number" step="any" placeholder="-12.0464" [(ngModel)]="form.lat" />
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="lng">Longitud</label>
+        <input id="lng" class="input" type="number" step="any" placeholder="-77.0428" [(ngModel)]="form.lng" />
+      </div>
+    </div>
+    <p class="form-hint">Si dejas latitud y longitud, el anuncio tendrá link a Google Maps.</p>
+
+    <!-- Etiquetas -->
+    <div class="form-field">
+      <app-tag-input
+        titulo="Etiquetas"
+        placeholder="Laptop, batería, Lima"
+        ayuda="Pulsa Enter o la coma para agregar cada etiqueta."
+        [(ngModel)]="form.etiquetas"
+      ></app-tag-input>
+    </div>
+
+    <!-- Advertencia de seguridad -->
+    @if (requiereAviso) {
+      <div class="aviso-previo" role="status">
+        <span class="material-symbols-outlined">warning</span>
+        <p>
+          Este tipo de anuncio ({{ form.tipo === 'RECICLAJE' ? 'reciclaje' : 'equipo no funcional' }}) suele requerir
+          advertencia de seguridad: describe baterías dañadas o residuos de riesgo si aplica.
+        </p>
+      </div>
+    }
+    <div class="form-field">
+      <label class="form-label" for="advertencia">Advertencia de seguridad</label>
+      <textarea
+        id="advertencia"
+        class="input"
+        rows="2"
+        maxlength="500"
+        placeholder="Ej. No abrir: batería hinchada, entregar solo a punto de reciclaje certificado."
+        [(ngModel)]="form.advertenciaSeguridad"
+      ></textarea>
+      <p class="form-hint">Opcional, pero obligatoria con residuos de riesgo.</p>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-outline" (click)="goBack()" [disabled]="saving()">
+        Cancelar
+      </button>
+      <button type="button" class="btn btn-primary" (click)="submit()" [disabled]="saving() || subiendo()">
+        <span class="material-symbols-outlined">publish</span>
+        {{ saving() ? 'Publicando…' : 'Publicar anuncio' }}
+      </button>
+    </div>
+  </div>
+</div>

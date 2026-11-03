@@ -13,6 +13,7 @@ export const routes: Routes = [
         { label: 'Mensajes', route: '/developer/messages', icon: 'chat' },
         { label: 'Solicitudes', route: '/developer/solicitudes', icon: 'person_add' },
         { label: 'Postulaciones', route: '/developer/postulaciones', icon: 'work' },
+        { label: 'EcoDev', route: '/developer/ecodev', icon: 'eco' },
         { label: 'Ranking', route: '/developer/ranking', icon: 'leaderboard' },
         { label: 'Perfil', route: '/developer/profile', icon: 'person' },
       ],
@@ -60,6 +61,22 @@ export const routes: Routes = [
         title: 'Ranking',
         loadComponent: () =>
           import('@features/developer/gamificacion/feature/ranking/ranking').then(m => m.DeveloperRanking),
+      },
+      {
+        path: 'ecodev',
+        title: 'EcoDev',
+        loadComponent: () => import('@features/developer/ecodev/feature/ecodev-list').then(m => m.EcodevList),
+      },
+      {
+        // "nuevo" antes de ":id": Angular empareja en orden de declaración
+        path: 'ecodev/nuevo',
+        title: 'Nuevo anuncio',
+        loadComponent: () => import('@features/developer/ecodev/feature/ecodev-nuevo').then(m => m.EcodevNuevo),
+      },
+      {
+        path: 'ecodev/:id',
+        title: 'Anuncio EcoDev',
+        loadComponent: () => import('@features/developer/ecodev/feature/ecodev-detail').then(m => m.EcodevDetail),
       },
       {
         path: 'discover',

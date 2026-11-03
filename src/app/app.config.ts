@@ -60,6 +60,8 @@ import { VACANCY_DETAIL_REPOSITORY } from '@features/developer/postulaciones/dom
 import { VacancyDetailGraphqlService } from '@features/developer/postulaciones/data-access/api/vacancy-detail-graphql.service';
 import { POINTS_REPOSITORY } from '@features/developer/gamificacion/domain/ports/points.repository';
 import { PointsGraphqlService } from '@features/developer/gamificacion/data-access/api/points-graphql.service';
+import { ECODEV_REPOSITORY } from '@features/developer/ecodev/domain/ports/ecodev.repository';
+import { EcotechGraphqlService } from '@features/developer/ecodev/data-access/api/ecotech-graphql.service';
 import { REPORT_REPOSITORY } from '@features/moderator/feature/reports/domain/ports/report.repository';
 import { ReportHttpService } from '@features/moderator/feature/reports/data-access/api/report-http.service';
 import { USER_MODERATION_REPOSITORY } from '@features/users/domain/ports/user-moderation.repository';
@@ -90,6 +92,7 @@ export const appConfig: ApplicationConfig = {
     { provide: APPLICATION_REPOSITORY, useClass: ApplicationGraphqlService },
     { provide: VACANCY_DETAIL_REPOSITORY, useClass: VacancyDetailGraphqlService },
     { provide: POINTS_REPOSITORY, useClass: PointsGraphqlService },
+    { provide: ECODEV_REPOSITORY, useClass: EcotechGraphqlService },
     { provide: REPORT_REPOSITORY, useClass: ReportHttpService },
     { provide: USER_MODERATION_REPOSITORY, useClass: UserModerationHttpService },
     provideRouter(routes, withInMemoryScrolling({

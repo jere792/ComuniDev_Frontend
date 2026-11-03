@@ -28,6 +28,8 @@ export class DeveloperLayout implements OnInit {
       route: l.route,
       icon: l.icon,
     }));
-    this.headerLinks = this.navLinks.filter((l) => !l.route.includes('/profile'));
+    this.headerLinks = this.navLinks.filter(
+      (l) => !l.route.includes('/profile') && !l.route.includes('/messages') && !l.route.includes('/solicitudes'),
+    );
   }
 }

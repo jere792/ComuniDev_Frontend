@@ -41,10 +41,20 @@ const ECOTECH_POSTS = gql`
   }
 `;
 
+const DETAIL_FIELDS = `
+  ${POST_FIELDS}
+  interesados {
+    id
+    nombre
+    nombreUsuario
+    fotoPerfilUrl
+  }
+`;
+
 const ECOTECH_POST = gql`
   query EcotechPost($id: ID!) {
     ecotechPost(id: $id) {
-      ${POST_FIELDS}
+      ${DETAIL_FIELDS}
     }
   }
 `;
@@ -236,6 +246,14 @@ function normalizePost(raw: Record<string, unknown>): EcotechPost {
     advertenciaSeguridad: asString(raw['advertenciaSeguridad']),
     estado: String(raw['estado'] ?? 'ACTIVA'),
     interesadosCount: asInt(raw['interesadosCount']),
+    interesados: Array.isArray(raw['interesados'])
+      ? (raw['interesados'] as Record<string, unknown>[]).map((persona) => ({
+          id: String(persona['id'] ?? ''),
+          nombre: asString(persona['nombre']),
+          nombreUsuario: asString(persona['nombreUsuario']),
+          fotoPerfilUrl: asString(persona['fotoPerfilUrl']),
+        }))
+      : [],
     createdAt: asString(raw['createdAt']),
   };
 }

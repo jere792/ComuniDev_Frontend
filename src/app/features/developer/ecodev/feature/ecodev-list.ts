@@ -109,6 +109,19 @@ export class EcodevList implements OnInit {
     this.router.navigate([this.baseEcoDev, postId]);
   }
 
+  /** Estado de tu operación sobre un anuncio, para el badge de la tarjeta. */
+  operacionDe(postId: string): { label: string; clase: string } | null {
+    const tx = this.store.misOperaciones().find((t) => t.ecotechPostId === postId);
+    if (!tx) return null;
+    if (tx.estado === 'PENDIENTE_CONFIRMACION' || tx.estado === 'EN_DISPUTA') {
+      return { label: 'En operación', clase: 'en-operacion' };
+    }
+    if (tx.estado === 'COMPLETADA') {
+      return { label: 'Operación completada', clase: 'completada' };
+    }
+    return null;
+  }
+
   puntoMaps(punto: RecyclingPoint): string | null {
     return googleMapsLink(punto.lat, punto.lng);
   }

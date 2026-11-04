@@ -166,6 +166,9 @@
                 @if (esMia(post)) {
                   <span class="mia-chip">Tu anuncio</span>
                 }
+                @if (operacionDe(post.id); as operacion) {
+                  <span class="operacion-chip" [ngClass]="operacion.clase">{{ operacion.label }}</span>
+                }
                 <span class="ver-detalle">
                   Ver detalles
                   <span class="material-symbols-outlined">chevron_right</span>

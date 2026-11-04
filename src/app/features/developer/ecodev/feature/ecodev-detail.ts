@@ -58,6 +58,12 @@ export class EcodevDetail implements OnInit {
 
   readonly activo = computed(() => this.post()?.estado === 'ACTIVA');
 
+  /** Ya marcaste interés: el backend no duplica el contador ni repite el aviso. */
+  readonly yaInteresado = computed(() => {
+    const post = this.post();
+    return !!post?.interesados?.some((persona) => persona.id === this.miUserId);
+  });
+
   /** Ya hay una operación viva tuya sobre este anuncio. */
   readonly conTransaccion = computed(() => {
     const tx = this.transaccion();
@@ -93,13 +99,30 @@ export class EcodevDetail implements OnInit {
     this.store.contact(post.id, this.miUserId).subscribe({
       next: (resultado) => {
         this.enviando.set(false);
-        if (resultado) this.toast.success('El autor recibirá tu interés. ¡Coordina por el chat!');
+        if (resultado) {
+          this.toast.success('El autor recibirá tu interés. ¡Coordina por el chat!');
+          // refresca la lista de interesados del detalle
+          this.store.loadDetail(post.id);
+        }
       },
       error: () => {
         this.enviando.set(false);
         this.toast.error('No se pudo registrar tu interés');
       },
     });
+  }
+
+  /** Abre el chat interno con el autor del anuncio (misma ruta que usa el perfil). */
+  conversar(): void {
+    const post = this.post();
+    if (post) this.conversarCon(post.autorId);
+  }
+
+  /** Abre el chat interno con una persona concreta. */
+  conversarCon(userId: string): void {
+    if (!userId) return;
+    const base = this.router.url.startsWith('/recruiter') ? '/recruiter' : '/developer';
+    this.router.navigate([base, 'messages'], { queryParams: { user: userId } });
   }
 
   /** "Coordinar operación": inicia la transacción con el autor del anuncio. */

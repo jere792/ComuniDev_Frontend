@@ -1,3 +1,11 @@
+/** Datos públicos de quien marcó "Me interesa" en un anuncio. */
+export interface InteresadoEcotech {
+  id: string;
+  nombre: string | null;
+  nombreUsuario: string | null;
+  fotoPerfilUrl: string | null;
+}
+
 /** Anuncio EcoDev (ODS 12), schema `EcotechPost`. */
 export interface EcotechPost {
   id: string;
@@ -22,6 +30,8 @@ export interface EcotechPost {
   /** ACTIVA (visible y coordinable) | CERRADA */
   estado: string;
   interesadosCount: number;
+  /** Quiénes marcaron "Me interesa" (solo viene en el detalle). */
+  interesados?: InteresadoEcotech[];
   createdAt: string | null;
 }
 

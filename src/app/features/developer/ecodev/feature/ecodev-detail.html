@@ -190,10 +190,19 @@
           class="btn btn-outline"
           type="button"
           (click)="marcarInteres()"
-          [disabled]="esMia() || !activo() || enviando()"
+          [disabled]="esMia() || !activo() || enviando() || yaInteresado()"
         >
           <span class="material-symbols-outlined">favorite</span>
-          Me interesa
+          {{ yaInteresado() ? 'Ya te interesa' : 'Me interesa' }}
+        </button>
+        <button
+          class="btn btn-outline"
+          type="button"
+          (click)="conversar()"
+          [disabled]="esMia()"
+        >
+          <span class="material-symbols-outlined">chat</span>
+          Conversar
         </button>
         <button
           class="btn btn-primary"
@@ -209,6 +218,41 @@
           Ver todos los anuncios
         </a>
       </div>
+    </section>
+
+    <!-- ─── Interesados ─── -->
+    <section class="interesados-card">
+      <h2 class="interesados-title">
+        <span class="material-symbols-outlined">groups</span>
+        Interesados ({{ post()!.interesados?.length || post()!.interesadosCount }})
+      </h2>
+      @if (post()!.interesados?.length) {
+        <ul class="interesados-list">
+          @for (persona of (post()!.interesados ?? []); track persona.id) {
+            <li class="interesado">
+              @if (persona.fotoPerfilUrl) {
+                <img class="interesado-avatar" [src]="persona.fotoPerfilUrl" [alt]="persona.nombre || 'Interesado'" />
+              } @else {
+                <span class="interesado-avatar fallback">{{ (persona.nombre || '?').charAt(0) }}</span>
+              }
+              <div class="interesado-info">
+                <span class="interesado-nombre">{{ persona.nombre || 'Usuario' }}</span>
+                @if (persona.nombreUsuario) {
+                  <span class="interesado-user">&#64;{{ persona.nombreUsuario }}</span>
+                }
+              </div>
+              @if (esMia()) {
+                <button class="btn btn-outline interesado-chat" type="button" (click)="conversarCon(persona.id)">
+                  <span class="material-symbols-outlined">chat</span>
+                  Conversar
+                </button>
+              }
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="interesados-vacio">Todavía nadie marcó interés en este anuncio.</p>
+      }
     </section>
   }
 

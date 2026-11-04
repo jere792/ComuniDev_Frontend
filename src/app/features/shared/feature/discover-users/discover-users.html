@@ -22,7 +22,11 @@
         <div class="user-card">
           <div class="card-banner" (click)="goToProfile(user.id!)">
             @if (user.bannerUrl) {
-              <img [src]="user.bannerUrl" alt="Banner" />
+              @if (user.bannerTipo === 'VIDEO') {
+                <video [src]="user.bannerUrl" autoplay muted loop playsinline></video>
+              } @else {
+                <img [src]="user.bannerUrl" alt="Banner" />
+              }
             }
           </div>
           <div class="card-body">

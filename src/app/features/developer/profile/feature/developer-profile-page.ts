@@ -8,6 +8,10 @@ import { UserStore } from '@features/users/data-access/state/user.store';
 import { ToastService } from '@core/services/toast.service';
 import { ImageEditorService } from '@core/services/image-editor.service';
 import { DeveloperProfileCard } from '@features/developer/profile/ui/profile-card/developer-profile-card';
+import {
+  BannerVideoRecorte,
+  VideoBannerModal,
+} from '@features/developer/profile/ui/video-banner-modal/video-banner-modal';
 import { DeveloperContactInfo } from '@features/developer/profile/ui/contact-info/developer-contact-info';
 import { DeveloperStackCard } from '@features/developer/profile/ui/stack-card/developer-stack-card';
 import { PointsStore } from '@features/developer/gamificacion/data-access/state/points.store';
@@ -25,6 +29,7 @@ import { TagInputComponent } from '@shared/ui/tag-input/tag-input';
     ReactiveFormsModule,
     RouterLink,
     DeveloperProfileCard,
+    VideoBannerModal,
     DeveloperContactInfo,
     DeveloperStackCard,
     PointsCard,
@@ -46,6 +51,9 @@ export class DeveloperProfilePage implements OnInit {
   isEditingBasic = signal(false);
   isEditingProfile = signal(false);
   uploadingImage = signal(false);
+  /** Modal de recorte para el banner de video. */
+  bannerVideoOpen = signal(false);
+  bannerVideoFile = signal<File | null>(null);
   socialModalOpen = signal(false);
   socialModalType = signal<SocialListType>('followers');
   basicForm: FormGroup;
@@ -264,6 +272,16 @@ export class DeveloperProfilePage implements OnInit {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
+
+    // Video: se abre el modal para recortarlo (maximo 60s a guardar).
+    // Imagen: flujo de siempre con el editor de imagenes.
+    if (file.type.startsWith('video/')) {
+      this.bannerVideoFile.set(file);
+      this.bannerVideoOpen.set(true);
+      input.value = '';
+      return;
+    }
+
     this.uploadImage(file, 'bannerUrl');
     input.value = '';
   }
@@ -292,7 +310,19 @@ export class DeveloperProfilePage implements OnInit {
       next: (res: { url: string }) => {
         const userId = this.user()?.id;
         if (!userId) return;
-        this.userStore.update(userId, { [field]: res.url }).subscribe({
+        // Al volver a una portada de imagen se limpian los metadatos del video.
+        const cambios: Partial<User> = isBanner
+          ? {
+              bannerUrl: res.url,
+              bannerTipo: 'IMAGE',
+              bannerInicio: 0,
+              bannerFin: 0,
+              bannerMusicaNombre: '',
+              bannerMusicaArtista: '',
+              bannerMusicaUrl: '',
+            }
+          : { fotoPerfilUrl: res.url };
+        this.userStore.update(userId, cambios).subscribe({
           next: (updatedUser: User) => {
             this.user.set(updatedUser);
             if (field === 'fotoPerfilUrl') localStorage.setItem('userPhoto', res.url);
@@ -306,5 +336,49 @@ export class DeveloperProfilePage implements OnInit {
         this.toast.error('Error al subir imagen');
       },
     });
+  }
+
+  /** Guarda el tramo elegido en el modal: sube el video y persiste el recorte. */
+  guardarBannerVideo(recorte: BannerVideoRecorte): void {
+    const file = this.bannerVideoFile();
+    const userId = this.user()?.id;
+    if (!file || !userId) return;
+
+    this.uploadingImage.set(true);
+    this.userStore.uploadFile(file).subscribe({
+      next: (res: { url: string }) => {
+        this.userStore
+          .update(userId, {
+            bannerUrl: res.url,
+            bannerTipo: 'VIDEO',
+            bannerInicio: recorte.inicio,
+            bannerFin: recorte.fin,
+            bannerMusicaNombre: recorte.musica?.nombre ?? '',
+            bannerMusicaArtista: recorte.musica?.artista ?? '',
+            bannerMusicaUrl: recorte.musica?.url ?? '',
+          })
+          .subscribe({
+            next: (updatedUser: User) => {
+              this.user.set(updatedUser);
+              this.uploadingImage.set(false);
+              this.cerrarBannerVideo();
+              this.toast.success('Banner de video actualizado');
+            },
+            error: (err) => {
+              this.uploadingImage.set(false);
+              this.toast.error(err?.error?.message ?? err?.message ?? 'No se pudo guardar el banner');
+            },
+          });
+      },
+      error: () => {
+        this.uploadingImage.set(false);
+        this.toast.error('Error al subir el video');
+      },
+    });
+  }
+
+  cerrarBannerVideo(): void {
+    this.bannerVideoOpen.set(false);
+    this.bannerVideoFile.set(null);
   }
 }

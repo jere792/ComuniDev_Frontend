@@ -27,4 +27,21 @@ export class DeveloperProfileCard {
     const name = this.user?.nombre;
     return name ? name.substring(0, 2) : '';
   }
+
+  /** El banner de video arranca en el inicio del recorte guardado. */
+  onVideoMeta(event: Event): void {
+    const video = event.target as HTMLVideoElement;
+    video.currentTime = this.user?.bannerInicio ?? 0;
+    video.play().catch(() => undefined);
+  }
+
+  /** Al llegar al fin del recorte, vuelve al inicio (loop del tramo). */
+  onVideoTime(event: Event): void {
+    const video = event.target as HTMLVideoElement;
+    const inicio = this.user?.bannerInicio ?? 0;
+    const fin = this.user?.bannerFin;
+    if (fin && fin > inicio && video.currentTime >= fin) {
+      video.currentTime = inicio;
+    }
+  }
 }

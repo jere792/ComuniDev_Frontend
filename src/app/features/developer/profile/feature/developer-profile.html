@@ -15,7 +15,7 @@
         (bioClick)="toggleEditBasic()"
         (statClick)="openSocialModal($event)"
       />
-      <input #bannerInput type="file" accept="image/*" hidden (change)="onBannerSelected($event)" />
+      <input #bannerInput type="file" accept="image/*,video/*" hidden (change)="onBannerSelected($event)" />
       <input #photoInput type="file" accept="image/*" hidden (change)="onPhotoSelected($event)" />
 
       <!-- Gamificación: puntos, nivel, rango e insignias -->
@@ -311,4 +311,11 @@
   [type]="socialModalType()"
   [userId]="user()?.id || ''"
   (close)="closeSocialModal()"
+/>
+
+<app-video-banner-modal
+  [open]="bannerVideoOpen()"
+  [file]="bannerVideoFile()"
+  (save)="guardarBannerVideo($event)"
+  (close)="cerrarBannerVideo()"
 />

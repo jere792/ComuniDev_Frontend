@@ -27,6 +27,22 @@ export class PublicProfile implements OnInit {
   isBlocked = signal(false);
   blockLoading = signal(false);
   removeConfirmOpen = signal(false);
+
+  /** Banner de video: respeta el recorte guardado en el perfil. */
+  onVideoMeta(event: Event): void {
+    const video = event.target as HTMLVideoElement;
+    video.currentTime = this.user()?.bannerInicio ?? 0;
+    video.play().catch(() => undefined);
+  }
+
+  onVideoTime(event: Event): void {
+    const video = event.target as HTMLVideoElement;
+    const inicio = this.user()?.bannerInicio ?? 0;
+    const fin = this.user()?.bannerFin;
+    if (fin && fin > inicio && video.currentTime >= fin) {
+      video.currentTime = inicio;
+    }
+  }
   /** Con sesión se muestra dentro del layout de la app; sin sesión, como página pública. */
   isLoggedIn = !!localStorage.getItem('userId');
 

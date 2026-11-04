@@ -6,6 +6,14 @@ export interface User {
   telefono?: string;
   fotoPerfilUrl?: string;
   bannerUrl?: string;
+  /** Portada: IMAGE o VIDEO. */
+  bannerTipo?: 'IMAGE' | 'VIDEO' | string;
+  /** Recorte del video de portada (segundos). */
+  bannerInicio?: number;
+  bannerFin?: number;
+  bannerMusicaNombre?: string;
+  bannerMusicaArtista?: string;
+  bannerMusicaUrl?: string;
   bio?: string;
   sitioWeb?: string;
   perfilPublico?: boolean;

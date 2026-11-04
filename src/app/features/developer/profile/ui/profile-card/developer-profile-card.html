@@ -1,7 +1,23 @@
 <div class="profile-card">
   <div class="banner-wrapper">
     @if (user?.bannerUrl) {
-      <img [src]="user.bannerUrl" alt="Banner" class="banner-image" />
+      @if (user?.bannerTipo === 'VIDEO') {
+        <video
+          class="banner-image"
+          [src]="user.bannerUrl"
+          autoplay
+          muted
+          loop
+          playsinline
+          (loadedmetadata)="onVideoMeta($event)"
+          (timeupdate)="onVideoTime($event)"
+        ></video>
+        @if (user?.bannerMusicaUrl) {
+          <audio [src]="user.bannerMusicaUrl" autoplay loop></audio>
+        }
+      } @else {
+        <img [src]="user.bannerUrl" alt="Banner" class="banner-image" />
+      }
     } @else {
       <div class="banner-placeholder"></div>
     }

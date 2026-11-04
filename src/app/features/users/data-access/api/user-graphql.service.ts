@@ -19,6 +19,7 @@ const GET_USERS = gql`
       email
       fotoPerfilUrl
       bannerUrl
+      bannerTipo
       bio
       roles
       rolActivo
@@ -42,6 +43,12 @@ const GET_USER_BY_ID = gql`
       telefono
       fotoPerfilUrl
       bannerUrl
+      bannerTipo
+      bannerInicio
+      bannerFin
+      bannerMusicaNombre
+      bannerMusicaArtista
+      bannerMusicaUrl
       bio
       sitioWeb
       perfilPublico
@@ -81,8 +88,8 @@ const GET_USER_BY_ID = gql`
 `;
 
 const UPDATE_USER = gql`
-  mutation UpdateUser($id: ID!, $nombre: String, $nombreUsuario: String, $email: String, $telefono: String, $fotoPerfilUrl: String, $bannerUrl: String, $bio: String, $sitioWeb: String, $perfilPublico: Boolean, $ubicacion: UserUbicacionInput) {
-    updateUser(id: $id, nombre: $nombre, nombreUsuario: $nombreUsuario, email: $email, telefono: $telefono, fotoPerfilUrl: $fotoPerfilUrl, bannerUrl: $bannerUrl, bio: $bio, sitioWeb: $sitioWeb, perfilPublico: $perfilPublico, ubicacion: $ubicacion) {
+  mutation UpdateUser($id: ID!, $nombre: String, $nombreUsuario: String, $email: String, $telefono: String, $fotoPerfilUrl: String, $bannerUrl: String, $bannerTipo: String, $bannerInicio: Float, $bannerFin: Float, $bannerMusicaNombre: String, $bannerMusicaArtista: String, $bannerMusicaUrl: String, $bio: String, $sitioWeb: String, $perfilPublico: Boolean, $ubicacion: UserUbicacionInput) {
+    updateUser(id: $id, nombre: $nombre, nombreUsuario: $nombreUsuario, email: $email, telefono: $telefono, fotoPerfilUrl: $fotoPerfilUrl, bannerUrl: $bannerUrl, bannerTipo: $bannerTipo, bannerInicio: $bannerInicio, bannerFin: $bannerFin, bannerMusicaNombre: $bannerMusicaNombre, bannerMusicaArtista: $bannerMusicaArtista, bannerMusicaUrl: $bannerMusicaUrl, bio: $bio, sitioWeb: $sitioWeb, perfilPublico: $perfilPublico, ubicacion: $ubicacion) {
       id
       nombre
       nombreUsuario
@@ -90,6 +97,12 @@ const UPDATE_USER = gql`
       telefono
       fotoPerfilUrl
       bannerUrl
+      bannerTipo
+      bannerInicio
+      bannerFin
+      bannerMusicaNombre
+      bannerMusicaArtista
+      bannerMusicaUrl
       bio
       sitioWeb
       perfilPublico
@@ -177,7 +190,7 @@ export class UserGraphqlService implements UserRepository {
     const unicos = [...new Set(ids.filter(id => !!id))];
     if (unicos.length === 0) return of([]);
 
-    const CAMPOS = 'id nombre nombreUsuario email fotoPerfilUrl bannerUrl bio roles rolActivo '
+    const CAMPOS = 'id nombre nombreUsuario email fotoPerfilUrl bannerUrl bannerTipo bio roles rolActivo '
       + 'estadoCuenta emailVerificado seguidoresCount siguiendoCount conexionesCount createdAt';
     const aliases = unicos.map((id, i) => `u${i}: user(id: "${id}") { ${CAMPOS} }`).join('\n      ');
     const consulta = gql`query GetUsersByIds { ${aliases} }`;

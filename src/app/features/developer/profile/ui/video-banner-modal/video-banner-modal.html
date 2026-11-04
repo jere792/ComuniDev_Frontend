@@ -1,0 +1,123 @@
+@if (open && objectUrl()) {
+  <div class="modal-backdrop" (click)="close.emit()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <header class="modal-head">
+        <div>
+          <h2>Editar banner de video</h2>
+          <p class="modal-sub">Elige el tramo que se verá en tu perfil (máximo 60 segundos).</p>
+        </div>
+        <button type="button" class="icon-btn" (click)="close.emit()" title="Cerrar">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </header>
+
+      <div class="preview-wrap">
+        <video
+          #preview
+          class="preview"
+          [src]="objectUrl()"
+          playsinline
+          (loadedmetadata)="onMetadata($event)"
+          (timeupdate)="onTimeUpdate($event)"
+        ></video>
+        <button type="button" class="preview-play" (click)="previsualizar()" title="Previsualizar recorte">
+          <span class="material-symbols-outlined">play_arrow</span>
+        </button>
+      </div>
+
+      <div class="recorte-info" [class.invalido]="!valido">
+        <span class="material-symbols-outlined">content_cut</span>
+        Recorte: <strong>{{ recorte | number: '1.0-1' }} s</strong> / 60 s máx.
+        <span class="duracion-original">(video original: {{ duracion() | number: '1.0-1' }} s)</span>
+      </div>
+
+      <div class="sliders">
+        <label class="slider">
+          <span>Inicio</span>
+          <input
+            type="range"
+            min="0"
+            [max]="duracion()"
+            step="0.1"
+            [ngModel]="inicio()"
+            (ngModelChange)="moverInicio($event)"
+          />
+          <em>{{ inicio() | number: '1.0-1' }} s</em>
+        </label>
+        <label class="slider">
+          <span>Fin</span>
+          <input
+            type="range"
+            min="0"
+            [max]="duracion()"
+            step="0.1"
+            [ngModel]="fin()"
+            (ngModelChange)="moverFin($event)"
+          />
+          <em>{{ fin() | number: '1.0-1' }} s</em>
+        </label>
+      </div>
+
+      <section class="musica-section">
+        <h3>
+          <span class="material-symbols-outlined">music_note</span>
+          Música (opcional)
+        </h3>
+        <div class="musica-buscar">
+          <input
+            type="text"
+            [(ngModel)]="busqueda"
+            placeholder="Buscar canción o artista..."
+            (keydown.enter)="buscarMusica()"
+          />
+          <button type="button" class="btn btn-outline" (click)="buscarMusica()">
+            <span class="material-symbols-outlined">search</span>
+            Buscar
+          </button>
+        </div>
+
+        @if (seleccionada(); as track) {
+          <div class="musica-elegida">
+            @if (track.coverUrl) {
+              <img [src]="track.coverUrl" [alt]="track.title" />
+            }
+            <div class="musica-texto">
+              <strong>{{ track.title }}</strong>
+              <span>{{ track.artist }}</span>
+            </div>
+            <button type="button" class="icon-btn" (click)="quitarMusica()" title="Quitar música">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+        } @else if (musica.loading()) {
+          <p class="musica-estado">Buscando...</p>
+        } @else if (musica.results().length) {
+          <ul class="musica-resultados">
+            @for (track of musica.results(); track track.id) {
+              <li>
+                <button type="button" (click)="elegirMusica(track)">
+                  @if (track.coverUrl) {
+                    <img [src]="track.coverUrl" [alt]="track.title" />
+                  }
+                  <span class="musica-texto">
+                    <strong>{{ track.title }}</strong>
+                    <span>{{ track.artist }}</span>
+                  </span>
+                  <span class="material-symbols-outlined">add_circle</span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <footer class="modal-actions">
+        <button type="button" class="btn btn-outline" (click)="close.emit()">Cancelar</button>
+        <button type="button" class="btn btn-primary" [disabled]="!valido" (click)="confirmar()">
+          <span class="material-symbols-outlined">check</span>
+          Guardar banner
+        </button>
+      </footer>
+    </div>
+  </div>
+}

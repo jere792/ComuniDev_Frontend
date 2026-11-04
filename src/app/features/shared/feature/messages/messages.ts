@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewChecked, ViewChild, ElementRef, inject, signal } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, ViewChild, ElementRef, HostListener, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -84,6 +84,13 @@ export class Messages implements OnInit, AfterViewChecked {
 
   cambiarPestana(pestana: 'conversaciones' | 'solicitudes'): void {
     this.pestana.set(pestana);
+  }
+
+  /** Al volver a la pestaña se recuperan los mensajes que el WS pudo perder. */
+  @HostListener('document:visibilitychange')
+  alVolverALaPestana(): void {
+    if (document.visibilityState !== 'visible' || !this.userId) return;
+    this.store.refrescar(this.userId);
   }
 
   /** Trae los mensajes mas viejos del hilo abierto (paginado hacia atras). */

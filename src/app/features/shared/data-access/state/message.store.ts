@@ -1,4 +1,5 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Message, MessageConversation } from '@features/shared/domain/models/message.model';
 import { MESSAGE_REPOSITORY, MessageRepository } from '@features/shared/domain/ports/message.repository';
 
@@ -23,6 +24,9 @@ export class MessageStore {
 
   /** Quien está usando la pantalla; el backend no lo dice porque no hay JWT. */
   private userId: string | null = null;
+  /** Suscripcion unica al canal de tiempo real (compartida por pantalla y header). */
+  private suscripcion: Subscription | null = null;
+  private usuarioEscuchando: string | null = null;
 
   cargarConversaciones(userId: string): void {
     this.userId = userId;
@@ -171,11 +175,55 @@ export class MessageStore {
   /** Se engancha al canal de tiempo real y aplica todo lo que llegue. */
   escuchar(userId: string, alCambiar?: () => void): void {
     this.userId = userId;
-    this.repository.messageReceived(userId).subscribe({
+    // La pantalla de mensajes y el header pueden pedir el canal a la vez:
+    // una sola suscripcion por usuario.
+    if (this.usuarioEscuchando === userId && this.suscripcion && !this.suscripcion.closed) return;
+
+    this.suscripcion?.unsubscribe();
+    this.usuarioEscuchando = userId;
+    this.suscripcion = this.repository.messageReceived(userId).subscribe({
       next: message => {
         this.aplicarLlegada(message, userId);
         alCambiar?.();
       },
+      // graphql-ws reintenta la conexion por su cuenta; al volver a la
+      // pestaña la pantalla de mensajes recarga lo que se haya perdido.
+      error: () => {},
+    });
+  }
+
+  /** Canal de tiempo real activo fuera de la pantalla de mensajes (badge global). */
+  activar(userId: string): void {
+    const cambioUsuario = this.usuarioEscuchando != null && this.usuarioEscuchando !== userId;
+    if (cambioUsuario) {
+      this.conversaciones.set([]);
+      this.solicitudes.set([]);
+      this.listaCargada = false;
+      this.cerrar();
+    }
+
+    this.escuchar(userId);
+    if (cambioUsuario || !this.listaCargada) this.cargarConversaciones(userId);
+  }
+
+  /**
+   * Al volver a la pestaña se recuperan los eventos que el WebSocket pudo
+   * perder mientras el navegador estaba en segundo plano. El hilo abierto se
+   * fusiona (no se reemplaza) para no perder el historial ya paginado.
+   */
+  refrescar(userId: string): void {
+    this.userId = userId;
+    this.cargarConversaciones(userId);
+    this.cargarSolicitudes(userId);
+
+    const abierta = this.abierta();
+    if (!abierta?.id) return;
+    this.repository.messages(userId, abierta.id, MessageStore.TAMANO_VENTANA).subscribe({
+      next: lista => {
+        if (this.abierta()?.id !== abierta.id) return;
+        this.mensajes.update(actual => sinDuplicados([...actual, ...lista]));
+      },
+      error: () => {},
     });
   }
 
@@ -257,11 +305,24 @@ export class MessageStore {
 /** El backend avisa por dos caminos y el mismo mensaje puede llegar dos veces. */
 function sinDuplicados(lista: Message[]): Message[] {
   const vistos = new Set<string>();
-  return lista.filter(message => {
-    if (vistos.has(message.id)) return false;
-    vistos.add(message.id);
-    return true;
-  });
+  return lista
+    .filter(message => {
+      if (vistos.has(message.id)) return false;
+      vistos.add(message.id);
+      return true;
+    })
+    .sort(porFecha);
+}
+
+/** Orden cronologico aunque los eventos del WebSocket lleguen desordenados. */
+function porFecha(a: Message, b: Message): number {
+  return fechaEnMs(a.createdAt) - fechaEnMs(b.createdAt);
+}
+
+function fechaEnMs(fecha: string | null): number {
+  if (!fecha) return 0;
+  const ms = Date.parse(fecha);
+  return Number.isNaN(ms) ? 0 : ms;
 }
 
 /**

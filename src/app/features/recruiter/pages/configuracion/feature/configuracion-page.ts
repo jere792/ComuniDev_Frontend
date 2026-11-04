@@ -12,6 +12,8 @@ import { CompanyStore } from '@features/recruiter/pages/company/data-access/stat
 import { Company } from '@features/recruiter/pages/company/domain/models/company.model';
 import { COUNTRIES, Country } from '@shared/constants/countries';
 import { SECTORS } from '@shared/constants/sectors';
+import { UbicacionService } from '@shared/data-access/ubicacion.service';
+import { UbicacionSelectorComponent } from '@shared/ui/ubicacion-selector/ubicacion-selector';
 import { ImageEditorService } from '@core/services/image-editor.service';
 import { UploadService } from '@core/services/upload.service';
 import { ThemeService } from '@core/services/theme.service';
@@ -19,7 +21,7 @@ import { ThemeService } from '@core/services/theme.service';
 @Component({
   selector: 'app-configuracion-page',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [RouterLink, ReactiveFormsModule, UbicacionSelectorComponent],
   templateUrl: './configuracion.html',
   styleUrl: './configuracion.scss',
 })
@@ -32,6 +34,7 @@ export class ConfiguracionPage implements OnInit {
   private route = inject(ActivatedRoute);
   private imageEditor = inject(ImageEditorService);
   private uploadService = inject(UploadService);
+  private ubicacionService = inject(UbicacionService);
 
   @ViewChild('logoFileInput') logoFileInput?: ElementRef<HTMLInputElement>;
   @ViewChild('bannerFileInput') bannerFileInput?: ElementRef<HTMLInputElement>;
@@ -156,12 +159,19 @@ export class ConfiguracionPage implements OnInit {
     contactoEmail: [''],
     contactoTelefono: [''],
     pais: [''],
+    departamento: [''],
+    provincia: [''],
     ciudad: [''],
     distrito: [''],
     direccion: [''],
     logoUrl: [''],
     bannerUrl: [''],
   });
+
+  /** El ubigeo del Perú solo aplica cuando la empresa está en el país. */
+  get empresaEnPeru(): boolean {
+    return this.empresaForm.value.pais === 'Perú';
+  }
 
   /**
    * Enlaces de la organización. Sin GitHub: una empresa no publica código,
@@ -271,12 +281,15 @@ export class ConfiguracionPage implements OnInit {
             contactoEmail: company.contacto?.email ?? '',
             contactoTelefono: company.contacto?.telefono ?? '',
             pais: company.ubicacion?.pais ?? '',
+            departamento: '',
+            provincia: '',
             ciudad: company.ubicacion?.ciudad ?? '',
             distrito: company.ubicacion?.distrito ?? '',
             direccion: company.ubicacion?.direccion ?? '',
             logoUrl: company.logoUrl ?? '',
             bannerUrl: company.bannerUrl ?? '',
           });
+          this.reconstruirUbigeoEmpresa();
           this.empresaRedesForm.patchValue({
             sitioWeb: company.sitioWeb ?? '',
             linkedin: company.redes?.linkedin ?? '',
@@ -285,6 +298,31 @@ export class ConfiguracionPage implements OnInit {
       },
       error: () => this.empresa.set(null),
     });
+  }
+
+  /**
+   * Company solo guarda ciudad/distrito, no departamento/provincia. Al abrir
+   * la configuración se deducen esos dos niveles desde los nombres guardados
+   * para que los selects queden precargados.
+   */
+  private reconstruirUbigeoEmpresa(): void {
+    const valores = this.empresaForm.value;
+    if (valores.pais !== 'Perú') return;
+
+    this.ubicacionService
+      .resolverPorNombres({
+        departamento: valores.departamento,
+        provincia: valores.provincia,
+        ciudad: valores.ciudad,
+        distrito: valores.distrito,
+      })
+      .subscribe((resuelto) => {
+        if (!resuelto) return;
+        this.empresaForm.patchValue({
+          departamento: valores.departamento || resuelto.departamento,
+          provincia: valores.provincia || resuelto.provincia,
+        });
+      });
   }
 
   saveEmpresa(): void {
@@ -332,7 +370,7 @@ export class ConfiguracionPage implements OnInit {
         fechaCreacion: v.fechaCreacion?.trim() || undefined,
         ubicacion: {
           pais: v.pais.trim(),
-          ciudad: v.ciudad?.trim() ?? '',
+          ciudad: v.ciudad?.trim() || v.provincia?.trim() || '',
           distrito: v.distrito?.trim() ?? '',
           direccion: v.direccion?.trim() ?? '',
         },

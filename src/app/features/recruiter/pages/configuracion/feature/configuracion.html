@@ -395,33 +395,37 @@
             </div>
           </div>
 
-          <div class="form-row">
-            <div class="form-group half">
-              <label class="form-label">País *</label>
-              <select class="form-input form-select" formControlName="pais">
-                <option value="">Selecciona un país…</option>
-                @for (country of countries; track country.code) {
-                  <option [value]="country.name">{{ country.name }}</option>
-                }
-              </select>
-            </div>
-
-            <div class="form-group half">
-              <label class="form-label">Ciudad</label>
-              <input class="form-input" type="text" formControlName="ciudad" placeholder="Ej. Lima" />
-            </div>
+          <div class="form-group">
+            <label class="form-label">País *</label>
+            <select class="form-input form-select" formControlName="pais">
+              <option value="">Selecciona un país…</option>
+              @for (country of countries; track country.code) {
+                <option [value]="country.name">{{ country.name }}</option>
+              }
+            </select>
           </div>
 
-          <div class="form-row">
-            <div class="form-group half">
-              <label class="form-label">Distrito</label>
-              <input class="form-input" type="text" formControlName="distrito" placeholder="Ej. San Borja" />
+          @if (empresaEnPeru) {
+            <div class="form-group">
+              <app-ubicacion-selector [formGroup]="empresaForm" [mostrarPais]="false" />
             </div>
+          } @else {
+            <div class="form-row">
+              <div class="form-group half">
+                <label class="form-label">Ciudad</label>
+                <input class="form-input" type="text" formControlName="ciudad" placeholder="Ej. Lima" />
+              </div>
 
-            <div class="form-group half">
-              <label class="form-label">Dirección de la empresa</label>
-              <input class="form-input" type="text" formControlName="direccion" placeholder="Av. Ejemplo 123" />
+              <div class="form-group half">
+                <label class="form-label">Distrito</label>
+                <input class="form-input" type="text" formControlName="distrito" placeholder="Ej. San Borja" />
+              </div>
             </div>
+          }
+
+          <div class="form-group">
+            <label class="form-label">Dirección de la empresa</label>
+            <input class="form-input" type="text" formControlName="direccion" placeholder="Av. Ejemplo 123" />
           </div>
 
           <div class="form-row">

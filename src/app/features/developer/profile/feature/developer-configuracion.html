@@ -210,25 +210,7 @@
             <input class="form-input" type="text" formControlName="pais" readonly />
           </div>
           <div class="form-group">
-            <label class="form-label">Departamento</label>
-            <select class="form-input form-select" formControlName="departamento">
-              <option value="">Selecciona un departamento</option>
-              @for (departamento of departamentos; track departamento) {
-                <option [value]="departamento">{{ departamento }}</option>
-              }
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Provincia</label>
-            <input class="form-input" type="text" formControlName="provincia" placeholder="Ej: Lima, Arequipa, Trujillo..." />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Ciudad / Distrito</label>
-            <input class="form-input" type="text" formControlName="ciudad" placeholder="Ej: Miraflores, San Isidro, Surco..." />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Distrito / Zona / Localidad</label>
-            <input class="form-input" type="text" formControlName="distrito" placeholder="Ej: Corpac, La Molina, Barranco..." />
+            <app-ubicacion-selector [formGroup]="ubicacionForm" [mostrarPais]="false" />
           </div>
           <div class="form-group">
             <label class="form-label">Dirección</label>

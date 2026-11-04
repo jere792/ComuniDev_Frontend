@@ -7,8 +7,8 @@ import { ToastService } from '@core/services/toast.service';
 import { UploadService } from '@core/services/upload.service';
 import { catchError, of } from 'rxjs';
 import { User, DeveloperProfile } from '@core/domain/models/user.model';
-import { PERU_DEPARTAMENTOS } from '@shared/constants/peru-departments';
 import { TagInputComponent } from '@shared/ui/tag-input/tag-input';
+import { UbicacionSelectorComponent } from '@shared/ui/ubicacion-selector/ubicacion-selector';
 
 interface ConfigItem {
   id: string;
@@ -26,7 +26,7 @@ interface ConfigCategory {
 @Component({
   selector: 'app-developer-configuracion-page',
   standalone: true,
-  imports: [ReactiveFormsModule, TagInputComponent],
+  imports: [ReactiveFormsModule, TagInputComponent, UbicacionSelectorComponent],
   templateUrl: './developer-configuracion.html',
   styleUrl: './developer-configuracion.scss',
 })
@@ -44,8 +44,6 @@ export class DeveloperConfiguracionPage implements OnInit {
   activeSection = signal('perfil-personal');
   expandedCategory = signal<string | null>('perfil');
   loading = signal(false);
-
-  readonly departamentos: string[] = PERU_DEPARTAMENTOS;
 
   categories: ConfigCategory[] = [
     {

@@ -20,6 +20,10 @@ import { BadgesGrid } from '@features/developer/gamificacion/ui/badges-grid/badg
 import { SidebarCard } from '@features/recruiter/pages/profile/ui/sidebar-card/sidebar-card';
 import { SocialListModal, SocialListType } from '@features/recruiter/pages/profile/ui/social-list-modal/social-list-modal';
 import { TagInputComponent } from '@shared/ui/tag-input/tag-input';
+import {
+  UbicacionSelectorComponent,
+  UbicacionCampos,
+} from '@shared/ui/ubicacion-selector/ubicacion-selector';
 import { ProfilePost, ProfilePostsService } from '@features/developer/profile/data-access/api/profile-posts.service';
 
 @Component({
@@ -38,6 +42,7 @@ import { ProfilePost, ProfilePostsService } from '@features/developer/profile/da
     SidebarCard,
     SocialListModal,
     TagInputComponent,
+    UbicacionSelectorComponent,
   ],
   templateUrl: './developer-profile.html',
   styleUrl: './developer-profile.scss',
@@ -65,6 +70,15 @@ export class DeveloperProfilePage implements OnInit {
   basicForm: FormGroup;
   profileForm: FormGroup;
 
+  /** Controles de ubicación dentro de `basicForm`. */
+  readonly camposUbicacion: UbicacionCampos = {
+    pais: 'ubicacionPais',
+    departamento: 'ubicacionDepartamento',
+    provincia: 'ubicacionProvincia',
+    ciudad: 'ubicacionCiudad',
+    distrito: 'ubicacionDistrito',
+  };
+
   private toast = inject(ToastService);
   private imageEditor = inject(ImageEditorService);
   private profilePosts = inject(ProfilePostsService);
@@ -77,7 +91,9 @@ export class DeveloperProfilePage implements OnInit {
       bio: [''],
       telefono: [''],
       perfilPublico: [true],
-      ubicacionPais: [''],
+      ubicacionPais: ['Perú'],
+      ubicacionDepartamento: [''],
+      ubicacionProvincia: [''],
       ubicacionCiudad: [''],
       ubicacionDistrito: [''],
     });
@@ -197,7 +213,9 @@ export class DeveloperProfilePage implements OnInit {
         bio: u.bio || '',
         telefono: u.telefono || '',
         perfilPublico: u.perfilPublico !== false,
-        ubicacionPais: u.ubicacion?.pais || '',
+        ubicacionPais: u.ubicacion?.pais || 'Perú',
+        ubicacionDepartamento: u.ubicacion?.departamento || '',
+        ubicacionProvincia: u.ubicacion?.provincia || '',
         ubicacionCiudad: u.ubicacion?.ciudad || '',
         ubicacionDistrito: u.ubicacion?.distrito || '',
       });
@@ -235,7 +253,9 @@ export class DeveloperProfilePage implements OnInit {
         telefono: formValue.telefono,
         perfilPublico: formValue.perfilPublico,
         ubicacion: {
-          pais: formValue.ubicacionPais,
+          pais: formValue.ubicacionPais || 'Perú',
+          departamento: formValue.ubicacionDepartamento,
+          provincia: formValue.ubicacionProvincia,
           ciudad: formValue.ubicacionCiudad,
           distrito: formValue.ubicacionDistrito,
         },

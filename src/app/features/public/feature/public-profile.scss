@@ -954,3 +954,29 @@ a.link {
     background: var(--primary);
   }
 }
+
+.banner-music-btn {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 4;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.72);
+  }
+
+  .material-symbols-outlined {
+    font-size: 20px;
+  }
+}

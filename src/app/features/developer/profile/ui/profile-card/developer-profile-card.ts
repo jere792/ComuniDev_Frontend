@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SocialListType } from '@features/recruiter/pages/profile/ui/social-list-modal/social-list-modal';
 
@@ -18,6 +18,21 @@ export class DeveloperProfileCard {
   @Output() photoClick = new EventEmitter<void>();
   @Output() bioClick = new EventEmitter<void>();
   @Output() statClick = new EventEmitter<SocialListType>();
+
+  @ViewChild('bannerAudio') private bannerAudio?: ElementRef<HTMLAudioElement>;
+
+  /** Preferencia de silencio de la musica del banner (persistida en el navegador). */
+  readonly musicaSilenciada = signal(localStorage.getItem('bannerMusicMuted') === '1');
+
+  toggleMusica(): void {
+    const silenciada = !this.musicaSilenciada();
+    this.musicaSilenciada.set(silenciada);
+    localStorage.setItem('bannerMusicMuted', silenciada ? '1' : '0');
+    const audio = this.bannerAudio?.nativeElement;
+    if (!audio) return;
+    audio.muted = silenciada;
+    if (!silenciada) audio.play().catch(() => undefined);
+  }
 
   openStat(type: SocialListType): void {
     this.statClick.emit(type);

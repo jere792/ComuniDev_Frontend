@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, inject, DestroyRef } from '@angular/core';
+import { Component, ElementRef, signal, OnInit, inject, DestroyRef, ViewChild } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
@@ -27,6 +27,20 @@ export class PublicProfile implements OnInit {
   isBlocked = signal(false);
   blockLoading = signal(false);
   removeConfirmOpen = signal(false);
+
+  @ViewChild('bannerAudio') private bannerAudio?: ElementRef<HTMLAudioElement>;
+  /** Preferencia de silencio de la musica del banner. */
+  readonly musicaSilenciada = signal(localStorage.getItem('bannerMusicMuted') === '1');
+
+  toggleMusica(): void {
+    const silenciada = !this.musicaSilenciada();
+    this.musicaSilenciada.set(silenciada);
+    localStorage.setItem('bannerMusicMuted', silenciada ? '1' : '0');
+    const audio = this.bannerAudio?.nativeElement;
+    if (!audio) return;
+    audio.muted = silenciada;
+    if (!silenciada) audio.play().catch(() => undefined);
+  }
 
   /** Banner de video: respeta el recorte guardado en el perfil. */
   onVideoMeta(event: Event): void {

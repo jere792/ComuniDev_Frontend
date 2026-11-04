@@ -13,7 +13,15 @@
           (timeupdate)="onVideoTime($event)"
         ></video>
         @if (user?.bannerMusicaUrl) {
-          <audio [src]="user.bannerMusicaUrl" autoplay loop></audio>
+          <audio #bannerAudio [src]="user.bannerMusicaUrl" autoplay loop [muted]="musicaSilenciada()"></audio>
+          <button
+            type="button"
+            class="banner-music-btn"
+            (click)="toggleMusica()"
+            [title]="musicaSilenciada() ? 'Activar música' : 'Silenciar música'"
+          >
+            <span class="material-symbols-outlined">{{ musicaSilenciada() ? 'volume_off' : 'volume_up' }}</span>
+          </button>
         }
       } @else {
         <img [src]="user.bannerUrl" alt="Banner" class="banner-image" />

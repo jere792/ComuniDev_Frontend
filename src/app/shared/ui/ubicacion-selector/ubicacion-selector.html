@@ -1,0 +1,50 @@
+<div class="ubicacion-grid" [formGroup]="formGroup">
+  @if (mostrarPais) {
+    <div class="ubicacion-campo">
+      <label class="ubicacion-label" [for]="id + '-pais'">País</label>
+      <select class="ubicacion-select" [id]="id + '-pais'" [formControlName]="campos.pais">
+        @for (pais of paises(); track $index) {
+          <option [value]="pais">{{ pais }}</option>
+        }
+      </select>
+    </div>
+  }
+
+  <div class="ubicacion-campo">
+    <label class="ubicacion-label" [for]="id + '-departamento'">Departamento</label>
+    <select
+      class="ubicacion-select"
+      [id]="id + '-departamento'"
+      [formControlName]="campos.departamento"
+    >
+      <option value="">Selecciona un departamento</option>
+      @for (departamento of departamentos(); track $index) {
+        <option [value]="departamento.nombre">{{ departamento.nombre }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="ubicacion-campo">
+    <label class="ubicacion-label" [for]="id + '-provincia'">Provincia</label>
+    <select class="ubicacion-select" [id]="id + '-provincia'" [formControlName]="campos.provincia">
+      <option value="">Selecciona una provincia</option>
+      @for (provincia of provincias(); track $index) {
+        <option [value]="provincia.nombre">{{ provincia.nombre }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="ubicacion-campo">
+    <label class="ubicacion-label" [for]="id + '-distrito'">Distrito</label>
+    <select class="ubicacion-select" [id]="id + '-distrito'" [formControlName]="campos.distrito">
+      <option value="">Selecciona un distrito</option>
+      @for (distrito of distritos(); track $index) {
+        <option [value]="distrito.nombre">{{ distrito.nombre }}</option>
+      }
+    </select>
+  </div>
+</div>
+
+@if (cargando()) {
+  <p class="ubicacion-ayuda">Cargando departamentos, provincias y distritos…</p>
+}

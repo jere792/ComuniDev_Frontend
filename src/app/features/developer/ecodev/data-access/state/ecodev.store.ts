@@ -1,10 +1,12 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, forkJoin, map, tap } from 'rxjs';
+import { Observable, Subscription, forkJoin, map, tap } from 'rxjs';
+import { ToastService } from '@core/services/toast.service';
 import {
   EcotechImpacto,
   EcotechPost,
   EcotechPostInput,
   EcotechTransaction,
+  EcotechTransactionEvent,
   RecyclingPoint,
 } from '@features/developer/ecodev/domain/models/ecodev.model';
 import { ECODEV_REPOSITORY, EcotechRepository } from '@features/developer/ecodev/domain/ports/ecodev.repository';
@@ -20,6 +22,7 @@ const PAGE_SIZE = 12;
 @Injectable({ providedIn: 'root' })
 export class EcodevStore {
   private repository = inject<EcotechRepository>(ECODEV_REPOSITORY);
+  private readonly toast = inject(ToastService);
 
   readonly posts = signal<EcotechPost[]>([]);
   readonly page = signal(0);
@@ -56,6 +59,12 @@ export class EcodevStore {
       ) ?? null
     );
   });
+
+  /** Suscripción única a `ecotechTransactionUpdated` (lista y detalle la comparten). */
+  private suscripcionTx: Subscription | null = null;
+  private usuarioTxEscuchando: string | null = null;
+  /** Ids ya recargados para no repetir la carga si el evento no llega a la lista. */
+  private readonly txRecargadas = new Set<string>();
 
   // ------------------------------------------------------------- listado
 
@@ -172,6 +181,75 @@ export class EcodevStore {
     });
   }
 
+  /**
+   * Canal de tiempo real de las transacciones: una sola suscripción por
+   * usuario, compartida por "Mis operaciones" y el detalle del anuncio.
+   */
+  escucharTransacciones(userId: string): void {
+    if (this.usuarioTxEscuchando === userId && this.suscripcionTx && !this.suscripcionTx.closed) return;
+
+    this.suscripcionTx?.unsubscribe();
+    this.usuarioTxEscuchando = userId;
+    this.suscripcionTx = this.repository.ecotechTransactionUpdated(userId).subscribe({
+      next: (event) => this.aplicarEventoTransaccion(event, userId),
+      error: () => {},
+    });
+  }
+
+  /** Refleja el evento en la operación (y en el detalle) sin recargar la lista. */
+  private aplicarEventoTransaccion(event: EcotechTransactionEvent, userId: string): void {
+    const actual = this.misOperaciones().find((tx) => tx.id === event.transactionId);
+
+    if (!actual) {
+      if (!this.operacionesLoading() && !this.txRecargadas.has(event.transactionId)) {
+        this.txRecargadas.add(event.transactionId);
+        this.loadMisOperaciones(userId);
+      }
+      return;
+    }
+
+    const sinCambios =
+      actual.estado === event.estado &&
+      actual.confirmadoPorEmisor === event.confirmadoPorEmisor &&
+      actual.confirmadoPorReceptor === event.confirmadoPorReceptor;
+    // La mutación propia y el evento del canal traen el mismo cambio: no se duplica.
+    if (sinCambios) return;
+
+    const eraPendiente = actual.estado === 'PENDIENTE_CONFIRMACION';
+
+    this.misOperaciones.update((lista) =>
+      lista.map((tx) =>
+        tx.id === event.transactionId
+          ? {
+              ...tx,
+              estado: event.estado,
+              confirmadoPorEmisor: event.confirmadoPorEmisor,
+              confirmadoPorReceptor: event.confirmadoPorReceptor,
+              fechaCompletado:
+                event.estado === 'COMPLETADA' ? event.updatedAt ?? tx.fechaCompletado : tx.fechaCompletado,
+            }
+          : tx,
+      ),
+    );
+
+    // La acción la hizo el propio usuario: su pantalla ya mostró el resultado.
+    if (event.actorId === userId) return;
+
+    if (event.estado === 'COMPLETADA') {
+      this.toast.success('Operación completada');
+    } else if (event.estado === 'CANCELADA' || event.estado === 'RECHAZADA') {
+      this.toast.info('Operación cancelada');
+    } else if (event.estado === 'EN_DISPUTA') {
+      this.toast.warning('La operación entró en disputa');
+    } else if (
+      eraPendiente &&
+      event.estado === 'PENDIENTE_CONFIRMACION' &&
+      (event.confirmadoPorEmisor || event.confirmadoPorReceptor)
+    ) {
+      this.toast.info('La otra parte confirmó la entrega');
+    }
+  }
+
   /** Trae el título de cada anuncio distinto citado por las transacciones. */
   private resolverTitulos(transacciones: EcotechTransaction[]): void {
     const ids = [...new Set(transacciones.map((tx) => tx.ecotechPostId).filter(Boolean))];
@@ -273,6 +351,10 @@ export class EcodevStore {
   }
 
   clear(): void {
+    this.suscripcionTx?.unsubscribe();
+    this.suscripcionTx = null;
+    this.usuarioTxEscuchando = null;
+    this.txRecargadas.clear();
     this.posts.set([]);
     this.detail.set(null);
     this.misOperaciones.set([]);

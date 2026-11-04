@@ -74,6 +74,19 @@ export interface EcotechTransaction {
   createdAt: string | null;
 }
 
+/** Evento de tiempo real `ecotechTransactionUpdated` para emisor y receptor. */
+export interface EcotechTransactionEvent {
+  transactionId: string;
+  postId: string | null;
+  /** PENDIENTE_CONFIRMACION | COMPLETADA | CANCELADA | RECHAZADA | EN_DISPUTA */
+  estado: string;
+  confirmadoPorEmisor: boolean;
+  confirmadoPorReceptor: boolean;
+  /** Quién hizo la acción (emisor o receptor). */
+  actorId: string | null;
+  updatedAt: string | null;
+}
+
 /** Impacto ODS 12: solo transacciones COMPLETADA alimentan las métricas. */
 export interface EcotechImpacto {
   donaciones: number;

@@ -64,6 +64,7 @@ export class EcodevList implements OnInit {
     const userId = localStorage.getItem('userId');
     if (userId) {
       this.store.loadImpacto(userId);
+      this.store.escucharTransacciones(userId);
       this.store.loadMisOperaciones(userId);
     }
   }

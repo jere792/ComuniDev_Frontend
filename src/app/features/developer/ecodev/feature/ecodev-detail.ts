@@ -83,7 +83,10 @@ export class EcodevDetail implements OnInit {
       return;
     }
     this.store.loadDetail(id);
-    if (this.miUserId) this.store.loadTransaccionesDelPost(id, this.miUserId);
+    if (this.miUserId) {
+      this.store.escucharTransacciones(this.miUserId);
+      this.store.loadTransaccionesDelPost(id, this.miUserId);
+    }
   }
 
   // ------------------------------------------------------------- acciones

@@ -1,12 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { map, Observable } from 'rxjs';
+import { filter, map, Observable } from 'rxjs';
 import {
   EcotechImpacto,
   EcotechPost,
   EcotechPostInput,
   EcotechPostsFiltro,
   EcotechTransaction,
+  EcotechTransactionEvent,
   EcotechTransactionsFiltro,
   RecyclingPoint,
 } from '@features/developer/ecodev/domain/models/ecodev.model';
@@ -216,6 +217,20 @@ const CANCEL_ECOTECH_TRANSACTION = gql`
   }
 `;
 
+const ECOTECH_TRANSACTION_UPDATED = gql`
+  subscription EcotechTransactionUpdated($userId: String!) {
+    ecotechTransactionUpdated(userId: $userId) {
+      transactionId
+      postId
+      estado
+      confirmadoPorEmisor
+      confirmadoPorReceptor
+      actorId
+      updatedAt
+    }
+  }
+`;
+
 const asString = (value: unknown): string | null =>
   typeof value === 'string' && value.length ? value : null;
 
@@ -295,8 +310,19 @@ function normalizeTransaction(raw: Record<string, unknown>): EcotechTransaction 
   };
 }
 
-function normalizeImpacto(raw: Record<string, unknown> | null): EcotechImpacto | null {
-  if (!raw) return null;
+function normalizeTransactionEvent(raw: Record<string, unknown>): EcotechTransactionEvent {
+  return {
+    transactionId: String(raw['transactionId'] ?? ''),
+    postId: asString(raw['postId']),
+    estado: String(raw['estado'] ?? ''),
+    confirmadoPorEmisor: raw['confirmadoPorEmisor'] === true,
+    confirmadoPorReceptor: raw['confirmadoPorReceptor'] === true,
+    actorId: asString(raw['actorId']),
+    updatedAt: asString(raw['updatedAt']),
+  };
+}
+
+function normalizeImpacto(raw: Record<string, unknown> | null): EcotechImpacto | null {  if (!raw) return null;
   return {
     donaciones: asInt(raw['donaciones']),
     intercambios: asInt(raw['intercambios']),
@@ -442,6 +468,19 @@ export class EcotechGraphqlService implements EcotechRepository {
         map((result) =>
           result.data?.cancelEcotechTransaction ? normalizeTransaction(result.data.cancelEcotechTransaction) : null,
         ),
+      );
+  }
+
+  ecotechTransactionUpdated(userId: string): Observable<EcotechTransactionEvent> {
+    return this.apollo
+      .subscribe<{ ecotechTransactionUpdated: Record<string, unknown> | null }>({
+        query: ECOTECH_TRANSACTION_UPDATED,
+        variables: { userId },
+      })
+      .pipe(
+        map((result) => result.data?.ecotechTransactionUpdated),
+        filter((event): event is Record<string, unknown> => event != null),
+        map(normalizeTransactionEvent),
       );
   }
 }

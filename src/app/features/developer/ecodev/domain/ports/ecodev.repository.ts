@@ -6,6 +6,7 @@ import {
   EcotechPostInput,
   EcotechPostsFiltro,
   EcotechTransaction,
+  EcotechTransactionEvent,
   EcotechTransactionsFiltro,
   RecyclingPoint,
 } from '@features/developer/ecodev/domain/models/ecodev.model';
@@ -31,6 +32,8 @@ export interface EcotechRepository {
   confirmEcotechTransaction(transactionId: string, userId: string): Observable<EcotechTransaction | null>;
   /** Cancela la transacción (CANCELADA), salvo que ya esté COMPLETADA. */
   cancelEcotechTransaction(transactionId: string, userId: string): Observable<EcotechTransaction | null>;
+  /** Inicio, confirmaciones y cierre de sus transacciones, en tiempo real. */
+  ecotechTransactionUpdated(userId: string): Observable<EcotechTransactionEvent>;
 }
 
 export const ECODEV_REPOSITORY = new InjectionToken<EcotechRepository>('EcotechRepository');

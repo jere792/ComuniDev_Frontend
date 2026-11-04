@@ -11,12 +11,13 @@
         @if (user()?.bannerUrl) {
           @if (user()?.bannerTipo === 'VIDEO') {
             <video
+              #bannerVideo
               class="banner-image"
               [src]="user()?.bannerUrl || ''"
               autoplay
-              muted
               loop
               playsinline
+              [muted]="!!user()?.bannerMusicaUrl || musicaSilenciada()"
               (loadedmetadata)="onVideoMeta($event)"
               (timeupdate)="onVideoTime($event)"
             ></video>
@@ -28,15 +29,15 @@
                 loop
                 [muted]="musicaSilenciada()"
               ></audio>
-              <button
-                type="button"
-                class="banner-music-btn"
-                (click)="toggleMusica()"
-                [title]="musicaSilenciada() ? 'Activar música' : 'Silenciar música'"
-              >
-                <span class="material-symbols-outlined">{{ musicaSilenciada() ? 'volume_off' : 'volume_up' }}</span>
-              </button>
             }
+            <button
+              type="button"
+              class="banner-music-btn"
+              (click)="toggleMusica()"
+              [title]="musicaSilenciada() ? 'Activar sonido del banner' : 'Silenciar banner'"
+            >
+              <span class="material-symbols-outlined">{{ musicaSilenciada() ? 'volume_off' : 'volume_up' }}</span>
+            </button>
           } @else {
             <img [src]="user()?.bannerUrl" alt="Banner" class="banner-image" />
           }

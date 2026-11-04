@@ -29,24 +29,47 @@ export class PublicProfile implements OnInit {
   removeConfirmOpen = signal(false);
 
   @ViewChild('bannerAudio') private bannerAudio?: ElementRef<HTMLAudioElement>;
-  /** Preferencia de silencio de la musica del banner. */
-  readonly musicaSilenciada = signal(localStorage.getItem('bannerMusicMuted') === '1');
+  @ViewChild('bannerVideo') private bannerVideo?: ElementRef<HTMLVideoElement>;
+  /**
+   * Silencio del banner (persistido). Arranca silenciado: el autoplay con
+   * sonido esta bloqueado por los navegadores hasta que el usuario interactua.
+   */
+  readonly musicaSilenciada = signal(
+    localStorage.getItem('bannerMusicMuted') === null
+      ? true
+      : localStorage.getItem('bannerMusicMuted') === '1',
+  );
 
+  /** Controla el audio del video o la pista de musica elegida. */
   toggleMusica(): void {
     const silenciada = !this.musicaSilenciada();
     this.musicaSilenciada.set(silenciada);
     localStorage.setItem('bannerMusicMuted', silenciada ? '1' : '0');
+
     const audio = this.bannerAudio?.nativeElement;
-    if (!audio) return;
-    audio.muted = silenciada;
-    if (!silenciada) audio.play().catch(() => undefined);
+    const video = this.bannerVideo?.nativeElement;
+
+    if (audio) {
+      audio.muted = silenciada;
+      if (!silenciada) audio.play().catch(() => undefined);
+    }
+    if (video) {
+      video.muted = audio ? true : silenciada;
+      if (!silenciada) video.play().catch(() => undefined);
+    }
   }
 
   /** Banner de video: respeta el recorte guardado en el perfil. */
   onVideoMeta(event: Event): void {
     const video = event.target as HTMLVideoElement;
     video.currentTime = this.user()?.bannerInicio ?? 0;
-    video.play().catch(() => undefined);
+    video.play().catch(() => {
+      // autoplay con sonido bloqueado: se silencia para que el banner se mueva
+      video.muted = true;
+      this.musicaSilenciada.set(true);
+      localStorage.setItem('bannerMusicMuted', '1');
+      video.play().catch(() => undefined);
+    });
   }
 
   onVideoTime(event: Event): void {

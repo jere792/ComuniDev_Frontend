@@ -18,6 +18,88 @@
       <input #bannerInput type="file" accept="image/*,video/*" hidden (change)="onBannerSelected($event)" />
       <input #photoInput type="file" accept="image/*" hidden (change)="onPhotoSelected($event)" />
 
+      <!-- Pestañas: publicaciones del usuario vs. resumen del perfil -->
+      <nav class="profile-tabs" role="tablist">
+        <button
+          type="button"
+          class="profile-tab"
+          role="tab"
+          [class.active]="tab() === 'publicaciones'"
+          (click)="tab.set('publicaciones')"
+        >
+          <span class="material-symbols-outlined">dynamic_feed</span>
+          Publicaciones
+          @if (posts().length) {
+            <span class="tab-count">{{ posts().length }}</span>
+          }
+        </button>
+        <button
+          type="button"
+          class="profile-tab"
+          role="tab"
+          [class.active]="tab() === 'perfil'"
+          (click)="tab.set('perfil')"
+        >
+          <span class="material-symbols-outlined">person</span>
+          Perfil
+        </button>
+      </nav>
+
+      @if (tab() === 'publicaciones') {
+        <section class="profile-posts">
+          @if (postsLoading()) {
+            <div class="posts-state">
+              <span class="material-symbols-outlined spinning">progress_activity</span>
+              Cargando publicaciones...
+            </div>
+          } @else if (!posts().length) {
+            <div class="posts-state">
+              <span class="material-symbols-outlined">article</span>
+              Todavía no has publicado nada.
+            </div>
+          } @else {
+            @for (post of posts(); track post.id) {
+              <article class="profile-post">
+                <header class="post-head">
+                  @if (user()?.fotoPerfilUrl) {
+                    <img class="post-avatar" [src]="user()!.fotoPerfilUrl" [alt]="user()?.nombre || 'Usuario'" />
+                  } @else {
+                    <span class="post-avatar fallback">{{ (user()?.nombre || '?').charAt(0) }}</span>
+                  }
+                  <div class="post-autor">
+                    <span class="post-nombre">{{ user()?.nombre }}</span>
+                    <span class="post-meta">&#64;{{ user()?.nombreUsuario }} · {{ fechaPost(post.createdAt) }}</span>
+                  </div>
+                  @if (post.categoria) {
+                    <span class="post-categoria">{{ post.categoria }}</span>
+                  }
+                </header>
+                @if (post.texto) {
+                  <p class="post-texto">{{ post.texto }}</p>
+                }
+                @if (post.imagenes.length) {
+                  <div class="post-imagenes">
+                    @for (img of post.imagenes; track img) {
+                      <img [src]="img" alt="Publicación" loading="lazy" />
+                    }
+                  </div>
+                }
+                <footer class="post-footer">
+                  <span>
+                    <span class="material-symbols-outlined">favorite</span>
+                    {{ post.reaccionesCount }}
+                  </span>
+                  <span>
+                    <span class="material-symbols-outlined">chat_bubble</span>
+                    {{ post.comentariosCount }}
+                  </span>
+                </footer>
+              </article>
+            }
+          }
+        </section>
+      } @else {
+
       <!-- Gamificación: puntos, nivel, rango e insignias -->
       <app-points-card />
       <app-badges-grid />
@@ -169,6 +251,7 @@
             </div>
           </form>
         </section>
+      }
       }
     </div>
 

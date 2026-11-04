@@ -20,6 +20,7 @@ import { BadgesGrid } from '@features/developer/gamificacion/ui/badges-grid/badg
 import { SidebarCard } from '@features/recruiter/pages/profile/ui/sidebar-card/sidebar-card';
 import { SocialListModal, SocialListType } from '@features/recruiter/pages/profile/ui/social-list-modal/social-list-modal';
 import { TagInputComponent } from '@shared/ui/tag-input/tag-input';
+import { ProfilePost, ProfilePostsService } from '@features/developer/profile/data-access/api/profile-posts.service';
 
 @Component({
   selector: 'app-developer-profile-page',
@@ -54,6 +55,11 @@ export class DeveloperProfilePage implements OnInit {
   /** Modal de recorte para el banner de video. */
   bannerVideoOpen = signal(false);
   bannerVideoFile = signal<File | null>(null);
+
+  /** Pestaña activa del perfil: publicaciones o el resumen de siempre. */
+  readonly tab = signal<'publicaciones' | 'perfil'>('publicaciones');
+  readonly posts = signal<ProfilePost[]>([]);
+  readonly postsLoading = signal(false);
   socialModalOpen = signal(false);
   socialModalType = signal<SocialListType>('followers');
   basicForm: FormGroup;
@@ -61,6 +67,7 @@ export class DeveloperProfilePage implements OnInit {
 
   private toast = inject(ToastService);
   private imageEditor = inject(ImageEditorService);
+  private profilePosts = inject(ProfilePostsService);
 
   constructor() {
     this.basicForm = this.fb.group({
@@ -111,7 +118,36 @@ export class DeveloperProfilePage implements OnInit {
     this.loadUser();
     // puntos, nivel, rango e insignias del usuario logueado (tarjetas del perfil)
     const userId = localStorage.getItem('userId');
-    if (userId) this.pointsStore.loadProfile(userId);
+    if (userId) {
+      this.pointsStore.loadProfile(userId);
+      this.loadPosts(userId);
+    }
+  }
+
+  /** Publicaciones del usuario, incluidas las antiguas (mas recientes primero). */
+  loadPosts(userId: string): void {
+    this.postsLoading.set(true);
+    this.profilePosts.getByUser(userId, 0, 10).subscribe({
+      next: (posts) => {
+        this.posts.set(posts);
+        this.postsLoading.set(false);
+      },
+      error: () => this.postsLoading.set(false),
+    });
+  }
+
+  /** Fecha corta de una publicacion (estilo feed). */
+  fechaPost(valor: string | null): string {
+    if (!valor) return '';
+    const fecha = new Date(valor);
+    if (isNaN(fecha.getTime())) return '';
+    return new Intl.DateTimeFormat('es-PE', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(fecha);
   }
 
   loadUser(): void {

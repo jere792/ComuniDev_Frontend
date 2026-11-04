@@ -72,6 +72,7 @@
 }
 
 .sidebar-btn {
+  position: relative;
   width: 100%;
   display: flex;
   align-items: center;
@@ -105,6 +106,26 @@
 
 .sidebar-btn-text {
   display: none;
+}
+
+/* contador de mensajes no leidos sobre el icono */
+.sidebar-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #d32f2f;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
 }
 
 /* en pantallas chicas la barra lateral se oculta: la navegacion va en el footer */

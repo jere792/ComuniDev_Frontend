@@ -9,6 +9,11 @@ export class MessageStore {
 
   readonly conversaciones = signal<MessageConversation[]>([]);
   readonly solicitudes = signal<MessageConversation[]>([]);
+  /** Total de no leidos (hilos + solicitudes) para el badge global. */
+  readonly noLeidos = computed(() =>
+    [...this.conversaciones(), ...this.solicitudes()]
+      .reduce((total, conversation) => total + (conversation.mensajesNoLeidos ?? 0), 0),
+  );
   readonly mensajes = signal<Message[]>([]);
   readonly abierta = signal<MessageConversation | null>(null);
   readonly cargandoConversaciones = signal(false);
@@ -33,7 +38,7 @@ export class MessageStore {
     this.cargandoConversaciones.set(true);
     this.repository.conversations(userId).subscribe({
       next: lista => {
-        this.conversaciones.set(lista);
+        this.conversaciones.set(this.sinNoLeidosDelHiloAbierto(lista));
         this.cargandoConversaciones.set(false);
         this.listaCargada = true;
         this.resolverEsperaDeLista();
@@ -52,10 +57,14 @@ export class MessageStore {
     this.cargandoSolicitudes.set(true);
     this.repository.messageRequests(userId).subscribe({
       next: lista => {
-        this.solicitudes.set(lista);
+        this.solicitudes.set(this.sinNoLeidosDelHiloAbierto(lista));
         this.cargandoSolicitudes.set(false);
+        this.solicitudesCargadas = true;
       },
-      error: () => this.cargandoSolicitudes.set(false),
+      error: () => {
+        this.cargandoSolicitudes.set(false);
+        this.solicitudesCargadas = true;
+      },
     });
   }
 
@@ -164,6 +173,8 @@ export class MessageStore {
 
   /** Ya se pidió al menos una vez la lista de hilos. */
   private listaCargada = false;
+  /** Ya se pidieron al menos una vez las solicitudes (para el badge global). */
+  private solicitudesCargadas = false;
   private alLlegarLista: (() => void) | null = null;
 
   cerrar(): void {
@@ -199,11 +210,17 @@ export class MessageStore {
       this.conversaciones.set([]);
       this.solicitudes.set([]);
       this.listaCargada = false;
+      this.solicitudesCargadas = false;
       this.cerrar();
     }
 
     this.escuchar(userId);
-    if (cambioUsuario || !this.listaCargada) this.cargarConversaciones(userId);
+    if ((cambioUsuario || !this.listaCargada) && !this.cargandoConversaciones()) {
+      this.cargarConversaciones(userId);
+    }
+    if ((cambioUsuario || !this.solicitudesCargadas) && !this.cargandoSolicitudes()) {
+      this.cargarSolicitudes(userId);
+    }
   }
 
   /**
@@ -249,10 +266,15 @@ export class MessageStore {
     this.userId = userId;
 
     const abierta = this.abierta();
-    if (abierta && esElHiloAbierto(abierta, message, userId)) {
+    const visible = abierta != null && esElHiloAbierto(abierta, message, userId);
+    if (abierta && visible) {
       this.mensajes.update(lista => sinDuplicados([...lista, message]));
       // El hilo recién creado todavía no traía id; ahora ya lo sabemos.
       if (!abierta.id) this.abierta.set({ ...abierta, id: message.conversationId });
+      // Lo que se está mirando queda leído también en el servidor.
+      if (message.emisorId !== userId && message.conversationId) {
+        this.repository.markConversationRead(userId, message.conversationId).subscribe();
+      }
     }
 
     const indice = this.conversaciones().findIndex(c => c.id === message.conversationId);
@@ -266,7 +288,7 @@ export class MessageStore {
           ultimoMensajeTexto: message.texto,
           ultimoMensajeEmisorId: message.emisorId,
           ultimoMensajeEn: message.createdAt ?? solicitud.ultimoMensajeEn,
-          mensajesNoLeidos: message.emisorId === userId ? 0 : (solicitud.mensajesNoLeidos ?? 0) + 1,
+          mensajesNoLeidos: message.emisorId === userId || visible ? 0 : (solicitud.mensajesNoLeidos ?? 0) + 1,
         };
         this.solicitudes.set([
           actualizada,
@@ -282,7 +304,6 @@ export class MessageStore {
 
     const actual = this.conversaciones()[indice];
     const esMio = message.emisorId === userId;
-    const visible = abierta != null && abierta.id === message.conversationId;
 
     const actualizada: MessageConversation = {
       ...actual,
@@ -299,6 +320,15 @@ export class MessageStore {
     this.repository.markConversationRead(userId, conversationId).subscribe();
     this.conversaciones.update(lista =>
       lista.map(c => (c.id === conversationId ? { ...c, mensajesNoLeidos: 0 } : c)));
+    this.solicitudes.update(lista =>
+      lista.map(c => (c.id === conversationId ? { ...c, mensajesNoLeidos: 0 } : c)));
+  }
+
+  /** Lo que el usuario esta mirando no cuenta como no leido en el badge. */
+  private sinNoLeidosDelHiloAbierto(lista: MessageConversation[]): MessageConversation[] {
+    const abiertaId = this.abierta()?.id;
+    if (!abiertaId) return lista;
+    return lista.map(c => (c.id === abiertaId ? { ...c, mensajesNoLeidos: 0 } : c));
   }
 }
 

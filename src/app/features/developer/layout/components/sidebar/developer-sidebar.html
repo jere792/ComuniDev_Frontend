@@ -9,6 +9,12 @@
         </div>
       }
     </a>
+    <a routerLink="/developer/messages" class="sidebar-btn" title="Mensajes">
+      <span class="material-symbols-outlined">chat</span>
+      @if (noLeidos() > 0) {
+        <span class="sidebar-badge">{{ noLeidos() > 9 ? '9+' : noLeidos() }}</span>
+      }
+    </a>
     <div class="sidebar-divider"></div>
     <button class="sidebar-btn" (click)="toggleTheme()" [title]="isDark() ? 'Modo claro' : 'Modo oscuro'">
       @if (isDark()) {

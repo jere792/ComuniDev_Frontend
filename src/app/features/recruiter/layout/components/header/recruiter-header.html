@@ -22,6 +22,9 @@
   <div class="header-right">
     <a routerLink="/recruiter/messages" class="icon-btn" title="Mensajes">
       <span class="material-symbols-outlined">chat</span>
+      @if (noLeidos() > 0) {
+        <span class="nav-badge">{{ noLeidos() > 9 ? '9+' : noLeidos() }}</span>
+      }
     </a>
     <a routerLink="/recruiter/solicitudes" class="icon-btn" title="Solicitudes">
       <span class="material-symbols-outlined">person_add</span>

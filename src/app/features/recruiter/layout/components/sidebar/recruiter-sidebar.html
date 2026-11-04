@@ -9,6 +9,12 @@
         </div>
       }
     </a>
+    <a routerLink="/recruiter/messages" class="sidebar-btn" title="Mensajes">
+      <span class="material-symbols-outlined">chat</span>
+      @if (noLeidos() > 0) {
+        <span class="sidebar-badge">{{ noLeidos() > 9 ? '9+' : noLeidos() }}</span>
+      }
+    </a>
     <a routerLink="/recruiter/saved" class="sidebar-btn" title="Guardados">
       <span class="material-symbols-outlined">bookmark</span>
     </a>

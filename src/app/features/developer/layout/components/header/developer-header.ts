@@ -1,6 +1,7 @@
-import { Component, Input, AfterViewInit, QueryList, ViewChildren, ElementRef, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, Input, OnInit, AfterViewInit, QueryList, ViewChildren, ElementRef, ChangeDetectorRef, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { NotificationBell } from '@features/shared/ui/notification-bell/notification-bell';
+import { MessageStore } from '@features/shared/data-access/state/message.store';
 import { filter } from 'rxjs';
 
 export interface HeaderLink {
@@ -16,9 +17,13 @@ export interface HeaderLink {
   templateUrl: './developer-header.html',
   styleUrl: './developer-header.scss',
 })
-export class DeveloperHeader implements AfterViewInit {
+export class DeveloperHeader implements OnInit, AfterViewInit {
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private messageStore = inject(MessageStore);
+
+  /** No leidos globales: badge del icono de Mensajes. */
+  readonly noLeidos = this.messageStore.noLeidos;
 
   @Input() links: HeaderLink[] = [];
   @ViewChildren('tabEl') tabElements!: QueryList<ElementRef<HTMLElement>>;
@@ -26,6 +31,12 @@ export class DeveloperHeader implements AfterViewInit {
   indicatorLeft = 0;
   indicatorWidth = 0;
   showIndicator = false;
+
+  ngOnInit(): void {
+    const userId = localStorage.getItem('userId');
+    // Deja el canal de tiempo real activo en todo el layout, no solo en /messages.
+    if (userId) this.messageStore.activar(userId);
+  }
 
   ngAfterViewInit(): void {
     this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {

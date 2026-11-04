@@ -139,6 +139,26 @@
   }
 }
 
+/* contador de mensajes no leidos sobre el icono */
+.nav-badge {
+  position: absolute;
+  top: 3px;
+  right: 1px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #d32f2f;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
 /* en movil el header queda solo con el logotipo y las notificaciones */
 @media (max-width: 768px) {
   .user-header {

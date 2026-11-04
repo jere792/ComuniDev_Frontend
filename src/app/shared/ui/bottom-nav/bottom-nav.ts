@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { UserStore } from '@features/users/data-access/state/user.store';
+import { MessageStore } from '@features/shared/data-access/state/message.store';
 
 export interface BottomNavLink {
   label: string;
@@ -20,6 +21,10 @@ export class BottomNav implements OnInit {
   @Input() links: BottomNavLink[] = [];
 
   private userStore = inject(UserStore);
+  private messageStore = inject(MessageStore);
+
+  /** No leidos globales: badge del item de Mensajes. */
+  readonly noLeidos = this.messageStore.noLeidos;
 
   /** Foto de perfil del usuario logueado (se muestra en el ítem de perfil).
    *  Es una señal: al resolverse la query asíncrona no dispara
@@ -29,6 +34,9 @@ export class BottomNav implements OnInit {
   ngOnInit(): void {
     const userId = localStorage.getItem('userId');
     if (userId) {
+      if (this.links.some(link => this.esMensajes(link.route))) {
+        this.messageStore.activar(userId);
+      }
       this.userStore.getById(userId).subscribe({
         next: (user) => {
           this.avatarUrl.set(user?.fotoPerfilUrl ?? '');
@@ -40,6 +48,11 @@ export class BottomNav implements OnInit {
   /** El perfil muestra la foto del usuario; el resto, su ícono. */
   esPerfil(route: string): boolean {
     return route.includes('profile');
+  }
+
+  /** Item de Mensajes: lleva el contador global de no leidos. */
+  esMensajes(route: string): boolean {
+    return route.includes('/messages');
   }
 
   /**

@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewChecked, ViewChild, ElementRef, HostListener, inject, signal } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, OnDestroy, ViewChild, ElementRef, HostListener, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,7 +15,7 @@ import { User } from '@core/domain/models/user.model';
   templateUrl: './messages.html',
   styleUrl: './messages.scss',
 })
-export class Messages implements OnInit, AfterViewChecked {
+export class Messages implements OnInit, AfterViewChecked, OnDestroy {
 
   private store = inject(MessageStore);
   private userStore = inject(UserStore);
@@ -71,6 +71,7 @@ export class Messages implements OnInit, AfterViewChecked {
         if (this.abierta()?.otroUserId !== id) this.store.abrirCon(userId, id);
       } else {
         this.mostrarChat.set(false);
+        this.store.cerrar();
       }
     });
 
@@ -129,7 +130,13 @@ export class Messages implements OnInit, AfterViewChecked {
   /** En movil, la flecha del header vuelve a la lista de conversaciones. */
   volverALista(): void {
     this.mostrarChat.set(false);
+    this.store.cerrar();
     this.router.navigate([this.rutaMensajes()]);
+  }
+
+  /** Al salir de la pantalla el hilo deja de considerarse abierto (badge). */
+  ngOnDestroy(): void {
+    this.store.cerrar();
   }
 
   enviar(): void {

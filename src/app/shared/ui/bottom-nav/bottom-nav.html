@@ -6,6 +6,9 @@
       } @else {
         <span class="material-symbols-outlined">{{ link.icon || 'circle' }}</span>
       }
+      @if (esMensajes(link.route) && noLeidos() > 0) {
+        <span class="bottom-nav-badge">{{ noLeidos() > 9 ? '9+' : noLeidos() }}</span>
+      }
       <span class="bottom-nav-label">{{ link.label }}</span>
     </a>
   }

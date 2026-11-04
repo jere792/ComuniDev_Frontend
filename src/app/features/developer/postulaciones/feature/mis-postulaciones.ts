@@ -35,6 +35,7 @@ export class MisPostulaciones implements OnInit {
   ngOnInit(): void {
     const userId = localStorage.getItem('userId');
     if (userId) {
+      this.store.escuchar(userId);
       this.store.load(userId);
     } else {
       this.store.error.set('Inicia sesión para ver tus postulaciones');

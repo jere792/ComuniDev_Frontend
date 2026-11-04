@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { map, Observable } from 'rxjs';
+import { filter, map, Observable } from 'rxjs';
 import {
   Application,
+  ApplicationStatusEvent,
   ApplicationVacancy,
 } from '@features/developer/postulaciones/domain/models/application.model';
 import { ApplicationRepository } from '@features/developer/postulaciones/domain/ports/application.repository';
@@ -66,6 +67,19 @@ const WITHDRAW_APPLICATION = gql`
   }
 `;
 
+const APPLICATION_STATUS_CHANGED = gql`
+  subscription ApplicationStatusChanged($userId: String!) {
+    applicationStatusChanged(userId: $userId) {
+      applicationId
+      vacancyId
+      vacancyTitulo
+      estado
+      actorId
+      createdAt
+    }
+  }
+`;
+
 const asString = (value: unknown): string | null =>
   typeof value === 'string' && value.length ? value : null;
 
@@ -100,6 +114,17 @@ function normalizeApplication(raw: Record<string, unknown>): Application {
     createdAt: asString(raw['createdAt']),
     updatedAt: asString(raw['updatedAt']),
     vacancy: normalizeVacancy(raw['vacancy']),
+  };
+}
+
+function normalizeStatusEvent(raw: Record<string, unknown>): ApplicationStatusEvent {
+  return {
+    applicationId: String(raw['applicationId'] ?? ''),
+    vacancyId: asString(raw['vacancyId']),
+    vacancyTitulo: asString(raw['vacancyTitulo']),
+    estado: String(raw['estado'] ?? ''),
+    actorId: asString(raw['actorId']),
+    createdAt: asString(raw['createdAt']),
   };
 }
 
@@ -141,5 +166,18 @@ export class ApplicationGraphqlService implements ApplicationRepository {
         variables: { applicationId },
       })
       .pipe(map((result) => !!result.data?.withdrawApplication));
+  }
+
+  applicationStatusChanged(userId: string): Observable<ApplicationStatusEvent> {
+    return this.apollo
+      .subscribe<{ applicationStatusChanged: Record<string, unknown> | null }>({
+        query: APPLICATION_STATUS_CHANGED,
+        variables: { userId },
+      })
+      .pipe(
+        map((result) => result.data?.applicationStatusChanged),
+        filter((event): event is Record<string, unknown> => event != null),
+        map(normalizeStatusEvent),
+      );
   }
 }

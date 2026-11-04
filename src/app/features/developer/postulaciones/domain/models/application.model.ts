@@ -13,6 +13,18 @@ export interface Application {
   vacancy: ApplicationVacancy | null;
 }
 
+/** Evento de tiempo real `applicationStatusChanged` que recibe el developer. */
+export interface ApplicationStatusEvent {
+  applicationId: string;
+  vacancyId: string | null;
+  /** Título de la vacante resuelto al emitir el evento (si aún existe). */
+  vacancyTitulo: string | null;
+  estado: string;
+  /** Quién hizo el cambio (normalmente el reclutador). */
+  actorId: string | null;
+  createdAt: string | null;
+}
+
 /** Lo mínimo de la vacante que necesita "Mis postulaciones" y el botón de detalle. */
 export interface ApplicationVacancy {
   id: string;

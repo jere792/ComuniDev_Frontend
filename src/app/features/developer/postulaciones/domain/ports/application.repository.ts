@@ -1,6 +1,9 @@
 import { InjectionToken } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Application } from '@features/developer/postulaciones/domain/models/application.model';
+import {
+  Application,
+  ApplicationStatusEvent,
+} from '@features/developer/postulaciones/domain/models/application.model';
 
 export interface ApplicationRepository {
   /** Postulaciones del developer (HU-43); `vacancy` viene resuelta. */
@@ -13,6 +16,8 @@ export interface ApplicationRepository {
   ): Observable<Application | null>;
   /** El developer retira su postulación; el registro queda en estado RETIRADA. */
   withdrawApplication(applicationId: string): Observable<boolean>;
+  /** Cada cambio de estado de sus postulaciones, en tiempo real (GraphQL WS). */
+  applicationStatusChanged(userId: string): Observable<ApplicationStatusEvent>;
 }
 
 export const APPLICATION_REPOSITORY = new InjectionToken<ApplicationRepository>('ApplicationRepository');

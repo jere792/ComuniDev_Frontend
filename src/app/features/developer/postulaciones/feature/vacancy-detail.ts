@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ToastService } from '@core/services/toast.service';
@@ -40,6 +40,7 @@ export class VacancyDetailPage implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly vacancyRepository = inject<VacancyDetailRepository>(VACANCY_DETAIL_REPOSITORY);
   private readonly applicationStore = inject(ApplicationStore);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly vacancy = signal<VacancyDetail | null>(null);
   readonly loading = signal(true);
@@ -87,7 +88,13 @@ export class VacancyDetailPage implements OnInit {
 
     if (this.esDeveloper) {
       const userId = localStorage.getItem('userId');
-      if (userId) this.applicationStore.load(userId);
+      if (userId) {
+        // El estado del detalle ya se ve aquí: el store no repite el aviso.
+        this.applicationStore.marcarDetalleAbierto(id);
+        this.destroyRef.onDestroy(() => this.applicationStore.marcarDetalleAbierto(null));
+        this.applicationStore.escuchar(userId);
+        this.applicationStore.load(userId);
+      }
     }
   }
 

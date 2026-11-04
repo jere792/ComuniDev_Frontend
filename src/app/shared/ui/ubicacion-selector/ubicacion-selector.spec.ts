@@ -8,7 +8,7 @@ import { UbicacionSelectorComponent } from './ubicacion-selector';
 @Component({
   standalone: true,
   imports: [ReactiveFormsModule, UbicacionSelectorComponent],
-  template: `<app-ubicacion-selector [formGroup]="form" />`,
+  template: `<form [formGroup]="form"><app-ubicacion-selector [formGroup]="form" /></form>`,
 })
 class HostComponent {
   form = new FormGroup({

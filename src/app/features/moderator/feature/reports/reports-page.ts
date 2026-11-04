@@ -67,6 +67,9 @@ export class ReportsPage implements OnInit {
   /** Fila con la vista previa expandida (`targetType:targetId`). */
   readonly previewAbierto = signal<string | null>(null);
 
+  /** Reportes ya anunciados por el canal: evita recargas y toasts repetidos. */
+  private readonly reportesVivosVistos = new Set<string>();
+
   ngOnInit(): void {
     // La URL manda (?estado=RESUELTO); sin query, el estado inicial lo da la
     // ruta: /moderator/reviews entra con RESUELTO (historial) y
@@ -84,6 +87,20 @@ export class ReportsPage implements OnInit {
               : 'PENDIENTE';
         this.previewAbierto.set(null);
         this.store.load(estado);
+      });
+
+    // Un reporte nuevo entra en vivo a la cola mientras el moderador la mira.
+    this.store
+      .subscribeToNewReports()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((event) => {
+        if (!event.reportId || this.reportesVivosVistos.has(event.reportId)) return;
+        this.reportesVivosVistos.add(event.reportId);
+        // En "Resueltos" no aplica; al volver a Pendientes se carga la cola igual.
+        if (this.estado() !== 'PENDIENTE') return;
+        this.toast.info('Nuevo reporte recibido');
+        // Recargar trae el reporter y el resto de campos que el evento no incluye.
+        this.store.load('PENDIENTE');
       });
   }
 

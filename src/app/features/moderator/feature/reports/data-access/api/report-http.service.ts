@@ -2,10 +2,12 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, filter, map } from 'rxjs/operators';
 import { environment } from '../../../../../../../environments/environment';
 import {
   ContenidoPreview,
+  JsonFecha,
+  ReportCreatedEvent,
   ReportEstado,
   Reporte,
 } from '@features/moderator/feature/reports/domain/models/report.model';
@@ -59,6 +61,40 @@ const PREVIEW_USER = gql`
     }
   }
 `;
+
+const REPORT_CREATED = gql`
+  subscription ReportCreated {
+    reportCreated {
+      reportId
+      targetType
+      targetId
+      motivo
+      createdAt
+    }
+  }
+`;
+
+const asString = (value: unknown): string | null =>
+  typeof value === 'string' && value.length ? value : null;
+
+/** Normaliza la fecha del evento al mismo tipo abierto que usa el REST. */
+function asFecha(value: unknown): JsonFecha {
+  if (typeof value === 'string' || typeof value === 'number') return value;
+  if (Array.isArray(value) && value.every((part) => typeof part === 'number')) {
+    return value as number[];
+  }
+  return null;
+}
+
+function normalizeReportCreated(raw: Record<string, unknown>): ReportCreatedEvent {
+  return {
+    reportId: String(raw['reportId'] ?? ''),
+    targetType: String(raw['targetType'] ?? ''),
+    targetId: asString(raw['targetId']),
+    motivo: asString(raw['motivo']),
+    createdAt: asFecha(raw['createdAt']),
+  };
+}
 
 /**
  * Cola de reportes por REST (`/api/v1/reports`), mismo patrón que
@@ -175,5 +211,17 @@ export class ReportHttpService implements ReportRepository {
       default:
         return of(null);
     }
+  }
+
+  subscribeToNewReports(): Observable<ReportCreatedEvent> {
+    return this.apollo
+      .subscribe<{ reportCreated: Record<string, unknown> | null }>({
+        query: REPORT_CREATED,
+      })
+      .pipe(
+        map((result) => result.data?.reportCreated),
+        filter((event): event is Record<string, unknown> => event != null),
+        map(normalizeReportCreated),
+      );
   }
 }

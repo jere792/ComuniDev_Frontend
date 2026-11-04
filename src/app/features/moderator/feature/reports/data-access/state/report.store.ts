@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import {
   ContenidoPreview,
+  ReportCreatedEvent,
   ReportEstado,
   Reporte,
 } from '@features/moderator/feature/reports/domain/models/report.model';
@@ -72,6 +73,11 @@ export class ReportStore {
         this.previewLoading.set(null);
       },
     });
+  }
+
+  /** Canal global de reportes nuevos; solo lo consume el panel de moderación. */
+  subscribeToNewReports(): Observable<ReportCreatedEvent> {
+    return this.repository.subscribeToNewReports();
   }
 
   clear(): void {

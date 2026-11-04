@@ -14,6 +14,16 @@ export type ReportAccion = 'OCULTAR' | 'RECHAZAR' | 'SANCIONAR';
  */
 export type JsonFecha = string | number | number[] | null;
 
+/** Evento global `reportCreated` que recibe el panel de moderación. */
+export interface ReportCreatedEvent {
+  reportId: string;
+  /** COMMENT | REEL | POST | USER | SUPPORT */
+  targetType: string;
+  targetId: string | null;
+  motivo: string | null;
+  createdAt: JsonFecha;
+}
+
 /** Reporte de contenido (POST | REEL | COMMENT | USER) hacia moderación. */
 export interface Reporte {
   id: string;

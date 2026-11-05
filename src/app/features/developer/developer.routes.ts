@@ -92,6 +92,19 @@ export const routes: Routes = [
           import('@features/developer/qa/feature/question-list/question-list').then(m => m.QuestionList),
       },
       {
+        // "nueva" y "mias" antes de ":id": Angular empareja en orden de declaración
+        path: 'preguntas/nueva',
+        title: 'Nueva pregunta',
+        loadComponent: () =>
+          import('@features/developer/qa/feature/question-nueva/question-nueva').then(m => m.QuestionNueva),
+      },
+      {
+        path: 'preguntas/mias',
+        title: 'Mis preguntas',
+        loadComponent: () =>
+          import('@features/developer/qa/feature/mis-preguntas/mis-preguntas').then(m => m.MisPreguntas),
+      },
+      {
         path: 'preguntas/:id',
         title: 'Pregunta',
         loadComponent: () =>

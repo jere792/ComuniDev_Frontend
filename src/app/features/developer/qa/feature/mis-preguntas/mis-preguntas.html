@@ -1,0 +1,59 @@
+<div class="mis-container">
+  <header class="mis-header">
+    <button class="back-btn" type="button" (click)="volver()" aria-label="Volver">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <div class="header-text">
+      <h1>Mis preguntas</h1>
+      <p class="header-subtitle">Todo lo que has preguntado en la comunidad</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn btn-outline" routerLink="/developer/preguntas">
+        <span class="material-symbols-outlined">forum</span>
+        Todas
+      </a>
+      <a class="btn btn-primary" routerLink="/developer/preguntas/nueva">
+        <span class="material-symbols-outlined">add_circle</span>
+        Nueva pregunta
+      </a>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <span class="material-symbols-outlined spinning">progress_activity</span>
+      Cargando tus preguntas...
+    </div>
+  } @else if (error()) {
+    <div class="state-box">
+      <span class="material-symbols-outlined">error</span>
+      <p>{{ error() }}</p>
+      <button class="btn btn-outline" type="button" (click)="store.loadMisPreguntas(miUserId)">Reintentar</button>
+    </div>
+  } @else {
+    <div class="questions-list">
+      @for (question of preguntas(); track question.id) {
+        <app-question-card
+          [question]="question"
+          [autorNombre]="autorNombre(question.autorId)"
+          [autorUsuario]="autorUsuario(question.autorId)"
+        />
+      } @empty {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">forum</span>
+          <span>Todavía no has publicado ninguna pregunta</span>
+          <a class="btn btn-primary" routerLink="/developer/preguntas/nueva">Hacer mi primera pregunta</a>
+        </div>
+      }
+    </div>
+
+    @if (store.misHasMore()) {
+      <div class="cargar-mas">
+        <button class="btn btn-outline" type="button" (click)="cargarMas()" [disabled]="store.misLoadingMore()">
+          <span class="material-symbols-outlined">expand_more</span>
+          {{ store.misLoadingMore() ? 'Cargando…' : 'Cargar más' }}
+        </button>
+      </div>
+    }
+  }
+</div>

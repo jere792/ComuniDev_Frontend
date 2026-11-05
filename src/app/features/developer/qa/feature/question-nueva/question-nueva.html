@@ -1,0 +1,95 @@
+<div class="nueva-container">
+  <div class="page-header">
+    <button class="back-btn" type="button" (click)="goBack()" aria-label="Volver">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <div class="header-text">
+      <h1>Nueva pregunta</h1>
+      <p class="header-subtitle">Describe tu duda con detalle para recibir mejores respuestas</p>
+    </div>
+  </div>
+
+  <form class="form-card" (ngSubmit)="submit()">
+    <div class="form-field">
+      <label class="form-label" for="titulo">Título *</label>
+      <input
+        id="titulo"
+        class="input"
+        name="titulo"
+        type="text"
+        maxlength="180"
+        placeholder="Ej. ¿Por qué Angular no detecta el cambio de mi signal?"
+        [(ngModel)]="form.titulo"
+      />
+      <p class="form-hint">Mínimo 10 caracteres. Sé concreto con el problema.</p>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label" for="descripcion">Descripción *</label>
+      <textarea
+        id="descripcion"
+        class="input"
+        name="descripcion"
+        rows="8"
+        placeholder="¿Qué intentaste? ¿Qué esperabas que pasara? ¿Qué error recibiste?"
+        [(ngModel)]="form.descripcion"
+      ></textarea>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label" for="codigoEjemplo">Código de ejemplo</label>
+      <textarea
+        id="codigoEjemplo"
+        class="input code-input"
+        name="codigoEjemplo"
+        rows="6"
+        spellcheck="false"
+        placeholder="Pega el fragmento relevante (opcional)"
+        [(ngModel)]="form.codigoEjemplo"
+      ></textarea>
+      <p class="form-hint">Se mostrará como bloque monoespaciado en el detalle.</p>
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label" for="categoria">Categoría</label>
+        <input
+          id="categoria"
+          class="input"
+          name="categoria"
+          type="text"
+          list="categorias-qa"
+          placeholder="Ej. Frontend"
+          [(ngModel)]="form.categoria"
+        />
+        <datalist id="categorias-qa">
+          @for (categoria of categorias; track categoria) {
+            <option [value]="categoria"></option>
+          }
+        </datalist>
+        <p class="form-hint">Puedes elegir una sugerencia o escribir la tuya.</p>
+      </div>
+
+      <div class="form-field">
+        <app-tag-input
+          titulo="Etiquetas *"
+          placeholder="Angular, TypeScript, GraphQL…"
+          ayuda="Pulsa Enter o la coma para agregar cada etiqueta."
+          [ngModelOptions]="{ standalone: true }"
+          [(ngModel)]="form.etiquetas"
+        ></app-tag-input>
+        <p class="form-hint">Al menos una etiqueta ayuda a que otros encuentren tu pregunta.</p>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-outline" type="button" (click)="goBack()" [disabled]="saving()">
+        Cancelar
+      </button>
+      <button class="btn btn-primary" type="submit" [disabled]="saving()">
+        <span class="material-symbols-outlined">send</span>
+        {{ saving() ? 'Publicando…' : 'Publicar pregunta' }}
+      </button>
+    </div>
+  </form>
+</div>

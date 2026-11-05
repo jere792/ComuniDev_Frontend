@@ -198,7 +198,7 @@ export class QuestionStore {
     this.detail.set(null);
     this.answers.set([]);
     this.answersError.set(null);
-    this.miVotoPregunta.set(null);
+    this.miVotoPregunta.set(this.leerVoto(this.claveVotoPregunta(id)));
 
     this.repository.question(id).subscribe({
       next: (question) => {
@@ -223,6 +223,13 @@ export class QuestionStore {
     this.repository.answers(questionId, 0, ANSWER_PAGE_SIZE).subscribe({
       next: (answers) => {
         this.answers.set(answers);
+        // Recupera el voto propio guardado: el schema no lo expone.
+        const votos: Record<string, 1 | -1> = {};
+        for (const answer of answers) {
+          const voto = this.leerVoto(this.claveVotoRespuesta(answer.id));
+          if (voto) votos[answer.id] = voto;
+        }
+        this.misVotosRespuestas.set(votos);
         this.answersLoading.set(false);
       },
       error: () => {
@@ -323,6 +330,7 @@ export class QuestionStore {
       tap((ok) => {
         if (!ok) return;
         this.miVotoPregunta.set(valor);
+        this.guardarVoto(this.claveVotoPregunta(questionId), valor);
         if (delta === 0) return;
         this.detail.update((question) =>
           question && question.id === questionId
@@ -355,6 +363,7 @@ export class QuestionStore {
       tap((ok) => {
         if (!ok) return;
         this.misVotosRespuestas.update((actual) => ({ ...actual, [answerId]: valor }));
+        this.guardarVoto(this.claveVotoRespuesta(answerId), valor);
         if (delta === 0) return;
         this.answers.update((actual) =>
           actual.map((answer) =>
@@ -387,6 +396,25 @@ export class QuestionStore {
       actual.map((item) => (item.id === question.id ? question : item)),
     );
     if (this.detail()?.id === question.id) this.detail.set(question);
+  }
+
+  // El backend no expone el voto del usuario; se guarda en el navegador para
+  // que, tras recargar, el siguiente clic mueva el contador por el delta real.
+  private claveVotoPregunta(id: string): string {
+    return `qa:voto:question:${id}`;
+  }
+
+  private claveVotoRespuesta(id: string): string {
+    return `qa:voto:answer:${id}`;
+  }
+
+  private leerVoto(clave: string): 1 | -1 | null {
+    const valor = localStorage.getItem(clave);
+    return valor === '1' || valor === '-1' ? (Number(valor) as 1 | -1) : null;
+  }
+
+  private guardarVoto(clave: string, valor: 1 | -1): void {
+    localStorage.setItem(clave, String(valor));
   }
 
   /** Limpia solo el detalle al salir de esa pantalla (conserva el listado). */

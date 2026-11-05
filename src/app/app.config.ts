@@ -64,6 +64,8 @@ import { ECODEV_REPOSITORY } from '@features/developer/ecodev/domain/ports/ecode
 import { EcotechGraphqlService } from '@features/developer/ecodev/data-access/api/ecotech-graphql.service';
 import { CHALLENGE_REPOSITORY } from '@features/developer/retos/domain/ports/challenge.repository';
 import { ChallengeGraphqlService } from '@features/developer/retos/data-access/api/challenge-graphql.service';
+import { QUESTION_REPOSITORY } from '@features/developer/qa/domain/ports/question.repository';
+import { QuestionGraphqlService } from '@features/developer/qa/data-access/api/question-graphql.service';
 import { REPORT_REPOSITORY } from '@features/moderator/feature/reports/domain/ports/report.repository';
 import { ReportHttpService } from '@features/moderator/feature/reports/data-access/api/report-http.service';
 import { USER_MODERATION_REPOSITORY } from '@features/users/domain/ports/user-moderation.repository';
@@ -96,6 +98,7 @@ export const appConfig: ApplicationConfig = {
     { provide: POINTS_REPOSITORY, useClass: PointsGraphqlService },
     { provide: ECODEV_REPOSITORY, useClass: EcotechGraphqlService },
     { provide: CHALLENGE_REPOSITORY, useClass: ChallengeGraphqlService },
+    { provide: QUESTION_REPOSITORY, useClass: QuestionGraphqlService },
     { provide: REPORT_REPOSITORY, useClass: ReportHttpService },
     { provide: USER_MODERATION_REPOSITORY, useClass: UserModerationHttpService },
     provideRouter(routes, withInMemoryScrolling({

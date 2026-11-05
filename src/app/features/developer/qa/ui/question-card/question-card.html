@@ -1,0 +1,69 @@
+<article class="question-card">
+  <div class="vote-box" aria-label="Votos de la pregunta">
+    <span class="material-symbols-outlined">arrow_upward</span>
+    <strong>{{ question.votosCount }}</strong>
+    <span class="vote-label">votos</span>
+  </div>
+
+  <div class="card-body">
+    <div class="card-top">
+      <span class="estado-pill" [ngClass]="estadoClase(question.estado)">
+        {{ estadoLabel(question.estado) }}
+      </span>
+      @if (question.categoria; as categoria) {
+        <span class="categoria-chip">
+          <span class="material-symbols-outlined">category</span>
+          {{ categoria }}
+        </span>
+      }
+      @if (esResuelta && question.estado !== 'RESUELTA') {
+        <span class="resuelta-chip">
+          <span class="material-symbols-outlined">check_circle</span>
+          Solución aceptada
+        </span>
+      }
+    </div>
+
+    <a class="card-title" [routerLink]="enlaceDetalle">{{ question.titulo }}</a>
+
+    <p class="card-excerpt">{{ extracto(question.descripcion) }}</p>
+
+    @if (question.etiquetas.length) {
+      <div class="card-tags">
+        @for (etiqueta of question.etiquetas; track etiqueta) {
+          <span class="tag">{{ etiqueta }}</span>
+        }
+      </div>
+    }
+
+    <footer class="card-footer">
+      <div class="author">
+        <span class="author-avatar">{{ iniciales(autorNombre) }}</span>
+        <div class="author-text">
+          <span class="author-name">{{ autorNombre }}</span>
+          @if (autorUsuario) {
+            <span class="author-user">&#64;{{ autorUsuario }}</span>
+          }
+        </div>
+        @if (question.createdAt; as fecha) {
+          <span class="card-date">{{ fecha | date: 'dd MMM yyyy' }}</span>
+        }
+      </div>
+
+      <div class="card-stats">
+        <span class="stat" title="Respuestas">
+          <span class="material-symbols-outlined">forum</span>
+          {{ question.respuestasCount }}
+        </span>
+        <span class="stat" title="Vistas">
+          <span class="material-symbols-outlined">visibility</span>
+          {{ question.vistasCount }}
+        </span>
+        <span class="ver-detalle">
+          Ver detalle
+          <span class="material-symbols-outlined">chevron_right</span>
+        </span>
+      </div>
+    </footer>
+  </div>
+</article>

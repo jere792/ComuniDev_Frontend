@@ -1,0 +1,117 @@
+<div class="qa-container">
+  <header class="qa-header">
+    <div class="header-text">
+      <h1>Preguntas y respuestas</h1>
+      <p class="header-subtitle">Resuelve dudas técnicas y comparte lo que sabes con la comunidad</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn btn-outline" routerLink="/developer/preguntas/mias">
+        <span class="material-symbols-outlined">bookmarks</span>
+        Mis preguntas
+      </a>
+      <a class="btn btn-primary" routerLink="/developer/preguntas/nueva">
+        <span class="material-symbols-outlined">add_circle</span>
+        Nueva pregunta
+      </a>
+    </div>
+  </header>
+
+  <section class="filtros-card" aria-label="Filtros de preguntas">
+    <form class="buscador" (ngSubmit)="buscar()">
+      <span class="material-symbols-outlined buscador-icon">search</span>
+      <input
+        class="input buscador-input"
+        type="search"
+        name="q"
+        placeholder="Buscar por título o descripción…"
+        [(ngModel)]="busqueda"
+        (keydown.enter)="buscar()"
+      />
+      <button class="btn btn-primary" type="submit" [disabled]="store.loading()">Buscar</button>
+    </form>
+
+    <div class="filtros-row">
+      <label class="filtro">
+        <span>Categoría</span>
+        <select class="input" [value]="store.categoria()" (change)="cambiarCategoria($event)">
+          <option value="">Todas</option>
+          @for (categoria of store.categorias(); track categoria) {
+            <option [value]="categoria">{{ categoria }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="filtro">
+        <span>Etiqueta</span>
+        <input
+          class="input"
+          type="text"
+          name="etiqueta"
+          placeholder="Ej. Angular"
+          [(ngModel)]="etiqueta"
+          (keydown.enter)="aplicarEtiqueta()"
+          (blur)="aplicarEtiqueta()"
+        />
+      </label>
+
+      <label class="filtro">
+        <span>Estado</span>
+        <select class="input" [value]="store.estado()" (change)="cambiarEstado($event)">
+          @for (estado of estados; track estado.valor) {
+            <option [value]="estado.valor">{{ estado.label }}</option>
+          }
+        </select>
+      </label>
+
+      @if (filtrosActivos()) {
+        <button class="btn btn-ghost limpiar" type="button" (click)="limpiar()">
+          <span class="material-symbols-outlined">filter_alt_off</span>
+          Limpiar filtros
+        </button>
+      }
+    </div>
+  </section>
+
+  @if (store.loading()) {
+    <div class="loading-state">
+      <span class="material-symbols-outlined spinning">progress_activity</span>
+      Cargando preguntas...
+    </div>
+  } @else if (store.error()) {
+    <div class="state-box">
+      <span class="material-symbols-outlined">error</span>
+      <p>{{ store.error() }}</p>
+      <button class="btn btn-outline" type="button" (click)="store.load()">Reintentar</button>
+    </div>
+  } @else {
+    <div class="questions-list">
+      @for (question of store.questions(); track question.id) {
+        <app-question-card
+          [question]="question"
+          [autorNombre]="autorNombre(question.autorId)"
+          [autorUsuario]="autorUsuario(question.autorId)"
+        />
+      } @empty {
+        <div class="empty-state">
+          <span class="material-symbols-outlined">forum</span>
+          @if (filtrosActivos()) {
+            <span>No hay preguntas con esos filtros</span>
+            <button class="btn btn-outline" type="button" (click)="limpiar()">Limpiar filtros</button>
+          } @else {
+            <span>Todavía no hay preguntas. ¡Sé el primero en preguntar!</span>
+            <a class="btn btn-primary" routerLink="/developer/preguntas/nueva">Hacer una pregunta</a>
+          }
+        </div>
+      }
+    </div>
+
+    @if (store.hasMore()) {
+      <div class="cargar-mas">
+        <button class="btn btn-outline" type="button" (click)="cargarMas()" [disabled]="store.loadingMore()">
+          <span class="material-symbols-outlined">expand_more</span>
+          {{ store.loadingMore() ? 'Cargando…' : 'Cargar más' }}
+        </button>
+      </div>
+    }
+  }
+</div>

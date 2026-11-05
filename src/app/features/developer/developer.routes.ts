@@ -15,6 +15,7 @@ export const routes: Routes = [
         { label: 'Postulaciones', route: '/developer/postulaciones', icon: 'work' },
         { label: 'EcoDev', route: '/developer/ecodev', icon: 'eco' },
         { label: 'Retos', route: '/developer/retos', icon: 'sports_score' },
+        { label: 'Preguntas', route: '/developer/preguntas', icon: 'forum' },
         { label: 'Ranking', route: '/developer/ranking', icon: 'leaderboard' },
         { label: 'Perfil', route: '/developer/profile', icon: 'person' },
       ],
@@ -83,6 +84,12 @@ export const routes: Routes = [
         path: 'retos',
         title: 'Retos diarios',
         loadComponent: () => import('@features/developer/retos/feature/reto-diario').then(m => m.RetoDiario),
+      },
+      {
+        path: 'preguntas',
+        title: 'Preguntas y respuestas',
+        loadComponent: () =>
+          import('@features/developer/qa/feature/question-list/question-list').then(m => m.QuestionList),
       },
       {
         path: 'discover',

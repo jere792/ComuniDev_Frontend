@@ -92,6 +92,12 @@ export const routes: Routes = [
           import('@features/developer/qa/feature/question-list/question-list').then(m => m.QuestionList),
       },
       {
+        path: 'preguntas/:id',
+        title: 'Pregunta',
+        loadComponent: () =>
+          import('@features/developer/qa/feature/question-detail/question-detail').then(m => m.QuestionDetail),
+      },
+      {
         path: 'discover',
         title: 'Descubrir',
         loadComponent: () => import('@features/shared/feature/discover-users/discover-users').then(m => m.DiscoverUsers),

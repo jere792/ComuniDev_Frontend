@@ -374,7 +374,9 @@ export class QuestionGraphqlService implements QuestionRepository {
           id,
           actorId,
           contenido: contenido.trim(),
-          codigoEjemplo: codigoEjemplo?.trim() ? codigoEjemplo.trim() : null,
+          // El backend solo cambia el código si llega distinto de null; el
+          // string vacío permite borrarlo al editar.
+          codigoEjemplo: codigoEjemplo ?? null,
         },
       })
       .pipe(

@@ -389,6 +389,18 @@ export class QuestionStore {
     if (this.detail()?.id === question.id) this.detail.set(question);
   }
 
+  /** Limpia solo el detalle al salir de esa pantalla (conserva el listado). */
+  limpiarDetalle(): void {
+    this.detail.set(null);
+    this.detailLoading.set(false);
+    this.detailError.set(null);
+    this.answers.set([]);
+    this.answersLoading.set(false);
+    this.answersError.set(null);
+    this.miVotoPregunta.set(null);
+    this.misVotosRespuestas.set({});
+  }
+
   /** Deja el módulo limpio al salir de las pantallas de Q&A. */
   clear(): void {
     this.questions.set([]);

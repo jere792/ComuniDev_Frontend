@@ -1,0 +1,445 @@
+<div class="detail-container">
+  <div class="detail-header">
+    <button class="back-btn" type="button" (click)="volver()" aria-label="Volver">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <div class="header-text">
+      <h1>Pregunta</h1>
+      <p class="header-subtitle">Comunidad técnica ComuniDev</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <span class="material-symbols-outlined spinning">progress_activity</span>
+      Cargando pregunta...
+    </div>
+  } @else if (error() || !question()) {
+    <div class="state-box">
+      <span class="material-symbols-outlined">error</span>
+      <p>{{ error() ?? 'No se encontró la pregunta' }}</p>
+      <button class="btn btn-outline" type="button" (click)="volver()">Volver al listado</button>
+    </div>
+  } @else {
+    @if (question(); as q) {
+      @if (editandoPregunta()) {
+        <section class="edit-card">
+          <h2 class="form-title">Editar pregunta</h2>
+          <form (ngSubmit)="guardarPregunta()">
+            <div class="form-field">
+              <label class="form-label" for="editTitulo">Título *</label>
+              <input
+                id="editTitulo"
+                class="input"
+                name="editTitulo"
+                type="text"
+                maxlength="180"
+                [(ngModel)]="editTitulo"
+              />
+              <p class="form-hint">Mínimo 10 caracteres.</p>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="editDescripcion">Descripción *</label>
+              <textarea
+                id="editDescripcion"
+                class="input"
+                name="editDescripcion"
+                rows="6"
+                [(ngModel)]="editDescripcion"
+              ></textarea>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="editCodigo">Código de ejemplo</label>
+              <textarea
+                id="editCodigo"
+                class="input code-input"
+                name="editCodigo"
+                rows="5"
+                spellcheck="false"
+                placeholder="Pega aquí el fragmento de código (opcional)"
+                [(ngModel)]="editCodigo"
+              ></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label" for="editCategoria">Categoría</label>
+                <input
+                  id="editCategoria"
+                  class="input"
+                  name="editCategoria"
+                  type="text"
+                  list="categorias-qa-edit"
+                  placeholder="Ej. Frontend"
+                  [(ngModel)]="editCategoria"
+                />
+                <datalist id="categorias-qa-edit">
+                  @for (categoria of categorias; track categoria) {
+                    <option [value]="categoria"></option>
+                  }
+                </datalist>
+              </div>
+
+              <div class="form-field">
+                <app-tag-input
+                  titulo="Etiquetas *"
+                  placeholder="Angular, TypeScript…"
+                  ayuda="Pulsa Enter o la coma para agregar."
+                  [ngModelOptions]="{ standalone: true }"
+                  [(ngModel)]="editEtiquetas"
+                ></app-tag-input>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button
+                class="btn btn-outline"
+                type="button"
+                (click)="cancelarEdicionPregunta()"
+                [disabled]="guardandoPregunta()"
+              >
+                Cancelar
+              </button>
+              <button class="btn btn-primary" type="submit" [disabled]="guardandoPregunta()">
+                <span class="material-symbols-outlined">save</span>
+                {{ guardandoPregunta() ? 'Guardando…' : 'Guardar cambios' }}
+              </button>
+            </div>
+          </form>
+        </section>
+      } @else {
+        <article class="question-card">
+          <div class="question-top">
+            <span class="estado-pill" [ngClass]="estadoClase(q.estado)">{{ estadoLabel(q.estado) }}</span>
+            @if (q.categoria; as categoria) {
+              <span class="categoria-chip">
+                <span class="material-symbols-outlined">category</span>
+                {{ categoria }}
+              </span>
+            }
+            @if (esMia()) {
+              <span class="mia-chip">Tu pregunta</span>
+            }
+          </div>
+
+          <h2 class="question-title">{{ q.titulo }}</h2>
+
+          <div class="question-meta">
+            <span class="author">
+              @if (fotoAutor(q.autorId); as foto) {
+                <img class="avatar-img" [src]="foto" [alt]="autorNombre(q.autorId)" />
+              } @else {
+                <span class="avatar">{{ iniciales(autorNombre(q.autorId)) }}</span>
+              }
+              <span class="author-data">
+                <span class="author-name">{{ autorNombre(q.autorId) }}</span>
+                @if (autorUsuario(q.autorId); as usuario) {
+                  <span class="author-user">&#64;{{ usuario }}</span>
+                }
+              </span>
+            </span>
+            @if (q.createdAt; as fecha) {
+              <span class="meta-item">
+                <span class="material-symbols-outlined">event</span>
+                {{ fecha | date: 'dd/MM/yyyy HH:mm' }}
+              </span>
+            }
+            <span class="meta-item">
+              <span class="material-symbols-outlined">visibility</span>
+              {{ q.vistasCount }} vistas
+            </span>
+            <span class="meta-item">
+              <span class="material-symbols-outlined">forum</span>
+              {{ q.respuestasCount }} respuestas
+            </span>
+          </div>
+
+          <div class="question-content">{{ q.descripcion }}</div>
+
+          @if (q.codigoEjemplo; as codigo) {
+            <div class="code-block">
+              <div class="code-bar">
+                <span class="code-dot code-dot-red"></span>
+                <span class="code-dot code-dot-amber"></span>
+                <span class="code-dot code-dot-green"></span>
+                <span class="code-label">Código de ejemplo</span>
+              </div>
+              <pre><code>{{ codigo }}</code></pre>
+            </div>
+          }
+
+          @if (q.etiquetas.length) {
+            <div class="question-tags">
+              @for (etiqueta of q.etiquetas; track etiqueta) {
+                <span class="tag">{{ etiqueta }}</span>
+              }
+            </div>
+          }
+
+          <div class="question-actions">
+            <div class="vote-control" aria-label="Votar la pregunta">
+              <button
+                class="vote-btn"
+                type="button"
+                [class.active]="store.miVotoPregunta() === 1"
+                [disabled]="esMia() || !miUserId || votandoPregunta()"
+                (click)="votarPregunta(1)"
+                [attr.title]="esMia() ? 'No puedes votar tu propia pregunta' : 'Voto a favor'"
+              >
+                <span class="material-symbols-outlined">arrow_upward</span>
+              </button>
+              <span class="vote-count">{{ q.votosCount }}</span>
+              <button
+                class="vote-btn"
+                type="button"
+                [class.active]="store.miVotoPregunta() === -1"
+                [disabled]="esMia() || !miUserId || votandoPregunta()"
+                (click)="votarPregunta(-1)"
+                [attr.title]="esMia() ? 'No puedes votar tu propia pregunta' : 'Voto en contra'"
+              >
+                <span class="material-symbols-outlined">arrow_downward</span>
+              </button>
+            </div>
+
+            @if (esMia()) {
+              <div class="owner-actions">
+                <button class="btn btn-outline" type="button" (click)="abrirEdicionPregunta()">
+                  <span class="material-symbols-outlined">edit</span>
+                  Editar
+                </button>
+                <button
+                  class="btn btn-outline btn-danger"
+                  type="button"
+                  (click)="pedirEliminarPregunta()"
+                  [disabled]="eliminandoPregunta()"
+                >
+                  <span class="material-symbols-outlined">delete</span>
+                  Eliminar
+                </button>
+              </div>
+            }
+          </div>
+        </article>
+      }
+
+      <section class="answers-section" aria-label="Respuestas">
+        <div class="answers-head">
+          <h2>{{ answers().length }} {{ answers().length === 1 ? 'respuesta' : 'respuestas' }}</h2>
+          <span class="answers-hint">Las más votadas primero</span>
+        </div>
+
+        @if (answersLoading()) {
+          <div class="loading-state small">
+            <span class="material-symbols-outlined spinning">progress_activity</span>
+            Cargando respuestas...
+          </div>
+        } @else if (answersError()) {
+          <div class="state-box small">
+            <span class="material-symbols-outlined">error</span>
+            <p>{{ answersError() }}</p>
+            <button class="btn btn-outline" type="button" (click)="store.loadAnswers(q.id)">Reintentar</button>
+          </div>
+        } @else {
+          <div class="answers-list">
+            @for (answer of answers(); track answer.id) {
+              <article class="answer-card" [class.answer-accepted]="esAceptada(answer)">
+                <div class="answer-votes">
+                  <button
+                    class="vote-btn"
+                    type="button"
+                    [class.active]="miVotoRespuesta(answer.id) === 1"
+                    [disabled]="answer.autorId === miUserId || !miUserId || votandoRespuesta() === answer.id"
+                    (click)="votarRespuesta(answer, 1)"
+                    [attr.title]="answer.autorId === miUserId ? 'No puedes votar tu propia respuesta' : 'Voto a favor'"
+                  >
+                    <span class="material-symbols-outlined">arrow_upward</span>
+                  </button>
+                  <span class="vote-count">{{ answer.votosCount }}</span>
+                  <button
+                    class="vote-btn"
+                    type="button"
+                    [class.active]="miVotoRespuesta(answer.id) === -1"
+                    [disabled]="answer.autorId === miUserId || !miUserId || votandoRespuesta() === answer.id"
+                    (click)="votarRespuesta(answer, -1)"
+                    [attr.title]="answer.autorId === miUserId ? 'No puedes votar tu propia respuesta' : 'Voto en contra'"
+                  >
+                    <span class="material-symbols-outlined">arrow_downward</span>
+                  </button>
+                </div>
+
+                <div class="answer-body">
+                  @if (esAceptada(answer)) {
+                    <span class="accepted-badge">
+                      <span class="material-symbols-outlined">check_circle</span>
+                      Solución aceptada
+                    </span>
+                  }
+
+                  @if (editandoRespuestaId() === answer.id) {
+                    <form class="answer-edit" (ngSubmit)="guardarRespuesta()">
+                      <textarea
+                        class="input"
+                        name="editRespuesta"
+                        rows="4"
+                        [(ngModel)]="editRespuestaContenido"
+                      ></textarea>
+                      <textarea
+                        class="input code-input"
+                        name="editRespuestaCodigo"
+                        rows="4"
+                        spellcheck="false"
+                        placeholder="Código (opcional)"
+                        [(ngModel)]="editRespuestaCodigo"
+                      ></textarea>
+                      <div class="form-actions">
+                        <button
+                          class="btn btn-outline"
+                          type="button"
+                          (click)="cancelarEdicionRespuesta()"
+                          [disabled]="guardandoRespuesta()"
+                        >
+                          Cancelar
+                        </button>
+                        <button class="btn btn-primary" type="submit" [disabled]="guardandoRespuesta()">
+                          <span class="material-symbols-outlined">save</span>
+                          {{ guardandoRespuesta() ? 'Guardando…' : 'Guardar' }}
+                        </button>
+                      </div>
+                    </form>
+                  } @else {
+                    <div class="answer-content">{{ answer.contenido }}</div>
+
+                    @if (answer.codigoEjemplo; as codigo) {
+                      <div class="code-block">
+                        <div class="code-bar">
+                          <span class="code-dot code-dot-red"></span>
+                          <span class="code-dot code-dot-amber"></span>
+                          <span class="code-dot code-dot-green"></span>
+                          <span class="code-label">Código</span>
+                        </div>
+                        <pre><code>{{ codigo }}</code></pre>
+                      </div>
+                    }
+                  }
+
+                  <footer class="answer-footer">
+                    <div class="answer-author">
+                      @if (fotoAutor(answer.autorId); as foto) {
+                        <img class="avatar-img small" [src]="foto" [alt]="autorNombre(answer.autorId)" />
+                      } @else {
+                        <span class="avatar small">{{ iniciales(autorNombre(answer.autorId)) }}</span>
+                      }
+                      <span class="author-name">{{ autorNombre(answer.autorId) }}</span>
+                      @if (answer.createdAt; as fecha) {
+                        <span class="answer-date">{{ fecha | date: 'dd/MM/yyyy HH:mm' }}</span>
+                      }
+                    </div>
+
+                    <div class="answer-actions">
+                      @if (puedeAceptar(answer)) {
+                        <button
+                          class="btn btn-accept"
+                          type="button"
+                          (click)="aceptarSolucion(answer)"
+                          [disabled]="aceptando() === answer.id"
+                        >
+                          <span class="material-symbols-outlined">task_alt</span>
+                          {{ aceptando() === answer.id ? 'Aceptando…' : 'Aceptar solución' }}
+                        </button>
+                      }
+                      @if (esMiRespuesta(answer) && editandoRespuestaId() !== answer.id) {
+                        <button class="btn btn-ghost" type="button" (click)="editarRespuesta(answer)">
+                          <span class="material-symbols-outlined">edit</span>
+                          Editar
+                        </button>
+                        @if (!esAceptada(answer)) {
+                          <button
+                            class="btn btn-ghost btn-danger"
+                            type="button"
+                            (click)="pedirEliminarRespuesta(answer)"
+                            [disabled]="eliminandoRespuesta()"
+                          >
+                            <span class="material-symbols-outlined">delete</span>
+                            Eliminar
+                          </button>
+                        }
+                      }
+                    </div>
+                  </footer>
+                </div>
+              </article>
+            } @empty {
+              <div class="empty-answers">
+                <span class="material-symbols-outlined">forum</span>
+                <span>Todavía no hay respuestas. ¡Anímate a responder!</span>
+              </div>
+            }
+          </div>
+        }
+
+        @if (esCerrada()) {
+          <div class="closed-note">
+            <span class="material-symbols-outlined">lock</span>
+            Esta pregunta está cerrada y no admite nuevas respuestas.
+          </div>
+        } @else if (!miUserId) {
+          <div class="closed-note">
+            <span class="material-symbols-outlined">login</span>
+            Inicia sesión para responder esta pregunta.
+          </div>
+        } @else {
+          <form class="answer-form" (ngSubmit)="publicarRespuesta()">
+            <h3>Tu respuesta</h3>
+            <textarea
+              class="input"
+              name="respuestaContenido"
+              rows="5"
+              placeholder="Explica tu solución con el mayor detalle posible…"
+              [(ngModel)]="respuestaContenido"
+            ></textarea>
+            <textarea
+              class="input code-input"
+              name="respuestaCodigo"
+              rows="4"
+              spellcheck="false"
+              placeholder="Código de ejemplo (opcional)"
+              [(ngModel)]="respuestaCodigo"
+            ></textarea>
+            <div class="form-actions">
+              <button class="btn btn-primary" type="submit" [disabled]="enviandoRespuesta()">
+                <span class="material-symbols-outlined">send</span>
+                {{ enviandoRespuesta() ? 'Publicando…' : 'Publicar respuesta' }}
+              </button>
+            </div>
+          </form>
+        }
+      </section>
+    }
+  }
+
+  <app-confirm-modal
+    [open]="deleteQuestionOpen()"
+    title="Eliminar pregunta"
+    message="¿Seguro que quieres eliminar esta pregunta? Dejará de aparecer en los listados y sus respuestas quedarán ocultas."
+    confirmText="Eliminar"
+    cancelText="Cancelar"
+    variant="danger"
+    icon="delete"
+    (confirm)="confirmarEliminarPregunta()"
+    (cancel)="cerrarEliminarPregunta()"
+  />
+
+  <app-confirm-modal
+    [open]="deleteAnswerOpen()"
+    title="Eliminar respuesta"
+    message="¿Seguro que quieres eliminar tu respuesta? Dejará de mostrarse en la pregunta."
+    confirmText="Eliminar"
+    cancelText="Cancelar"
+    variant="danger"
+    icon="delete"
+    (confirm)="confirmarEliminarRespuesta()"
+    (cancel)="cerrarEliminarRespuesta()"
+  />
+</div>
